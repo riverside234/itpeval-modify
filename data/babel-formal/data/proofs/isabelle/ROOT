@@ -1,0 +1,19 @@
+session "Babel_Formal" = HOL +
+  theories
+    circle_average
+    comp_commute
+    galois
+    graph_paths
+    group
+    ideals
+    inner_product
+    integral_comp_neg_Iic
+    lattice_like
+    limits_uniqueness
+    linear_map
+    polynomial
+    probability
+    set_algebra
+    supinf
+    zero_le_one_elem
+

@@ -1,0 +1,4 @@
+session "ITPEval_Arith_0_Plus_0" = HOL +
+  options [document = false]
+  theories
+    Hello

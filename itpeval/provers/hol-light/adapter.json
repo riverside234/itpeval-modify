@@ -1,0 +1,6 @@
+{
+  "id": "hol-light",
+  "name": "HOL Light",
+  "foundation": "higher-order logic",
+  "capabilities": ["install", "check", "version", "task-dir-override"]
+}

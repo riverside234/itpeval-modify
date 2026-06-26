@@ -1,0 +1,16 @@
+{
+  "id": "arith_0_plus_0",
+  "title": "0 + 0 = 0",
+  "description": "Trivial arithmetic benchmark proving 0 + 0 = 0 in multiple ITPs.",
+  "tags": [
+    "smoke-test",
+    "arithmetic",
+    "shared-benchmark"
+  ],
+  "provers": {
+    "lean4": "lean4/Hello.lean",
+    "rocq": "rocq/hello.v",
+    "isabelle": "isabelle/ROOT",
+    "hol-light": "hol-light/hello.ml"
+  }
+}

@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "itpeval"
+version = "0.1.0"
+requires-python = ">=3.10"
+description = "ITP toolchain manager and proof verifier"
+
+[tool.setuptools.packages.find]
+include = ["itpeval*"]
+
+[project.scripts]
+itpeval = "itpeval.cli.main:main"

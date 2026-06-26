@@ -1,0 +1,6 @@
+{
+  "id": "rocq",
+  "name": "Rocq",
+  "foundation": "calculus of inductive constructions",
+  "capabilities": ["install", "check", "version", "task-dir-override"]
+}

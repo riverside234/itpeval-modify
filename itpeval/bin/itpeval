@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+
+def main() -> int:
+    # Ensure the repo root is importable so `import itpeval.cli` works when this
+    # script is executed directly.
+    repo_root = Path(__file__).resolve().parents[2]
+    sys.path.insert(0, str(repo_root))
+
+    from itpeval.cli.main import main as cli_main  # noqa: PLC0415
+
+    return int(cli_main())
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+

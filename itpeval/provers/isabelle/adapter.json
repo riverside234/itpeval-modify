@@ -1,0 +1,6 @@
+{
+  "id": "isabelle",
+  "name": "Isabelle",
+  "foundation": "higher-order logic",
+  "capabilities": ["install", "check", "version", "task-dir-override"]
+}

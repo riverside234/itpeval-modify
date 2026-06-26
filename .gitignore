@@ -1,0 +1,73 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# ITPEval runtime artifacts
+itpeval/_toolchains/
+itpeval/.downloads/
+itpeval/.runs/
+
+# Lean
+**/.lake/
+**/lake-manifest.json
+**/.olean
+
+# Rocq / Coq
+**/.coq-native/
+**/*.vo
+**/*.vok
+**/*.vos
+**/*.glob
+**/*.aux
+**/ccomp-*.log
+**/.Makefile.d
+
+# Isabelle
+**/*.thy.exports/
+**/browser_info/
+**/heaps/
+**/*.session_graph
+**/document/
+
+# HOL Light (OCaml build artifacts)
+**/*.cmo
+**/*.cmi
+**/*.cmx
+**/*.cmxs
+**/*.o
+**/*.a
+
+# Scraper caches
+data/hundred-theorems/data/_lean4_source_map.json
+
+# Evaluation
+.env
+eval/.env
+eval/results/
+
+# Python packaging
+*.egg-info/
+dist/
+
+# Scratch / temp
+*.tmp
+*.bak
+*.swp
+*~

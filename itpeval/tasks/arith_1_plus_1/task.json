@@ -1,0 +1,16 @@
+{
+  "id": "arith_1_plus_1",
+  "title": "1 + 1 = 2",
+  "description": "Trivial arithmetic benchmark proving 1 + 1 = 2 in multiple ITPs.",
+  "tags": [
+    "smoke-test",
+    "arithmetic",
+    "shared-benchmark"
+  ],
+  "provers": {
+    "lean4": "lean4/Hello.lean",
+    "rocq": "rocq/hello.v",
+    "isabelle": "isabelle/ROOT",
+    "hol-light": "hol-light/hello.ml"
+  }
+}

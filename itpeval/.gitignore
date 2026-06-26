@@ -1,0 +1,14 @@
+/_toolchains/
+/.cache/
+/.downloads/
+/.logs/
+__pycache__/
+*.pyc
+/.runs/
+
+# Rocq/Coq build artifacts
+*.vo
+*.vos
+*.vok
+*.glob
+*.aux

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "cache_dir": ".downloads",
+  "resources": [
+    {
+      "id": "rocq.opam-binary",
+      "kind": "binary",
+      "url": "https://github.com/ocaml/opam/releases/download/2.5.0/opam-2.5.0-x86_64-linux",
+      "sha256": "7aae51da01a66666c8733130852c2c00546eff486effb0999b78145cb75aee74"
+    }
+  ],
+  "notes": [
+    "This manifest is a lockfile for shared downloads and the on-disk cache is reused across installs.",
+    "Use `download_cached <url> [sha256] [destination]` from `itpeval/bin/common.sh` after sourcing the file.",
+    "Set `ITPEVAL_DOWNLOAD_CACHE` to move the cache outside the repo."
+  ]
+}

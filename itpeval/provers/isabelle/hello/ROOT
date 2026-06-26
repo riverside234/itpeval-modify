@@ -1,0 +1,4 @@
+session "ITPEval_Hello" = HOL +
+  options [document = false]
+  theories
+    Hello

@@ -1,0 +1,6 @@
+{
+  "id": "lean4",
+  "name": "Lean 4",
+  "foundation": "dependent type theory",
+  "capabilities": ["install", "check", "version", "task-dir-override"]
+}

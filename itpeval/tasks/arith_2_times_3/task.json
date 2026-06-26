@@ -1,0 +1,16 @@
+{
+  "id": "arith_2_times_3",
+  "title": "2 * 3 = 6",
+  "description": "Trivial arithmetic benchmark proving 2 * 3 = 6 in multiple ITPs.",
+  "tags": [
+    "smoke-test",
+    "arithmetic",
+    "shared-benchmark"
+  ],
+  "provers": {
+    "lean4": "lean4/Hello.lean",
+    "rocq": "rocq/hello.v",
+    "isabelle": "isabelle/ROOT",
+    "hol-light": "hol-light/hello.ml"
+  }
+}
