@@ -21,9 +21,9 @@ eval/
 │   ├── cycle/             # multicycle NL↔ITP consistency experiment
 │   │   ├── run.py         # cycle generation (NL→ITP→NL→ITP)
 │   │   └── verify.py      # cycle verification
-│   └── beq/               # bidirectional equivalence checking
-│       ├── beq.py         # BEq implementation (extraction and tactic checks)
-│       └── beq_check.py   # BEq runner: apply BEq to verified JSONL files
+│   └── beq/               # Lean 4 bidirectional equivalence checking
+│       ├── beq.py         # Lean 4 BEq implementation (extraction and tactic checks)
+│       └── beq_check.py   # BEq runner: apply Lean 4 BEq to verified JSONL files
 ├── data/
 │   ├── stmts.json     # 1,560 sorry-stripped theorem statements (390 theorems × 4 ITPs)
 │   ├── proofs.json    # 296 full proofs (74 theorems × 4 ITPs)
@@ -76,7 +76,7 @@ Smoke-test with:
 ### Python dependencies
 
 ```bash
-pip install anthropic openai google-genai python-dotenv
+pip install -e .
 ```
 
 ## Data
@@ -85,8 +85,8 @@ Two flat JSON arrays, one record per (theorem, prover) pair:
 
 | File | Content |
 |---|---|
-| `data/stmts.json` | Sorry-stripped theorem statements (no proof body) |
-| `data/proofs.json` | Full proof files |
+| `eval/data/stmts.json` | Sorry-stripped theorem statements (no proof body) |
+| `eval/data/proofs.json` | Full proof files |
 
 Record schema:
 
@@ -115,7 +115,9 @@ For each theorem with *n* ITP variants, all *n × (n−1)* directed pairs are ge
 
 ## Models
 
-Configured in `config.py`. Current primary models:
+Configured in `eval/pipeline/config.py`. Current primary models:
+
+> Model identifiers are provider API identifiers. Before running a public evaluation, confirm that the IDs in `config.py` are still available for your provider accounts, or replace them with the exact model IDs you intend to report.
 
 | Label | Provider | Batch API | Notes |
 |---|---|---|---|
@@ -154,6 +156,12 @@ Creates `eval/results/batch_jobs/<timestamp>.json`. Claude, GPT, and Gemini subm
 | `--models` | all in config | comma-separated model labels |
 | `--ids` | all | comma-separated theorem IDs (useful for small tests) |
 
+`collect` options:
+
+| Flag | Default | Description |
+|---|---|---|
+| `--workers` | `8` | parallel ITP verification workers |
+
 **Step 2 — Collect** (requires ITP toolchains; run on a machine with them installed):
 
 ```bash
@@ -161,8 +169,8 @@ python3 -m eval.pipeline.translation.batch_run collect eval/results/batch_jobs/<
 ```
 
 - Polls Claude/GPT every 60 seconds until complete
-- Verifies each generated proof by running it through the target ITP
-- Writes results to `eval/results/batch_<mode>_<timestamp>.jsonl`
+- Verifies each generated proof by running it through the target ITP, using a resumable JSONL checkpoint
+- Writes results to `eval/results/verified/batch_<mode>_<timestamp>.jsonl`
 - Safe to re-run if interrupted — job file is updated in place as models complete
 
 > **Running collect on a cluster**: The job file embeds all LLM responses once polling is complete, so no API keys are needed for the collect step. Copy the job file to the cluster, install ITP toolchains, and run the collect command above.
@@ -202,6 +210,7 @@ Both pipelines write JSONL to `eval/results/`. Each line:
 
 ```json
 {
+  "custom_id":    "babel-formal__42__lean4__isabelle__sample0",
   "theorem_id":   42,
   "title":        "circle_average",
   "source":       "babel-formal",
@@ -211,7 +220,11 @@ Both pipelines write JSONL to `eval/results/`. Each line:
   "model":        "claude-sonnet-4-6",
   "model_id":     "claude-sonnet-4-6",
   "mode":         "stmts",
+  "sample_idx":    0,
+  "temperature":   0.0,
   "generated":    "<translated proof>",
+  "translate_error": "",
+  "translate_ms":  1284,
   "verified":     true,
   "verify_error": "",
   "verify_ms":    3240
@@ -237,7 +250,7 @@ python3 -m eval.pipeline.translation.verify_generated \
     eval/results/generated/{proofs,stmts}_{claude-sonnet-4-6,gpt-5.5}_*.jsonl
 ```
 
-Output is written to `eval/results/verified/` with the same filename. A `.ckpt.jsonl` checkpoint is maintained alongside so runs can be safely interrupted and resumed.
+Output is written to `eval/results/verified/` with the same filename. A `.ckpt.jsonl` checkpoint is maintained alongside so runs can be safely interrupted and resumed. The batch `collect` command uses the same checkpointed verifier after provider outputs are collected.
 
 `verify_generated.py` options:
 
@@ -278,9 +291,9 @@ python3 -m eval.pipeline.translation.verify_generated \
 
 ## BEq equivalence checking
 
-BEq (Bidirectional Extended Definitional Equivalence) checks whether verified translations preserve theorem meaning, adapting [Liu et al. (ICLR 2025)](https://openreview.net/forum?id=hUb2At2DsQ).
+BEq (Bidirectional Extended Definitional Equivalence) checks whether verified Lean 4 translations preserve theorem meaning, adapting [Liu et al. (ICLR 2025)](https://openreview.net/forum?id=hUb2At2DsQ).
 
-For each verified translation, BEq extracts the generated and reference theorem statements, then attempts to prove both forward (generated ⊢ reference) and backward (reference ⊢ generated) entailment. A translation passes BEq iff both directions succeed.
+For each verified Lean 4 translation, BEq extracts the generated and reference theorem statements, then attempts to prove both forward (generated ⊢ reference) and backward (reference ⊢ generated) entailment. A translation passes BEq iff both directions succeed. BEq results are reported for Lean 4 targets.
 
 **Running BEq on verified results**:
 
@@ -306,27 +319,22 @@ Output is written to `eval/results/beq/` with the same filename. Each record is 
 
 | Flag | Default | Description |
 |---|---|---|
-| `--workers` | 8 | parallel workers (for non-Lean 4 entries) |
+| `--workers` | 8 | parallel workers |
 | `--source` | all | filter to a specific benchmark (e.g., `minif2f`) |
-| `--target` | all | filter to a specific target prover (e.g., `lean4`) |
+| `--target` | all | filter to a specific target prover; use `lean4` for current BEq runs |
 
-### Strategy per prover
+### Lean 4 Strategy
 
-**Lean 4 and Isabelle** use a *rename* approach: both theorems are placed in the same file, the assumed theorem is renamed to `stmt_assumed`, and the goal theorem's proof is replaced with a tactic check. Lean 4 checks each candidate independently, first using `exact?` and accepting it only when the suggestion references `stmt_assumed`, then trying deterministic normal tactics.
-
-**Rocq and HOL Light** use an *axiom + extracted type* approach: the proposition type is extracted from each statement, the assumed proposition is declared as an axiom, and the goal proposition is proved using automation tactics.
+Lean 4 uses a *rename* approach: both theorems are placed in the same file, the assumed theorem is renamed to `stmt_assumed`, and the goal theorem's proof is replaced with a tactic check. Lean 4 checks each candidate independently, first using `exact?` and accepting it only when the suggestion references `stmt_assumed`, then trying deterministic normal tactics.
 
 ### Automation tactics
 
-Lean 4's deterministic checks are proxies for the BEq paper's LLM-sampled restricted transformation primitives. The normal Lean patterns are written to use `stmt_assumed`, avoiding standalone automation that can prove the goal independently. Other provers currently use broader prover-specific automation cascades.
+Lean 4's deterministic checks are proxies for the BEq paper's LLM-sampled restricted transformation primitives. The normal Lean patterns are written to use `stmt_assumed`, avoiding standalone automation that can prove the goal independently.
 
 | Prover | Tactics |
 |---|---|
 | **Lean 4 exact** | `exact?` |
 | **Lean 4 normal** | `exact`, `apply`, `rw`, `intro`, `intros`, `constructor`, `ext`, `have`, `cases`, `use` |
-| **Isabelle** | `rule`, `auto`, `simp`, `blast`, `force`, `fastforce`, `metis`, `meson`, `smt (verit)`, `smt (z3)`, `arith`, `linarith`, `presburger`, `normalization`, `argo`, `algebra` |
-| **Rocq** | `exact`, `auto`, `eauto`, `tauto`, `intuition`, `firstorder`, `congruence`, `lia`, `lra`, `nra`, `ring`, `field_simplify`, `fourier`, `psatz` |
-| **HOL Light** | `ACCEPT_TAC`, `MESON_TAC`, `ASM_MESON_TAC`, `SIMP_TAC`, `ASM_SIMP_TAC`, `REWRITE_TAC`, `ASM_REWRITE_TAC`, `ARITH_TAC`, `REAL_ARITH_TAC`, `INT_ARITH_TAC`, `NORM_TAC`, `MATCH_ACCEPT_TAC`, `NUMBER_TAC`, `ITAUT_TAC` |
 
 ## Multicycle consistency experiment
 
@@ -484,7 +492,7 @@ Most providers offer an OpenAI-compatible API (as shown above). For non-compatib
 **Step 2** — Add the API key to `eval/.env`:
 
 ```
-MY_PROVIDER_API_KEY=sk-...
+MY_PROVIDER_API_KEY=<provider-api-key>
 ```
 
 **Step 3** — Register the model in `config.py`:

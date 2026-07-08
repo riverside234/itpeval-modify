@@ -1,32 +1,15 @@
-"""Verify ITP outputs from cycle consistency experiment results.
-
-Reads cycle JSONL files, runs each generated statement through the
-actual ITP verifier, and writes annotated results with _ok / _err / _ms
-fields for every step output.
-
-Cycle 1 verifies: step1_lean4, step3_lean4  (both Lean 4)
-Cycle 2 verifies: step1_{lean4,isabelle,rocq,hol_light},
-                  step3_{lean4,isabelle,rocq,hol_light}
-
-Output: eval/results/cycle/cycle{1,2}/{model}_verified.jsonl
-        (same directory as input; safe to resume after interruption)
-
-Usage:
-    python -m eval.pipeline.cycle.verify --cycle 1 --model claude-sonnet-4-6 --workers 8
-
-    python -m eval.pipeline.cycle.verify --workers 4
-"""
 from __future__ import annotations
 
 import argparse
 import json
 import threading
-import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from eval.pipeline.config import MODELS, RESULTS_DIR
-from eval.pipeline.verify import verify
+from eval.pipeline.config import RESULTS_DIR
+from eval.pipeline.jsonl import load_jsonl
+from eval.pipeline.models import select_models
+from eval.pipeline.verify import timeout_for, verify
 
 CYCLE_DIR = RESULTS_DIR / "cycle"
 
@@ -36,13 +19,6 @@ _ITP_PROVER = {
     "rocq":      "rocq",
     "hol_light": "hol-light",
 }
-_TIMEOUTS = {
-    "lean4":     60,
-    "isabelle":  120,
-    "rocq":      60,
-    "hol-light": 300,
-}
-
 CYCLE1_FIELDS: list[tuple[str, str]] = [
     ("step1_lean4", "lean4"),
     ("step3_lean4", "lean4"),
@@ -62,6 +38,7 @@ def _verify_record(
     for field, itp in fields:
         prover = _ITP_PROVER[itp]
 
+        # Empty cycle sections are recorded without invoking the prover
         content = record.get(field, "")
         if not content:
             result[f"{field}_ok"]  = None
@@ -69,11 +46,10 @@ def _verify_record(
             result[f"{field}_ms"]  = 0
             continue
 
-        t0 = time.monotonic()
-        vr = verify(prover, content, timeout_s=_TIMEOUTS[prover])
+        vr = verify(prover, content, timeout_s=timeout_for(prover))
         result[f"{field}_ok"]  = vr.ok
         result[f"{field}_err"] = vr.error
-        result[f"{field}_ms"]  = int((time.monotonic() - t0) * 1000)
+        result[f"{field}_ms"]  = vr.duration_ms
 
     return result
 
@@ -82,13 +58,8 @@ def _load_done(out_path: Path) -> set[str]:
     done: set[str] = set()
     if not out_path.exists():
         return done
-    for line in out_path.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        try:
-            done.add(json.loads(line)["name"])
-        except Exception:
-            pass
+    for record in load_jsonl(out_path):
+        done.add(record["name"])
     return done
 
 
@@ -98,10 +69,11 @@ def verify_cycle_file(
     *,
     workers: int,
 ) -> Path:
-    records = [json.loads(l) for l in input_path.read_text().splitlines() if l.strip()]
+    records = load_jsonl(input_path)
     out_path = input_path.with_name(input_path.stem + "_verified.jsonl")
 
     done = _load_done(out_path)
+    # Cycle verification resumes by theorem name within each model output file
     remaining = [r for r in records if r["name"] not in done]
     total = len(records)
 
@@ -145,7 +117,7 @@ def verify_cycle_file(
 def _print_summary(out_path: Path, fields: list[tuple[str, str]]) -> None:
     if not out_path.exists():
         return
-    recs = [json.loads(l) for l in out_path.read_text().splitlines() if l.strip()]
+    recs = load_jsonl(out_path)
     print(f"\n  Summary ({out_path.name}):")
     for field, _ in fields:
         ok_key  = f"{field}_ok"
@@ -175,9 +147,7 @@ def main() -> None:
                         help="Parallel workers (records verified simultaneously, default: 4)")
     args = parser.parse_args()
 
-    model_labels = [m["label"] for m in MODELS]
-    if args.model:
-        model_labels = [m.strip() for m in args.model.split(",")]
+    model_labels = [m["label"] for m in select_models(args.model)]
 
     cycles = [1, 2] if args.cycle == "both" else [int(args.cycle)]
 

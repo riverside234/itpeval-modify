@@ -31,6 +31,7 @@ def load_pairs(
     if subset:
         records = [r for r in records if (r["source"], int(r["theorem_id"])) in subset]
 
+    # Pair records only within the same theorem/source group
     by_theorem: dict[tuple, list[dict]] = {}
     for r in records:
         if not r.get("content"):
@@ -40,6 +41,7 @@ def load_pairs(
     pairs = []
     for recs in by_theorem.values():
         prover_map = {r["prover"]: r for r in recs}
+        # For each theorem with n provers, emit all n * (n - 1) directed pairs
         for src_prover, src_rec in prover_map.items():
             for tgt_prover in prover_map:
                 if src_prover != tgt_prover:

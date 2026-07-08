@@ -21,9 +21,8 @@ def _four_way_stems(dirs: dict[str, Path]) -> list[str]:
 
 
 def _collect_babel_formal(mode: str, offset: int) -> tuple[list[dict], int]:
-    src_dir = DATA / "babel-formal" / "data" / mode
-    index = json.loads((DATA / "babel-formal" / "data" / "index.json").read_text())
-    topics = sorted(index["topics"].keys())
+    src_dir = DATA / "babel-formal" / mode
+    topics = sorted(p.stem for p in (src_dir / "lean4").glob(f"*{EXT['lean4']}"))
     rows = []
     for i, topic in enumerate(topics, start=1):
         tid = offset + i
@@ -43,7 +42,7 @@ def _collect_babel_formal(mode: str, offset: int) -> tuple[list[dict], int]:
 
 
 def _collect_hundred_theorems(mode: str, offset: int) -> tuple[list[dict], int]:
-    base = DATA / "hundred-theorems" / "data" / mode
+    base = DATA / "hundred-theorems" / mode
     dirs = {itp: base / itp for itp in ITPS}
     stems = _four_way_stems(dirs)
     rows = []
@@ -63,7 +62,7 @@ def _collect_hundred_theorems(mode: str, offset: int) -> tuple[list[dict], int]:
 
 
 def _collect_minif2f(mode: str, offset: int) -> tuple[list[dict], int]:
-    base = DATA / "minif2f" / "data" / mode
+    base = DATA / "minif2f" / mode
 
     itp_stems: dict[str, set[str]] = {itp: set() for itp in ITPS}
     stem_split: dict[str, str] = {}

@@ -30,7 +30,7 @@ Every file is formalized in all four ITPs (4-way intersection), yielding **12 ba
 
 ```
 itp-interop/
-├── eval/                # LLM translation, verification & BEq pipeline
+├── eval/                # LLM translation, verification & Lean 4 BEq pipeline
 │   ├── data/            # Benchmark JSON files (stmts.json, proofs.json)
 │   ├── pipeline/        # Pipeline implementation (translation/ + cycle/ + beq/ subpackages)
 │   └── results/         # Local generated outputs
@@ -57,7 +57,7 @@ See [`itpeval/README.md`](itpeval/README.md) for per-prover details.
 ### 2. Install Python dependencies
 
 ```bash
-pip install anthropic openai google-genai python-dotenv
+pip install -e .
 ```
 
 ### 3. Set API keys
@@ -82,12 +82,13 @@ See [`eval/README.md`](eval/README.md) for full pipeline documentation.
 
 ### 5. BEq equivalence checking
 
-After verification, check whether verified translations are semantically equivalent to reference statements:
+After verification, check whether verified Lean 4 translations are semantically equivalent to reference statements:
 
 ```bash
 python3 -m eval.pipeline.beq.beq_check \
     eval/results/verified/stmts_claude-sonnet-4-6_20260426.jsonl \
-    --source minif2f
+    --source minif2f \
+    --target lean4
 ```
 
 ### 6. Using the benchmark data directly

@@ -2,21 +2,50 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import openai
-
 from eval.pipeline.batch import poll, submit
-from eval.pipeline.config import BATCH_JOBS_DIR, MODELS, VERIFIED_DIR
+from eval.pipeline.config import BATCH_JOBS_DIR, VERIFIED_DIR
+from eval.pipeline.models import select_models
+from eval.pipeline.records import make_translation_record, translation_custom_id
 from eval.pipeline.translation.data import load_pairs
 from eval.pipeline.translation.prompt import build_prompt
-from eval.pipeline.verify import verify
+from eval.pipeline.verify import verify_translation_records
 
-POLL_INTERVAL_S = 60  # seconds between status checks
-GEMINI_CHUNK_SIZE = 200  # requests per chunk (~4M tokens at 16k output each, safe for proofs)
+POLL_INTERVAL_S = 60
+GEMINI_CHUNK_SIZE = 200 
+TERMINAL_STATUSES = {"failed", "expired", "cancelled"}
+
+
+def _is_transient_poll_error(exc: Exception) -> bool:
+    transient_types: list[type[BaseException]] = []
+    try:
+        import openai
+        for name in ("APIConnectionError", "APITimeoutError", "RateLimitError"):
+            cls = getattr(openai, name, None)
+            if cls is not None:
+                transient_types.append(cls)
+    except ImportError:
+        pass
+
+    try:
+        import httpx
+        transient_types.extend([httpx.TimeoutException, httpx.TransportError])
+    except ImportError:
+        pass
+
+    try:
+        import requests
+        transient_types.extend([requests.exceptions.Timeout, requests.exceptions.ConnectionError])
+        if isinstance(exc, requests.exceptions.HTTPError):
+            status = exc.response.status_code if exc.response is not None else None
+            return status == 429 or (status is not None and status >= 500)
+    except ImportError:
+        pass
+
+    return bool(transient_types) and isinstance(exc, tuple(transient_types))
 
 
 def _make_request(pair: dict, mode: str) -> dict:
@@ -27,7 +56,8 @@ def _make_request(pair: dict, mode: str) -> dict:
         source_content=pair["src_content"],
         mode=mode,
     )
-    custom_id = f"{pair['source']}__{pair['theorem_id']}__{pair['src_prover']}__{pair['tgt_prover']}"
+    custom_id = translation_custom_id(pair)
+    # Metadata fields are kept in the job file but omitted from provider requests
     return {
         "custom_id":     custom_id,
         "system_prompt": system_prompt,
@@ -38,6 +68,8 @@ def _make_request(pair: dict, mode: str) -> dict:
         "_tier":         pair["tier"],
         "_src_prover":   pair["src_prover"],
         "_tgt_prover":   pair["tgt_prover"],
+        "_sample_idx":   0,
+        "_temperature":  0.0,
     }
 
 
@@ -84,13 +116,9 @@ def cmd_submit(args: argparse.Namespace) -> None:
     if getattr(args, "subset", None):
         subset_items = json.loads(Path(args.subset).read_text(encoding="utf-8"))
         subset = {(it["source"], int(it["theorem_id"])) for it in subset_items}
+    models = select_models(args.models)
     pairs = load_pairs(args.mode, sources=sources, theorem_ids=ids, subset=subset)
     print(f"Loaded {len(pairs)} pairs (mode={args.mode})")
-
-    wanted_labels = set(args.models.split(",")) if args.models else None
-    models = [m for m in MODELS if not wanted_labels or m["label"] in wanted_labels]
-    if not models:
-        sys.exit(f"No models matched: {wanted_labels}")
 
     BATCH_JOBS_DIR.mkdir(exist_ok=True)
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
@@ -128,6 +156,7 @@ def cmd_submit(args: argparse.Namespace) -> None:
         }
 
         if model_cfg["provider"] == "gemini":
+            # Gemini batches are chunked to keep each uploaded request file bounded
             chunks = _chunk(api_requests, GEMINI_CHUNK_SIZE)
             print(f"Submitting {len(api_requests)} requests for {label} "
                   f"in {len(chunks)} chunk(s) ...", flush=True)
@@ -153,17 +182,21 @@ def cmd_collect(args: argparse.Namespace) -> None:
     job_data = json.loads(job_file.read_text())
 
     meta = {r["custom_id"]: r for r in job_data["requests"]}
-    model_by_label = {m["label"]: m for m in MODELS}
-
     for info in job_data["models"].values():
         if "batch_id" in info and "batch_ids" not in info:
             info["batch_ids"] = [info["batch_id"]] if info["batch_id"] else []
 
     pending: dict[str, list[str]] = {}
-    collected: dict[str, dict[str, str]] = {}  # label → {custom_id: text}
+    collected: dict[str, dict[str, str]] = {} 
+    terminal_errors: list[str] = []
 
     for label, info in job_data["models"].items():
-        if info["status"] in ("completed", "failed", "expired", "cancelled"):
+        # Completed job files can be collected without provider API access
+        if info["status"] in TERMINAL_STATUSES:
+            terminal_errors.append(f"{label}: previous collect recorded status={info['status']}")
+            collected[label] = info.get("results", {})
+            continue
+        if info["status"] == "completed":
             collected[label] = info.get("results", {})
             continue
         pending[label] = list(info["batch_ids"])
@@ -178,23 +211,41 @@ def cmd_collect(args: argparse.Namespace) -> None:
 
         for label, batch_ids in pending.items():
             info = job_data["models"][label]
-            model_cfg = model_by_label[label]
+            model_cfg = {
+                "label": label,
+                "id": info["model_id"],
+                "provider": info["provider"],
+            }
             remaining_ids = []
 
             for bid in batch_ids:
                 try:
                     status, results = poll(model_cfg, bid)
-                except (openai.APIConnectionError, Exception) as e:
-                    print(f"  {label} [{bid[:20]}]: transient error ({e}), will retry")
-                    remaining_ids.append(bid)
+                except Exception as e:
+                    if _is_transient_poll_error(e):
+                        print(f"  {label} [{bid[:20]}]: transient error ({e}), will retry")
+                        remaining_ids.append(bid)
+                    else:
+                        msg = f"{label} [{bid}]: poll failed with non-transient error: {e}"
+                        print(f"  {msg}", flush=True)
+                        info["status"] = "failed"
+                        info.setdefault("errors", []).append(msg)
+                        terminal_errors.append(msg)
+                        job_file.write_text(json.dumps(job_data, indent=2, ensure_ascii=False))
                     continue
 
                 print(f"  {label} [{bid[:20]}...]: {status}")
 
                 if status == "completed" and results is not None:
                     collected[label].update(results)
-                elif status in ("failed", "expired", "cancelled"):
-                    print(f"  {label} [{bid[:20]}]: chunk {status}, skipping")
+                elif status in TERMINAL_STATUSES:
+                    msg = f"{label} [{bid}]: batch {status}"
+                    print(f"  {msg}", flush=True)
+                    info["status"] = status
+                    info.setdefault("failed_batch_ids", []).append(bid)
+                    info.setdefault("errors", []).append(msg)
+                    terminal_errors.append(msg)
+                    job_file.write_text(json.dumps(job_data, indent=2, ensure_ascii=False))
                 else:
                     remaining_ids.append(bid)
 
@@ -207,52 +258,56 @@ def cmd_collect(args: argparse.Namespace) -> None:
 
         pending = still_pending
 
+    if terminal_errors:
+        raise SystemExit(
+            "Batch collection stopped because one or more provider jobs failed:\n"
+            + "\n".join(f"- {msg}" for msg in terminal_errors)
+        )
+
     VERIFIED_DIR.mkdir(parents=True, exist_ok=True)
     mode = job_data["mode"]
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     results_path = VERIFIED_DIR / f"batch_{mode}_{timestamp}.jsonl"
-    print(f"\nVerifying and writing results to {results_path} ...")
+    print(f"\nPreparing generated records for {results_path} ...")
 
-    total = sum(len(v) for v in collected.values())
-    done = 0
+    expected_ids = list(meta)
+    records: list[dict] = []
+    for label, results in collected.items():
+        info = job_data["models"][label]
+        model_cfg = {
+            "label": label,
+            "id": info["model_id"],
+            "provider": info["provider"],
+        }
+        missing = sorted(set(expected_ids) - set(results))
+        if missing:
+            info["missing_output_count"] = len(missing)
+            job_file.write_text(json.dumps(job_data, indent=2, ensure_ascii=False))
+            print(f"  {label}: {len(missing)} requested outputs missing; writing no-output records")
+        for custom_id in expected_ids:
+            generated = results.get(custom_id, "")
+            m = meta.get(custom_id, {})
+            pair = {
+                "theorem_id": m.get("_theorem_id"),
+                "title": m.get("_title"),
+                "source": m.get("_source"),
+                "tier": m.get("_tier"),
+                "src_prover": m.get("_src_prover"),
+                "tgt_prover": m.get("_tgt_prover", ""),
+            }
+            records.append(make_translation_record(
+                pair=pair,
+                model_cfg=model_cfg,
+                mode=mode,
+                generated=generated,
+                sample_idx=int(m.get("_sample_idx", 0)),
+                temperature=float(m.get("_temperature", 0.0)),
+                custom_id=custom_id,
+            ))
 
-    with results_path.open("w", encoding="utf-8") as out:
-        for label, results in collected.items():
-            info = job_data["models"][label]
-            model_id = info["model_id"]
-            for custom_id, generated in results.items():
-                done += 1
-                m = meta.get(custom_id, {})
-                tgt_prover = m.get("_tgt_prover", "")
-
-                print(f"[{done}/{total}] {label}  {custom_id}", end=" ", flush=True)
-
-                if generated and tgt_prover:
-                    vr = verify(tgt_prover, generated)
-                    verified, verify_error, verify_ms = vr.ok, vr.error, vr.duration_ms
-                else:
-                    verified, verify_error, verify_ms = False, "no output", 0
-
-                status = "PASS" if verified else "FAIL"
-                print(status)
-
-                record = {
-                    "theorem_id":   m.get("_theorem_id"),
-                    "title":        m.get("_title"),
-                    "source":       m.get("_source"),
-                    "tier":         m.get("_tier"),
-                    "src_prover":   m.get("_src_prover"),
-                    "tgt_prover":   tgt_prover,
-                    "model":        label,
-                    "model_id":     model_id,
-                    "mode":         mode,
-                    "generated":    generated,
-                    "verified":     verified,
-                    "verify_error": verify_error,
-                    "verify_ms":    verify_ms,
-                }
-                out.write(json.dumps(record, ensure_ascii=False) + "\n")
-                out.flush()
+    print(f"\nVerifying and writing {len(records)} records to {results_path} ...")
+    # Batch outputs enter the same verifier path as generated JSONL files
+    verify_translation_records(records, results_path, workers=args.workers)
 
     print(f"\nDone. Results: {results_path}")
 
@@ -274,6 +329,8 @@ def main() -> None:
 
     p_collect = sub.add_parser("collect", help="Poll, verify, and write results")
     p_collect.add_argument("job_file", help="Path to the .json job file from submit")
+    p_collect.add_argument("--workers", type=int, default=8,
+                           help="Parallel verification workers (default: 8)")
 
     args = parser.parse_args()
     if args.cmd == "submit":

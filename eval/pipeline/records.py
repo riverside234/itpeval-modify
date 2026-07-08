@@ -1,0 +1,84 @@
+from __future__ import annotations
+
+import json
+from typing import Any
+
+
+def translation_custom_id(pair: dict[str, Any], *, sample_idx: int = 0) -> str:
+    # This ID is shared by sync runs, batch runs, checkpoints, and BEq outputs
+    return (
+        f"{pair['source']}__{pair['theorem_id']}__"
+        f"{pair['src_prover']}__{pair['tgt_prover']}__sample{sample_idx}"
+    )
+
+
+def translation_record_key(record: dict[str, Any]) -> str:
+    custom_id = record.get("custom_id")
+    if isinstance(custom_id, str) and custom_id:
+        return custom_id
+    # Older result files may not have custom_id; keep resume behavior stable
+    return json.dumps(
+        {
+            "source": record.get("source"),
+            "theorem_id": record.get("theorem_id"),
+            "title": record.get("title"),
+            "src_prover": record.get("src_prover"),
+            "tgt_prover": record.get("tgt_prover"),
+            "model": record.get("model"),
+            "mode": record.get("mode"),
+            "sample_idx": record.get("sample_idx", 0),
+            "temperature": record.get("temperature"),
+        },
+        sort_keys=True,
+        ensure_ascii=False,
+    )
+
+
+def translation_record_label(record: dict[str, Any]) -> str:
+    custom_id = record.get("custom_id")
+    if isinstance(custom_id, str) and custom_id:
+        return custom_id
+    return (
+        f"{record.get('model', '?')} "
+        f"{record.get('title', record.get('theorem_id', '?'))} "
+        f"{record.get('src_prover', '?')}->{record.get('tgt_prover', '?')}"
+    )
+
+
+def make_translation_record(
+    *,
+    pair: dict[str, Any],
+    model_cfg: dict[str, Any],
+    mode: str,
+    generated: str = "",
+    verified: bool = False,
+    translate_error: str = "",
+    verify_error: str = "",
+    translate_ms: int = 0,
+    verify_ms: int = 0,
+    sample_idx: int = 0,
+    temperature: float = 0.0,
+    custom_id: str | None = None,
+) -> dict[str, Any]:
+    cid = custom_id or translation_custom_id(pair, sample_idx=sample_idx)
+    # Keep sync, batch, and post-hoc verification outputs on the same schema
+    return {
+        "custom_id": cid,
+        "theorem_id": pair["theorem_id"],
+        "title": pair["title"],
+        "source": pair["source"],
+        "tier": pair["tier"],
+        "src_prover": pair["src_prover"],
+        "tgt_prover": pair["tgt_prover"],
+        "model": model_cfg["label"],
+        "model_id": model_cfg["id"],
+        "mode": mode,
+        "sample_idx": sample_idx,
+        "temperature": temperature,
+        "generated": generated,
+        "verified": verified,
+        "translate_error": translate_error,
+        "verify_error": verify_error,
+        "translate_ms": translate_ms,
+        "verify_ms": verify_ms,
+    }

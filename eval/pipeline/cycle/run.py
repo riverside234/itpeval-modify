@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from eval.pipeline.config import EVAL_DIR, MODELS, RESULTS_DIR
+from eval.pipeline.config import EVAL_DIR, RESULTS_DIR
+from eval.pipeline.jsonl import load_jsonl
+from eval.pipeline.models import select_models
 from eval.pipeline.translate import translate
 
 CYCLE_DIR = RESULTS_DIR / "cycle"
@@ -107,6 +108,7 @@ def _parse_4itps(text: str) -> dict[str, str]:
     result = {k: "" for k in _ITP_ORDER}
     headers = [_ITP_HEADERS[k] for k in _ITP_ORDER]
     for i, key in enumerate(_ITP_ORDER):
+        # Sections are parsed by exact headers produced in the cycle prompts
         start = text.find(headers[i])
         if start == -1:
             continue
@@ -155,6 +157,7 @@ def _run_cycle1_record(record: dict, model_cfg: dict, max_tokens: int,
     if err:
         return result
 
+    # Later cycle steps use generated text from earlier steps, not the references
     out, err, ms = _call(model_cfg, *_lean4_to_nl(result["step1_lean4"]), max_tokens)
     result.update(step2_nl=out, step2_error=err, step2_ms=ms)
     print(f"  step2 {'OK' if not err else 'FAIL'}  {label}", flush=True)
@@ -224,15 +227,8 @@ def _load_done(out_path: Path) -> set[str]:
     done: set[str] = set()
     if not out_path.exists():
         return done
-    for line in out_path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            r = json.loads(line)
-            done.add(r["name"])
-        except Exception:
-            pass
+    for r in load_jsonl(out_path):
+        done.add(r["name"])
     return done
 
 
@@ -254,6 +250,7 @@ def run_cycle(
         done = _load_done(out_path)
         remaining = [r for r in records if r["name"] not in done]
 
+        # Cycle outputs are append-only by model, so reruns resume by theorem name
         print(f"\n--- cycle{cycle} model={model_cfg['label']} ---")
         print(f"  {len(records)} records, {len(done)} already done, {len(remaining)} remaining")
 
@@ -304,12 +301,14 @@ def main() -> None:
                         help="Only include records that have all 4 ITP statements")
     args = parser.parse_args()
 
+    models = select_models(args.model)
+
     data_path = Path(args.data)
     if not data_path.exists():
         sys.exit(f"Data file not found: {data_path}\n"
-                 "Run: python -m eval.pipeline.cycle.build_cycle_data")
+                 "Regenerate eval data with: python3 data/build_eval_jsons.py")
 
-    records = [json.loads(l) for l in data_path.read_text().splitlines() if l.strip()]
+    records = load_jsonl(data_path)
     if args.cycle100:
         records = [r for r in records if r.get("cycle100")]
     if args.split != "both":
@@ -318,13 +317,6 @@ def main() -> None:
         records = [r for r in records
                    if all(r.get(k) for k in ["lean4", "isabelle", "rocq", "hol_light"])]
     print(f"Loaded {len(records)} records from {data_path}")
-
-    models = MODELS
-    if args.model:
-        wanted = set(args.model.split(","))
-        models = [m for m in MODELS if m["label"] in wanted]
-        if not models:
-            sys.exit(f"No models matched: {wanted}")
 
     cycles = [1, 2] if args.cycle == "both" else [int(args.cycle)]
     for c in cycles:

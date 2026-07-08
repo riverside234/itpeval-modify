@@ -44,8 +44,8 @@ def default_prefix() -> Path:
     env_prefix = os.environ.get("ITPEVAL_PREFIX")
     if env_prefix:
         return Path(env_prefix)
-    # When the repo lives on EFS, large toolchains (opam/cabal) can become unusably slow.
-    # Prefer /tmp by default unless the user explicitly overrides via ITPEVAL_PREFIX/--prefix.
+    # When the repo lives on EFS, large toolchains (opam/cabal) can become unusably slow
+    # Prefer /tmp by default unless the user explicitly overrides via ITPEVAL_PREFIX/--prefix
     if str(ROOT).startswith("/efs/"):
         return Path("/tmp/itpeval-toolchains")
     return ROOT / "_toolchains"

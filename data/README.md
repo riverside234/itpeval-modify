@@ -19,12 +19,11 @@ This document describes the benchmark dataset structure across two axes:
 
 ## Raw File Structure (`data/`)
 
-Each benchmark lives under `data/<source>/data/`:
+Each benchmark lives under `data/<source>/`:
 
 ```
 data/
-  babel-formal/data/
-    index.json                  # metadata: topics, items per topic
+  babel-formal/
     proofs/                     # full proofs (one file per topic per ITP)
       isabelle/                 # 16 .thy files
       lean4/                    # 16 .lean files
@@ -36,8 +35,7 @@ data/
       rocq/
       hol-light/
 
-  hundred-theorems/data/
-    index.json
+  hundred-theorems/
     proofs/                     # full proofs scraped from upstream
       hol-light/                # 86 theorems
       isabelle/                 # 88 theorems
@@ -49,8 +47,7 @@ data/
       lean4/
       rocq/
 
-  minif2f/data/
-    index.json
+  minif2f/
     proofs/                     # already sorry-stripped at source
       hol-light/
         test/  valid/
@@ -63,6 +60,8 @@ data/
 ```
 
 **Convention:** `proofs/` contains the original scraped or authored files. `stmts/` mirrors `proofs/` with all proof bodies replaced by the appropriate placeholder (`sorry`, `Admitted`, etc.).
+
+Third-party license texts for included or derived benchmark data are collected in `data/third_party_licenses/`.
 
 ## Eval JSON Files (`eval/data/`)
 
@@ -95,10 +94,4 @@ To regenerate the eval JSONs from raw data:
 
 ```bash
 python3 data/build_eval_jsons.py
-```
-
-To regenerate sorry-stripped statements from full proofs:
-
-```bash
-python3 data/sorry_strip.py
 ```

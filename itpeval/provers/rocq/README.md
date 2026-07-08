@@ -7,7 +7,7 @@ Files:
 - `check.sh` compiles `hello/hello.v` with `rocq` or `coqc`.
 - `hello/hello.v` is the minimal smoke-test lemma.
 
-The install path is intentionally local and isolated:
+The install path is local and isolated:
 - opam root: `ITPEVAL_PREFIX/rocq/opamroot`
 - switch name: `rocq` by default
 

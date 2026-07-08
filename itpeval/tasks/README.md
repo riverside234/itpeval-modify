@@ -15,6 +15,6 @@ Layout convention:
 - task files should be self-contained when possible
 - optional `task.json` files can describe the task metadata and prover mapping
 
-The benchmark layer is intentionally separate from the prover adapters:
+The benchmark layer is separate from the prover adapters:
 - adapters know how to install/check a prover
 - tasks provide the proof artifact or script to verify

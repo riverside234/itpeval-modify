@@ -19,6 +19,7 @@ def build_prompt(
     src_name = PROVER_DISPLAY[src_prover]
     tgt_name = PROVER_DISPLAY[tgt_prover]
 
+    # Statement mode asks for theorem files with admitted proofs; proof mode asks for full files
     if mode == "stmts":
         system = (
             f"You are an expert in interactive theorem proving, fluent in {src_name} and {tgt_name}. "

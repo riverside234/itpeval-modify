@@ -1,10 +1,6 @@
 from __future__ import annotations
 
 import os
-import anthropic
-import openai
-from google import genai
-from google.genai import types as genai_types
 
 
 def _load_keys() -> None:
@@ -23,6 +19,7 @@ _loaded = False
 def _ensure_loaded() -> None:
     global _loaded
     if not _loaded:
+        # Load local API keys lazily so import-only commands do not require credentials
         _load_keys()
         _loaded = True
 
@@ -41,7 +38,10 @@ def translate(
     provider = model_cfg["provider"]
     model_id = model_cfg["id"]
 
+    # Provider branches normalize each SDK response to a single text string
     if provider == "anthropic":
+        import anthropic
+
         client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
         message = client.messages.create(
             model=model_id,
@@ -56,6 +56,8 @@ def translate(
         return text
 
     elif provider == "openai":
+        import openai
+
         client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
         response = client.chat.completions.create(
             model=model_id,
@@ -71,6 +73,8 @@ def translate(
         return text
 
     elif provider == "groq":
+        import openai
+
         client = openai.OpenAI(
             api_key=os.environ["GROQ_API_KEY"],
             base_url="https://api.groq.com/openai/v1",
@@ -90,6 +94,8 @@ def translate(
         return text
 
     elif provider == "openrouter":
+        import openai
+
         client = openai.OpenAI(
             api_key=os.environ["OPENROUTER_API_KEY"],
             base_url="https://openrouter.ai/api/v1",
@@ -112,6 +118,9 @@ def translate(
         return text
 
     elif provider == "gemini":
+        from google import genai
+        from google.genai import types as genai_types
+
         client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
         response = client.models.generate_content(
             model=model_id,

@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 
-from eval.pipeline.config import MODELS, VERIFIED_DIR, GENERATED_DIR
+from eval.pipeline.config import VERIFIED_DIR, GENERATED_DIR
+from eval.pipeline.jsonl import load_jsonl
+from eval.pipeline.models import select_models
+from eval.pipeline.records import make_translation_record, translation_record_key
 from eval.pipeline.translation.data import load_pairs
 from eval.pipeline.translation.prompt import build_prompt
 from eval.pipeline.translate import translate
@@ -70,6 +72,7 @@ def _run_single(
         verify_error = translate_error
         verify_ms = 0
     else:
+        # Synchronous runs verify immediately unless --no-verify is set
         vr = verify(tgt_prover, generated)
         verified = vr.ok
         verify_error = vr.error
@@ -82,39 +85,23 @@ def _run_single(
         status = "PASS" if verified else "FAIL"
         print(f"  {status}  {label}  translate={translate_ms}ms  verify={verify_ms}ms", flush=True)
 
-    return {
-        "theorem_id":      pair["theorem_id"],
-        "title":           pair["title"],
-        "source":          pair["source"],
-        "tier":            pair["tier"],
-        "src_prover":      src_prover,
-        "tgt_prover":      tgt_prover,
-        "model":           model_cfg["label"],
-        "sample_idx":      sample_idx,
-        "temperature":     temperature,
-        "mode":            mode,
-        "generated":       generated,
-        "verified":        verified,
-        "translate_error": translate_error,
-        "verify_error":    verify_error,
-        "translate_ms":    translate_ms,
-        "verify_ms":       verify_ms,
-    }
+    return make_translation_record(
+        pair=pair,
+        model_cfg=model_cfg,
+        mode=mode,
+        generated=generated,
+        verified=verified,
+        translate_error=translate_error,
+        verify_error=verify_error,
+        translate_ms=translate_ms,
+        verify_ms=verify_ms,
+        sample_idx=sample_idx,
+        temperature=temperature,
+    )
 
 
-def _load_done(results_path: Path) -> set[tuple]:
-    done = set()
-    if not results_path.exists():
-        return done
-    for line in results_path.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        try:
-            r = json.loads(line)
-            done.add((r["model"], r.get("source", ""), r["theorem_id"], r["src_prover"], r["tgt_prover"], r["sample_idx"]))
-        except Exception:
-            pass
-    return done
+def _load_done(results_path: Path) -> set[str]:
+    return {translation_record_key(r) for r in load_jsonl(results_path)}
 
 
 def run_eval(
@@ -147,15 +134,23 @@ def run_eval(
 
     done = _load_done(results_path)
     if done:
+        # Resume skips records using the same key used by post-hoc verification
         jobs = [
             (m, p, s) for m, p, s in jobs
-            if (m["label"], p["source"], p["theorem_id"], p["src_prover"], p["tgt_prover"], s) not in done
+            if translation_record_key(make_translation_record(
+                pair=p,
+                model_cfg=m,
+                mode=mode,
+                sample_idx=s,
+                temperature=temperature,
+            )) not in done
         ]
         print(f"  Resuming: {len(done)} already done, {len(jobs)} remaining")
 
     total = len(jobs)
 
     if dry_run:
+        # Dry runs print prompt previews without calling provider APIs or provers
         for i, (model_cfg, pair, sample_idx) in enumerate(jobs, 1):
             system_prompt, user_prompt = build_prompt(
                 title=pair["title"],
@@ -232,12 +227,7 @@ def main() -> None:
                         help="Print prompts, skip API + verify")
     args = parser.parse_args()
 
-    models = MODELS
-    if args.model:
-        wanted = set(args.model.split(","))
-        models = [m for m in MODELS if m["label"] in wanted]
-        if not models:
-            sys.exit(f"No models matched: {wanted}")
+    models = select_models(args.model)
 
     sources = args.sources.split(",") if args.sources else None
     ids = [int(x) for x in args.ids.split(",")] if args.ids else None
