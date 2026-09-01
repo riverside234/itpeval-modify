@@ -71,3 +71,5 @@ dist/
 *.bak
 *.swp
 *~
+
+/notes/
