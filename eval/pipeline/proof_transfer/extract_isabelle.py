@@ -19,7 +19,9 @@ from eval.pipeline.proof_transfer.aligned_data import (
 )
 from eval.pipeline.proof_transfer.inventory import (
     Declaration,
+    exact_name_matches,
     inventory_isabelle_declarations,
+    inventory_lean4_declarations,
 )
 from eval.pipeline.proof_transfer.manifest import (
     BabelTarget,
@@ -30,6 +32,7 @@ from eval.pipeline.proof_transfer.sanitize_lean import sanitize_lean_target
 
 
 CONTEXT_MODE = "proof_masked_stmt_file"
+EXACT_NAME_STATUS = "exact_name_match"
 
 
 @dataclass(frozen=True)
@@ -71,8 +74,8 @@ def _find_declaration(
     raise ValueError(f"could not find {prover} declaration {name!r}; available: {available}")
 
 
-def _validate_verified_target(target: BabelTarget) -> None:
-    if target.status != "verified" or not target.semantic_alignment_verified:
+def _validate_target(target: BabelTarget, *, require_verified: bool) -> None:
+    if require_verified and (target.status != "verified" or not target.semantic_alignment_verified):
         raise ValueError(
             f"target {target.target_key!r} is not verified "
             f"(status={target.status!r}, "
@@ -128,8 +131,13 @@ def extract_isabelle_target(
     )
 
 
-def build_v1_record(topic: AlignedBabelTopic, target: BabelTarget) -> dict[str, Any]:
-    _validate_verified_target(target)
+def build_v1_record(
+    topic: AlignedBabelTopic,
+    target: BabelTarget,
+    *,
+    require_verified: bool = False,
+) -> dict[str, Any]:
+    _validate_target(target, require_verified=require_verified)
 
     isabelle = extract_isabelle_target(topic, target)
     lean4 = sanitize_lean_target(
@@ -155,6 +163,9 @@ def build_v1_record(topic: AlignedBabelTopic, target: BabelTarget) -> dict[str, 
         "context_mode": CONTEXT_MODE,
         "target_alignment_status": target.status,
         "semantic_alignment_verified": target.semantic_alignment_verified,
+        "target_selection_mode": "manifest_verified"
+        if target.status == "verified"
+        else "exact_name",
         "metadata": {
             "isabelle": isabelle.to_dict(),
             "lean4": lean4.to_dict(),
@@ -189,8 +200,57 @@ def _topics_for_args(args: argparse.Namespace) -> list[AlignedBabelTopic]:
     return [_load_topic_from_args(args)]
 
 
+def _exact_name_targets_for_topic(topic: AlignedBabelTopic) -> list[BabelTarget]:
+    isabelle_declarations = inventory_isabelle_declarations(
+        topic.isabelle_proof_content,
+        topic=topic.topic,
+    )
+    lean4_declarations = inventory_lean4_declarations(
+        topic.lean4_stmt_content,
+        topic=topic.topic,
+    )
+    return [
+        BabelTarget(
+            topic=topic.topic,
+            target_key=name,
+            isabelle_target_name=name,
+            lean4_target_name=name,
+            status=EXACT_NAME_STATUS,
+            semantic_alignment_verified=False,
+            notes="Auto-selected exact-name Isabelle/Lean4 declaration match.",
+        )
+        for name in exact_name_matches(isabelle_declarations, lean4_declarations)
+    ]
+
+
+def _target_from_key(args: argparse.Namespace, topic: AlignedBabelTopic) -> BabelTarget:
+    if args.verified_only:
+        return get_babel_target(topic=topic.topic, target_key=args.target_key)
+
+    manifest_targets = {
+        target.target_key: target
+        for target in iter_babel_targets()
+        if target.topic == topic.topic
+    }
+    if args.target_key in manifest_targets:
+        return manifest_targets[args.target_key]
+
+    exact_targets = {
+        target.target_key: target
+        for target in _exact_name_targets_for_topic(topic)
+    }
+    if args.target_key in exact_targets:
+        return exact_targets[args.target_key]
+
+    available = ", ".join(sorted(exact_targets | manifest_targets))
+    raise SystemExit(f"Unknown target {args.target_key!r} for topic {topic.topic!r}. Available: {available}")
+
+
 def _targets_for_args(args: argparse.Namespace, topic: AlignedBabelTopic) -> list[BabelTarget]:
     if args.all_targets:
+        if not args.verified_only:
+            return _exact_name_targets_for_topic(topic)
+
         return [
             target
             for target in iter_babel_targets(statuses=["verified"])
@@ -200,7 +260,7 @@ def _targets_for_args(args: argparse.Namespace, topic: AlignedBabelTopic) -> lis
     if not args.target_key:
         raise SystemExit("Provide --target-key or --all-targets.")
 
-    return [get_babel_target(topic=topic.topic, target_key=args.target_key)]
+    return [_target_from_key(args, topic)]
 
 
 def _print_json(data: Any, *, include_indent: bool = True) -> None:
@@ -254,9 +314,14 @@ def main() -> None:
     parser.add_argument("--check-layout", action="store_true", help="Validate repo/input paths and exit.")
     parser.add_argument("--id", type=int, help="Babel theorem_id.")
     parser.add_argument("--topic", help="Babel topic name.")
-    parser.add_argument("--all-topics", action="store_true", help="Build verified targets across all Babel topics.")
+    parser.add_argument("--all-topics", action="store_true", help="Build targets across all Babel topics.")
     parser.add_argument("--target-key", help="Manifest target key.")
-    parser.add_argument("--all-targets", action="store_true", help="Build every verified target in the topic.")
+    parser.add_argument(
+        "--all-targets",
+        action="store_true",
+        help="Build every exact-name target in the topic, or every verified manifest target with --verified-only.",
+    )
+    parser.add_argument("--verified-only", action="store_true", help="Use only verified manifest targets.")
     parser.add_argument("--jsonl", action="store_true", help="Print one compact JSON record per line.")
     parser.add_argument("--output", help="Write JSON/JSONL under the repo root instead of printing to stdout.")
     args = parser.parse_args()
@@ -270,10 +335,13 @@ def main() -> None:
     records: list[dict[str, Any]] = []
     for topic in _topics_for_args(args):
         targets = _targets_for_args(args, topic)
-        records.extend(build_v1_record(topic, target) for target in targets)
+        records.extend(
+            build_v1_record(topic, target, require_verified=args.verified_only)
+            for target in targets
+        )
 
     if not records:
-        raise SystemExit("No verified target records found. Add verified targets to the Babel manifest first.")
+        raise SystemExit("No target records found.")
 
     _write_records(records, args)
 
