@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
+from eval.pipeline.proof_transfer.aligned_data import LAB_REPO_ROOT, validate_repo_layout
+
 
 MANIFEST_DIR = Path(__file__).resolve().parent / "manifests"
 BABEL_TARGETS_JSON = MANIFEST_DIR / "babel_targets.json"
@@ -109,8 +111,16 @@ def exact_name_candidate_targets(topic: str, names: Iterable[str]) -> list[dict[
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Inspect the Babel Formal proof-transfer manifest.")
+    parser.add_argument("--expected-root", help=f"Expected repo root, e.g. {LAB_REPO_ROOT}.")
+    parser.add_argument("--check-layout", action="store_true", help="Validate repo/input paths and exit.")
     parser.add_argument("--verified-only", action="store_true")
     args = parser.parse_args()
+
+    if args.expected_root or args.check_layout:
+        layout = validate_repo_layout(args.expected_root)
+        if args.check_layout:
+            print(json.dumps(layout, indent=2, ensure_ascii=False))
+            return
 
     statuses = ["verified"] if args.verified_only else None
     targets = [target.to_dict() for target in iter_babel_targets(statuses=statuses)]
@@ -119,4 +129,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

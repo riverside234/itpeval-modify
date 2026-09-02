@@ -8,8 +8,10 @@ from typing import Iterable, Literal
 
 from eval.pipeline.proof_transfer.aligned_data import (
     BABEL_FORMAL,
+    LAB_REPO_ROOT,
     AlignedBabelTopic,
     iter_babel_topics,
+    validate_repo_layout,
 )
 
 
@@ -218,11 +220,19 @@ def _parse_csv(value: str | None) -> list[str] | None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Inventory Babel Formal theorem declarations.")
     parser.add_argument("--source", default=BABEL_FORMAL, choices=[BABEL_FORMAL])
+    parser.add_argument("--expected-root", help=f"Expected repo root, e.g. {LAB_REPO_ROOT}.")
+    parser.add_argument("--check-layout", action="store_true", help="Validate repo/input paths and exit.")
     parser.add_argument("--ids", help="Comma-separated Babel theorem_ids.")
     parser.add_argument("--topics", help="Comma-separated Babel topic names.")
     parser.add_argument("--json", action="store_true", help="Print machine-readable JSON.")
     parser.add_argument("--names", action="store_true", help="Print exact-name match names.")
     args = parser.parse_args()
+
+    if args.expected_root or args.check_layout:
+        layout = validate_repo_layout(args.expected_root)
+        if args.check_layout:
+            print(json.dumps(layout, indent=2, ensure_ascii=False))
+            return
 
     theorem_ids = [int(item) for item in _parse_csv(args.ids) or []] or None
     topics = _parse_csv(args.topics)
@@ -251,4 +261,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

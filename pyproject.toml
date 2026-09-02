@@ -26,7 +26,11 @@ dependencies = [
 include = ["eval*", "itpeval*"]
 
 [tool.setuptools.package-data]
-eval = ["data/*.json", "data/*.jsonl"]
+eval = [
+    "data/*.json",
+    "data/*.jsonl",
+    "pipeline/proof_transfer/manifests/*.json",
+]
 
 [project.scripts]
 itpeval = "itpeval.cli.main:main"

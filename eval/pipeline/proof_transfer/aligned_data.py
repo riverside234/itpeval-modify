@@ -7,12 +7,14 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable
 
-from eval.pipeline.config import PROOFS_JSON, STMTS_JSON
+from eval.pipeline.config import PROOFS_JSON, REPO_ROOT, STMTS_JSON
 
 
 BABEL_FORMAL = "babel-formal"
 ISABELLE = "isabelle"
 LEAN4 = "lean4"
+LAB_REPO_ROOT = "/data/not_backed_up/yxu209/ITPEval"
+PROOF_TRANSFER_DIR = Path(__file__).resolve().parent
 
 
 @dataclass(frozen=True)
@@ -40,6 +42,45 @@ class AlignedBabelTopic:
 
 def sha256_text(content: str) -> str:
     return hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+
+def resolved_repo_root() -> Path:
+    return REPO_ROOT.resolve(strict=False)
+
+
+def _is_under(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+    except ValueError:
+        return False
+    return True
+
+
+def validate_repo_layout(expected_root: str | Path | None = None) -> dict[str, str]:
+    root = resolved_repo_root()
+    if expected_root is not None:
+        expected = Path(expected_root).expanduser().resolve(strict=False)
+        if root != expected:
+            raise RuntimeError(
+                f"expected repo root {expected}, but eval.pipeline.config resolved {root}"
+            )
+
+    required_paths = {
+        "repo_root": REPO_ROOT,
+        "stmts_json": STMTS_JSON,
+        "proofs_json": PROOFS_JSON,
+        "proof_transfer_dir": PROOF_TRANSFER_DIR,
+        "babel_targets_json": PROOF_TRANSFER_DIR / "manifests" / "babel_targets.json",
+    }
+    resolved_paths: dict[str, str] = {}
+    for name, path in required_paths.items():
+        resolved = path.resolve(strict=False)
+        if not _is_under(resolved, root):
+            raise RuntimeError(f"{name} resolves outside repo root: {resolved}")
+        if not path.exists():
+            raise FileNotFoundError(f"missing required {name}: {resolved}")
+        resolved_paths[name] = str(resolved)
+    return resolved_paths
 
 
 @lru_cache(maxsize=None)
