@@ -6,7 +6,7 @@ import json
 import sys
 import time
 from collections.abc import Iterable
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -157,7 +157,7 @@ def generate_draft_record(
     result["draft_prompt_version"] = prompt.prompt_version
     result["draft_prompt_sha256"] = _prompt_sha256(prompt)
     result["draft_model"] = config.to_metadata()
-    result["draft_generated_at"] = datetime.now(UTC).isoformat()
+    result["draft_generated_at"] = datetime.now(timezone.utc).isoformat()
 
     start = time.monotonic()
     try:
