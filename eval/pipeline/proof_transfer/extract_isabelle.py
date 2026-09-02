@@ -4,14 +4,17 @@ import argparse
 import json
 import sys
 from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import Any, Iterable
 
 from eval.pipeline.proof_transfer.aligned_data import (
     BABEL_FORMAL,
     LAB_REPO_ROOT,
     AlignedBabelTopic,
+    iter_babel_topics,
     load_babel_topic,
     load_babel_topic_by_name,
+    resolved_repo_root,
     validate_repo_layout,
 )
 from eval.pipeline.proof_transfer.inventory import (
@@ -175,6 +178,17 @@ def _load_topic_from_args(args: argparse.Namespace) -> AlignedBabelTopic:
     return load_babel_topic_by_name(args.topic)
 
 
+def _topics_for_args(args: argparse.Namespace) -> list[AlignedBabelTopic]:
+    if args.all_topics:
+        if args.id is not None or args.topic:
+            raise SystemExit("Use either --all-topics or --id/--topic, not both.")
+        if not args.all_targets:
+            raise SystemExit("--all-topics requires --all-targets.")
+        return list(iter_babel_topics())
+
+    return [_load_topic_from_args(args)]
+
+
 def _targets_for_args(args: argparse.Namespace, topic: AlignedBabelTopic) -> list[BabelTarget]:
     if args.all_targets:
         return [
@@ -196,27 +210,31 @@ def _print_json(data: Any, *, include_indent: bool = True) -> None:
     print(json.dumps(data, indent=indent, ensure_ascii=False))
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Build parsed Babel Formal V1 target records.")
-    parser.add_argument("--source", default=BABEL_FORMAL, choices=[BABEL_FORMAL])
-    parser.add_argument("--expected-root", help=f"Expected repo root, e.g. {LAB_REPO_ROOT}.")
-    parser.add_argument("--check-layout", action="store_true", help="Validate repo/input paths and exit.")
-    parser.add_argument("--id", type=int, help="Babel theorem_id.")
-    parser.add_argument("--topic", help="Babel topic name.")
-    parser.add_argument("--target-key", help="Manifest target key.")
-    parser.add_argument("--all-targets", action="store_true", help="Build every verified target in the topic.")
-    parser.add_argument("--jsonl", action="store_true", help="Print one compact JSON record per line.")
-    args = parser.parse_args()
+def _resolve_output_path(output: str) -> Path:
+    root = resolved_repo_root()
+    path = Path(output).expanduser()
+    if not path.is_absolute():
+        path = root / path
+    resolved = path.resolve(strict=False)
+    try:
+        resolved.relative_to(root)
+    except ValueError as exc:
+        raise SystemExit(f"--output must be inside repo root {root}: {resolved}") from exc
+    return resolved
 
-    if args.expected_root or args.check_layout:
-        layout = validate_repo_layout(args.expected_root)
-        if args.check_layout:
-            _print_json(layout)
-            return
 
-    topic = _load_topic_from_args(args)
-    targets = _targets_for_args(args, topic)
-    records = [build_v1_record(topic, target) for target in targets]
+def _write_records(records: list[dict[str, Any]], args: argparse.Namespace) -> None:
+    if args.output:
+        output_path = _resolve_output_path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        if args.jsonl:
+            payload = "\n".join(json.dumps(record, ensure_ascii=False) for record in records)
+            output_path.write_text(payload + ("\n" if payload else ""), encoding="utf-8")
+        else:
+            data: Any = records[0] if len(records) == 1 else records
+            output_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(f"Wrote {len(records)} record(s) to {output_path}")
+        return
 
     if args.jsonl:
         for record in records:
@@ -227,6 +245,37 @@ def main() -> None:
         _print_json(records[0])
     else:
         _print_json(records)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Build parsed Babel Formal V1 target records.")
+    parser.add_argument("--source", default=BABEL_FORMAL, choices=[BABEL_FORMAL])
+    parser.add_argument("--expected-root", help=f"Expected repo root, e.g. {LAB_REPO_ROOT}.")
+    parser.add_argument("--check-layout", action="store_true", help="Validate repo/input paths and exit.")
+    parser.add_argument("--id", type=int, help="Babel theorem_id.")
+    parser.add_argument("--topic", help="Babel topic name.")
+    parser.add_argument("--all-topics", action="store_true", help="Build verified targets across all Babel topics.")
+    parser.add_argument("--target-key", help="Manifest target key.")
+    parser.add_argument("--all-targets", action="store_true", help="Build every verified target in the topic.")
+    parser.add_argument("--jsonl", action="store_true", help="Print one compact JSON record per line.")
+    parser.add_argument("--output", help="Write JSON/JSONL under the repo root instead of printing to stdout.")
+    args = parser.parse_args()
+
+    if args.expected_root or args.check_layout:
+        layout = validate_repo_layout(args.expected_root)
+        if args.check_layout:
+            _print_json(layout)
+            return
+
+    records: list[dict[str, Any]] = []
+    for topic in _topics_for_args(args):
+        targets = _targets_for_args(args, topic)
+        records.extend(build_v1_record(topic, target) for target in targets)
+
+    if not records:
+        raise SystemExit("No verified target records found. Add verified targets to the Babel manifest first.")
+
+    _write_records(records, args)
 
 
 if __name__ == "__main__":
