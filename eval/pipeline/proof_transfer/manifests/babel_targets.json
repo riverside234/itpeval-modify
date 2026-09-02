@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "source": "babel-formal",
+  "description": "Curated Isabelle-to-Lean4 target mappings for Babel Formal proof-transfer V1. Exact-name matches can be auto-suggested by inventory.py, but targets should be reviewed before being marked verified.",
+  "targets": [
+    {
+      "topic": "circle_average",
+      "target_key": "circleAverage_center_independent",
+      "isabelle_target_name": "circleAverage_center_independent",
+      "lean4_target_name": "circleAverage_center_independent",
+      "status": "verified",
+      "semantic_alignment_verified": true,
+      "notes": "Starter fixture for Step 1 plumbing; both files state circleAverage f c = integral f."
+    }
+  ]
+}
