@@ -71,6 +71,8 @@ def validate_repo_layout(expected_root: str | Path | None = None) -> dict[str, s
         "proofs_json": PROOFS_JSON,
         "proof_transfer_dir": PROOF_TRANSFER_DIR,
         "babel_targets_json": PROOF_TRANSFER_DIR / "manifests" / "babel_targets.json",
+        "extract_isabelle_py": PROOF_TRANSFER_DIR / "extract_isabelle.py",
+        "sanitize_lean_py": PROOF_TRANSFER_DIR / "sanitize_lean.py",
     }
     resolved_paths: dict[str, str] = {}
     for name, path in required_paths.items():
