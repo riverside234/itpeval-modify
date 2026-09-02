@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 
-DRAFT_PROMPT_VERSION = "babel_formal_v1_isabelle_to_draft_2026_09_02_p3"
+DRAFT_PROMPT_VERSION = "babel_formal_v1_isabelle_to_draft_2026_09_02_p4"
 
 SYSTEM_PROMPT = (
     "You are an expert mathematician and formal theorem prover, fluent in "
@@ -18,9 +18,11 @@ SYSTEM_PROMPT = (
     "prover-specific tactics, rewrites, automation, and local facts into the "
     "mathematical facts they establish. Use the proof-masked reference theory "
     "only to understand definitions, notation, assumptions, and helper theorem "
-    "statements. Do not invent a different proof, do not translate unrelated "
-    "theorems, and do not treat sorry placeholders as proof content. Return "
-    "only the final Draft using numbered proof-step headings."
+    "statements. When the proof uses a named definition or helper theorem, "
+    "preserve that name together with the mathematical content it contributes. "
+    "Do not invent a different proof, do not translate unrelated theorems, and "
+    "do not treat sorry placeholders as proof content. Return only the final "
+    "Draft using numbered proof-step headings."
 )
 
 
@@ -87,6 +89,9 @@ def build_draft_prompt(record: dict[str, Any]) -> DraftPrompt:
             "- Do not use sorry placeholders as evidence.\n"
             "- If the source proof invokes an earlier lemma, state the mathematical "
             "fact used from that lemma, not the lemma proof.\n"
+            "- Preserve the names of definitions, assumptions, and helper theorems "
+            "that are actually used, together with the mathematical claim each "
+            "one contributes.\n"
             "- Preserve variable names, hypotheses, case assumptions, induction "
             "hypotheses, contradiction assumptions, auxiliary variables, and "
             "witnesses when they are mathematically necessary.\n"
@@ -96,6 +101,9 @@ def build_draft_prompt(record: dict[str, Any]) -> DraftPrompt:
             "propositions, set relations, implications, or witnesses.\n"
             "- Use ordinary mathematical notation and preserve variable names "
             "when possible.\n"
+            "- Avoid renaming functions, constants, hypotheses, or helper facts "
+            "when their original names appear in the target statement or "
+            "reference context.\n"
             "- Keep each step focused on one principal mathematical claim.\n"
             "- Omit routine syntactic operations, but do not omit intermediate "
             "facts needed to reconstruct the argument.\n"
