@@ -128,7 +128,11 @@ def select_records(
     return selected
 
 
-def completed_draft_keys(path: str | Path) -> set[tuple[str, int, str, str]]:
+def completed_draft_keys(
+    path: str | Path,
+    *,
+    prompt_version: str | None = None,
+) -> set[tuple[str, int, str, str]]:
     output_path = resolve_repo_path(path)
     if not output_path.exists():
         return set()
@@ -136,6 +140,8 @@ def completed_draft_keys(path: str | Path) -> set[tuple[str, int, str, str]]:
     completed: set[tuple[str, int, str, str]] = set()
     for record in read_jsonl(output_path):
         if record.get("draft") and not record.get("draft_error"):
+            if prompt_version is not None and record.get("draft_prompt_version") != prompt_version:
+                continue
             completed.add(record_key(record))
     return completed
 
@@ -216,7 +222,12 @@ def generate_drafts(
         )
         return 0
 
-    skipped_keys = completed_draft_keys(output_path) if resume else set()
+    prompt_version = build_draft_prompt(records[0]).prompt_version
+    skipped_keys = (
+        completed_draft_keys(output_path, prompt_version=prompt_version)
+        if resume
+        else set()
+    )
     output = resolve_repo_path(output_path)
     if not resume:
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -293,3 +304,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+

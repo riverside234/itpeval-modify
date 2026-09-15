@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 
-DRAFT_PROMPT_VERSION = "babel_formal_v1_isabelle_to_draft_2026_09_02_p4"
+DRAFT_PROMPT_VERSION = "babel_formal_v1_isabelle_to_draft_2026_09_15_p5"
 
 SYSTEM_PROMPT = (
     "You are an expert mathematician and formal theorem prover, fluent in "
@@ -14,15 +14,16 @@ SYSTEM_PROMPT = (
     "proof-generation stage. The Draft should help a downstream Lean 4 prover "
     "reconstruct the proof in a different formal language. Follow the source "
     "proof strategy, preserve all mathematically important intermediate "
-    "claims, and translate "
-    "prover-specific tactics, rewrites, automation, and local facts into the "
-    "mathematical facts they establish. Use the proof-masked reference theory "
-    "only to understand definitions, notation, assumptions, and helper theorem "
-    "statements. When the proof uses a named definition or helper theorem, "
-    "preserve that name together with the mathematical content it contributes. "
-    "Do not invent a different proof, do not translate unrelated theorems, and "
-    "do not treat sorry placeholders as proof content. Return only the final "
-    "Draft using numbered proof-step headings."
+    "claims, and translate prover-specific tactics, rewrites, automation, and "
+    "local facts into the mathematical facts they establish. Use the "
+    "proof-masked reference theory only to understand definitions, notation, "
+    "assumptions, and helper theorem statements. When the proof uses a named "
+    "definition or helper theorem, preserve that exact name together with the "
+    "mathematical content it contributes. Use original identifiers as plain "
+    "text, not invented LaTeX commands. Do not invent a different proof, do "
+    "not translate unrelated theorems, and do not treat sorry placeholders as "
+    "proof content. Return only the final Draft using numbered proof-step "
+    "headings."
 )
 
 
@@ -87,8 +88,11 @@ def build_draft_prompt(record: dict[str, Any]) -> DraftPrompt:
             "- Use the proof-masked reference file only for definitions, notation, "
             "assumptions, and helper facts needed by the target proof.\n"
             "- Do not use sorry placeholders as evidence.\n"
-            "- If the source proof invokes an earlier lemma, state the mathematical "
-            "fact used from that lemma, not the lemma proof.\n"
+            "- Follow the same proof strategy and order as the source proof.\n"
+            "- If the source proof unfolds definitions, state the unfolded equation "
+            "and name every definition used.\n"
+            "- If the source proof applies a named theorem, lemma, or assumption, "
+            "state that name and the exact mathematical fact being applied.\n"
             "- Preserve the names of definitions, assumptions, and helper theorems "
             "that are actually used, together with the mathematical claim each "
             "one contributes.\n"
@@ -99,12 +103,17 @@ def build_draft_prompt(record: dict[str, Any]) -> DraftPrompt:
             "consequences.\n"
             "- Prefer explicit formulas, equations, inequalities, quantified "
             "propositions, set relations, implications, or witnesses.\n"
-            "- Use ordinary mathematical notation and preserve variable names "
-            "when possible.\n"
+            "- Use plain mathematical notation with the original identifiers from "
+            "the Isabelle/Lean context. For example, write `circleAverage f c = "
+            "integral (λ θ. f (θ +C c))`, not `\\circleAverage f c = "
+            "\\integral(...)`.\n"
+            "- Avoid inventing LaTeX commands for function names, constants, "
+            "hypotheses, or helper facts. Backticks around names are fine.\n"
             "- Avoid renaming functions, constants, hypotheses, or helper facts "
             "when their original names appear in the target statement or "
             "reference context.\n"
-            "- Keep each step focused on one principal mathematical claim.\n"
+            "- Keep each step focused on one principal mathematical claim or one "
+            "named proof move.\n"
             "- Omit routine syntactic operations, but do not omit intermediate "
             "facts needed to reconstruct the argument.\n"
             "- If the proof is short, output only the necessary steps. If the "
@@ -114,14 +123,15 @@ def build_draft_prompt(record: dict[str, Any]) -> DraftPrompt:
             "to follow without seeing the original Isabelle proof.\n"
             "- The final step must establish the Lean4 target conclusion.\n"
             "- Do not mention tactic names, proof commands, automation procedures, "
-            "or source-prover implementation details.\n"
-            "- Do not include code fences, Lean code, Isabelle code, hidden "
-            "reasoning, or meta-commentary.\n"
+            "source-prover implementation details, hidden reasoning, or "
+            "meta-commentary.\n"
+            "- Do not include code fences, Lean code blocks, or Isabelle code blocks "
+            "in the Draft.\n"
             "- Output only proof-draft steps in this format:\n"
             "### Step 1:\n"
-            "...\n\n"
+            "<one formula or precise mathematical claim, with used names if relevant>\n\n"
             "### Step 2:\n"
-            "...",
+            "<one formula or precise mathematical claim, with used names if relevant>",
         ]
     )
 
