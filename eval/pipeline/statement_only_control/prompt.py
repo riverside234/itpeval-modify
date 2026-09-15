@@ -4,20 +4,22 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
+from eval.pipeline.proof_transfer.inventory import inventory_isabelle_declarations
 
-STATEMENT_ONLY_PROMPT_VERSION = "babel_formal_v1_isabelle_statement_only_2026_09_15_p1"
+
+STATEMENT_ONLY_PROMPT_VERSION = "babel_formal_v1_isabelle_statement_reference_2026_09_15_p4"
+INPUT_MODE = "isabelle_statement_plus_masked_reference"
 
 SYSTEM_PROMPT = (
     "You are an expert mathematician and formal theorem prover, fluent in "
-    "Isabelle/HOL and Lean 4. This is a statement-only control experiment. "
-    "Convert the specified Isabelle theorem statement into a mathematical proof "
-    "Draft that could help a later automated proof-generation stage. You are "
-    "not given the original Isabelle proof. Do not pretend to know source proof "
-    "steps that were not provided. Instead, produce a plausible mathematical "
-    "proof plan from the theorem statement and any proof-masked reference "
-    "statements explicitly supplied. Preserve names of relevant definitions, "
-    "assumptions, and helper theorem statements when they are available. Return "
-    "only the final Draft using numbered proof-step headings."
+    "Isabelle/HOL and Lean 4. Generate a mathematical Draft for one theorem "
+    "from the provided proof-masked Isabelle theorem statement and proof-masked "
+    "Isabelle reference context. This is a statement/reference control "
+    "experiment: the original Isabelle proof is not provided. Produce a "
+    "plausible sequence of proof-step claims that could guide a later proof "
+    "generator. Follow the style of a Draft phase: numbered steps, mostly "
+    "formulas or precise mathematical claims, no source code, and no discussion "
+    "of prover internals."
 )
 
 
@@ -26,7 +28,7 @@ class StatementOnlyPrompt:
     system_prompt: str
     user_prompt: str
     prompt_version: str = STATEMENT_ONLY_PROMPT_VERSION
-    input_mode: str = "isabelle_statement_only"
+    input_mode: str = INPUT_MODE
 
 
 def _required_text(record: dict[str, Any], key: str) -> str:
@@ -40,64 +42,76 @@ def _fenced(language: str, content: str) -> str:
     return f"```{language}\n{content.rstrip()}\n```"
 
 
-def build_statement_only_prompt(
-    record: dict[str, Any],
-    *,
-    include_reference_context: bool = False,
-) -> StatementOnlyPrompt:
-    """Build the statement-only control prompt for one parsed V1 record."""
+def proof_masked_isabelle_statement(record: dict[str, Any]) -> str:
+    """Extract the target theorem statement from the proof-masked Isabelle file."""
+    reference = _required_text(record, "isabelle_reference_context")
+    target_name = record.get("isabelle_target_name") or record.get("target_key")
+    if not isinstance(target_name, str) or not target_name:
+        raise ValueError("record is missing isabelle_target_name/target_key")
+
+    declarations = inventory_isabelle_declarations(
+        reference,
+        topic=str(record.get("topic", "")),
+    )
+    for declaration in declarations:
+        if declaration.name == target_name:
+            start, end = declaration.statement_span
+            return reference[start:end].strip()
+
+    available = ", ".join(declaration.name for declaration in declarations)
+    raise ValueError(
+        f"could not find target {target_name!r} in proof-masked Isabelle reference; "
+        f"available declarations: {available}"
+    )
+
+
+def build_statement_only_prompt(record: dict[str, Any]) -> StatementOnlyPrompt:
+    """Build the statement-plus-masked-reference control prompt for one V1 record."""
     source = record.get("source", "")
     theorem_id = record.get("theorem_id", "")
     topic = record.get("topic", "")
     target_key = record.get("target_key", "")
-    input_mode = (
-        "isabelle_statement_plus_masked_reference"
-        if include_reference_context
-        else "isabelle_statement_only"
-    )
+    masked_statement = proof_masked_isabelle_statement(record)
+    masked_reference = _required_text(record, "isabelle_reference_context")
 
     sections = [
-        "EXPERIMENT TARGET\n"
+        "experiment_target:\n"
         f"source: {source}\n"
         f"theorem_id: {theorem_id}\n"
         f"topic: {topic}\n"
         f"target_key: {target_key}\n"
-        f"control_input_mode: {input_mode}",
-        "TARGET ISABELLE THEOREM STATEMENT\n"
-        + _fenced("isabelle", _required_text(record, "isabelle_statement")),
+        f"control_input_mode: {INPUT_MODE}",
+        "isabelle_statement:\n"
+        + _fenced("isabelle", masked_statement),
+        "isabelle_reference:\n"
+        + _fenced("isabelle", masked_reference),
     ]
 
-    if include_reference_context:
-        sections.append(
-            "PROOF-MASKED REFERENCE ISABELLE FILE\n"
-            + _fenced("isabelle", _required_text(record, "isabelle_reference_context"))
-        )
-
     sections.append(
-        "DRAFT REQUIREMENTS\n"
-        "- This is a control run: do not use the original Isabelle proof.\n"
+        "Please provide a possible mathematical proof Draft in numbered steps. "
+        "The Draft should be useful to a later automated proof-generation stage.\n\n"
+        "Important constraints:\n"
+        "- Use only the proof-masked Isabelle theorem statement and proof-masked Isabelle reference context above.\n"
+        "- Do not use the original Isabelle proof; it is intentionally not provided.\n"
         "- Do not use the oracle Lean statement, Lean header, Lean proof, or any target-language proof.\n"
-        "- Use only the target Isabelle theorem statement"
-        + (" and the proof-masked Isabelle reference file" if include_reference_context else "")
-        + ".\n"
-        "- If a proof-masked reference file is provided, use it only for definitions, notation, assumptions, and helper theorem statements; do not use sorry placeholders as evidence.\n"
-        "- Produce a mathematical Draft: a sequence of useful claims, reductions, cases, witnesses, or lemmas that could plausibly reconstruct the target theorem.\n"
-        "- Preserve variable names, function names, constants, definitions, assumptions, and helper theorem names when they appear in the provided Isabelle text.\n"
-        "- Prefer explicit formulas, equations, inequalities, quantified propositions, set relations, implications, or witnesses.\n"
-        "- Do not mention tactic names, proof commands, automation procedures, source-prover implementation details, or the fact that this is only a control run.\n"
-        "- Do not include code fences, Lean code, Isabelle code, hidden reasoning, or meta-commentary.\n"
-        "- The final step must state the target conclusion.\n"
-        "- Output only proof-draft steps in this format:\n"
+        "- Use the proof-masked Isabelle reference only for definitions, notation, assumptions, and helper theorem statements. Do not use `sorry` placeholders as proof evidence.\n"
+        "- Do not claim that the source proof performed a step unless that step follows from the provided statement or reference context.\n"
+        "- Prefer a sequence of explicit formulas, equations, inequalities, quantified propositions, case claims, witnesses, or named helper facts.\n"
+        "- Each step should contain one principal mathematical claim. Short explanatory phrases are allowed only when they clarify the claim.\n"
+        "- Preserve names of functions, constants, definitions, assumptions, and helper theorems that appear in the provided Isabelle text.\n"
+        "- Do not output Isabelle code, Lean code, tactic names, proof commands, automation procedures, or meta-commentary.\n"
+        "- The final step should state the target conclusion.\n\n"
+        "Here is the required output format:\n"
         "### Step 1:\n"
-        "...\n\n"
+        "<one formula or precise mathematical claim>\n\n"
         "### Step 2:\n"
-        "..."
+        "<one formula or precise mathematical claim>\n\n"
+        "Continue until the theorem follows.\n"
     )
 
     return StatementOnlyPrompt(
         system_prompt=SYSTEM_PROMPT,
         user_prompt="\n\n".join(sections),
-        input_mode=input_mode,
     )
 
 

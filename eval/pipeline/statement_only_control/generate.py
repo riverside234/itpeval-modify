@@ -24,15 +24,17 @@ from eval.pipeline.proof_transfer.llm import (
     call_draft_model,
 )
 from eval.pipeline.statement_only_control.prompt import (
+    INPUT_MODE,
     StatementOnlyPrompt,
     build_statement_only_prompt,
     normalize_draft_content,
+    proof_masked_isabelle_statement,
 )
 
 
 DEFAULT_RECORDS_INPUT = "eval/results/proof_transfer/babel_formal_v1_exact_name_records.jsonl"
-DEFAULT_OUTPUT = "eval/results/statement_only_control/babel_formal_v1_statement_only_drafts.jsonl"
-CONTROL_NAME = "isabelle_statement_only"
+DEFAULT_OUTPUT = "eval/results/statement_only_control/babel_formal_v1_statement_reference_drafts.jsonl"
+CONTROL_NAME = INPUT_MODE
 
 
 def _print_json(data: Any) -> None:
@@ -69,13 +71,9 @@ def generate_statement_only_record(
     record: dict[str, Any],
     *,
     config: DraftModelConfig,
-    include_reference_context: bool = False,
     continue_on_error: bool = True,
 ) -> dict[str, Any]:
-    prompt = build_statement_only_prompt(
-        record,
-        include_reference_context=include_reference_context,
-    )
+    prompt = build_statement_only_prompt(record)
     result = {
         "source": record.get("source"),
         "theorem_id": record.get("theorem_id"),
@@ -84,9 +82,11 @@ def generate_statement_only_record(
         "target_key": record.get("target_key"),
         "isabelle_target_name": record.get("isabelle_target_name"),
         "lean4_target_name": record.get("lean4_target_name"),
-        "isabelle_statement": record.get("isabelle_statement"),
+        "isabelle_statement": proof_masked_isabelle_statement(record),
+        "isabelle_reference": record.get("isabelle_reference_context"),
         "control_name": CONTROL_NAME,
         "control_input_mode": prompt.input_mode,
+        "input_policy": "proof_masked_isabelle_statement_and_reference_only",
         "excluded_from_prompt": [
             "isabelle_proof",
             "lean4_statement",
@@ -94,15 +94,12 @@ def generate_statement_only_record(
             "lean4_footer",
             "metadata.lean4.original_proof",
         ],
-        "reference_context_included": include_reference_context,
+        "reference_context_included": True,
         "draft_prompt_version": prompt.prompt_version,
         "draft_prompt_sha256": _prompt_sha256(prompt),
         "draft_model": config.to_metadata(),
         "draft_generated_at": datetime.now(timezone.utc).isoformat(),
     }
-
-    if include_reference_context:
-        result["isabelle_reference_context"] = record.get("isabelle_reference_context")
 
     start = time.monotonic()
     try:
@@ -134,7 +131,6 @@ def generate_statement_only_drafts(
     model: str = DEFAULT_DRAFT_MODEL,
     reasoning_effort: ReasoningEffort = DEFAULT_REASONING_EFFORT,
     max_output_tokens: int = 16000,
-    include_reference_context: bool = False,
     resume: bool = True,
     continue_on_error: bool = True,
     dry_run: bool = False,
@@ -149,10 +145,7 @@ def generate_statement_only_drafts(
         raise SystemExit("No input records matched the requested filters.")
 
     if dry_run:
-        prompt = build_statement_only_prompt(
-            records[0],
-            include_reference_context=include_reference_context,
-        )
+        prompt = build_statement_only_prompt(records[0])
         _print_json(
             {
                 "dry_run": True,
@@ -184,42 +177,36 @@ def generate_statement_only_drafts(
     for index, record in enumerate(records, start=1):
         key = record_key(record)
         if key in skipped:
-            print(f"[{index}/{total}] skip existing statement-only draft {key[2]}/{key[3]}", file=sys.stderr)
+            print(f"[{index}/{total}] skip existing statement/reference draft {key[2]}/{key[3]}", file=sys.stderr)
             continue
 
-        print(f"[{index}/{total}] statement-only draft {key[2]}/{key[3]}", file=sys.stderr)
+        print(f"[{index}/{total}] statement/reference draft {key[2]}/{key[3]}", file=sys.stderr)
         drafted = generate_statement_only_record(
             record,
             config=config,
-            include_reference_context=include_reference_context,
             continue_on_error=continue_on_error,
         )
         append_jsonl(output, drafted)
         written += 1
 
-    print(f"Wrote {written} new statement-only draft record(s) to {output}")
+    print(f"Wrote {written} new statement/reference draft record(s) to {output}")
     return written
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Generate statement-only control Drafts for parsed Babel Formal records."
+        description="Generate statement/reference control Drafts for parsed Babel Formal records."
     )
     parser.add_argument("--expected-root", help=f"Expected repo root, e.g. {LAB_REPO_ROOT}.")
     parser.add_argument("--check-layout", action="store_true", help="Validate repo/input paths and exit.")
     parser.add_argument("--input", default=DEFAULT_RECORDS_INPUT, help="Parsed V1 records JSONL.")
-    parser.add_argument("--output", default=DEFAULT_OUTPUT, help="Statement-only Draft records JSONL.")
+    parser.add_argument("--output", default=DEFAULT_OUTPUT, help="Statement/reference Draft records JSONL.")
     parser.add_argument("--topic", help="Optional Babel Formal topic filter.")
     parser.add_argument("--target-key", help="Optional local target theorem filter.")
     parser.add_argument("--limit", type=int, help="Optional maximum number of selected records.")
     parser.add_argument("--model", default=DEFAULT_DRAFT_MODEL)
     parser.add_argument("--reasoning-effort", default=DEFAULT_REASONING_EFFORT)
     parser.add_argument("--max-output-tokens", type=int, default=16000)
-    parser.add_argument(
-        "--include-reference-context",
-        action="store_true",
-        help="Also include the proof-masked Isabelle stmt file. Default is strict theorem-statement only.",
-    )
     parser.add_argument("--resume", dest="resume", action="store_true", default=True)
     parser.add_argument("--no-resume", dest="resume", action="store_false")
     parser.add_argument("--continue-on-error", dest="continue_on_error", action="store_true", default=True)
@@ -242,7 +229,6 @@ def main() -> None:
         model=args.model,
         reasoning_effort=args.reasoning_effort,
         max_output_tokens=args.max_output_tokens,
-        include_reference_context=args.include_reference_context,
         resume=args.resume,
         continue_on_error=args.continue_on_error,
         dry_run=args.dry_run,
@@ -251,3 +237,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
