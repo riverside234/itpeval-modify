@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 
-DRAFT_PROMPT_VERSION = "babel_formal_v1_isabelle_to_draft_2026_09_15_p5"
+DRAFT_PROMPT_VERSION = "babel_formal_v1_isabelle_to_draft_2026_09_15_p6"
 
 SYSTEM_PROMPT = (
     "You are an expert mathematician and formal theorem prover, fluent in "
@@ -16,14 +16,14 @@ SYSTEM_PROMPT = (
     "proof strategy, preserve all mathematically important intermediate "
     "claims, and translate prover-specific tactics, rewrites, automation, and "
     "local facts into the mathematical facts they establish. Use the "
-    "proof-masked reference theory only to understand definitions, notation, "
-    "assumptions, and helper theorem statements. When the proof uses a named "
-    "definition or helper theorem, preserve that exact name together with the "
-    "mathematical content it contributes. Use original identifiers as plain "
-    "text, not invented LaTeX commands. Do not invent a different proof, do "
-    "not translate unrelated theorems, and do not treat sorry placeholders as "
-    "proof content. Return only the final Draft using numbered proof-step "
-    "headings."
+    "proof-masked Isabelle reference theory to understand the source proof and "
+    "the proof-masked Lean 4 context to translate source notation into exact "
+    "target-side identifiers. When an equivalent Lean declaration is present, "
+    "use its exact name and expression vocabulary in the Draft. Write formulas "
+    "as plain Lean-like expressions inside Markdown prose, not as LaTeX. Do not "
+    "invent a different proof, translate unrelated theorems, emit Lean proof "
+    "code, or treat sorry placeholders as proof content. Return only the final "
+    "Draft using numbered Markdown proof-step headings."
 )
 
 
@@ -63,6 +63,7 @@ def build_draft_prompt(record: dict[str, Any]) -> DraftPrompt:
     context_mode = record.get("context_mode", "")
 
     lean4_statement = _required_text(record, "lean4_statement")
+    lean4_header = _required_text(record, "lean4_header")
 
     user_prompt = "\n\n".join(
         [
@@ -75,6 +76,9 @@ def build_draft_prompt(record: dict[str, Any]) -> DraftPrompt:
             "ORACLE LEAN4 TARGET STATEMENT (proof masked; use only as the "
             "target conclusion)\n"
             + _fenced("lean4", lean4_statement),
+            "PROOF-MASKED LEAN4 CONTEXT (use only for exact target-side "
+            "declaration names, notation, types, and helper-fact statements)\n"
+            + _fenced("lean4", lean4_header),
             "TARGET ISABELLE THEOREM STATEMENT\n"
             + _fenced("isabelle", _required_text(record, "isabelle_statement")),
             "TARGET ISABELLE PROOF TO TRANSLATE\n"
@@ -84,15 +88,22 @@ def build_draft_prompt(record: dict[str, Any]) -> DraftPrompt:
             "DRAFT REQUIREMENTS\n"
             "- Translate only the target Isabelle proof body.\n"
             "- Read the whole target statement, target proof, oracle Lean4 "
-            "statement, and reference context before writing the Draft.\n"
+            "statement, proof-masked Lean4 context, and Isabelle reference "
+            "context before writing the Draft.\n"
             "- Use the proof-masked reference file only for definitions, notation, "
             "assumptions, and helper facts needed by the target proof.\n"
+            "- Use the proof-masked Lean4 context as a vocabulary map for the "
+            "target language, not as proof evidence.\n"
             "- Do not use sorry placeholders as evidence.\n"
             "- Follow the same proof strategy and order as the source proof.\n"
             "- If the source proof unfolds definitions, state the unfolded equation "
-            "and name every definition used.\n"
+            "and use the exact corresponding definition names from the Lean4 "
+            "context when available. An Isabelle name such as `foo_def` often "
+            "corresponds to the Lean definition `foo`; do not retain `_def` unless "
+            "that exact declaration exists in the Lean4 context.\n"
             "- If the source proof applies a named theorem, lemma, or assumption, "
-            "state that name and the exact mathematical fact being applied.\n"
+            "state the exact corresponding Lean4 name when available and the "
+            "mathematical fact being applied.\n"
             "- Preserve the names of definitions, assumptions, and helper theorems "
             "that are actually used, together with the mathematical claim each "
             "one contributes.\n"
@@ -102,13 +113,17 @@ def build_draft_prompt(record: dict[str, Any]) -> DraftPrompt:
             "- Replace Isabelle tactics and proof commands with their mathematical "
             "consequences.\n"
             "- Prefer explicit formulas, equations, inequalities, quantified "
-            "propositions, set relations, implications, or witnesses.\n"
-            "- Use plain mathematical notation with the original identifiers from "
-            "the Isabelle/Lean context. For example, write `circleAverage f c = "
-            "integral (λ θ. f (θ +C c))`, not `\\circleAverage f c = "
-            "\\integral(...)`.\n"
-            "- Avoid inventing LaTeX commands for function names, constants, "
-            "hypotheses, or helper facts. Backticks around names are fine.\n"
+            "propositions, set relations, implications, or witnesses. Write them "
+            "in plain Lean-like notation whenever the Lean4 context provides the "
+            "needed vocabulary.\n"
+            "- Translate Isabelle-only syntax and notation into the corresponding "
+            "Lean-like expression. For example, translate `\\<lambda>theta. ...` "
+            "to `fun theta => ...`, and translate source-only `theta +C c` to "
+            "`AddMonoid.add theta c` when that is the operation declared in the "
+            "Lean4 context.\n"
+            "- Use inline backticks around identifiers and formulas. Do not use "
+            "LaTeX commands, display-math delimiters, HTML escapes, trailing "
+            "backslashes, or invented notation.\n"
             "- Avoid renaming functions, constants, hypotheses, or helper facts "
             "when their original names appear in the target statement or "
             "reference context.\n"
@@ -122,16 +137,25 @@ def build_draft_prompt(record: dict[str, Any]) -> DraftPrompt:
             "- Make the Draft self-contained enough for a later proof generator "
             "to follow without seeing the original Isabelle proof.\n"
             "- The final step must establish the Lean4 target conclusion.\n"
-            "- Do not mention tactic names, proof commands, automation procedures, "
-            "source-prover implementation details, hidden reasoning, or "
-            "meta-commentary.\n"
-            "- Do not include code fences, Lean code blocks, or Isabelle code blocks "
-            "in the Draft.\n"
-            "- Output only proof-draft steps in this format:\n"
-            "### Step 1:\n"
-            "<one formula or precise mathematical claim, with used names if relevant>\n\n"
-            "### Step 2:\n"
-            "<one formula or precise mathematical claim, with used names if relevant>",
+            "- Do not reproduce Isabelle tactic syntax, proof-command syntax, "
+            "automation procedures, source-prover implementation details, hidden "
+            "reasoning, or meta-commentary. Describe the mathematical effect of "
+            "each source proof move instead.\n"
+            "- Do not include code fences, a complete Lean theorem, or tactic-mode "
+            "proof code in the Draft.\n"
+            "- Output only proof-draft steps in this Markdown format:\n"
+            "### Step 1\n"
+            "<one proof move followed by its Lean-like formula or precise claim>\n\n"
+            "### Step 2\n"
+            "<one proof move followed by its Lean-like formula or precise claim>\n\n"
+            "FORMAT EXAMPLE (illustrative only; do not copy its theorem-specific "
+            "content into other problems):\n"
+            "### Step 1\n"
+            "Unfold `circleAverage` and `circleMap`. The goal becomes "
+            "`integral (fun theta => f (AddMonoid.add theta c)) = integral f`.\n\n"
+            "### Step 2\n"
+            "Apply `integral_shift f c`, whose conclusion is exactly the current "
+            "goal. Therefore, `circleAverage f c = integral f`.",
         ]
     )
 
