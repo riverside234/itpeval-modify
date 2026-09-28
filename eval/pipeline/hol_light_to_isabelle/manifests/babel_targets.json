@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "source": "babel-formal",
+  "direction": "hol-light-to-isabelle",
+  "targets": [
+    {
+      "topic": "circle_average",
+      "target_key": "circleAverage_center_independent",
+      "hol_light_target_name": "circleAverage_center_independent",
+      "isabelle_target_name": "circleAverage_center_independent",
+      "status": "verified",
+      "semantic_alignment_verified": true,
+      "notes": "Starter fixture: the HOL Light statement and Isabelle locale lemma express center independence."
+    }
+  ]
+}

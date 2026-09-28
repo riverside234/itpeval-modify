@@ -30,6 +30,7 @@ eval = [
     "data/*.json",
     "data/*.jsonl",
     "pipeline/proof_transfer/manifests/*.json",
+    "pipeline/hol_light_to_isabelle/manifests/*.json",
 ]
 
 [project.scripts]
