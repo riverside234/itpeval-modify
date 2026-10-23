@@ -23,7 +23,9 @@ class PipelineTests(unittest.TestCase):
             verified = root / "verified.jsonl"
             write_jsonl(records, extract_records(
                 topic="circle_average", target_key="circleAverage_center_independent"))
-            with patch("eval.pipeline.hol_light_to_isabelle.generate_draft.call_draft_model",
+            with patch("eval.pipeline.hol_light_to_isabelle.verify_isabelle.isabelle2024_runtime",
+                       return_value={"prefix": str(root), "isabelle_version": "Isabelle2024"}), patch(
+                "eval.pipeline.hol_light_to_isabelle.generate_draft.call_draft_model",
                        return_value="### Step 1\nUse integral_shift.") as draft_model, patch(
                 "eval.pipeline.hol_light_to_isabelle.generate_sketch.call_draft_model",
                 return_value="by simp") as sketch_model, patch(

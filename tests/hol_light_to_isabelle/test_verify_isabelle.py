@@ -28,7 +28,9 @@ class VerifyTests(unittest.TestCase):
         record, = extract_records(topic="circle_average",
                                   target_key="circleAverage_center_independent")
         record["isabelle_proof"] = "by simp"
-        with patch("eval.pipeline.hol_light_to_isabelle.verify_isabelle.run_itp") as run:
+        with patch("eval.pipeline.hol_light_to_isabelle.verify_isabelle.isabelle2024_runtime",
+                   return_value={"prefix": ".", "isabelle_version": "Isabelle2024"}), patch(
+                "eval.pipeline.hol_light_to_isabelle.verify_isabelle.run_itp") as run:
             run.return_value = SimpleNamespace(ok=False, stderr="proof failed", stdout="",
                                                returncode=1, duration_ms=20)
             result = verify_record(record)
@@ -57,7 +59,9 @@ class VerifyTests(unittest.TestCase):
                                duration_ms=20)
         bad = SimpleNamespace(ok=False, stderr="expected failure", stdout="",
                               returncode=1, duration_ms=20)
-        with patch("eval.pipeline.hol_light_to_isabelle.verify_isabelle.run_itp",
+        with patch("eval.pipeline.hol_light_to_isabelle.verify_isabelle.isabelle2024_runtime",
+                   return_value={"prefix": ".", "isabelle_version": "Isabelle2024"}), patch(
+                   "eval.pipeline.hol_light_to_isabelle.verify_isabelle.run_itp",
                    side_effect=[good, bad]) as prover:
             result = preflight(record)
         self.assertTrue(result["baseline_ok"])

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -79,3 +80,111 @@ def write_jsonl(path: str | Path, records: Iterable[dict[str, Any]]) -> Path:
 
 def prompt_hash(system: str, user: str) -> str:
     return sha256(system + "\n\n" + user)
+
+
+def fingerprint(value: Any) -> str:
+    return sha256(json.dumps(value, sort_keys=True, ensure_ascii=True, separators=(",", ":")))
+
+
+def repository_commit() -> str | None:
+    try:
+        run = subprocess.run(["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"],
+                             capture_output=True, text=True, check=True, timeout=10)
+        return run.stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def public_record(record: dict) -> dict:
+    omitted = {"system_prompt", "user_prompt", "thinking", "reasoning_content", "raw_response"}
+    return {name: value for name, value in record.items() if name not in omitted}
+
+
+def latest_records(path: str | Path, *, samples: bool = False, **filters) -> list[dict]:
+    latest = {}
+    for record in read_jsonl(path):
+        identity = (key(record), int(record["sample_idx"])) if samples else key(record)
+        latest[identity] = record
+    limit = filters.pop("limit", None)
+    records = select(latest.values(), **filters)
+    if limit is not None:
+        if limit < 1:
+            raise ValueError("limit must be positive")
+        wanted = list(dict.fromkeys(key(record) for record in records))[:limit]
+        records = [record for record in records if key(record) in wanted]
+    return records
+
+
+def align_samples(records: list[dict], expected: list[dict] | None,
+                  samples: int | None, *, pipeline: str) -> list[dict]:
+    if expected is None:
+        return records
+    if samples is None or samples < 1:
+        raise ValueError("expected_samples must be positive with an expected cohort")
+    latest = {(key(record), int(record["sample_idx"])): record for record in records}
+    fields = ("draft", "isabelle_statement", "isabelle_theory_template",
+              "isabelle_context_before_target", "isabelle_proof_prefix",
+              "isabelle_target_proof_span", "metadata")
+    result = []
+    for target in expected:
+        for index in range(samples):
+            record = latest.get((key(target), index))
+            if record is not None and all(
+                record.get(field, "" if field == "isabelle_proof_prefix" else None)
+                == target.get(field, "" if field == "isabelle_proof_prefix" else None)
+                for field in fields
+            ):
+                result.append(record)
+            else:
+                result.append({
+                    **public_record(target), "pipeline": pipeline, "sample_idx": index,
+                    "sketch_error": "missing or stale Sketch for this saved Draft/context",
+                    "failure_category": "missing_sketch",
+                })
+    return result
+
+
+def summarize(records: list[dict], *, expected: list[dict] | None = None,
+              expected_samples: int | None = None) -> dict:
+    groups: dict[tuple, list[dict]] = {key(record): [] for record in expected or []}
+    failures: dict[str, int] = {}
+    for record in records:
+        groups.setdefault(key(record), []).append(record)
+        if not record.get("verified"):
+            category = record.get("failure_category") or (
+                "sketch_error" if record.get("sketch_error") else "verification_failure")
+            failures[category] = failures.get(category, 0) + 1
+    one = sum(any(row.get("verified") and row.get("sample_idx") == 0 for row in rows)
+              for rows in groups.values())
+    many = sum(any(row.get("verified") for row in rows) for rows in groups.values())
+    total = len(groups)
+    result = {
+        "targets": total, "samples": len(records),
+        "verified_samples": sum(bool(row.get("verified")) for row in records),
+        "pass_at_1_count": one, "pass_at_1": one / total if total else 0,
+        "pass_at_k_count": many, "pass_at_k": many / total if total else 0,
+        "metric": "empirical first-sample success and success among generated K samples",
+        "failure_counts": failures,
+    }
+    if expected_samples is not None:
+        result["expected_samples_per_target"] = expected_samples
+        result["missing_samples"] = sum(
+            len(set(range(expected_samples)) - {int(row["sample_idx"]) for row in rows})
+            for rows in groups.values())
+    return result
+
+
+def save_results(path: str | Path, records: list[dict], *,
+                 preserve_unselected: bool = False, **summary_options) -> dict:
+    stored = records
+    output = repo_path(path)
+    if preserve_unselected and output.is_file():
+        active = {(row.get("pipeline"), key(row), int(row["sample_idx"])) for row in records}
+        retained = [row for row in read_jsonl(path)
+                    if (row.get("pipeline"), key(row), int(row["sample_idx"])) not in active]
+        stored = retained + records
+    output = write_jsonl(path, [public_record(record) for record in stored])
+    summary = summarize(records, **summary_options)
+    output.with_suffix(".summary.json").write_text(
+        json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return summary

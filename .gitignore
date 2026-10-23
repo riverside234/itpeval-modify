@@ -73,3 +73,7 @@ dist/
 *~
 
 /notes/
+
+# Local V2 DSP dependencies and runtime configuration
+/external/
+/eval/configs/hol_light_to_isabelle/*.local.json

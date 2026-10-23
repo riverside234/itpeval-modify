@@ -31,7 +31,13 @@ eval = [
     "data/*.jsonl",
     "pipeline/proof_transfer/manifests/*.json",
     "pipeline/hol_light_to_isabelle/manifests/*.json",
+    "configs/hol_light_to_isabelle/*.example.json",
+    "pipeline/hol_light_to_isabelle/v2_dsp/UPSTREAM_LICENSE.txt",
+    "pipeline/hol_light_to_isabelle/README.md",
 ]
+
+[project.optional-dependencies]
+isabelle-dsp = ["grpcio", "protobuf>=3.20,<4"]
 
 [project.scripts]
 itpeval = "itpeval.cli.main:main"
