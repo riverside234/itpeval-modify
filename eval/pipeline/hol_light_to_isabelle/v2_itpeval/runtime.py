@@ -1,23 +1,11 @@
-"""Resolve the exact ITPEval installation used for both version checks and builds."""
+"""Compatibility alias for the relocated Babel Formal pipeline."""
 
-from __future__ import annotations
+from importlib import import_module
+import sys
 
-import subprocess
+module = import_module("eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_itpeval.runtime")
 
-from itpeval.itp import _default_prefix
-from eval.pipeline.hol_light_to_isabelle.common import repository_commit
-
-
-def isabelle2024_runtime() -> dict:
-    prefix = _default_prefix().resolve()
-    executable = prefix / "isabelle" / "bin" / "isabelle"
-    if not executable.is_file():
-        raise FileNotFoundError(f"missing Isabelle2024 executable: {executable}")
-    run = subprocess.run([str(executable), "version"], text=True, capture_output=True,
-                         timeout=30, check=True)
-    version = run.stdout.strip()
-    if version != "Isabelle2024":
-        raise ValueError(f"v2-itpeval requires Isabelle2024; found {version!r}")
-    return {"backend": "itpeval", "isabelle_version": version,
-            "itpeval_commit": repository_commit(),
-            "isabelle_executable": str(executable.resolve()), "prefix": str(prefix)}
+if __name__ == "__main__":
+    module.main()
+else:
+    sys.modules[__name__] = module

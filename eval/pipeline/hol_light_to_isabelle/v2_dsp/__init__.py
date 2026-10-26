@@ -1,1 +1,1 @@
-"""Individual Isabelle theorem sketches and DSP/PISA proof search."""
+"""Compatibility namespace; use babel_formal_pipeline for new commands."""

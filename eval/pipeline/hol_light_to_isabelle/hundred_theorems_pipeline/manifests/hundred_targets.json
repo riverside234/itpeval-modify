@@ -1,0 +1,6 @@
+{
+  "source": "hundred-theorems",
+  "direction": "hol-light-to-isabelle",
+  "notes": "Automatic unique-name candidates are inventoried from aligned files. Add reviewed renamed mappings here; do not infer declaration equivalence from a shared file title.",
+  "targets": []
+}

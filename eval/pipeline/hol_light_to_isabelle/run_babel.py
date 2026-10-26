@@ -1,5 +1,11 @@
-"""Legacy V2 end-to-end command, including explicit Draft generation."""
-from eval.pipeline.hol_light_to_isabelle.v2_itpeval.legacy import main
+"""Compatibility alias for the relocated Babel Formal pipeline."""
+
+from importlib import import_module
+import sys
+
+module = import_module("eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.run_babel")
 
 if __name__ == "__main__":
-    main()
+    module.main()
+else:
+    sys.modules[__name__] = module

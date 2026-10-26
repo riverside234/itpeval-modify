@@ -1,6 +1,11 @@
-"""Compatibility import for the original V2 Sketch prompt."""
-import sys
-from importlib import import_module
+"""Compatibility alias for the relocated Babel Formal pipeline."""
 
-sys.modules[__name__] = import_module(
-    "eval.pipeline.hol_light_to_isabelle.v2_itpeval.sketch_prompt")
+from importlib import import_module
+import sys
+
+module = import_module("eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sketch_prompt")
+
+if __name__ == "__main__":
+    module.main()
+else:
+    sys.modules[__name__] = module

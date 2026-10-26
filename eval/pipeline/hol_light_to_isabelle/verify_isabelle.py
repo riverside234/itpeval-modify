@@ -1,10 +1,11 @@
-"""Compatibility entry point for the original V2 verifier."""
-import sys
-from importlib import import_module
+"""Compatibility alias for the relocated Babel Formal pipeline."""
 
-_implementation = import_module(
-    "eval.pipeline.hol_light_to_isabelle.v2_itpeval.verify_isabelle")
+from importlib import import_module
+import sys
+
+module = import_module("eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.verify_isabelle")
+
 if __name__ == "__main__":
-    _implementation.main(legacy=True)
+    module.main(legacy=True)
 else:
-    sys.modules[__name__] = _implementation
+    sys.modules[__name__] = module
