@@ -77,3 +77,11 @@ dist/
 # Local V2 DSP dependencies and runtime configuration
 /external/
 /eval/configs/hol_light_to_isabelle/*.local.json
+
+# Isolated Qwen/vLLM server artifacts
+/vllm/env/
+/vllm/models/
+/vllm/cache/
+/vllm/logs/
+/vllm/*.local.json
+/eval/configs/inference/*.local.json

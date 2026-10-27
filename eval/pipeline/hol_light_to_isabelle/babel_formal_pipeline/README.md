@@ -1,5 +1,10 @@
 # Babel Formal: HOL Light to Isabelle V2
 
+Draft and Sketch support the existing GPT API and an optional local Qwen
+server. Standalone generators accept `--llm-config`; saved-Draft runners
+accept `--sketch-llm-config`. See [vLLM setup and commands](../../../../vllm/README.md).
+
+
 The two baselines consume the same saved mathematical Drafts, oracle Isabelle
 statements, and proof-masked target contexts. Each record represents one
 theorem. Draft generation is in this dataset package.

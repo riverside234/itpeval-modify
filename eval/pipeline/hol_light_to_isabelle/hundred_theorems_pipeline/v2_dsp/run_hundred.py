@@ -20,7 +20,8 @@ from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.prove 
 )
 from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.runtime import DspConfig
 from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.sketch_prompt import build_sketch_prompt
-from eval.pipeline.proof_transfer.llm import DEFAULT_DRAFT_MODEL
+from eval.pipeline.inference.config import output_path_for_profile
+from eval.pipeline.proof_transfer.llm import DEFAULT_DRAFT_MODEL, resolve_model_config
 
 
 def main() -> None:
@@ -28,17 +29,18 @@ def main() -> None:
     parser.add_argument("--expected-root", help=f"Lab repo: {LAB_REPO_ROOT}")
     parser.add_argument("--config", required=True)
     parser.add_argument("--drafts", required=True)
-    parser.add_argument("--dsp-output", default=DEFAULT_DSP)
-    parser.add_argument("--sketch-output", default=DEFAULT_SKETCHES)
-    parser.add_argument("--prove-output", default=DEFAULT_PROVE_OUTPUT)
-    parser.add_argument("--output", default=DEFAULT_OUTPUT)
+    parser.add_argument("--dsp-output")
+    parser.add_argument("--sketch-output")
+    parser.add_argument("--prove-output")
+    parser.add_argument("--output")
     parser.add_argument("--topic")
     parser.add_argument("--target-key")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--samples", type=int, default=1)
-    parser.add_argument("--sketch-model", default=DEFAULT_DRAFT_MODEL)
-    parser.add_argument("--sketch-reasoning-effort", default="high")
-    parser.add_argument("--max-output-tokens", type=int, default=16000)
+    parser.add_argument("--sketch-llm-config", help="API or vLLM JSON profile for Sketch generation.")
+    parser.add_argument("--sketch-model", default=None)
+    parser.add_argument("--sketch-reasoning-effort", default=None)
+    parser.add_argument("--max-output-tokens", type=int, default=None)
     parser.add_argument("--no-resume", action="store_true")
     parser.add_argument("--fail-fast", action="store_true")
     parser.add_argument("--skip-sketch", action="store_true")
@@ -47,6 +49,10 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     validate_layout(args.expected_root)
+    llm_config = resolve_model_config(
+        args.sketch_llm_config, model=args.sketch_model,
+        reasoning_effort=args.sketch_reasoning_effort, max_output_tokens=args.max_output_tokens,
+        default_effort="high", dry_run=args.dry_run)
     if args.samples < 1:
         parser.error("--samples must be positive")
     filters = dict(topic=args.topic, target_key=args.target_key, limit=args.limit)
@@ -54,10 +60,15 @@ def main() -> None:
     require_source(expected, SOURCE)
     if not expected:
         parser.error("no matching saved Drafts")
+    args.sketch_output = output_path_for_profile(args.sketch_output, DEFAULT_SKETCHES, llm_config, draft_records=expected)
+    args.output = output_path_for_profile(args.output, DEFAULT_OUTPUT, llm_config, draft_records=expected)
+    args.dsp_output = output_path_for_profile(args.dsp_output, DEFAULT_DSP, llm_config, draft_records=expected)
+    args.prove_output = output_path_for_profile(args.prove_output, DEFAULT_PROVE_OUTPUT, llm_config, draft_records=expected)
     if args.dry_run:
         prompt = build_sketch_prompt(export_record(expected[0]))
         print(json.dumps({"pipeline": "v2-dsp", "selected_records": len(expected),
-                          "samples": args.samples, "prompt_version": prompt.version,
+                          "samples": args.samples, "llm_config": llm_config.to_metadata(),
+                          "prompt_version": prompt.version,
                           "system_prompt": prompt.system_prompt,
                           "user_prompt": prompt.user_prompt}, indent=2))
         return
@@ -87,7 +98,7 @@ def main() -> None:
             samples=args.samples, model=args.sketch_model,
             reasoning_effort=args.sketch_reasoning_effort,
             max_output_tokens=args.max_output_tokens, resume=not args.no_resume,
-            continue_on_error=not args.fail_fast, blocked_targets=blocked)
+            continue_on_error=not args.fail_fast, blocked_targets=blocked, llm_config=llm_config)
     source = args.prove_output if args.skip_prove else args.sketch_output
     if not repo_path(source).is_file():
         parser.error("requested saved Sketch/Prove artifact does not exist")

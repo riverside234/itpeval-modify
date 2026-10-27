@@ -14,22 +14,24 @@ from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_itpeval.ge
 from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_itpeval.verify_isabelle import (
     DEFAULT_OUTPUT, preflight, verify_sketches,
 )
-from eval.pipeline.proof_transfer.llm import DEFAULT_DRAFT_MODEL
+from eval.pipeline.inference.config import output_path_for_profile
+from eval.pipeline.proof_transfer.llm import DEFAULT_DRAFT_MODEL, resolve_model_config
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="v2-itpeval: saved Drafts to Isabelle2024 proofs.")
     parser.add_argument("--expected-root", help=f"Lab repo: {LAB_REPO_ROOT}")
     parser.add_argument("--drafts", required=True)
-    parser.add_argument("--sketch-output", default=DEFAULT_SKETCHES)
-    parser.add_argument("--output", default=DEFAULT_OUTPUT)
+    parser.add_argument("--sketch-output")
+    parser.add_argument("--output")
     parser.add_argument("--topic")
     parser.add_argument("--target-key")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--samples", type=int, default=1)
-    parser.add_argument("--sketch-model", default=DEFAULT_DRAFT_MODEL)
-    parser.add_argument("--sketch-reasoning-effort", default="high")
-    parser.add_argument("--max-output-tokens", type=int, default=16000)
+    parser.add_argument("--sketch-llm-config", help="API or vLLM JSON profile for Sketch generation.")
+    parser.add_argument("--sketch-model", default=None)
+    parser.add_argument("--sketch-reasoning-effort", default=None)
+    parser.add_argument("--max-output-tokens", type=int, default=None)
     parser.add_argument("--timeout-s", type=int, default=1200)
     parser.add_argument("--no-resume", action="store_true")
     parser.add_argument("--fail-fast", action="store_true")
@@ -38,11 +40,17 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     validate_layout(args.expected_root)
+    llm_config = resolve_model_config(
+        args.sketch_llm_config, model=args.sketch_model,
+        reasoning_effort=args.sketch_reasoning_effort, max_output_tokens=args.max_output_tokens,
+        default_effort="high", dry_run=args.dry_run)
     filters = dict(topic=args.topic, target_key=args.target_key, limit=args.limit)
     records = latest_records(args.drafts, **filters)
     require_source(records, SOURCE)
     if not records:
         parser.error("no matching saved Drafts")
+    args.sketch_output = output_path_for_profile(args.sketch_output, DEFAULT_SKETCHES, llm_config, draft_records=records)
+    args.output = output_path_for_profile(args.output, DEFAULT_OUTPUT, llm_config, draft_records=records)
     if args.samples < 1:
         parser.error("--samples must be positive")
     paths = [args.drafts, args.sketch_output, args.output]
@@ -73,7 +81,7 @@ def main() -> None:
             reasoning_effort=args.sketch_reasoning_effort,
             max_output_tokens=args.max_output_tokens, resume=not args.no_resume,
             continue_on_error=not args.fail_fast, dry_run=args.dry_run,
-            blocked_targets=blocked)
+            blocked_targets=blocked, llm_config=llm_config)
     elif not repo_path(args.sketch_output).is_file():
         parser.error("--skip-sketch requires an existing Sketch JSONL")
     if not args.dry_run and not args.skip_verify:

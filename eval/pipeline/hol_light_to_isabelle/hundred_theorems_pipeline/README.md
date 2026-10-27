@@ -1,5 +1,10 @@
 # Hundred Theorems: HOL Light to Isabelle V2
 
+Draft and Sketch support the existing GPT API and an optional local Qwen
+server. Standalone generators accept `--llm-config`; saved-Draft runners
+accept `--sketch-llm-config`. See [vLLM setup and commands](../../../../vllm/README.md).
+
+
 This is the same experiment as [Babel Formal](../babel_formal_pipeline/README.md):
 a selected HOL Light proof and masked source reference produce a mathematical
 Draft; the unchanged oracle Isabelle declaration and masked target context

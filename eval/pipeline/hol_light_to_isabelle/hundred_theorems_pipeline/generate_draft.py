@@ -8,11 +8,11 @@ from .prompt import DRAFT_PROMPT_VERSION, build_draft_prompt
 DEFAULT_OUTPUT = RESULTS_DIR + "/hundred_theorems_v2_drafts.jsonl"
 
 
-def generate_drafts(*, input_path: str = DEFAULT_INPUT, output_path: str = DEFAULT_OUTPUT, **options) -> int:
+def generate_drafts(*, input_path: str = DEFAULT_INPUT, output_path: str | None = None, **options) -> int:
     return _engine.generate_drafts(
         input_path=input_path, output_path=output_path,
         prompt_builder=build_draft_prompt, prompt_version=DRAFT_PROMPT_VERSION,
-        expected_source=SOURCE, **options)
+        expected_source=SOURCE, default_output=DEFAULT_OUTPUT, **options)
 
 
 def main() -> None:

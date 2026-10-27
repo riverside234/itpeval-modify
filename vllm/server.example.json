@@ -1,0 +1,21 @@
+{
+  "model": "Qwen/Qwen3.8-27B",
+  "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+  "model_dir": "vllm/models/Qwen3.8-27B",
+  "host": "127.0.0.1",
+  "port": 30002,
+  "cuda_visible_devices": "0",
+  "dtype": "bfloat16",
+  "quantization": null,
+  "tensor_parallel_size": 1,
+  "max_model_len": 65536,
+  "max_num_seqs": 1,
+  "gpu_memory_utilization": 0.9,
+  "manifest": "vllm/logs/server_manifest.json",
+  "log": "vllm/logs/qwen_server.log",
+  "expected_versions": {
+    "vllm": "0.32.0",
+    "transformers": "5.19.0",
+    "huggingface-hub": "2.3.0"
+  }
+}
