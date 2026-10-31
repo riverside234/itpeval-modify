@@ -1,10 +1,15 @@
 """Opt-in real Isabelle2026 controls; no LLM calls. See the native DSP README."""
 from dataclasses import replace
 import os
+from pathlib import Path
+import shutil
+import time
 import unittest
+import uuid
 
 from eval.pipeline.hol_light_to_isabelle.v2_dsp.checker import Checker
 from eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime import DspConfig
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.native_search import NativeSearch
 from eval.pipeline.hol_light_to_isabelle.v2_dsp.preflight import control_record, preflight
 from eval.pipeline.hol_light_to_isabelle.extract_hol_light import extract_records
 
@@ -23,6 +28,43 @@ class NativeIntegrationTests(unittest.TestCase):
                 result = preflight(control_record("by simp", sketch_source=mode), config=self.config,
                                    backend_metadata=self.backend, sketch_source=mode)
                 self.assertTrue(result["ok"], result)
+                hammer = result["controls"]["hammer"]
+                settings = hammer["prover_settings"]
+                self.assertEqual("some", settings["native_outcome"])
+                self.assertGreater(int(settings["candidate_count"]), 0)
+                self.assertIn(settings["reconstruction_source"], {"preplayed", "native_tactic"})
+                self.assertTrue(any(row["mode"] == "reconstruction" and row["success"]
+                                    for row in hammer["step_results"]))
+
+    def test_native_tactic_without_separate_preplay_is_executed_and_replayed(self):
+        config = replace(self.config, provers=("simp",))
+        proof = "proof -\n show True\n sledgehammer\nqed"
+        result = Checker(config).check(control_record(proof), force_hammer=True,
+                                       backend_metadata=config.metadata())
+        self.assertTrue(result["verified"], result["verify_error"])
+        settings = result["prover_settings"]
+        self.assertEqual("native_tactic", settings["reconstruction_source"])
+        self.assertEqual("0", settings["preplay_count"])
+        self.assertGreater(int(settings["candidate_count"]), 0)
+        self.assertTrue(any(row["mode"] == "reconstruction" and row["success"]
+                            for row in result["step_results"]))
+        self.assertTrue(result["replay_verified"])
+
+    def test_native_reconstruction_without_pide_and_failed_preplay_filter(self):
+        native = NativeSearch(self.config)
+        deadline = time.monotonic() + self.config.target_timeout_s
+        parent_dir, parent_session = native.infrastructure(deadline=deadline)
+        directory = Checker(self.config).directory("reconstruction-regression-")
+        theory = "DSP_Reconstruction_Test"
+        source = Path(__file__).parent / "fixtures" / (theory + ".thy")
+        shutil.copyfile(source, directory / source.name)
+        session = "DSP_Reconstruction_Test_" + uuid.uuid4().hex
+        (directory / "ROOT").write_text(
+            f"session {session} = {parent_session} +\n"
+            f"  options [document = false]\n  theories {theory}\n", encoding="utf-8")
+        code = native.run_build(directory, session, timeout_s=self.config.startup_timeout_s,
+                                deadline=deadline, parent_dir=parent_dir)
+        self.assertEqual(0, code, (directory / "build.log").read_text(encoding="utf-8"))
 
     def test_nested_isar_multiple_gaps_local_assumptions_and_symbols(self):
         proof = ("proof -\n have first: True\n  sledgehammer\n"
@@ -41,6 +83,7 @@ class NativeIntegrationTests(unittest.TestCase):
         result = Checker(config).check(control_record(proof), force_hammer=True, backend_metadata=config.metadata())
         self.assertFalse(result["verified"])
         self.assertEqual("hammer_failure", result["failure_category"])
+        self.assertEqual("dsp_nonexistent_prover", result["prover_settings"]["resolved_provers"])
         config = replace(self.config, step_timeout_s=0.000001)
         result = Checker(config).check(control_record(proof), backend_metadata=config.metadata())
         self.assertFalse(result["verified"])

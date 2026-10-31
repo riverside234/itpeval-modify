@@ -68,6 +68,25 @@ class NativeSearchTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             read_result(path, self.request, returncode=0)
 
+    def test_failed_hammer_retains_native_diagnostics_even_with_zero_process_exit(self):
+        path = self.result(success="false", target_closed="false")
+        root = ET.parse(path).getroot()
+        root.find("proof").text = ""
+        root.find("category").text = "missing_reconstruction"
+        root.find("error").text = "native Sledgehammer returned no usable reconstruction"
+        diagnostics = {
+            "resolved_provers": "e vampire", "native_outcome": "some",
+            "preplay_count": "1", "preplayed_count": "0", "candidate_count": "0",
+            "reconstruction_source": "preplayed", "native_messages": "Native preplay failed.",
+        }
+        for name, value in diagnostics.items():
+            ET.SubElement(root.find("settings"), "param", name=name).text = value
+        ET.ElementTree(root).write(path, encoding="utf-8")
+        result = read_result(path, self.request, returncode=0)
+        self.assertFalse(result["success"])
+        self.assertEqual("missing_reconstruction", result["failure_category"])
+        self.assertEqual(diagnostics, result["prover_settings"])
+
     def test_driver_loads_only_imports_and_passes_preceding_context(self):
         config = DspConfig()
         native = NativeSearch(config)

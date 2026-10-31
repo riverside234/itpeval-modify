@@ -70,6 +70,12 @@ The first run builds the infrastructure heap and can require a larger
 `startup_timeout_s` than later runs. Failed gates/context checks are recorded;
 failed targets remain in the selected cohort.
 
+Sledgehammer diagnostics are retained on failure in
+`controls.hammer.prover_settings` in the preflight JSON report: resolved provers,
+native outcome/messages, preplay results/counts, reconstruction source and
+candidate count. A successful `isabelle build` alone does not imply successful
+search; consult the structured report/result XML.
+
 For all-target context acceptance, remove the topic/target filters and add
 `--all-targets`. For Hundred Theorems use
 `eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.preflight`
@@ -165,8 +171,12 @@ Only the original imports and preceding target context enter search. The full
 masked target theory is not imported. Earlier masked helpers are admitted
 background; the target and generated intermediate claims must be proved.
 Each gap tries the ordered DSP heuristics from the same saved state, then
-native Sledgehammer. Only preplayed, executable reconstructions that actually
-close the pending obligation are accepted, including `using ... by ...`.
+native Sledgehammer. ATP reconstructions require a native `Played` result.
+Isabelle2026's integrated tactic provers return an already executed command
+with no separate preplay list; their structured sendback is also supported.
+Serialization enables PIDE markup locally so batch mode cannot discard the
+sendback wrapper. Every candidate must execute from the saved proof state and
+actually close the pending obligation, including `using ... by ...`.
 The reconstructed target must close its original scopes, and a fresh
 `isabelle build` of the resulting theory must succeed without search helpers.
 

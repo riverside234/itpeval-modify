@@ -87,7 +87,7 @@ fun run driver_theory request_file result_file =
           Exn.Res state => SOME state
         | Exn.Exn (Timeout.TIMEOUT _) => fail "timeout" "native operation timed out; isolated job aborted"
         | Exn.Exn DSP_Sledgehammer.Hammer_Timeout => fail "timeout" "native Sledgehammer timed out"
-        | Exn.Exn DSP_Sledgehammer.No_Reconstruction => fail "missing_reconstruction" "no preplayed native reconstruction"
+        | Exn.Exn (DSP_Sledgehammer.No_Reconstruction message) => fail "missing_reconstruction" message
         | Exn.Exn exn => if Exn.is_interrupt exn then Exn.reraise exn else NONE)
       end;
     fun execute mode state span =
@@ -138,7 +138,7 @@ fun run driver_theory request_file result_file =
             val returned = Unsynchronized.ref (NONE: (string list * (string * string) list) option);
             val found = attempt "hammer" "native Sledgehammer" 0 (fn () =>
               (returned := SOME (bounded (budget + #preplay_timeout config)
-                  (DSP_Sledgehammer.search config) state); state));
+                  (DSP_Sledgehammer.search (fn params => settings := params) config) state); state));
             val (candidates, params) =
               (case (found, !returned) of
                 (SOME _, SOME result) => result
