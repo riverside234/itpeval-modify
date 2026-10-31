@@ -7,7 +7,7 @@
   "session_dependencies": [],
   "threads": 4,
   "provers": null,
-  "startup_timeout_s": 120,
+  "startup_timeout_s": 600,
   "step_timeout_s": 10,
   "hammer_timeout_s": 40,
   "preplay_timeout_s": 10,
