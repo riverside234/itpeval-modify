@@ -155,6 +155,21 @@ class NativeIntegrationTests(unittest.TestCase):
             self.assertTrue(result["verified"], result["verify_error"])
 
 
+    def test_corrected_real_run_sketches_in_circle_average_locale(self):
+        """Manual syntax diagnostics; never counted as model-generated successes."""
+        import json
+        from eval.pipeline.hol_light_to_isabelle.v2_dsp.export_dsp import export_record
+        examples = json.loads((Path(__file__).parent / "fixtures/DSP_Sketch_Syntax.json").read_text(encoding="utf-8"))
+        raw = extract_records(topic="circle_average", target_key="circleAverage_center_independent")[0]
+        raw["draft"] = "Unfold the definitions and apply integral_shift."
+        for mode, name in [("draft", "draft_corrected"), ("hol-light-proof", "direct_corrected")]:
+            with self.subTest(mode=mode):
+                row = export_record(raw, sketch_source=mode)
+                row["isabelle_sketch"] = examples[name]
+                result = Checker(self.config).check(row, backend_metadata=self.backend)
+                self.assertTrue(result["verified"], result["verify_error"])
+                self.assertTrue(result["replay_verified"])
+
     def test_fresh_replay_error_is_not_search_success(self):
         from eval.pipeline.hol_light_to_isabelle.v2_dsp.native_search import NativeSearch
         class CorruptedReplay(NativeSearch):

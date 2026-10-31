@@ -3,7 +3,7 @@ from ..prompt import Prompt
 from .input_contract import input_metadata, require_text
 from .sketch_prompt import ISABELLE_OUTPUT_RULES, ISABELLE_PROOF_REQUIREMENTS
 
-DIRECT_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_direct_p2"
+DIRECT_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_direct_p3"
 SYSTEM_PROMPT = (
     "You are a proof engineer fluent in HOL Light and Isabelle/HOL. Translate the "
     "selected completed HOL Light proof directly into an Isabelle proof, preserving "

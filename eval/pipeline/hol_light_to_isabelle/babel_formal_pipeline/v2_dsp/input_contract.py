@@ -13,6 +13,7 @@ from ..isabelle_syntax import tokens
 SCHEMA_VERSION = "hol_light_to_isabelle_dsp_v2"
 ISABELLE_VERSION = "Isabelle2026"
 MODES = ("draft", "hol-light-proof")
+SKETCH_VALIDATOR_VERSION = "isabelle_sketch_structure_v1"
 CONTEXT_FIELDS = ("isabelle_statement", "isabelle_theory_template",
                   "isabelle_context_before_target", "isabelle_proof_prefix",
                   "isabelle_target_proof_span", "isabelle_target_name")
@@ -201,9 +202,39 @@ def output_path(path, *, results_dir: str, filename: str, mode: str, config=None
                ("direct" if mode == "hol-light-proof" else "draft") / profile / filename)
 
 
+# Standard Isar outer commands cannot be methods inside a terminal `by`.
+# Keep this deliberately lexical: Isabelle remains the full syntax/type checker.
+_ISAR_COMMANDS = frozenset("""
+proof qed by apply apply_end done have show hence thus then from with using
+unfolding fix assume presume let note next case also finally moreover ultimately
+obtain consider define subgoal prefer defer back sledgehammer
+""".split())
+
+
 def normalize_sketch(proof: str) -> str:
     body = normalize_body(proof, allow_hammer=True)
-    for token in tokens(body):
+    items = tokens(body)
+    for index, token in enumerate(items):
+        if token.kind == "word" and token.text == "by":
+            following = items[index + 1] if index + 1 < len(items) else None
+            if following is None or (following.kind == "word" and following.text in _ISAR_COMMANDS):
+                line = body.count("\n", 0, token.start) + 1
+                raise ValueError(f"line {line}: by requires a proof method, not an Isar command "
+                                 "or empty body; use proof - ... qed for have/show steps")
+    if items[0].text == "by":
+        methods = items[1:]
+        if any(item.kind == "word" and item.text in _ISAR_COMMANDS for item in methods):
+            raise ValueError("a terminal by proof cannot contain further Isar commands; "
+                             "use proof - ... qed for a structured proof")
+        # Pure.thy's `by` accepts one or two Method.parse expressions. Bare names
+        # are individual expressions; arguments/sequences belong in parentheses.
+        # Do not reject Isabelle's valid `unfold` method or two-method proofs.
+        if len(methods) > 2 and all(item.kind in {"word", "string"} for item in methods):
+            raise ValueError("by accepts one or two method expressions, not a sequence of bare "
+                             "names; parenthesize method arguments and combinators, e.g. "
+                             "by (unfold definition_fact, rule supporting_fact). "
+                             "Indentation does not sequence tactics in Isabelle")
+    for token in items:
         if token.kind == "word" and token.text == "sledgehammer":
             start = body.rfind("\n", 0, token.start) + 1
             end = body.find("\n", token.end)

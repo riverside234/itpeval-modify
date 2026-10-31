@@ -99,6 +99,36 @@ class CheckerTests(unittest.TestCase):
                 self.assertEqual("rejected_proof", result["failure_category"])
         self.assertEqual([], self.fake.calls)
 
+    def test_malformed_by_block_is_rejected_before_starting_isabelle(self):
+        result = self.check('by\n have "True" by simp\n show ?thesis by simp\nqed')
+        self.assertEqual("rejected_proof", result["failure_category"])
+        self.assertIn("proof - ... qed", result["verify_error"])
+        self.assertEqual([], self.fake.calls)
+        self.assertNotIn("workdir", result)
+
+    def test_native_error_details_are_exposed_in_top_level_failure(self):
+        search = {"success": False, "target_closed": False,
+                  "failure_category": "sketch_step_failure", "error": "failed command: by",
+                  "step_results": [{"mode": "search", "success": False, "line": "7",
+                                    "error": "Undefined method: fixture_missing"}]}
+        with patch.object(self.fake, "request", return_value=search):
+            result = self.check()
+        self.assertFalse(result["verified"])
+        self.assertIn("Undefined method: fixture_missing", result["verify_error"])
+        self.assertIn("line 7", result["verify_error"])
+        self.assertNotIn("native_replay", result)
+
+    def test_earlier_failed_heuristic_does_not_obscure_a_later_failure(self):
+        search = {"success": False, "target_closed": False,
+                  "failure_category": "incomplete_proof", "error": "target is still open",
+                  "step_results": [
+                      {"mode": "heuristic", "success": False, "error": "old failed candidate"},
+                      {"mode": "search", "success": True, "error": ""}]}
+        with patch.object(self.fake, "request", return_value=search):
+            result = self.check()
+        self.assertIn("target is still open", result["verify_error"])
+        self.assertNotIn("old failed candidate", result["verify_error"])
+
     def test_context_preflight_does_not_require_a_draft(self):
         row = control_record("by simp")
         del row["draft"]

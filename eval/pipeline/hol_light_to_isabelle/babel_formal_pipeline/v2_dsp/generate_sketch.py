@@ -13,13 +13,15 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import (
 )
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import normalize_visible_content
 from .input_contract import (MODES, envelope, clean_record, input_metadata, load_inputs,
-                             validate_artifacts, normalize_sketch, output_path as native_output_path)
+                             validate_artifacts, normalize_sketch, SKETCH_VALIDATOR_VERSION,
+                             output_path as native_output_path)
 from .direct_sketch_prompt import build_direct_sketch_prompt, DIRECT_PROMPT_VERSION
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.export_dsp import DEFAULT_OUTPUT as DEFAULT_INPUT
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.sketch_prompt import (
     SKETCH_PROMPT_VERSION, build_sketch_prompt,
 )
 from eval.pipeline.proof_transfer.llm import call_draft_model, resolve_model_config
+from eval.pipeline.inference.client import visible_text
 
 
 DEFAULT_OUTPUT = native_output_path(None, results_dir=RESULTS_DIR, filename="sketches.jsonl", mode="draft")
@@ -77,7 +79,8 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
     previous = read_jsonl(output_path) if resume and output.is_file() else []
     completed = {row.get("sketch_fingerprint"): row for row in previous
                  if row.get("pipeline") == "v2-dsp" and row.get("isabelle_sketch")
-                 and not row.get("sketch_error") and row.get("sketch_prompt_version") == version}
+                 and not row.get("sketch_error") and row.get("sketch_prompt_version") == version
+                 and row.get("sketch_validator_version") == SKETCH_VALIDATOR_VERSION}
     latest_sample = {(key(row), row["sample_idx"]): row.get("sketch_fingerprint")
                      for row in previous}
     written = 0
@@ -108,6 +111,7 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
                 **envelope(sketch_source), "target": key(record),
                 "input": metadata.get("input_fingerprint"), "prompt": digest,
                 "model": config.to_metadata(), "sample_idx": sample_idx,
+                "sketch_validator_version": SKETCH_VALIDATOR_VERSION,
             })
             if not input_error and identity in completed:
                 if latest_sample.get((key(record), sample_idx)) != identity:
@@ -117,6 +121,7 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
             result = {**clean_record(record, sketch_source), **metadata, **envelope(sketch_source),
                       "sample_idx": sample_idx, "sketch_fingerprint": identity,
                       "sketch_prompt_version": version,
+                      "sketch_validator_version": SKETCH_VALIDATOR_VERSION,
                       "sketch_prompt_sha256": digest, "sketch_model": config.to_metadata(),
                       "sketch_generated_at": datetime.now(timezone.utc).isoformat()}
             started = time.monotonic()
@@ -127,14 +132,19 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
                     system_prompt=prompt.system_prompt, user_prompt=prompt.user_prompt,
                     config=config)
                 result["sketch_response"] = getattr(response, "metadata", {})
-                body = normalize_visible_content(response)
+                # Preserve final visible output even when syntax validation fails.
+                # Thinking is removed before saving; prompts are never stored here.
+                result["sketch_response_content"] = visible_text(response)
+                body = normalize_visible_content(result["sketch_response_content"])
                 result["isabelle_sketch"] = normalize_sketch(body)
                 result["sketch_error"], result["failure_category"] = None, None
             except Exception as exc:
                 if not continue_on_error:
                     raise
                 result["isabelle_sketch"] = ""
-                result["sketch_response"] = getattr(exc, "metadata", {})
+                # Validation errors have no response metadata of their own. Keep
+                # the completed API call's usage so failed samples remain counted.
+                result.setdefault("sketch_response", getattr(exc, "metadata", {}))
                 result["sketch_error"] = f"{type(exc).__name__}: {exc}"
                 result["failure_category"] = input_category if input_error else "sketch_error"
             result["sketch_duration_seconds"] = round(time.monotonic() - started, 3)

@@ -5,7 +5,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import (
 )
 from .common import SOURCE, require_source
 
-DRAFT_PROMPT_VERSION = "hundred_theorems_v2_hol_light_to_isabelle_p2"
+DRAFT_PROMPT_VERSION = "hundred_theorems_v2_hol_light_to_isabelle_p3"
 
 
 def build_draft_prompt(record: dict) -> Prompt:

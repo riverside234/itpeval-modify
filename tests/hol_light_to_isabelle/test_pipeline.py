@@ -49,6 +49,12 @@ class PipelineTests(unittest.TestCase):
                 self.assertEqual(1, draft_model.call_count)
                 self.assertEqual(2, sketch_model.call_count)
                 self.assertEqual(2, prover.call_count)
+                draft_config = draft_model.call_args.kwargs["config"]
+                sketch_config = sketch_model.call_args.kwargs["config"]
+                self.assertEqual(("gpt-6.1-terra", "medium"),
+                                 (draft_config.model, draft_config.reasoning_effort))
+                self.assertEqual(("gpt-6.1-terra", "high"),
+                                 (sketch_config.model, sketch_config.reasoning_effort))
 
 
 if __name__ == "__main__":

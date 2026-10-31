@@ -21,11 +21,15 @@ Both datasets use the same instructions with dataset-specific prompt versions:
 
 | Stage | Input and expected output | Current version suffix |
 | --- | --- | --- |
-| Draft | Completed selected HOL Light proof, masked source reference and oracle context -> mathematical claims with justifications in target vocabulary | `hol_light_to_isabelle_p2` |
-| Draft to Sketch | Saved mathematical Draft and oracle context -> Isabelle Isar proof body | `isabelle2026_draft_p3` |
-| Direct to Sketch | Completed selected HOL Light proof, masked source reference and oracle context -> Isabelle Isar proof body | `isabelle2026_direct_p2` |
+| Draft | Completed selected HOL Light proof, masked source reference and oracle context -> mathematical claims with justifications in target vocabulary | `hol_light_to_isabelle_p3` |
+| Draft to Sketch | Saved mathematical Draft and oracle context -> Isabelle Isar proof body | `isabelle2026_draft_p4` |
+| Direct to Sketch | Completed selected HOL Light proof, masked source reference and oracle context -> Isabelle Isar proof body | `isabelle2026_direct_p3` |
 
-The Draft explains instantiated helper facts, substitutions, and side conditions.
+The Draft uses numbered steps with `Claim:` and `Justification:`. Each step
+identifies its premises and earlier-step dependencies. It distinguishes constants
+from defining equations, available facts from claims being proved, and local
+assumptions from the outer theorem context. Substitutions and side conditions
+remain explicit; it gives mathematical reasoning rather than proof commands.
 Both Sketch prompts preserve that argument and use the same rules for available
 facts, proof prefixes, local claims, and standalone `sledgehammer` gaps. Earlier
 masked helper statements are available background; the selected target and later
@@ -39,6 +43,35 @@ Sketch generation. Prompt versions and hashes prevent generation from reusing
 old prompt outputs; `--skip-sketch` deliberately uses the saved Sketch instead.
 Use separate output paths to compare prompt revisions, and add `--dry-run` to
 the generation command to inspect the prompt before inference.
+
+A structured Isabelle proof starts with `proof -` (or an appropriate proof
+method) and ends with `qed`. A terminal `by` takes method expressions; it does
+not open an indented block. Both Sketch prompts now demonstrate this distinction.
+Generation rejects the observed `by`/`have` mixture and unparenthesized sequences
+of bare names before invoking native search. These are lexical checks, not a
+complete Isabelle parser. Imported methods and mathematical correctness still
+require native checking and fresh replay.
+
+`sketch_response_content` stores only the model's visible final response,
+including when the Sketch fails validation; reasoning and prompts are excluded.
+The API usage metadata also survives validation failure. The
+`sketch_validator_version` participates in generation resume identity.
+A failed validation remains a failed sample; the pipeline does not silently
+repair it or request additional samples.
+
+
+The default API model is now `gpt-6.1-terra` for Draft, Draft-to-Sketch and
+Direct-to-Sketch. Draft keeps medium reasoning effort; Sketch keeps high.
+Explicit model/profile selections still override the default. The Qwen/vLLM
+profile remains selectable. The exact identifier and both reasoning settings
+are supported by the [official model documentation](https://developers.openai.com/api/docs/models/gpt-6.1-terra).
+
+To adopt both revisions, rerun `generate_draft` from the extracted records,
+then pass that new Draft file to the DSP runner. The runner does not refresh
+saved Draft text automatically. The revised prompt version and model metadata
+invalidate generation reuse; use fresh output paths to preserve old experiments.
+A copied local API profile that pins the previous model must be updated or
+explicitly overridden with `--model` (generators) or `--sketch-model` (runner).
 
 ## Install and configure on the lab computer
 
@@ -91,6 +124,10 @@ original prefix and executes positive, forced-native-Sledgehammer, invalid
 method, admission, self-reference and later-fact controls. The hammer control
 bypasses all heuristics and must obtain, apply and independently replay a
 concrete reconstruction. Controls must pass before the runner invokes a model.
+Preflight checks the backend, target context and fixed capability controls. It
+does not validate a future model-generated Sketch. A successful preflight and a
+later syntax/proof failure are therefore compatible. The pulled single-theorem
+failure and regeneration commands are documented in [PROVER_REVIEW.md](PROVER_REVIEW.md#pulled-single-theorem-run-c8fb3cb).
 The first run builds the infrastructure heap and can require a larger
 `startup_timeout_s` than later runs. Failed gates/context checks are recorded;
 failed targets remain in the selected cohort.
@@ -219,7 +256,7 @@ process start times before signaling owned descendants.
 
 The [2026-10-31 prover review](PROVER_REVIEW.md) records the source comparison,
 fixed bugs, and native regression cases. The checker version is
-`dsp_isabelle2026_native_p2`; adapter and checker changes invalidate old
+`dsp_isabelle2026_native_p3`; adapter and checker changes invalidate old
 verification caches. Preflight now includes a quoted goal to exercise proof
 serialization and fresh replay.
 

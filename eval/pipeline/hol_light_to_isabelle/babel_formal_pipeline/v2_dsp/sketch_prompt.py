@@ -3,19 +3,32 @@ from __future__ import annotations
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import Prompt, _required
 
 
-SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p3"
+SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p4"
 
 # Both input modes use the same target, background, and gap contract.
 ISABELLE_OUTPUT_RULES = (
     "Construct one Isabelle2026/HOL Isar proof body for the exact oracle declaration "
     "in its supplied theory and locale context. Use standalone sledgehammer commands "
     "for unresolved proof obligations; a later prover will replace each with a "
-    "checked proof that closes that obligation. Return only the proof body, starting "
-    "with by or proof and ending with qed for a structured proof."
+    "checked proof that closes that obligation. Return only Isabelle/Isar syntax. "
+    "For multiple claims use proof - ... qed. For a terminal proof use by followed "
+    "by a complete method expression, such as by (simp add: available_facts). "
+    "In Isabelle, by does not open an indented block of commands."
 )
 
 ISABELLE_PROOF_REQUIREMENTS = (
     "PROOF REQUIREMENTS\n"
+    "- Choose valid Isabelle proof syntax before writing steps. A structured proof "
+    "with have/show starts with proof - (or an appropriate proof method) and ends "
+    "with qed. Never write by followed by have/show or a sequence of tactics. "
+    "Indentation and newlines do not turn by into a tactic block.\n"
+    "- Put method arguments in parentheses: by (rule available_fact), "
+    "by (simp only: available_definition), or "
+    "by (unfold available_definition, rule available_fact). Rewrite with actual "
+    "definition theorems (often name_def), not bare constant names. For a local "
+    "goal, unfolding available_definition belongs before its terminal by, as in "
+    "show ?thesis unfolding available_definition by (rule available_fact). "
+    "The names here are schematic; use only facts supplied by the real context.\n"
     "- The oracle declaration and preceding Isabelle context are authoritative. "
     "Preserve types, quantifiers, hypotheses, fixed locale parameters, and notation. "
     "Introduce only variables, assumptions, and witnesses justified by the current "
@@ -47,7 +60,16 @@ ISABELLE_PROOF_REQUIREMENTS = (
     "- Close every local goal, case, and target goal with valid Isar structure. "
     "Return only the proof body: no Markdown fences, explanatory prose, repeated "
     "declaration, theory header, global definitions, axioms, ML/setup commands, or "
-    "admissions such as sorry, oops, or admit."
+    "admissions such as sorry, oops, or admit.\n\n"
+    "ISABELLE SYNTAX EXAMPLE (only for an illustrative goal True; adapt the "
+    "structure to the actual target rather than copying its propositions):\n"
+    "proof -\n"
+    '  have h: "True" by simp\n'
+    "  show ?thesis using h\n"
+    "    sledgehammer\n"
+    "qed\n"
+    "Here have and show are inside proof - ... qed. Each terminal by supplies "
+    "its own method; sledgehammer fills only the pending show obligation."
 )
 
 SYSTEM_PROMPT = (

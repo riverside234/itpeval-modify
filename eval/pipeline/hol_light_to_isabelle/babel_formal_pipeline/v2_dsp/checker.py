@@ -18,7 +18,7 @@ from .runtime import DspConfig
 
 ProofFailure = NativeFailure  # Preserve the old exception import for callers.
 
-CHECKER_VERSION = "dsp_isabelle2026_native_p2"
+CHECKER_VERSION = "dsp_isabelle2026_native_p3"
 HEURISTICS = (
     "by auto", "by simp", "by blast", "by fastforce", "by force", "by eval",
     "by presburger", "by sos", "by arith", "by linarith", "by (auto simp: field_simps)",
@@ -78,7 +78,12 @@ class Checker:
                 result["step_results"] = search["step_results"]
                 result["prover_settings"] = search.get("prover_settings", {})
                 if not search["success"] or not search.get("target_closed"):
-                    raise NativeFailure(search.get("failure_category") or "incomplete_proof", search.get("error", "target is open"))
+                    message = search.get("error") or "target is open"
+                    last_step = search["step_results"][-1] if search["step_results"] else {}
+                    if (not last_step.get("success") and last_step.get("error")
+                            and last_step["error"] not in message):
+                        message += f" (line {last_step.get('line', '?')}): {last_step['error']}"
+                    raise NativeFailure(search.get("failure_category") or "incomplete_proof", message)
                 proof = normalize_body(search["isabelle_proof"])
                 result["prove_success"] = True
             result["isabelle_proof"] = proof

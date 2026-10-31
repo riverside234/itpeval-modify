@@ -130,7 +130,7 @@ python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.generate
   --output eval/results/hol_light_to_isabelle_v2/hundred-theorems/single_drafts.jsonl
 ```
 
-The default model is `gpt-5.6-terra` with medium reasoning effort, using the
+The default model is `gpt-6.1-terra` with medium reasoning effort, using the
 existing API configuration. Only visible content is used as the Draft.
 Prompt text and hidden reasoning are absent from saved records. The prompt
 follows the same translation instructions as Babel, without a brevity limit.

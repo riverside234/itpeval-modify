@@ -13,7 +13,7 @@ from urllib.parse import urlsplit
 
 from eval.pipeline.config import REPO_ROOT
 
-DEFAULT_DRAFT_MODEL = "gpt-5.6-terra"
+DEFAULT_DRAFT_MODEL = "gpt-6.1-terra"
 ReasoningEffort = Literal["none", "minimal", "low", "medium", "high", "xhigh"]
 DEFAULT_REASONING_EFFORT: ReasoningEffort = "medium"
 QWEN_MODEL = "Qwen/Qwen3.8-27B"

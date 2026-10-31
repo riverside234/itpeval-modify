@@ -36,7 +36,7 @@ Relevant official code:
 | Robustness: inherited Sledgehammer search modes | Imported theory settings could switch a proof search to falsification or abduction. | Explicitly request `falsify = false` and `abduce = 0`. |
 
 The existing checked-reconstruction and fresh-replay requirements remain the
-acceptance gate. The checker version is now `dsp_isabelle2026_native_p2` and
+acceptance gate. This review introduced checker version `dsp_isabelle2026_native_p2` and
 native adapter fingerprints change, so old verification results are not reused.
 The previous prompt revisions are preserved.
 
@@ -78,3 +78,118 @@ python -m unittest discover \
 The native dataset-context test also checks a Hundred Theorems import; configure
 its required session dependencies as described in the README. No model calls
 are made by preflight or native integration tests.
+
+## Pulled single-theorem run (c8fb3cb)
+
+The newly pulled lab run passed preflight, including native Sledgehammer
+reconstruction and fresh replay. Its real Draft-to-Sketch run failed before any
+heuristic or Sledgehammer call. No timeout or prover configuration failure is
+shown for that sample.
+
+Evidence:
+
+- `eval/results/hol_light_to_isabelle_v2/preflight/0108afca2e6bf8b4453a.json`:
+  `ok = true`, `baseline_ok = true`, and `controls.hammer.verified = true`.
+- `eval/results/hol_light_to_isabelle_v2/work/target-lvk5pwyk/search/result.xml`:
+  the context and target declaration succeeded; attempt 57 is the first Sketch
+  command, `by`, and fails with `keyword "(" expected, but end-of-input`.
+  `settings` is empty because no search gap was reached.
+- The saved Draft-mode Sketch starts with `by`, then contains `have`/`show`
+  commands and a closing `qed`. This structure requires `proof -`, not `by`.
+- The direct-mode Sketch is `by` followed by `unfold circleAverage circleMap`
+  and `rule integral_shift` on indented lines. The pulled files contain no
+  native Prove result for this direct sample, but its body is already invalid:
+  Isabelle does not use indentation to sequence tactics, method arguments need
+  parentheses, and definitions are rewritten using their theorem facts.
+
+The visible-content normalizers only strip thinking/fences and whitespace;
+they do not replace `proof` with `by`. The old artifacts retained the normalized
+Sketch and API statistics, but not an independent copy of the visible response.
+The specific pipeline bug was accepting these shapes as valid generated Sketches.
+Passing preflight demonstrates environment/capability readiness, not that an
+arbitrary subsequent model response has valid syntax or proves its target.
+
+This diagnosis agrees with official
+[`Pure.thy`'s terminal `by` parser](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Pure.thy#L985)
+and the
+[`Method.parse` grammar](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Isar/method.ML#L691).
+`by` accepts one required and one optional method expression; a bare name is one
+expression, while arguments and combinators require parentheses. `unfold`
+**is** a valid Isabelle method when used correctly; the fix does not ban it.
+
+Changes following this run:
+
+1. Revised both datasets' shared Sketch instructions, with a valid generic Isar
+   example, explicit `proof - ... qed` structure, and correct method/definition
+   syntax. Draft-to-Sketch is now `*_draft_p4`, direct-to-Sketch `*_direct_p3`.
+   The mathematical Draft prompt is unchanged.
+2. Added narrow lexical validation for the observed malformed bodies. They are
+   rejected before native startup, with actionable errors, rather than silently
+   changed into different proofs. This is not a complete Isabelle parser.
+3. Preserve `sketch_response_content` (visible final output only) and API usage
+   when validation fails. Previously the exception handler replaced completed
+   API response metadata with an empty object, undercounting failed samples.
+4. Include the final native command's detailed error/line in `verify_error`.
+   Do not attach an earlier failed heuristic if later commands succeeded.
+5. Bump the checker to `dsp_isabelle2026_native_p3` and include the lexical
+   validator version in generation fingerprints. A normal generation run will
+   not reuse the old prompt/validator output. `--skip-sketch` still deliberately
+   reads the saved Sketch and cannot repair it.
+
+Follow-up validation: **134 offline tests passed; 11 native integration tests
+skipped** (145 collected). Python 3.10 syntax checks passed for all 125 pipeline
+and test modules. The two exact saved failures are regression fixtures; valid
+parenthesized methods, two-method proofs, structured proofs, comments and
+cartouches remain accepted by the lexical validator. Native execution of the
+corrected diagnostic proofs is still pending on the lab machine.
+
+A minimal manual diagnostic for the saved Draft-mode proof changes only the
+first `by` to `proof -`. The direct proof's mathematical steps can be expressed as:
+
+```isabelle
+proof -
+  show ?thesis
+    unfolding circleAverage_def circleMap_def
+    by (rule integral_shift)
+qed
+```
+
+These manual diagnostics are test fixtures, not model outputs or experimental
+successes. They have not been executed locally because Isabelle2026 is installed
+on the lab computer. Run the focused native test without making any LLM calls:
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+export ITPEVAL_NATIVE_ISABELLE2026_CONFIG=eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
+python -m unittest discover \
+  -s tests/hol_light_to_isabelle/v2_dsp \
+  -p 'test_native_integration.py' -k corrected_real_run_sketches
+```
+
+For an experimental rerun, retain the saved mathematical Draft and generate a
+new Sketch with the revised prompt. Use a new output directory so the failed
+sample remains available for comparison. Do not add `--skip-sketch` or
+`--skip-prove` to this command:
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+DSP_RUN_DIR=eval/results/hol_light_to_isabelle_v2/v2-dsp-isabelle2026/single/draft-syntax-p4
+python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.run_babel \
+  --expected-root "$PWD" \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
+  --sketch-source draft \
+  --drafts eval/results/hol_light_to_isabelle_v2/v2-dsp-isabelle2026/single/draft/drafts.jsonl \
+  --topic circle_average --target-key circleAverage_center_independent \
+  --samples 1 \
+  --dsp-output "$DSP_RUN_DIR/inputs.jsonl" \
+  --sketch-output "$DSP_RUN_DIR/sketches.jsonl" \
+  --prove-output "$DSP_RUN_DIR/prove.jsonl" \
+  --output "$DSP_RUN_DIR/verified.jsonl"
+```
+
+For direct mode, use another new directory such as `single/direct-syntax-p3`,
+replace `--sketch-source draft` with `--sketch-source hol-light-proof`, and replace
+`--drafts ...` with
+`--records eval/results/hol_light_to_isabelle_v2/single_records.jsonl`.
+The rerun makes one new Sketch-model call per selected sample. Prompt changes
+reduce the observed syntax confusion but do not guarantee model correctness.

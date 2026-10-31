@@ -32,9 +32,9 @@ class ClientTests(unittest.TestCase):
         factory = Mock(return_value=manager)
         return client,factory
 
-    def test_existing_api_request_and_metadata_contract(self):
+    def test_default_api_request_and_metadata_contract(self):
         response = SimpleNamespace(
-            output_text="VISIBLE", status="completed",id="api-response",model="gpt-5.6-terra",
+            output_text="VISIBLE", status="completed",id="api-response",model="gpt-6.1-terra",
             usage={"input_tokens":10,"output_tokens":12,"total_tokens":22,
                    "output_tokens_details":{"reasoning_tokens":8}})
         client,factory = self.api(response)
@@ -45,9 +45,10 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(8,result.metadata["usage"]["reasoning_tokens"])
         factory.assert_called_once_with(api_key="test-key")
         self.assertEqual({"effort":"medium"},client.responses.create.call_args.kwargs["reasoning"])
+        self.assertEqual("gpt-6.1-terra",client.responses.create.call_args.kwargs["model"])
         self.assertEqual("input_text",client.responses.create.call_args.kwargs["input"][0]["content"][0]["type"])
         self.assertEqual({
-            "provider":"openai","model":"gpt-5.6-terra","reasoning_effort":"medium",
+            "provider":"openai","model":"gpt-6.1-terra","reasoning_effort":"medium",
             "max_output_tokens":16000,"stored_output":"content_only"},InferenceConfig().to_metadata())
 
     def test_api_errors_do_not_echo_keys_or_raw_provider_bodies(self):
@@ -136,6 +137,17 @@ class ClientTests(unittest.TestCase):
     def test_profile_defaults_cli_overrides_and_invalid_settings(self):
         qwen = resolve_config("eval/configs/inference/qwen_vllm.example.json",dry_run=True)
         self.assertEqual("medium",qwen.reasoning_effort)
+        self.assertEqual(QWEN_MODEL,qwen.model)
+        for effort in ("medium", "high"):
+            for profile in (None, "eval/configs/inference/api.example.json"):
+                config = resolve_config(profile,default_effort=effort,dry_run=True)
+                self.assertEqual(("gpt-6.1-terra",effort),(config.model,config.reasoning_effort))
+        # Explicitly pinned older models remain usable for controlled comparisons.
+        pinned = self.path / "pinned-api.json"
+        pinned.write_text('{"model":"gpt-5.6-terra"}',encoding="utf-8")
+        self.assertEqual("gpt-5.6-terra",resolve_config(pinned,dry_run=True).model)
+        self.assertEqual("gpt-6.1-terra",resolve_config(
+            pinned,model="gpt-6.1-terra",dry_run=True).model)
         changed = resolve_config(qwen,reasoning_effort="low",max_output_tokens=77,dry_run=True)
         self.assertEqual(("low",77),(changed.reasoning_effort,changed.max_output_tokens))
         self.assertEqual("high",resolve_config("eval/configs/inference/api.example.json",default_effort="high",dry_run=True).reasoning_effort)

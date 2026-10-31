@@ -50,7 +50,7 @@ does not establish semantic equivalence; the original alignment flags remain
 in every record.
 
 Sketch generation uses the existing configured API client, default model
-gpt-5.6-terra, and high reasoning effort. Draft generation retains medium
+gpt-6.1-terra, and high reasoning effort. Draft generation retains medium
 reasoning effort. Only visible content is stored; final records omit prompt
 text and thinking. Prompt previews print prompts only in dry-run mode.
 

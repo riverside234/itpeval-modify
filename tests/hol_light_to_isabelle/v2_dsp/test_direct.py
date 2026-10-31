@@ -62,6 +62,8 @@ class DirectTests(unittest.TestCase):
                 "eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.generate_draft.generate_drafts") as draft:
             options = dict(input_path=source, output_path=output, sketch_source=MODE)
             self.assertEqual(1, generate_sketches(**options))
+            config = sketch.call_args.kwargs["config"]
+            self.assertEqual(("gpt-6.1-terra", "high"), (config.model, config.reasoning_effort))
             self.assertEqual(0, generate_sketches(**options))
             changed = {**self.record, "hol_light_proof": self.record["hol_light_proof"] + " (* changed *)"}
             write_jsonl(source, [changed])
