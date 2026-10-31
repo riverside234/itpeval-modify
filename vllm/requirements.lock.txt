@@ -1,6 +1,3 @@
-# Direct dependency pins, checked against published package constraints.
-# Native CUDA/GPU acceptance is pending; this is not a full transitive lock.
-# The launcher records all actually installed versions in server_packages.txt.
-vllm==0.32.0
-transformers==5.19.0
-huggingface-hub==2.3.0
+# Compatibility entry point; the root file is the source of direct pins.
+# Server environment: Python 3.12. Not a full transitive/GPU-validated lock.
+-r ../requirements-vllm.txt

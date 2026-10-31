@@ -72,15 +72,44 @@ engines, so adding a dataset does not require duplicating the prover adapter.
 
 ## Quick start
 
-Use **Python 3.10 or newer** for the pipeline client. Actual proof verification
-requires the relevant Isabelle installation; DSP additionally requires PISA and
-Java. Local vLLM serving uses its own Linux/CUDA environment.
+Use **Python 3.10** for the main pipeline environment and **Python 3.12** for
+the separate vLLM server environment. The main environment covers data
+collection/extraction, API generation, and Isabelle/DSP compilation and
+verification orchestration. Formal prover installations are separate from pip
+dependencies; the native DSP-style backend uses Isabelle2026.
 
 ```bash
 git clone https://github.com/riverside234/itpeval-modify.git
 cd itpeval-modify
-python -m pip install -e .
+python -m pip install -r requirements.txt
 ```
+
+The two root requirements files are:
+
+- `requirements.txt`: main Python 3.10 environment; installs the project and
+  its dependencies from `pyproject.toml`.
+- `requirements-vllm.txt`: isolated Python 3.12 Linux/CUDA server; includes
+  vLLM, Transformers, and Hugging Face Hub.
+
+On the lab machine, create each environment under the repository root:
+
+```bash
+cd /data/not_backed_up/yxu209/ITPEval
+source vllm/env_vars.sh
+
+# Main environment: data preparation, generation and proof verification.
+conda create --prefix "$PWD/.venv" python=3.10 pip
+conda activate "$PWD/.venv"
+python -m pip install -r requirements.txt
+
+# Separate server environment; vllm/environment.yml selects Python 3.12.
+conda env create --prefix "$PWD/vllm/env" --file vllm/environment.yml
+"$PWD/vllm/env/bin/python" -m pip install -r requirements-vllm.txt
+"$PWD/vllm/env/bin/python" -m pip check
+```
+
+The main environment can remain active while `vllm/launch_qwen.sh` uses the
+server interpreter explicitly. Both environment directories are Git-ignored.
 
 Run commands from the repository root. Extract one Babel Formal theorem:
 

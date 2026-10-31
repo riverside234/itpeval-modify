@@ -1,0 +1,11 @@
+# Isolated vLLM server environment: Python 3.12, Linux, supported CUDA GPU.
+# Run from the repository root in vllm/env:
+# python -m pip install -r requirements-vllm.txt
+#
+# Direct dependency pins; not a complete transitive or GPU-validated lock.
+# Keep these versions aligned with vllm/server.example.json.
+# vLLM selects its compatible PyTorch/CUDA dependencies; do not install
+# these server packages into the main Python 3.10 ITPEval environment.
+vllm==0.32.0
+transformers==5.19.0
+huggingface-hub==2.3.0
