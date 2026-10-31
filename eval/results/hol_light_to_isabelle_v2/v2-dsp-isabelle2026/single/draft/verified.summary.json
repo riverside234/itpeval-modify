@@ -1,0 +1,35 @@
+{
+  "targets": 1,
+  "samples": 1,
+  "verified_samples": 0,
+  "pass_at_1_count": 0,
+  "pass_at_1": 0.0,
+  "pass_at_k_count": 0,
+  "pass_at_k": 0.0,
+  "metric": "empirical first-sample success and success among generated K samples",
+  "failure_counts": {
+    "sketch_step_failure": 1
+  },
+  "schema_version": "hol_light_to_isabelle_dsp_v2",
+  "pipeline": "v2-dsp",
+  "sketch_source": "draft",
+  "draft_used": true,
+  "expected_isabelle_version": "Isabelle2026",
+  "missing_samples": 0,
+  "llm_usage": {
+    "draft": {
+      "input_tokens": 3288,
+      "output_tokens": 153,
+      "total_tokens": 3441,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0
+    },
+    "sketch": {
+      "input_tokens": 1596,
+      "output_tokens": 101,
+      "total_tokens": 1697,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0
+    }
+  }
+}

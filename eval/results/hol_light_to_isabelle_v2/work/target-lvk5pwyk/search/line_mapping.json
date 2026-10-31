@@ -1,0 +1,6 @@
+{
+  "original_prefix_lines": 66,
+  "oracle_lines": 2,
+  "sketch_lines": 11,
+  "note": "native attempt line numbers are relative to the recorded source section; offsets count Isabelle symbols"
+}

@@ -9,7 +9,7 @@
   ],
   "ok": true,
   "baseline_ok": true,
-  "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/context-yn8elvio",
+  "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/context-rh57mi4q",
   "backend_metadata": {
     "backend": "isabelle-native",
     "isabelle_version": "Isabelle2026",
@@ -862,19 +862,19 @@
       }
     },
     "native_adapter_sha256": {
-      "dsp_sledgehammer.ML": "89e41a033e06dc0b4081994c37c9b9ff47e6c37effd813d02e30978ca0b13d1b",
-      "dsp_native.ML": "951c7040ed9b549d21e47c1228dd44b8802f3b47535916d845abd9ba0d10837d",
+      "dsp_sledgehammer.ML": "c2fe546cdd5e2edf6b28d9986155926fd229e57509b957e3055a0b6c39dc0fd2",
+      "dsp_native.ML": "1de30ae90fffb9fc386adb71b0e616e6f6d5141299453576b5b3c83682ecf640",
       "ROOT": "0eda565e6c4243196b43663ac019a1f8e5b59ccdb847aa32a056e9f0c037de23",
       "release_sources.json": "29042738a67e9b71ad53f9b763f2e7a24687b470bcb5890d684c70931cf95ca4",
       "DSP_Native.thy": "23c7190e3af5fe92ba8ae582599f4db40254e3fd58b71824827853bb877a30c7",
-      "runtime.py": "8f7cecb7f2fb42ee3695d45c032d949c31c0e307d9d4f2df0367f3dafe2dc665",
-      "native_search.py": "c03dbb25efcabeb3acf0fec6e211fa438aebf280f1efeee4eb036dfc7b5d8be9",
-      "checker.py": "e9de03732243f5eea2355a515289d82954c397368c4f538e50217c4d661d8375",
+      "runtime.py": "2ac6e84a0250c36fbdc96cda00225df37601a511f431f0b704399b6275bb274e",
+      "native_search.py": "586df0136f8ec3a5faa5242605b61073eb86e1d15d50c3c3a8c7cb497998a84b",
+      "checker.py": "2de0e8de83d6199811f2156fb4015f204154682ffe6b17d8c86fff787bbb04b9",
       "input_contract.py": "5ee2f4621b5cdfd6781850a0c05962a223ac9c235804c4342927243150d2e97f",
       "theory_context.py": "e87e6133643906b47656bd16624e209bda1d5304ec0f8e87825246f43f3327da",
       "sanitize_isabelle.py": "8f9950fde74efa43365225f7480749e688c6131b4b542625e323b7320695de8d",
       "isabelle_syntax.py": "c2fe9690aa877ad941c577351bb0efbc400f16c7db1c835ce7eaec2b859e4235",
-      "prompt.py": "31bcb4ccc754bdcba02f3c5324bbc7e6a2026a2d9b13091a1a4659e9e755c0da",
+      "prompt.py": "92a52b2407a621146c0994fbe89a9282f8b1e96703ba15c4840e7ca78d8a43c3",
       "common.py": "07ef8491e2dc2290997f2b6b81b40be81d73823d51dabc316d82e8b4281150de"
     },
     "distribution_sources_sha256": "4ce3a0ae02fbd03b38b229cb8d6721f21a53e093e36e9e486ca9838a5990a85d",
@@ -889,7 +889,7 @@
       "ISABELLE_TMP_PREFIX": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2026-native/tmp/isabelle",
       "ISABELLE_HEAPS_SYSTEM": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/heaps"
     },
-    "itpeval_commit": "8467b653ce461feb1593bbfb22187b593118d071",
+    "itpeval_commit": "9468d6af9e676da5a8cac28a5f0eb360705f4806",
     "config": {
       "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026",
       "expected_isabelle_version": "Isabelle2026",
@@ -907,7 +907,7 @@
       "replay_timeout_s": 1200
     },
     "background_policy": "earlier_masked_helpers_admitted",
-    "backend_fingerprint": "990b92aacbf39fdf0b62ca3d8adbf83e7ca251b25dd65bb845de88c08831770e"
+    "backend_fingerprint": "f8ea06c42e50dc5f1552bde52d3620cf903ece2f96cae4bf288ed563910a8ff2"
   },
   "draft_context_policy": "original_masked_prefix",
   "context_sha256": "2f406241e3b00f7867899202b90141cdb54b602d11fb65b08542da65c68b0b36",
@@ -941,7 +941,7 @@
         "index": "1",
         "line": "1",
         "source_state": "0",
-        "duration_seconds": "0.038",
+        "duration_seconds": "0.039",
         "command": "theory circle_average\n  imports Main\nbegin",
         "error": ""
       },
@@ -971,8 +971,8 @@
         "index": "4",
         "line": "5",
         "source_state": "3",
-        "duration_seconds": "0.027",
-        "command": "locale circle_average_setup =\n  fixes zero     :: 'r\n    and add      :: 'r \\<Rightarrow> 'r \\<Rightarrow> 'r     (infixl +C 65)\n    and integral :: ('r \\<Rightarrow> 'r) \\<Rightarrow> 'r\n  assumes add_zero      : \\<And>x. x +C zero = x\n    and   add_comm      : \\<And>x y. x +C y = y +C x\n    and   add_assoc     : \\<And>x y z. (x +C y) +C z = x +C (y +C z)\n    and   integral_ext  : \\<And>g h. (\\<forall>\\<theta>. g \\<theta> = h \\<theta>) \\<Longrightarrow> integral g = integral h\n    and   integral_const: \\<And>c. integral (\\<lambda>_. c) = c\n    and   integral_add  : \\<And>f g. integral (\\<lambda>\\<theta>. f \\<theta> +C g \\<theta>) = integral f +C integral g\n    and   integral_shift: \\<And>f c. integral (\\<lambda>\\<theta>. f (\\<theta> +C c)) = integral f\nbegin",
+        "duration_seconds": "0.028",
+        "command": "locale circle_average_setup =\n  fixes zero     :: \"'r\"\n    and add      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"     (infixl \"+C\" 65)\n    and integral :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> 'r\"\n  assumes add_zero      : \"\\<And>x. x +C zero = x\"\n    and   add_comm      : \"\\<And>x y. x +C y = y +C x\"\n    and   add_assoc     : \"\\<And>x y z. (x +C y) +C z = x +C (y +C z)\"\n    and   integral_ext  : \"\\<And>g h. (\\<forall>\\<theta>. g \\<theta> = h \\<theta>) \\<Longrightarrow> integral g = integral h\"\n    and   integral_const: \"\\<And>c. integral (\\<lambda>_. c) = c\"\n    and   integral_add  : \"\\<And>f g. integral (\\<lambda>\\<theta>. f \\<theta> +C g \\<theta>) = integral f +C integral g\"\n    and   integral_shift: \"\\<And>f c. integral (\\<lambda>\\<theta>. f (\\<theta> +C c)) = integral f\"\nbegin",
         "error": ""
       },
       {
@@ -991,8 +991,8 @@
         "index": "6",
         "line": "22",
         "source_state": "5",
-        "duration_seconds": "0.009",
-        "command": "definition circleMap :: 'r \\<Rightarrow> 'r \\<Rightarrow> 'r\n  where circleMap c \\<theta> \\<equiv> \\<theta> +C c",
+        "duration_seconds": "0.011",
+        "command": "definition circleMap :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"circleMap c \\<theta> \\<equiv> \\<theta> +C c\"",
         "error": ""
       },
       {
@@ -1011,8 +1011,8 @@
         "index": "8",
         "line": "25",
         "source_state": "7",
-        "duration_seconds": "0.011",
-        "command": "definition circleAverage :: ('r \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> 'r\n  where circleAverage f c \\<equiv> integral (\\<lambda>\\<theta>. f (circleMap c \\<theta>))",
+        "duration_seconds": "0.012",
+        "command": "definition circleAverage :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"circleAverage f c \\<equiv> integral (\\<lambda>\\<theta>. f (circleMap c \\<theta>))\"",
         "error": ""
       },
       {
@@ -1031,8 +1031,8 @@
         "index": "10",
         "line": "32",
         "source_state": "9",
-        "duration_seconds": "0.002",
-        "command": "lemma circleMap_zero: circleMap zero \\<theta> = \\<theta>",
+        "duration_seconds": "0.003",
+        "command": "lemma circleMap_zero: \"circleMap zero \\<theta> = \\<theta>\"",
         "error": ""
       },
       {
@@ -1071,8 +1071,8 @@
         "index": "14",
         "line": "34",
         "source_state": "13",
-        "duration_seconds": "0.002",
-        "command": "lemma circleAverage_zero: circleAverage f zero = integral f",
+        "duration_seconds": "0.001",
+        "command": "lemma circleAverage_zero: \"circleAverage f zero = integral f\"",
         "error": ""
       },
       {
@@ -1091,7 +1091,7 @@
         "index": "16",
         "line": "35",
         "source_state": "15",
-        "duration_seconds": "0.001",
+        "duration_seconds": "0.002",
         "command": "sorry",
         "error": ""
       },
@@ -1112,7 +1112,7 @@
         "line": "36",
         "source_state": "17",
         "duration_seconds": "0.003",
-        "command": "lemma circleAverage_add:\n  circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage f c +C circleAverage g c",
+        "command": "lemma circleAverage_add:\n  \"circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage f c +C circleAverage g c\"",
         "error": ""
       },
       {
@@ -1131,7 +1131,7 @@
         "index": "20",
         "line": "39",
         "source_state": "19",
-        "duration_seconds": "0.002",
+        "duration_seconds": "0.003",
         "command": "sorry",
         "error": ""
       },
@@ -1151,8 +1151,8 @@
         "index": "22",
         "line": "40",
         "source_state": "21",
-        "duration_seconds": "0.002",
-        "command": "lemma circleAverage_fun_add:\n  circleAverage (\\<lambda>z. f (z +C c)) zero = circleAverage f c",
+        "duration_seconds": "0.003",
+        "command": "lemma circleAverage_fun_add:\n  \"circleAverage (\\<lambda>z. f (z +C c)) zero = circleAverage f c\"",
         "error": ""
       },
       {
@@ -1192,7 +1192,7 @@
         "line": "43",
         "source_state": "25",
         "duration_seconds": "0.002",
-        "command": "lemma circleMap_add:\n  circleMap (c +C d) \\<theta> = circleMap c (circleMap d \\<theta>)",
+        "command": "lemma circleMap_add:\n  \"circleMap (c +C d) \\<theta> = circleMap c (circleMap d \\<theta>)\"",
         "error": ""
       },
       {
@@ -1232,7 +1232,7 @@
         "line": "46",
         "source_state": "29",
         "duration_seconds": "0.003",
-        "command": "lemma circleAverage_shift:\n  circleAverage f (c +C d) = circleAverage (\\<lambda>z. f (z +C d)) c",
+        "command": "lemma circleAverage_shift:\n  \"circleAverage f (c +C d) = circleAverage (\\<lambda>z. f (z +C d)) c\"",
         "error": ""
       },
       {
@@ -1272,7 +1272,7 @@
         "line": "49",
         "source_state": "33",
         "duration_seconds": "0.002",
-        "command": "lemma circleAverage_const:\n  circleAverage (\\<lambda>_. k) c = k",
+        "command": "lemma circleAverage_const:\n  \"circleAverage (\\<lambda>_. k) c = k\"",
         "error": ""
       },
       {
@@ -1312,7 +1312,7 @@
         "line": "52",
         "source_state": "37",
         "duration_seconds": "0.002",
-        "command": "lemma circleAverage_add_const:\n  circleAverage (\\<lambda>z. f z +C k) c = circleAverage f c +C k",
+        "command": "lemma circleAverage_add_const:\n  \"circleAverage (\\<lambda>z. f z +C k) c = circleAverage f c +C k\"",
         "error": ""
       },
       {
@@ -1352,7 +1352,7 @@
         "line": "55",
         "source_state": "41",
         "duration_seconds": "0.003",
-        "command": "lemma circleAverage_comm_add:\n  circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage (\\<lambda>z. g z +C f z) c",
+        "command": "lemma circleAverage_comm_add:\n  \"circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage (\\<lambda>z. g z +C f z) c\"",
         "error": ""
       },
       {
@@ -1392,7 +1392,7 @@
         "line": "59",
         "source_state": "45",
         "duration_seconds": "0.004",
-        "command": "lemma circleAverage_add_assoc:\n  circleAverage (\\<lambda>z. (f z +C g z) +C h z) c =\n   circleAverage f c +C (circleAverage g c +C circleAverage h c)",
+        "command": "lemma circleAverage_add_assoc:\n  \"circleAverage (\\<lambda>z. (f z +C g z) +C h z) c =\n   circleAverage f c +C (circleAverage g c +C circleAverage h c)\"",
         "error": ""
       },
       {
@@ -1432,7 +1432,7 @@
         "line": "63",
         "source_state": "49",
         "duration_seconds": "0.002",
-        "command": "lemma circleAverage_center_comm:\n  circleAverage f (c +C d) = circleAverage f (d +C c)",
+        "command": "lemma circleAverage_center_comm:\n  \"circleAverage f (c +C d) = circleAverage f (d +C c)\"",
         "error": ""
       },
       {
@@ -1481,8 +1481,8 @@
         "index": "55",
         "line": "1",
         "source_state": "54",
-        "duration_seconds": "0.002",
-        "command": "lemma circleAverage_center_independent:\n  circleAverage f c = integral f",
+        "duration_seconds": "0.001",
+        "command": "lemma circleAverage_center_independent:\n  \"circleAverage f c = integral f\"",
         "error": ""
       },
       {
@@ -1497,9 +1497,9 @@
       }
     ],
     "prover_settings": {},
-    "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/context-yn8elvio/result.xml",
-    "request_id": "0f5b4714ce0a4e63a3c89d865b816280",
-    "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/context-yn8elvio"
+    "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/context-rh57mi4q/result.xml",
+    "request_id": "765d23f1670d49b8be600126bf6c18b2",
+    "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/context-rh57mi4q"
   },
   "valid_control_verified": true,
   "hammer_control_verified": true,
@@ -1543,7 +1543,7 @@
       "formal_statement": "lemma v2_control: \"True\"",
       "input_error": null,
       "informal_proof": "Establish the supplied conclusion.",
-      "checker_version": "dsp_isabelle2026_native_p1",
+      "checker_version": "dsp_isabelle2026_native_p2",
       "prove_success": true,
       "replay_verified": true,
       "verified": true,
@@ -1597,7 +1597,7 @@
           "line": "1",
           "source_state": "4",
           "duration_seconds": "0.001",
-          "command": "lemma v2_control: True",
+          "command": "lemma v2_control: \"True\"",
           "error": ""
         },
         {
@@ -2483,19 +2483,19 @@
           }
         },
         "native_adapter_sha256": {
-          "dsp_sledgehammer.ML": "89e41a033e06dc0b4081994c37c9b9ff47e6c37effd813d02e30978ca0b13d1b",
-          "dsp_native.ML": "951c7040ed9b549d21e47c1228dd44b8802f3b47535916d845abd9ba0d10837d",
+          "dsp_sledgehammer.ML": "c2fe546cdd5e2edf6b28d9986155926fd229e57509b957e3055a0b6c39dc0fd2",
+          "dsp_native.ML": "1de30ae90fffb9fc386adb71b0e616e6f6d5141299453576b5b3c83682ecf640",
           "ROOT": "0eda565e6c4243196b43663ac019a1f8e5b59ccdb847aa32a056e9f0c037de23",
           "release_sources.json": "29042738a67e9b71ad53f9b763f2e7a24687b470bcb5890d684c70931cf95ca4",
           "DSP_Native.thy": "23c7190e3af5fe92ba8ae582599f4db40254e3fd58b71824827853bb877a30c7",
-          "runtime.py": "8f7cecb7f2fb42ee3695d45c032d949c31c0e307d9d4f2df0367f3dafe2dc665",
-          "native_search.py": "c03dbb25efcabeb3acf0fec6e211fa438aebf280f1efeee4eb036dfc7b5d8be9",
-          "checker.py": "e9de03732243f5eea2355a515289d82954c397368c4f538e50217c4d661d8375",
+          "runtime.py": "2ac6e84a0250c36fbdc96cda00225df37601a511f431f0b704399b6275bb274e",
+          "native_search.py": "586df0136f8ec3a5faa5242605b61073eb86e1d15d50c3c3a8c7cb497998a84b",
+          "checker.py": "2de0e8de83d6199811f2156fb4015f204154682ffe6b17d8c86fff787bbb04b9",
           "input_contract.py": "5ee2f4621b5cdfd6781850a0c05962a223ac9c235804c4342927243150d2e97f",
           "theory_context.py": "e87e6133643906b47656bd16624e209bda1d5304ec0f8e87825246f43f3327da",
           "sanitize_isabelle.py": "8f9950fde74efa43365225f7480749e688c6131b4b542625e323b7320695de8d",
           "isabelle_syntax.py": "c2fe9690aa877ad941c577351bb0efbc400f16c7db1c835ce7eaec2b859e4235",
-          "prompt.py": "31bcb4ccc754bdcba02f3c5324bbc7e6a2026a2d9b13091a1a4659e9e755c0da",
+          "prompt.py": "92a52b2407a621146c0994fbe89a9282f8b1e96703ba15c4840e7ca78d8a43c3",
           "common.py": "07ef8491e2dc2290997f2b6b81b40be81d73823d51dabc316d82e8b4281150de"
         },
         "distribution_sources_sha256": "4ce3a0ae02fbd03b38b229cb8d6721f21a53e093e36e9e486ca9838a5990a85d",
@@ -2510,7 +2510,7 @@
           "ISABELLE_TMP_PREFIX": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2026-native/tmp/isabelle",
           "ISABELLE_HEAPS_SYSTEM": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/heaps"
         },
-        "itpeval_commit": "8467b653ce461feb1593bbfb22187b593118d071",
+        "itpeval_commit": "9468d6af9e676da5a8cac28a5f0eb360705f4806",
         "config": {
           "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026",
           "expected_isabelle_version": "Isabelle2026",
@@ -2528,9 +2528,9 @@
           "replay_timeout_s": 1200
         },
         "background_policy": "earlier_masked_helpers_admitted",
-        "backend_fingerprint": "990b92aacbf39fdf0b62ca3d8adbf83e7ca251b25dd65bb845de88c08831770e"
+        "backend_fingerprint": "f8ea06c42e50dc5f1552bde52d3620cf903ece2f96cae4bf288ed563910a8ff2"
       },
-      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-jpypmnx1",
+      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-mc28yhme",
       "native_search": {
         "success": true,
         "target_closed": true,
@@ -2585,7 +2585,7 @@
             "line": "1",
             "source_state": "4",
             "duration_seconds": "0.001",
-            "command": "lemma v2_control: True",
+            "command": "lemma v2_control: \"True\"",
             "error": ""
           },
           {
@@ -2620,21 +2620,21 @@
           }
         ],
         "prover_settings": {},
-        "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-jpypmnx1/search/result.xml",
-        "request_id": "d802bb3e54cd47328217a0ab22abe976",
-        "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-jpypmnx1/search"
+        "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-mc28yhme/search/result.xml",
+        "request_id": "70c89980606f4a238b0b62d56b4c5cd9",
+        "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-mc28yhme/search"
       },
       "prover_settings": {},
       "isabelle_proof": "by simp",
       "native_replay": {
         "success": true,
-        "replay_theory_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-jpypmnx1/replay/V2Control.thy",
-        "replay_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-jpypmnx1/replay/build.log",
+        "replay_theory_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-mc28yhme/replay/V2Control.thy",
+        "replay_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-mc28yhme/replay/build.log",
         "returncode": 0
       },
-      "replay_theory_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-jpypmnx1/replay/V2Control.thy",
-      "replay_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-jpypmnx1/replay/build.log",
-      "verify_duration_seconds": 27.883
+      "replay_theory_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-mc28yhme/replay/V2Control.thy",
+      "replay_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-mc28yhme/replay/build.log",
+      "verify_duration_seconds": 36.695
     },
     "hammer": {
       "source": "babel-formal",
@@ -2651,7 +2651,7 @@
         68
       ],
       "sample_idx": 0,
-      "isabelle_sketch": "proof -\n show True\n sledgehammer\nqed",
+      "isabelle_sketch": "proof -\n show \"True\"\n sledgehammer\nqed",
       "draft": "Establish the supplied conclusion.",
       "draft_context_policy": "original_masked_prefix",
       "context_sha256": "410191a8b82725df3a2f4c4554c34eab5703d36c03d161fe7dcc94e8eee78be2",
@@ -2671,7 +2671,7 @@
       "formal_statement": "lemma v2_control: \"True\"",
       "input_error": null,
       "informal_proof": "Establish the supplied conclusion.",
-      "checker_version": "dsp_isabelle2026_native_p1",
+      "checker_version": "dsp_isabelle2026_native_p2",
       "prove_success": true,
       "replay_verified": true,
       "verified": true,
@@ -2684,7 +2684,7 @@
           "index": "1",
           "line": "1",
           "source_state": "0",
-          "duration_seconds": "0.038",
+          "duration_seconds": "0.028",
           "command": "theory V2Control imports Main begin",
           "error": ""
         },
@@ -2725,7 +2725,7 @@
           "line": "1",
           "source_state": "4",
           "duration_seconds": "0.001",
-          "command": "lemma v2_control: True",
+          "command": "lemma v2_control: \"True\"",
           "error": ""
         },
         {
@@ -2764,8 +2764,8 @@
           "index": "9",
           "line": "2",
           "source_state": "8",
-          "duration_seconds": "0.001",
-          "command": "show True",
+          "duration_seconds": "0.000",
+          "command": "show \"True\"",
           "error": ""
         },
         {
@@ -2784,7 +2784,7 @@
           "index": "11",
           "line": "0",
           "source_state": "10",
-          "duration_seconds": "0.717",
+          "duration_seconds": "0.613",
           "command": "native Sledgehammer",
           "error": ""
         },
@@ -2794,7 +2794,7 @@
           "index": "12",
           "line": "0",
           "source_state": "10",
-          "duration_seconds": "0.001",
+          "duration_seconds": "0.000",
           "command": "by satx",
           "error": ""
         },
@@ -3681,19 +3681,19 @@
           }
         },
         "native_adapter_sha256": {
-          "dsp_sledgehammer.ML": "89e41a033e06dc0b4081994c37c9b9ff47e6c37effd813d02e30978ca0b13d1b",
-          "dsp_native.ML": "951c7040ed9b549d21e47c1228dd44b8802f3b47535916d845abd9ba0d10837d",
+          "dsp_sledgehammer.ML": "c2fe546cdd5e2edf6b28d9986155926fd229e57509b957e3055a0b6c39dc0fd2",
+          "dsp_native.ML": "1de30ae90fffb9fc386adb71b0e616e6f6d5141299453576b5b3c83682ecf640",
           "ROOT": "0eda565e6c4243196b43663ac019a1f8e5b59ccdb847aa32a056e9f0c037de23",
           "release_sources.json": "29042738a67e9b71ad53f9b763f2e7a24687b470bcb5890d684c70931cf95ca4",
           "DSP_Native.thy": "23c7190e3af5fe92ba8ae582599f4db40254e3fd58b71824827853bb877a30c7",
-          "runtime.py": "8f7cecb7f2fb42ee3695d45c032d949c31c0e307d9d4f2df0367f3dafe2dc665",
-          "native_search.py": "c03dbb25efcabeb3acf0fec6e211fa438aebf280f1efeee4eb036dfc7b5d8be9",
-          "checker.py": "e9de03732243f5eea2355a515289d82954c397368c4f538e50217c4d661d8375",
+          "runtime.py": "2ac6e84a0250c36fbdc96cda00225df37601a511f431f0b704399b6275bb274e",
+          "native_search.py": "586df0136f8ec3a5faa5242605b61073eb86e1d15d50c3c3a8c7cb497998a84b",
+          "checker.py": "2de0e8de83d6199811f2156fb4015f204154682ffe6b17d8c86fff787bbb04b9",
           "input_contract.py": "5ee2f4621b5cdfd6781850a0c05962a223ac9c235804c4342927243150d2e97f",
           "theory_context.py": "e87e6133643906b47656bd16624e209bda1d5304ec0f8e87825246f43f3327da",
           "sanitize_isabelle.py": "8f9950fde74efa43365225f7480749e688c6131b4b542625e323b7320695de8d",
           "isabelle_syntax.py": "c2fe9690aa877ad941c577351bb0efbc400f16c7db1c835ce7eaec2b859e4235",
-          "prompt.py": "31bcb4ccc754bdcba02f3c5324bbc7e6a2026a2d9b13091a1a4659e9e755c0da",
+          "prompt.py": "92a52b2407a621146c0994fbe89a9282f8b1e96703ba15c4840e7ca78d8a43c3",
           "common.py": "07ef8491e2dc2290997f2b6b81b40be81d73823d51dabc316d82e8b4281150de"
         },
         "distribution_sources_sha256": "4ce3a0ae02fbd03b38b229cb8d6721f21a53e093e36e9e486ca9838a5990a85d",
@@ -3708,7 +3708,7 @@
           "ISABELLE_TMP_PREFIX": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2026-native/tmp/isabelle",
           "ISABELLE_HEAPS_SYSTEM": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/heaps"
         },
-        "itpeval_commit": "8467b653ce461feb1593bbfb22187b593118d071",
+        "itpeval_commit": "9468d6af9e676da5a8cac28a5f0eb360705f4806",
         "config": {
           "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026",
           "expected_isabelle_version": "Isabelle2026",
@@ -3726,13 +3726,13 @@
           "replay_timeout_s": 1200
         },
         "background_policy": "earlier_masked_helpers_admitted",
-        "backend_fingerprint": "990b92aacbf39fdf0b62ca3d8adbf83e7ca251b25dd65bb845de88c08831770e"
+        "backend_fingerprint": "f8ea06c42e50dc5f1552bde52d3620cf903ece2f96cae4bf288ed563910a8ff2"
       },
-      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-br3kl3fk",
+      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-sdotmwe8",
       "native_search": {
         "success": true,
         "target_closed": true,
-        "isabelle_proof": "proof -\n show True\n by satx\n\nqed",
+        "isabelle_proof": "proof -\n show \"True\"\n by satx\n\nqed",
         "error": "",
         "failure_category": "",
         "step_results": [
@@ -3742,7 +3742,7 @@
             "index": "1",
             "line": "1",
             "source_state": "0",
-            "duration_seconds": "0.038",
+            "duration_seconds": "0.028",
             "command": "theory V2Control imports Main begin",
             "error": ""
           },
@@ -3783,7 +3783,7 @@
             "line": "1",
             "source_state": "4",
             "duration_seconds": "0.001",
-            "command": "lemma v2_control: True",
+            "command": "lemma v2_control: \"True\"",
             "error": ""
           },
           {
@@ -3822,8 +3822,8 @@
             "index": "9",
             "line": "2",
             "source_state": "8",
-            "duration_seconds": "0.001",
-            "command": "show True",
+            "duration_seconds": "0.000",
+            "command": "show \"True\"",
             "error": ""
           },
           {
@@ -3842,7 +3842,7 @@
             "index": "11",
             "line": "0",
             "source_state": "10",
-            "duration_seconds": "0.717",
+            "duration_seconds": "0.613",
             "command": "native Sledgehammer",
             "error": ""
           },
@@ -3852,7 +3852,7 @@
             "index": "12",
             "line": "0",
             "source_state": "10",
-            "duration_seconds": "0.001",
+            "duration_seconds": "0.000",
             "command": "by satx",
             "error": ""
           },
@@ -3891,42 +3891,42 @@
           "resolved_provers": "cvc5 verit z3 e spass vampire zipperposition presburger fastforce linarith algebra order metis meson force blast simp satx fast auto argo",
           "native_parameters": "{abduce = SOME 0, cache_dir = NONE, compress = NONE, debug = false, expect =\n \"\", fact_filter = SOME \"mepo\", fact_thresholds = (0.45, 0.85), falsify =\n SOME false, induction_rules = NONE, instantiate = NONE, isar_proofs =\n SOME false, lam_trans = NONE, learn = false, max_facts = NONE,\n max_mono_iters = NONE, max_new_mono_instances = NONE, max_proofs = 4,\n minimize = true, overlord = false, preplay_timeout = 10.000, provers =\n [\"cvc5\", \"verit\", \"z3\", \"e\", \"spass\", \"vampire\", \"zipperposition\",\n  \"presburger\", \"fastforce\", \"linarith\", \"algebra\", \"order\", \"metis\",\n  \"meson\", \"force\", \"blast\", \"simp\", \"satx\", \"fast\", \"auto\", \"argo\"],\n slices = 192, smt_proofs = true, spy = false, strict = false, timeout =\n 40.000, try0 = false, type_enc = NONE, uncurried_aliases = NONE, verbose =\n false}",
           "caller_pide_enabled": "true",
-          "native_messages": "satx found a proof...\nsatx: Try this: by satx (1 ms)\npresburger found a proof...\npresburger: Try this: by presburger (1 ms)\nsimp found a proof...\nargo found a proof...\nsimp: Try this: by simp (0.2 ms)\nargo: Try this: by argo (0.8 ms)\nmetis found a proof...\nmetis: Try this: by metis (4 ms)\nDone",
+          "native_messages": "satx found a proof...\nsatx: Try this: by satx (0.9 ms)\npresburger found a proof...\npresburger: Try this: by presburger (1 ms)\nsimp found a proof...\nsimp: Try this: by simp (0.1 ms)\nauto found a proof...\nauto: Try this: by auto (0.4 ms)\nargo found a proof...\nargo: Try this: by argo (1 ms)\nmetis found a proof...\nmetis: Try this: by metis (5 ms)\nDone",
           "native_outcome": "some",
-          "native_message": "Try this: by satx (1 ms)",
+          "native_message": "Try this: by satx (0.9 ms)",
           "preplay_count": "0",
           "preplayed_count": "0",
           "preplay_results": "",
           "reconstruction_source": "native_tactic",
           "candidate_count": "1"
         },
-        "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-br3kl3fk/search/result.xml",
-        "request_id": "e713e3b83ae64c189c821f6f462ad234",
-        "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-br3kl3fk/search"
+        "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-sdotmwe8/search/result.xml",
+        "request_id": "1f92e5b8638d4dadbe186edc9703e17e",
+        "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-sdotmwe8/search"
       },
       "prover_settings": {
         "resolved_provers": "cvc5 verit z3 e spass vampire zipperposition presburger fastforce linarith algebra order metis meson force blast simp satx fast auto argo",
         "native_parameters": "{abduce = SOME 0, cache_dir = NONE, compress = NONE, debug = false, expect =\n \"\", fact_filter = SOME \"mepo\", fact_thresholds = (0.45, 0.85), falsify =\n SOME false, induction_rules = NONE, instantiate = NONE, isar_proofs =\n SOME false, lam_trans = NONE, learn = false, max_facts = NONE,\n max_mono_iters = NONE, max_new_mono_instances = NONE, max_proofs = 4,\n minimize = true, overlord = false, preplay_timeout = 10.000, provers =\n [\"cvc5\", \"verit\", \"z3\", \"e\", \"spass\", \"vampire\", \"zipperposition\",\n  \"presburger\", \"fastforce\", \"linarith\", \"algebra\", \"order\", \"metis\",\n  \"meson\", \"force\", \"blast\", \"simp\", \"satx\", \"fast\", \"auto\", \"argo\"],\n slices = 192, smt_proofs = true, spy = false, strict = false, timeout =\n 40.000, try0 = false, type_enc = NONE, uncurried_aliases = NONE, verbose =\n false}",
         "caller_pide_enabled": "true",
-        "native_messages": "satx found a proof...\nsatx: Try this: by satx (1 ms)\npresburger found a proof...\npresburger: Try this: by presburger (1 ms)\nsimp found a proof...\nargo found a proof...\nsimp: Try this: by simp (0.2 ms)\nargo: Try this: by argo (0.8 ms)\nmetis found a proof...\nmetis: Try this: by metis (4 ms)\nDone",
+        "native_messages": "satx found a proof...\nsatx: Try this: by satx (0.9 ms)\npresburger found a proof...\npresburger: Try this: by presburger (1 ms)\nsimp found a proof...\nsimp: Try this: by simp (0.1 ms)\nauto found a proof...\nauto: Try this: by auto (0.4 ms)\nargo found a proof...\nargo: Try this: by argo (1 ms)\nmetis found a proof...\nmetis: Try this: by metis (5 ms)\nDone",
         "native_outcome": "some",
-        "native_message": "Try this: by satx (1 ms)",
+        "native_message": "Try this: by satx (0.9 ms)",
         "preplay_count": "0",
         "preplayed_count": "0",
         "preplay_results": "",
         "reconstruction_source": "native_tactic",
         "candidate_count": "1"
       },
-      "isabelle_proof": "proof -\n show True\n by satx\n\nqed",
+      "isabelle_proof": "proof -\n show \"True\"\n by satx\n\nqed",
       "native_replay": {
         "success": true,
-        "replay_theory_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-br3kl3fk/replay/V2Control.thy",
-        "replay_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-br3kl3fk/replay/build.log",
+        "replay_theory_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-sdotmwe8/replay/V2Control.thy",
+        "replay_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-sdotmwe8/replay/build.log",
         "returncode": 0
       },
-      "replay_theory_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-br3kl3fk/replay/V2Control.thy",
-      "replay_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-br3kl3fk/replay/build.log",
-      "verify_duration_seconds": 40.843
+      "replay_theory_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-sdotmwe8/replay/V2Control.thy",
+      "replay_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-sdotmwe8/replay/build.log",
+      "verify_duration_seconds": 34.563
     },
     "invalid": {
       "source": "babel-formal",
@@ -3963,7 +3963,7 @@
       "formal_statement": "lemma v2_control: \"True\"",
       "input_error": null,
       "informal_proof": "Establish the supplied conclusion.",
-      "checker_version": "dsp_isabelle2026_native_p1",
+      "checker_version": "dsp_isabelle2026_native_p2",
       "prove_success": false,
       "replay_verified": false,
       "verified": false,
@@ -3976,7 +3976,7 @@
           "index": "1",
           "line": "1",
           "source_state": "0",
-          "duration_seconds": "0.037",
+          "duration_seconds": "0.038",
           "command": "theory V2Control imports Main begin",
           "error": ""
         },
@@ -4006,7 +4006,7 @@
           "index": "4",
           "line": "1",
           "source_state": "3",
-          "duration_seconds": "0.001",
+          "duration_seconds": "0.000",
           "command": "declare [[quick_and_dirty = false]]",
           "error": ""
         },
@@ -4017,7 +4017,7 @@
           "line": "1",
           "source_state": "4",
           "duration_seconds": "0.001",
-          "command": "lemma v2_control: True",
+          "command": "lemma v2_control: \"True\"",
           "error": ""
         },
         {
@@ -4893,19 +4893,19 @@
           }
         },
         "native_adapter_sha256": {
-          "dsp_sledgehammer.ML": "89e41a033e06dc0b4081994c37c9b9ff47e6c37effd813d02e30978ca0b13d1b",
-          "dsp_native.ML": "951c7040ed9b549d21e47c1228dd44b8802f3b47535916d845abd9ba0d10837d",
+          "dsp_sledgehammer.ML": "c2fe546cdd5e2edf6b28d9986155926fd229e57509b957e3055a0b6c39dc0fd2",
+          "dsp_native.ML": "1de30ae90fffb9fc386adb71b0e616e6f6d5141299453576b5b3c83682ecf640",
           "ROOT": "0eda565e6c4243196b43663ac019a1f8e5b59ccdb847aa32a056e9f0c037de23",
           "release_sources.json": "29042738a67e9b71ad53f9b763f2e7a24687b470bcb5890d684c70931cf95ca4",
           "DSP_Native.thy": "23c7190e3af5fe92ba8ae582599f4db40254e3fd58b71824827853bb877a30c7",
-          "runtime.py": "8f7cecb7f2fb42ee3695d45c032d949c31c0e307d9d4f2df0367f3dafe2dc665",
-          "native_search.py": "c03dbb25efcabeb3acf0fec6e211fa438aebf280f1efeee4eb036dfc7b5d8be9",
-          "checker.py": "e9de03732243f5eea2355a515289d82954c397368c4f538e50217c4d661d8375",
+          "runtime.py": "2ac6e84a0250c36fbdc96cda00225df37601a511f431f0b704399b6275bb274e",
+          "native_search.py": "586df0136f8ec3a5faa5242605b61073eb86e1d15d50c3c3a8c7cb497998a84b",
+          "checker.py": "2de0e8de83d6199811f2156fb4015f204154682ffe6b17d8c86fff787bbb04b9",
           "input_contract.py": "5ee2f4621b5cdfd6781850a0c05962a223ac9c235804c4342927243150d2e97f",
           "theory_context.py": "e87e6133643906b47656bd16624e209bda1d5304ec0f8e87825246f43f3327da",
           "sanitize_isabelle.py": "8f9950fde74efa43365225f7480749e688c6131b4b542625e323b7320695de8d",
           "isabelle_syntax.py": "c2fe9690aa877ad941c577351bb0efbc400f16c7db1c835ce7eaec2b859e4235",
-          "prompt.py": "31bcb4ccc754bdcba02f3c5324bbc7e6a2026a2d9b13091a1a4659e9e755c0da",
+          "prompt.py": "92a52b2407a621146c0994fbe89a9282f8b1e96703ba15c4840e7ca78d8a43c3",
           "common.py": "07ef8491e2dc2290997f2b6b81b40be81d73823d51dabc316d82e8b4281150de"
         },
         "distribution_sources_sha256": "4ce3a0ae02fbd03b38b229cb8d6721f21a53e093e36e9e486ca9838a5990a85d",
@@ -4920,7 +4920,7 @@
           "ISABELLE_TMP_PREFIX": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2026-native/tmp/isabelle",
           "ISABELLE_HEAPS_SYSTEM": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/heaps"
         },
-        "itpeval_commit": "8467b653ce461feb1593bbfb22187b593118d071",
+        "itpeval_commit": "9468d6af9e676da5a8cac28a5f0eb360705f4806",
         "config": {
           "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026",
           "expected_isabelle_version": "Isabelle2026",
@@ -4938,9 +4938,9 @@
           "replay_timeout_s": 1200
         },
         "background_policy": "earlier_masked_helpers_admitted",
-        "backend_fingerprint": "990b92aacbf39fdf0b62ca3d8adbf83e7ca251b25dd65bb845de88c08831770e"
+        "backend_fingerprint": "f8ea06c42e50dc5f1552bde52d3620cf903ece2f96cae4bf288ed563910a8ff2"
       },
-      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-z9l0vlur",
+      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-6nlwa16q",
       "native_search": {
         "success": false,
         "target_closed": false,
@@ -4954,7 +4954,7 @@
             "index": "1",
             "line": "1",
             "source_state": "0",
-            "duration_seconds": "0.037",
+            "duration_seconds": "0.038",
             "command": "theory V2Control imports Main begin",
             "error": ""
           },
@@ -4984,7 +4984,7 @@
             "index": "4",
             "line": "1",
             "source_state": "3",
-            "duration_seconds": "0.001",
+            "duration_seconds": "0.000",
             "command": "declare [[quick_and_dirty = false]]",
             "error": ""
           },
@@ -4995,7 +4995,7 @@
             "line": "1",
             "source_state": "4",
             "duration_seconds": "0.001",
-            "command": "lemma v2_control: True",
+            "command": "lemma v2_control: \"True\"",
             "error": ""
           },
           {
@@ -5020,12 +5020,12 @@
           }
         ],
         "prover_settings": {},
-        "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-z9l0vlur/search/result.xml",
-        "request_id": "1815559553204dc482c36a51a380cafa",
-        "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-z9l0vlur/search"
+        "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-6nlwa16q/search/result.xml",
+        "request_id": "4dd6a547ae0a41b694cfdc381fbc6001",
+        "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-6nlwa16q/search"
       },
       "prover_settings": {},
-      "verify_duration_seconds": 22.483
+      "verify_duration_seconds": 20.109
     },
     "admitted": {
       "source": "babel-formal",
@@ -5062,7 +5062,7 @@
       "formal_statement": "lemma v2_control: \"True\"",
       "input_error": null,
       "informal_proof": "Establish the supplied conclusion.",
-      "checker_version": "dsp_isabelle2026_native_p1",
+      "checker_version": "dsp_isabelle2026_native_p2",
       "prove_success": false,
       "replay_verified": false,
       "verified": false,
@@ -5106,7 +5106,7 @@
       "formal_statement": "lemma v2_control: \"True\"",
       "input_error": null,
       "informal_proof": "Establish the supplied conclusion.",
-      "checker_version": "dsp_isabelle2026_native_p1",
+      "checker_version": "dsp_isabelle2026_native_p2",
       "prove_success": false,
       "replay_verified": false,
       "verified": false,
@@ -5119,7 +5119,7 @@
           "index": "1",
           "line": "1",
           "source_state": "0",
-          "duration_seconds": "0.038",
+          "duration_seconds": "0.037",
           "command": "theory V2Control imports Main begin",
           "error": ""
         },
@@ -5160,7 +5160,7 @@
           "line": "1",
           "source_state": "4",
           "duration_seconds": "0.001",
-          "command": "lemma v2_control: True",
+          "command": "lemma v2_control: \"True\"",
           "error": ""
         },
         {
@@ -6036,19 +6036,19 @@
           }
         },
         "native_adapter_sha256": {
-          "dsp_sledgehammer.ML": "89e41a033e06dc0b4081994c37c9b9ff47e6c37effd813d02e30978ca0b13d1b",
-          "dsp_native.ML": "951c7040ed9b549d21e47c1228dd44b8802f3b47535916d845abd9ba0d10837d",
+          "dsp_sledgehammer.ML": "c2fe546cdd5e2edf6b28d9986155926fd229e57509b957e3055a0b6c39dc0fd2",
+          "dsp_native.ML": "1de30ae90fffb9fc386adb71b0e616e6f6d5141299453576b5b3c83682ecf640",
           "ROOT": "0eda565e6c4243196b43663ac019a1f8e5b59ccdb847aa32a056e9f0c037de23",
           "release_sources.json": "29042738a67e9b71ad53f9b763f2e7a24687b470bcb5890d684c70931cf95ca4",
           "DSP_Native.thy": "23c7190e3af5fe92ba8ae582599f4db40254e3fd58b71824827853bb877a30c7",
-          "runtime.py": "8f7cecb7f2fb42ee3695d45c032d949c31c0e307d9d4f2df0367f3dafe2dc665",
-          "native_search.py": "c03dbb25efcabeb3acf0fec6e211fa438aebf280f1efeee4eb036dfc7b5d8be9",
-          "checker.py": "e9de03732243f5eea2355a515289d82954c397368c4f538e50217c4d661d8375",
+          "runtime.py": "2ac6e84a0250c36fbdc96cda00225df37601a511f431f0b704399b6275bb274e",
+          "native_search.py": "586df0136f8ec3a5faa5242605b61073eb86e1d15d50c3c3a8c7cb497998a84b",
+          "checker.py": "2de0e8de83d6199811f2156fb4015f204154682ffe6b17d8c86fff787bbb04b9",
           "input_contract.py": "5ee2f4621b5cdfd6781850a0c05962a223ac9c235804c4342927243150d2e97f",
           "theory_context.py": "e87e6133643906b47656bd16624e209bda1d5304ec0f8e87825246f43f3327da",
           "sanitize_isabelle.py": "8f9950fde74efa43365225f7480749e688c6131b4b542625e323b7320695de8d",
           "isabelle_syntax.py": "c2fe9690aa877ad941c577351bb0efbc400f16c7db1c835ce7eaec2b859e4235",
-          "prompt.py": "31bcb4ccc754bdcba02f3c5324bbc7e6a2026a2d9b13091a1a4659e9e755c0da",
+          "prompt.py": "92a52b2407a621146c0994fbe89a9282f8b1e96703ba15c4840e7ca78d8a43c3",
           "common.py": "07ef8491e2dc2290997f2b6b81b40be81d73823d51dabc316d82e8b4281150de"
         },
         "distribution_sources_sha256": "4ce3a0ae02fbd03b38b229cb8d6721f21a53e093e36e9e486ca9838a5990a85d",
@@ -6063,7 +6063,7 @@
           "ISABELLE_TMP_PREFIX": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2026-native/tmp/isabelle",
           "ISABELLE_HEAPS_SYSTEM": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/heaps"
         },
-        "itpeval_commit": "8467b653ce461feb1593bbfb22187b593118d071",
+        "itpeval_commit": "9468d6af9e676da5a8cac28a5f0eb360705f4806",
         "config": {
           "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026",
           "expected_isabelle_version": "Isabelle2026",
@@ -6081,9 +6081,9 @@
           "replay_timeout_s": 1200
         },
         "background_policy": "earlier_masked_helpers_admitted",
-        "backend_fingerprint": "990b92aacbf39fdf0b62ca3d8adbf83e7ca251b25dd65bb845de88c08831770e"
+        "backend_fingerprint": "f8ea06c42e50dc5f1552bde52d3620cf903ece2f96cae4bf288ed563910a8ff2"
       },
-      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-8e9lojc7",
+      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-cdiztxh2",
       "native_search": {
         "success": false,
         "target_closed": false,
@@ -6097,7 +6097,7 @@
             "index": "1",
             "line": "1",
             "source_state": "0",
-            "duration_seconds": "0.038",
+            "duration_seconds": "0.037",
             "command": "theory V2Control imports Main begin",
             "error": ""
           },
@@ -6138,7 +6138,7 @@
             "line": "1",
             "source_state": "4",
             "duration_seconds": "0.001",
-            "command": "lemma v2_control: True",
+            "command": "lemma v2_control: \"True\"",
             "error": ""
           },
           {
@@ -6163,12 +6163,12 @@
           }
         ],
         "prover_settings": {},
-        "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-8e9lojc7/search/result.xml",
-        "request_id": "51c3646f67cc4e2fa08a2a92e2ce495e",
-        "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-8e9lojc7/search"
+        "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-cdiztxh2/search/result.xml",
+        "request_id": "36362c8d76b74c6293342252360e76dd",
+        "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-cdiztxh2/search"
       },
       "prover_settings": {},
-      "verify_duration_seconds": 19.132
+      "verify_duration_seconds": 15.402
     },
     "later_reference": {
       "source": "babel-formal",
@@ -6205,7 +6205,7 @@
       "formal_statement": "lemma v2_control: \"False\"",
       "input_error": null,
       "informal_proof": "Establish the supplied conclusion.",
-      "checker_version": "dsp_isabelle2026_native_p1",
+      "checker_version": "dsp_isabelle2026_native_p2",
       "prove_success": false,
       "replay_verified": false,
       "verified": false,
@@ -6218,7 +6218,7 @@
           "index": "1",
           "line": "1",
           "source_state": "0",
-          "duration_seconds": "0.038",
+          "duration_seconds": "0.023",
           "command": "theory V2Control imports Main begin",
           "error": ""
         },
@@ -6228,7 +6228,7 @@
           "index": "2",
           "line": "1",
           "source_state": "1",
-          "duration_seconds": "0.001",
+          "duration_seconds": "0.000",
           "command": "declare [[quick_and_dirty = true]]",
           "error": ""
         },
@@ -6259,7 +6259,7 @@
           "line": "1",
           "source_state": "4",
           "duration_seconds": "0.001",
-          "command": "lemma v2_control: False",
+          "command": "lemma v2_control: \"False\"",
           "error": ""
         },
         {
@@ -7135,19 +7135,19 @@
           }
         },
         "native_adapter_sha256": {
-          "dsp_sledgehammer.ML": "89e41a033e06dc0b4081994c37c9b9ff47e6c37effd813d02e30978ca0b13d1b",
-          "dsp_native.ML": "951c7040ed9b549d21e47c1228dd44b8802f3b47535916d845abd9ba0d10837d",
+          "dsp_sledgehammer.ML": "c2fe546cdd5e2edf6b28d9986155926fd229e57509b957e3055a0b6c39dc0fd2",
+          "dsp_native.ML": "1de30ae90fffb9fc386adb71b0e616e6f6d5141299453576b5b3c83682ecf640",
           "ROOT": "0eda565e6c4243196b43663ac019a1f8e5b59ccdb847aa32a056e9f0c037de23",
           "release_sources.json": "29042738a67e9b71ad53f9b763f2e7a24687b470bcb5890d684c70931cf95ca4",
           "DSP_Native.thy": "23c7190e3af5fe92ba8ae582599f4db40254e3fd58b71824827853bb877a30c7",
-          "runtime.py": "8f7cecb7f2fb42ee3695d45c032d949c31c0e307d9d4f2df0367f3dafe2dc665",
-          "native_search.py": "c03dbb25efcabeb3acf0fec6e211fa438aebf280f1efeee4eb036dfc7b5d8be9",
-          "checker.py": "e9de03732243f5eea2355a515289d82954c397368c4f538e50217c4d661d8375",
+          "runtime.py": "2ac6e84a0250c36fbdc96cda00225df37601a511f431f0b704399b6275bb274e",
+          "native_search.py": "586df0136f8ec3a5faa5242605b61073eb86e1d15d50c3c3a8c7cb497998a84b",
+          "checker.py": "2de0e8de83d6199811f2156fb4015f204154682ffe6b17d8c86fff787bbb04b9",
           "input_contract.py": "5ee2f4621b5cdfd6781850a0c05962a223ac9c235804c4342927243150d2e97f",
           "theory_context.py": "e87e6133643906b47656bd16624e209bda1d5304ec0f8e87825246f43f3327da",
           "sanitize_isabelle.py": "8f9950fde74efa43365225f7480749e688c6131b4b542625e323b7320695de8d",
           "isabelle_syntax.py": "c2fe9690aa877ad941c577351bb0efbc400f16c7db1c835ce7eaec2b859e4235",
-          "prompt.py": "31bcb4ccc754bdcba02f3c5324bbc7e6a2026a2d9b13091a1a4659e9e755c0da",
+          "prompt.py": "92a52b2407a621146c0994fbe89a9282f8b1e96703ba15c4840e7ca78d8a43c3",
           "common.py": "07ef8491e2dc2290997f2b6b81b40be81d73823d51dabc316d82e8b4281150de"
         },
         "distribution_sources_sha256": "4ce3a0ae02fbd03b38b229cb8d6721f21a53e093e36e9e486ca9838a5990a85d",
@@ -7162,7 +7162,7 @@
           "ISABELLE_TMP_PREFIX": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2026-native/tmp/isabelle",
           "ISABELLE_HEAPS_SYSTEM": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/heaps"
         },
-        "itpeval_commit": "8467b653ce461feb1593bbfb22187b593118d071",
+        "itpeval_commit": "9468d6af9e676da5a8cac28a5f0eb360705f4806",
         "config": {
           "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026",
           "expected_isabelle_version": "Isabelle2026",
@@ -7180,9 +7180,9 @@
           "replay_timeout_s": 1200
         },
         "background_policy": "earlier_masked_helpers_admitted",
-        "backend_fingerprint": "990b92aacbf39fdf0b62ca3d8adbf83e7ca251b25dd65bb845de88c08831770e"
+        "backend_fingerprint": "f8ea06c42e50dc5f1552bde52d3620cf903ece2f96cae4bf288ed563910a8ff2"
       },
-      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-y4wcxwc2",
+      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-wudxnhjn",
       "native_search": {
         "success": false,
         "target_closed": false,
@@ -7196,7 +7196,7 @@
             "index": "1",
             "line": "1",
             "source_state": "0",
-            "duration_seconds": "0.038",
+            "duration_seconds": "0.023",
             "command": "theory V2Control imports Main begin",
             "error": ""
           },
@@ -7206,7 +7206,7 @@
             "index": "2",
             "line": "1",
             "source_state": "1",
-            "duration_seconds": "0.001",
+            "duration_seconds": "0.000",
             "command": "declare [[quick_and_dirty = true]]",
             "error": ""
           },
@@ -7237,7 +7237,7 @@
             "line": "1",
             "source_state": "4",
             "duration_seconds": "0.001",
-            "command": "lemma v2_control: False",
+            "command": "lemma v2_control: \"False\"",
             "error": ""
           },
           {
@@ -7262,12 +7262,12 @@
           }
         ],
         "prover_settings": {},
-        "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-y4wcxwc2/search/result.xml",
-        "request_id": "92bc3f20bfa644b2a117317545598603",
-        "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-y4wcxwc2/search"
+        "result_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-wudxnhjn/search/result.xml",
+        "request_id": "a63655f9703046d89c3b07865321426a",
+        "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/work/target-wudxnhjn/search"
       },
       "prover_settings": {},
-      "verify_duration_seconds": 16.511
+      "verify_duration_seconds": 31.701
     }
   }
 }
