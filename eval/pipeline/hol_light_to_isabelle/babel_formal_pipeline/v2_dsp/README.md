@@ -22,8 +22,8 @@ Both datasets use the same instructions with dataset-specific prompt versions:
 | Stage | Input and expected output | Current version suffix |
 | --- | --- | --- |
 | Draft | Completed selected HOL Light proof, masked source reference and oracle context -> mathematical claims with justifications in target vocabulary | `hol_light_to_isabelle_p3` |
-| Draft to Sketch | Saved mathematical Draft and oracle context -> Isabelle Isar proof body | `isabelle2026_draft_p4` |
-| Direct to Sketch | Completed selected HOL Light proof, masked source reference and oracle context -> Isabelle Isar proof body | `isabelle2026_direct_p3` |
+| Draft to Sketch | Saved mathematical Draft and oracle context -> Isabelle Isar proof body | `isabelle2026_draft_p5` |
+| Direct to Sketch | Completed selected HOL Light proof, masked source reference and oracle context -> Isabelle Isar proof body | `isabelle2026_direct_p4` |
 
 The Draft uses numbered steps with `Claim:` and `Justification:`. Each step
 identifies its premises and earlier-step dependencies. It distinguishes constants
@@ -35,6 +35,11 @@ facts, proof prefixes, local claims, and standalone `sledgehammer` gaps. Earlier
 masked helper statements are available background; the selected target and later
 declarations cannot justify the target. There is no brevity or step-count target.
 The shared Draft builder also supplies newly generated Drafts to `v2_itpeval`.
+Complete proofs with zero gaps are valid. Draft step headings do not require
+one `have` per step: adjacent rewrites/helper applications can share a method
+when it preserves the argument and all necessary dependencies. The p3 Draft
+from the successful `547adaf` run can be reused with this Sketch revision;
+regenerating that Draft is unnecessary.
 
 Rerun `generate_draft` on the extracted records to use the revised Draft prompt,
 then run saved-Draft mode with that output. The DSP runner consumes saved Drafts
@@ -128,6 +133,9 @@ Preflight checks the backend, target context and fixed capability controls. It
 does not validate a future model-generated Sketch. A successful preflight and a
 later syntax/proof failure are therefore compatible. The pulled single-theorem
 failure and regeneration commands are documented in [PROVER_REVIEW.md](PROVER_REVIEW.md#pulled-single-theorem-run-c8fb3cb).
+The subsequent [547adaf review](PROVER_REVIEW.md#successful-single-theorem-runs-547adaf)
+confirms both proof modes passed native checking and replay; neither needed
+heuristic gap filling or Sledgehammer on that target.
 The first run builds the infrastructure heap and can require a larger
 `startup_timeout_s` than later runs. Failed gates/context checks are recorded;
 failed targets remain in the selected cohort.
@@ -267,6 +275,43 @@ reuse. Mixing modes or old PISA results in a reused file is rejected, including
 when `--no-resume` is supplied. Missing/stale Sketches and context failures
 remain explicit failed samples in the denominator. Success is relative to the
 supplied admitted background, not an admission-free proof of the whole file.
+
+### Histories and summaries
+
+Draft and Sketch JSONL files are append-only histories. The loader selects the
+latest record per target/sample within that target's latest input, Draft
+provenance, Sketch model, prompt and validator settings. It does not combine
+sample 0 from a new model with sample 1 from an older model. With a requested
+cohort/K, absent current samples become `missing_sketch` failures. Same-setting
+failures remain failures rather than falling back to older successes.
+
+Sketch reuse also checks Draft model, prompt, generation identity/time and
+response metadata. Two Draft generations with identical mathematical text
+retain their own attribution. A new Draft generation can therefore invalidate
+Sketch reuse even when the visible text is unchanged.
+
+Prove/verified files are current result snapshots. Re-evaluating a target replaces
+all its saved sample indices, including obsolete indices when K decreases.
+Unselected targets are preserved with resume enabled; historical Draft/Sketch
+logs are preserved separately. Use separate run directories for comparisons.
+
+Each summary describes the current invocation's selection (`summary_scope`),
+while `stored_samples` counts all rows in its paired JSONL, including retained
+unselected targets. `llm_profiles` exposes the recorded Draft/Sketch model and
+reasoning settings. `search_activity` counts search execution, heuristic attempts,
+Sledgehammer calls and reconstruction attempts from native steps; empty
+`prover_settings` is expected for a complete proof that never invokes Sledgehammer.
+These counts describe the selected proof results, not the preflight controls or
+all historical inference attempts. `llm_usage` likewise counts the selected
+Draft once per target and selected Sketch once per sample, not total historical
+API spend.
+
+The `547adaf` artifacts record `gpt-6.1-terra` and **medium** reasoning for both
+Sketch modes. To request high explicitly, pass `--sketch-reasoning-effort high`
+to the runner (`--reasoning-effort high` to standalone `generate_sketch`). The
+code default remains high; profile/CLI overrides are honored. `--skip-sketch`
+uses the saved model/prompt settings, regardless of newly specified inference
+options; inspect `llm_profiles` in the summary for what was actually evaluated.
 
 ## Validation
 

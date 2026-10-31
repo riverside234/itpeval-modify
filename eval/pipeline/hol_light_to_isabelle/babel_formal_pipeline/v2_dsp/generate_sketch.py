@@ -13,7 +13,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import (
 )
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import normalize_visible_content
 from .input_contract import (MODES, envelope, clean_record, input_metadata, load_inputs,
-                             validate_artifacts, normalize_sketch, SKETCH_VALIDATOR_VERSION,
+                             validate_artifacts, normalize_sketch, SKETCH_VALIDATOR_VERSION, draft_provenance,
                              output_path as native_output_path)
 from .direct_sketch_prompt import build_direct_sketch_prompt, DIRECT_PROMPT_VERSION
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.export_dsp import DEFAULT_OUTPUT as DEFAULT_INPUT
@@ -112,6 +112,7 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
                 "input": metadata.get("input_fingerprint"), "prompt": digest,
                 "model": config.to_metadata(), "sample_idx": sample_idx,
                 "sketch_validator_version": SKETCH_VALIDATOR_VERSION,
+                "draft_provenance": draft_provenance(record) if sketch_source == "draft" else None,
             })
             if not input_error and identity in completed:
                 if latest_sample.get((key(record), sample_idx)) != identity:

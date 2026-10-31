@@ -3,14 +3,16 @@ from __future__ import annotations
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import Prompt, _required
 
 
-SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p4"
+SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p5"
 
 # Both input modes use the same target, background, and gap contract.
 ISABELLE_OUTPUT_RULES = (
     "Construct one Isabelle2026/HOL Isar proof body for the exact oracle declaration "
     "in its supplied theory and locale context. Use standalone sledgehammer commands "
     "for unresolved proof obligations; a later prover will replace each with a "
-    "checked proof that closes that obligation. Return only Isabelle/Isar syntax. "
+    "checked proof that closes that obligation. A complete proof with no "
+    "sledgehammer placeholders is valid; do not introduce gaps into known proofs. "
+    "Return only Isabelle/Isar syntax. "
     "For multiple claims use proof - ... qed. For a terminal proof use by followed "
     "by a complete method expression, such as by (simp add: available_facts). "
     "In Isabelle, by does not open an indented block of commands."
@@ -99,7 +101,11 @@ def build_sketch_prompt(record: dict) -> Prompt:
         "MATHEMATICAL PROOF DRAFT\n~~~text\n" + draft + "\n~~~",
         "Use the draft as the mathematical argument to formalize. Check each step "
         "against the exact goal and available facts; the draft is guidance, not an "
-        "additional assumption. Repair notation, explicit instantiations, and "
+        "additional assumption. Claim/Justification labels and step numbers are "
+        "mathematical organization, not instructions to create one have per step. "
+        "Combine adjacent rewrites and helper applications when a reliable Isabelle "
+        "method expresses the same reasoning; keep separate claims when later "
+        "steps need them. Repair notation, explicit instantiations, and "
         "missing justifications locally while preserving the argument. If the draft "
         "names a source-only helper, establish its needed mathematical instance "
         "instead of copying the name into Isabelle.",

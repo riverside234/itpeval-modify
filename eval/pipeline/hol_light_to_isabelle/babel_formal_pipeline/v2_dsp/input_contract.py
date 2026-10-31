@@ -18,6 +18,22 @@ CONTEXT_FIELDS = ("isabelle_statement", "isabelle_theory_template",
                   "isabelle_context_before_target", "isabelle_proof_prefix",
                   "isabelle_target_proof_span", "isabelle_target_name")
 SOURCE_FIELDS = ("hol_light_statement", "hol_light_proof", "hol_light_reference_context")
+DRAFT_PROVENANCE_FIELDS = ("draft_model", "draft_prompt_version", "draft_prompt_sha256",
+                           "draft_fingerprint", "draft_generated_at", "draft_response")
+
+
+def draft_provenance(record: dict) -> dict:
+    """Identical text from distinct Draft generations is a distinct experiment input."""
+    return {name: record[name] for name in DRAFT_PROVENANCE_FIELDS if name in record}
+
+
+def sample_cohort(record: dict, mode: str) -> str:
+    """Group compatible sample indices, excluding per-sample outputs and timings."""
+    fields = CONTEXT_FIELDS + ("metadata", "input_fingerprint", "sketch_model",
+        "sketch_prompt_version", "sketch_prompt_sha256", "sketch_validator_version")
+    fields += (("draft", "draft_error") + DRAFT_PROVENANCE_FIELDS
+               if mode == "draft" else SOURCE_FIELDS)
+    return fingerprint({name: record.get(name) for name in fields})
 
 
 def validate_mode(mode: str) -> str:
@@ -117,11 +133,24 @@ def load_inputs(path, *, mode: str, samples: bool = False, artifacts: bool = Fal
                 validate_artifacts([row], mode)
             elif row.get("sketch_source", mode) != mode:
                 raise ValueError("mixed Sketch input modes")
-    latest = {}
+    latest, cohorts, current_cohort = {}, {}, {}
     for row in rows:
         identity = (key(row), int(row["sample_idx"])) if samples else key(row)
         latest[identity] = clean_record(row, mode)
-    selected = select(latest.values(), topic=topic, target_key=target_key)
+        if samples:
+            if row.get("failure_category") == "missing_sketch":
+                # Synthetic denominator rows have no generation settings. Keep
+                # them as failures without making them the newest model/prompt.
+                cohorts[identity] = None
+            else:
+                cohorts[identity] = current_cohort[key(row)] = sample_cohort(row, mode)
+    # A rerun may change model/prompt/input and generate fewer sample indices.
+    # Never borrow the remaining indices from an older configuration, even if
+    # those older attempts passed and the newest generation failed.
+    selected = select((row for identity, row in latest.items()
+                       if not samples or cohorts[identity] is None
+                       or cohorts[identity] == current_cohort.get(key(row))),
+                      topic=topic, target_key=target_key)
     if limit is not None:
         if limit < 1:
             raise ValueError("limit must be positive")
@@ -138,7 +167,8 @@ def align_samples(records: list[dict], expected: list[dict] | None, samples: int
         raise ValueError("expected_samples must be positive with a target cohort")
     latest = {(key(row), int(row["sample_idx"])): row for row in records}
     result = []
-    fields = CONTEXT_FIELDS + (("draft", "draft_error") if mode == "draft" else SOURCE_FIELDS)
+    fields = CONTEXT_FIELDS + ("metadata",) + (
+        ("draft", "draft_error") + DRAFT_PROVENANCE_FIELDS if mode == "draft" else SOURCE_FIELDS)
     for target in expected:
         for index in range(samples):
             row = latest.get((key(target), index))
@@ -157,10 +187,23 @@ def save_results(path, records: list[dict], *, mode: str, preserve_unselected=Fa
     validate_artifacts(records, mode)
     previous = read_jsonl(path) if repo_path(path).is_file() else []
     validate_artifacts(previous, mode)
-    active = {(key(row), int(row["sample_idx"])) for row in records}
-    retained = [row for row in previous if (key(row), int(row["sample_idx"])) not in active]
-    write_jsonl(path, (retained if preserve_unselected else []) + records)
+    # Replace the whole selected target, not only the current sample indices:
+    # otherwise decreasing K leaves old successes in the verified artifact.
+    active = {key(row) for row in records}
+    retained = [row for row in previous if key(row) not in active]
+    stored = (retained if preserve_unselected else []) + records
+    write_jsonl(path, stored)
+    summary = summarize_results(records, mode=mode, expected=expected, expected_samples=expected_samples)
+    summary["stored_samples"] = len(stored)
+    repo_path(path).with_suffix(".summary.json").write_text(
+        json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return summary
+
+
+def summarize_results(records: list[dict], *, mode: str, expected=None, expected_samples=None) -> dict:
+    """Describe the evaluated selection, including the settings actually saved."""
     summary = summarize(records, expected=expected, expected_samples=expected_samples)
+    summary["summary_scope"] = "current_selection"
     summary.update(envelope(mode))
     summary["missing_samples"] = summary.get("missing_samples", 0) + sum(
         row.get("failure_category") == "missing_sketch" for row in records)
@@ -175,8 +218,26 @@ def save_results(path, records: list[dict], *, mode: str, preserve_unselected=Fa
     unique = {key(row): row for row in expected or records}
     summary["llm_usage"] = {"draft": usage(unique.values(), "draft_response") if mode == "draft" else {},
                             "sketch": usage(records, "sketch_response")}
-    repo_path(path).with_suffix(".summary.json").write_text(
-        json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    def profiles(rows, field):
+        distinct = {fingerprint(row[field]): row[field] for row in rows if row.get(field)}
+        return [distinct[digest] for digest in sorted(distinct)]
+    summary["llm_profiles"] = {
+        "draft": profiles(unique.values(), "draft_model") if mode == "draft" else [],
+        "sketch": profiles(records, "sketch_model"),
+    }
+    # Only count the current check's steps. Replay-only rows may also carry
+    # historical native_search metadata from the saved proof they replayed.
+    steps = [row.get("step_results") or [] for row in records]
+    gap_modes = {"heuristic", "hammer", "reconstruction"}
+    summary["search_activity"] = {
+        "samples_with_native_search": sum(any(s.get("mode") in gap_modes | {"search"}
+                                              for s in sample) for sample in steps),
+        "samples_with_gap_filling": sum(any(s.get("mode") in gap_modes for s in sample) for sample in steps),
+        "samples_with_sledgehammer": sum(any(s.get("mode") == "hammer" for s in sample) for sample in steps),
+        "heuristic_attempts": sum(s.get("mode") == "heuristic" for sample in steps for s in sample),
+        "sledgehammer_calls": sum(s.get("mode") == "hammer" for sample in steps for s in sample),
+        "reconstruction_attempts": sum(s.get("mode") == "reconstruction" for sample in steps for s in sample),
+    }
     return summary
 
 

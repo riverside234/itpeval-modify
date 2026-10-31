@@ -193,3 +193,82 @@ replace `--sketch-source draft` with `--sketch-source hol-light-proof`, and repl
 `--records eval/results/hol_light_to_isabelle_v2/single_records.jsonl`.
 The rerun makes one new Sketch-model call per selected sample. Prompt changes
 reduce the observed syntax confusion but do not guarantee model correctness.
+
+## Successful single-theorem runs (547adaf)
+
+Reviewed commit `547adaf6733252a5f9dbc699525a3230e0377b43` and the current
+Python code. Both latest samples prove `circleAverage_center_independent`:
+
+| Mode | Saved Sketch | Search | Fresh replay | Gap-filling / hammer calls |
+| --- | --- | --- | --- | --- |
+| Saved Draft | `proof -`, definition equality, `integral_shift`, transitivity, `qed` | Target closed | Passed | 0 / 0 |
+| Direct HOL Light | `by (simp only: circleAverage_def circleMap_def integral_shift)` | Target closed | Passed | 0 / 0 |
+
+Evidence lives under `eval/results/hol_light_to_isabelle_v2/`:
+
+- `v2-dsp-isabelle2026/single/draft/{drafts,sketches,prove,verified}.jsonl`
+- `v2-dsp-isabelle2026/single/direct/{sketches,prove,verified}.jsonl`
+- `work/target-2aspjy9b/{search/result.xml,replay/circle_average.thy,replay/build.log}`
+- `work/target-i5uxxth6/{search/result.xml,replay/circle_average.thy,replay/build.log}`
+
+The XML request identifiers/input hashes match their saved requests, returned
+proofs match the result rows, and both replay logs report successful builds.
+The replay theories disable `quick_and_dirty` before the target, contain its
+actual proof and exclude later declarations. The 11 earlier masked helpers
+remain admitted background under the existing experiment policy. The generated
+proofs explicitly use definitions and the locale's `integral_shift` assumption.
+No new native prover failure or incorrect success flag was found in these runs.
+
+The new p3 Draft correctly explains definition expansion, the instantiated
+locale assumption and transitivity. The old malformed gpt-5.6 sketches remain
+in the append-only histories; each latest gpt-6.1 sample is the one evaluated.
+Both latest Sketch metadata records say **medium** reasoning. This is the
+recorded setting, even though the code defaults to high when no override is
+supplied. These are one-theorem smoke tests; they do not establish dataset-wide
+success or exercise real-target Sledgehammer reconstruction.
+
+### Bugs found while reviewing repeated-run handling
+
+These did not invalidate the two successful K=1 results, but would affect
+subsequent experiments reusing paths. Offline regressions reproduced them before
+applying the fixes:
+
+1. `load_inputs(samples=True)` previously selected the last row independently
+   for each sample index. After changing model/prompt/input and generating only
+   index 0, it could also select index 1 from an older configuration. Selection
+   now keeps only samples compatible with the target's latest generation
+   settings. Requested but absent samples remain explicit failures.
+2. `save_results` preserved indices outside the current selection even for the
+   same target. Reducing K could leave an old successful index in `verified.jsonl`
+   while its summary described only the current failed sample. Saving now
+   replaces all indices for selected targets and retains only unselected targets.
+3. Sketch resume used Draft text without its generation provenance. A new Draft
+   model producing identical text could reuse a Sketch carrying the old Draft
+   metadata. Generation identity and expected-input alignment now include Draft
+   provenance. Current input validation and fresh replay remain required.
+
+Summaries now expose actual model profiles, native search/gap-filling counts,
+and the distinction between the evaluated selection and all stored rows.
+Token totals describe selected artifacts, not every call in the historical logs.
+The native engine and proof-admission policy were not changed by this review.
+
+### Prompt revision and validation
+
+Keep the p3 Draft prompt: the observed mathematical reasoning is correct.
+Draft-to-Sketch p5 and direct-to-Sketch p4 explicitly allow a complete proof with
+zero search placeholders. The Draft handoff also permits combining neighboring
+rewrites/helper applications without mechanically generating one `have` per
+Draft step. Necessary dependencies and source strategy remain required; there
+is no length restriction. Both datasets use these shared instructions.
+
+Reuse the successful p3 Draft, run Sketch normally with fresh output paths to
+compare this revision, and omit `--skip-sketch` if testing the new prompt.
+No historical experiment artifacts were edited. No live API calls or native
+Isabelle execution were made on Windows for this review.
+
+Validation after this revision: **141 offline tests passed; 11 native integration
+tests skipped** (152 total). Seven new result-history regressions cover both
+input modes, model/prompt/provenance changes, failed/missing samples, K reduction
+and summary accounting. Python 3.10 syntax checks passed for all 100 v2 pipeline
+modules. Re-reading the pulled artifacts with the new loader still selects one
+verified sample in each mode and reports zero real-target Sledgehammer calls.
