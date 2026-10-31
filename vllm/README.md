@@ -13,7 +13,7 @@ The `vllm/` directory contains scripts and deliberately has no `__init__.py`.
 Run from the repository root:
 
 ```bash
-cd /data/not_backed_up/yxu209/ITPEval
+cd /data/not_backed_up/yxu209/itpeval-modify
 conda activate vllm
 source vllm/env_vars.sh
 
@@ -141,7 +141,7 @@ The input record files are the existing extracted dataset files.
 
 ```bash
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.generate_draft \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --input eval/results/hol_light_to_isabelle_v2/babel_formal_v2_exact_name_records.jsonl \
   --topic circle_average --target-key circleAverage_center_independent \
   --llm-config eval/configs/inference/qwen_vllm.example.json \
@@ -161,14 +161,14 @@ Use the same saved Draft in either verifier baseline:
 
 ```bash
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_itpeval.run \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --drafts eval/results/hol_light_to_isabelle_v2/qwen_single_drafts.jsonl \
   --topic circle_average --target-key circleAverage_center_independent \
   --sketch-llm-config eval/configs/inference/qwen_vllm.example.json \
   --samples 1
 
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.run \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --config eval/configs/hol_light_to_isabelle/v2_dsp.local.json \
   --drafts eval/results/hol_light_to_isabelle_v2/qwen_single_drafts.jsonl \
   --topic circle_average --target-key circleAverage_center_independent \

@@ -81,15 +81,15 @@ and newly generated intermediate claims must be proved.
 Run from the lab repository root:
 
 ```bash
-cd /data/not_backed_up/yxu209/ITPEval
+cd /data/not_backed_up/yxu209/itpeval-modify
 
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.inventory \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --all-topics --names \
   --output eval/results/hol_light_to_isabelle_v2/hundred-theorems/inventory.json
 
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.extract_hol_light \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --all-topics --all-targets
 ```
 
@@ -114,7 +114,7 @@ To prepare just one target instead:
 
 ```bash
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.extract_hol_light \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --topic 030_the_ballot_problem --target-key all_countings \
   --output eval/results/hol_light_to_isabelle_v2/hundred-theorems/single_records.jsonl
 ```
@@ -125,7 +125,7 @@ Generate one target from the full prepared record file:
 
 ```bash
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.generate_draft \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --topic 030_the_ballot_problem --target-key all_countings \
   --output eval/results/hol_light_to_isabelle_v2/hundred-theorems/single_drafts.jsonl
 ```
@@ -145,7 +145,7 @@ Check the selected masked theory with Isabelle2024 before generating sketches:
 
 ```bash
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_itpeval.verify_isabelle \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --preflight \
   --input eval/results/hol_light_to_isabelle_v2/hundred-theorems/hundred_theorems_v2_records.jsonl \
   --topic 030_the_ballot_problem --target-key all_countings
@@ -155,7 +155,7 @@ Run one saved Draft:
 
 ```bash
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_itpeval.run \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --drafts eval/results/hol_light_to_isabelle_v2/hundred-theorems/single_drafts.jsonl \
   --topic 030_the_ballot_problem --target-key all_countings \
   --samples 1 \
@@ -179,7 +179,7 @@ Preflight accepts raw records without requiring a Draft:
 
 ~~~bash
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.preflight \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
   --input eval/results/hol_light_to_isabelle_v2/hundred-theorems/hundred_theorems_v2_records.jsonl \
   --topic 030_the_ballot_problem --target-key all_countings
@@ -189,7 +189,7 @@ Direct-mode smoke run:
 
 ~~~bash
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.run_hundred \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
   --sketch-source hol-light-proof \
   --records eval/results/hol_light_to_isabelle_v2/hundred-theorems/hundred_theorems_v2_records.jsonl \

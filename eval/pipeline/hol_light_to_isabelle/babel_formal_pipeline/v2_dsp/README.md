@@ -19,14 +19,14 @@ The separate `v2_itpeval` pipeline continues to use its Isabelle2024 configurati
 
 Use the existing Python >=3.10 ITPEval conda environment. Install the official
 **Isabelle2026 Linux distribution** separately under
-`/data/not_backed_up/yxu209/ITPEval/itpeval/_toolchains/Isabelle2026`.
+`/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026`.
 Use the platform distribution with its bundled provers and heaps, rather than
 the source-only archive. Obtain and verify its published checksum from the
 [official distribution directory](https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/).
 This change does not install Isabelle on the local Windows computer.
 
 ~~~bash
-cd /data/not_backed_up/yxu209/ITPEval
+cd /data/not_backed_up/yxu209/itpeval-modify
 python -m pip install -e .
 cp eval/configs/hol_light_to_isabelle/v2_dsp.example.json \
    eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
@@ -55,7 +55,7 @@ are preserved. Native execution is intended for the Linux lab host.
 
 ~~~bash
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.preflight \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
   --input eval/results/hol_light_to_isabelle_v2/single_records.jsonl \
   --topic circle_average --target-key circleAverage_center_independent
@@ -83,7 +83,7 @@ Saved-Draft mode:
 ~~~bash
 DSP_RUN_DIR=eval/results/hol_light_to_isabelle_v2/v2-dsp-isabelle2026/draft/api-smoke
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.run_babel \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
   --sketch-source draft \
   --drafts eval/results/hol_light_to_isabelle_v2/single_drafts.jsonl \
@@ -100,7 +100,7 @@ Direct completed HOL Light proof to Sketch:
 ~~~bash
 DSP_RUN_DIR=eval/results/hol_light_to_isabelle_v2/v2-dsp-isabelle2026/direct/api-smoke
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.run_babel \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
   --sketch-source hol-light-proof \
   --records eval/results/hol_light_to_isabelle_v2/single_records.jsonl \

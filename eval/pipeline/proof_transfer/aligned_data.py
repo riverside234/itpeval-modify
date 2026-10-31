@@ -13,7 +13,7 @@ from eval.pipeline.config import PROOFS_JSON, REPO_ROOT, STMTS_JSON
 BABEL_FORMAL = "babel-formal"
 ISABELLE = "isabelle"
 LEAN4 = "lean4"
-LAB_REPO_ROOT = "/data/not_backed_up/yxu209/ITPEval"
+LAB_REPO_ROOT = "/data/not_backed_up/yxu209/itpeval-modify"
 PROOF_TRANSFER_DIR = Path(__file__).resolve().parent
 
 

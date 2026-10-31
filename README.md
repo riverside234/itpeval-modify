@@ -94,7 +94,7 @@ The two root requirements files are:
 On the lab machine, use separate main and server conda environments:
 
 ```bash
-cd /data/not_backed_up/yxu209/ITPEval
+cd /data/not_backed_up/yxu209/itpeval-modify
 source vllm/env_vars.sh
 
 # Main environment: data preparation, generation and proof verification.

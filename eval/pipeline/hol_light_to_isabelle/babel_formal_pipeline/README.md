@@ -28,19 +28,19 @@ The two new runners require saved Drafts and never generate them implicitly.
 Run lab commands from the ITPEval root:
 
 ~~~bash
-cd /data/not_backed_up/yxu209/ITPEval
+cd /data/not_backed_up/yxu209/itpeval-modify
 ~~~
 
 Reuse existing V2 records/Drafts. To create them:
 
 ~~~bash
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.extract_hol_light \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --all-topics --all-targets \
   --output eval/results/hol_light_to_isabelle_v2/babel_formal_v2_exact_name_records.jsonl
 
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.generate_draft \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --input eval/results/hol_light_to_isabelle_v2/babel_formal_v2_exact_name_records.jsonl \
   --output eval/results/hol_light_to_isabelle_v2/babel_formal_v2_drafts.jsonl
 ~~~
@@ -65,7 +65,7 @@ Preflight one target:
 
 ~~~bash
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_itpeval.verify_isabelle \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --preflight \
   --input eval/results/hol_light_to_isabelle_v2/babel_formal_v2_exact_name_records.jsonl \
   --topic circle_average --target-key circleAverage_center_independent
@@ -75,7 +75,7 @@ Run one theorem from the saved Draft file:
 
 ~~~bash
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_itpeval.run_babel \
-  --expected-root /data/not_backed_up/yxu209/ITPEval \
+  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
   --drafts eval/results/hol_light_to_isabelle_v2/babel_formal_v2_drafts.jsonl \
   --topic circle_average --target-key circleAverage_center_independent \
   --samples 1 \

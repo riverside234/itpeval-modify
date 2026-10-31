@@ -9,7 +9,7 @@ from typing import Any, Iterable
 from eval.pipeline.config import REPO_ROOT
 
 
-LAB_REPO_ROOT = "/data/not_backed_up/yxu209/ITPEval"
+LAB_REPO_ROOT = "/data/not_backed_up/yxu209/itpeval-modify"
 RESULTS_DIR = "eval/results/hol_light_to_isabelle_v2"
 
 
