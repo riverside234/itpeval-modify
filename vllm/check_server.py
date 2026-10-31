@@ -15,7 +15,7 @@ from eval.pipeline.inference.client import generate_text, server_preflight, toke
 from eval.pipeline.inference.config import resolve_config, repository_path
 
 
-def record_prompt(record: dict, stage: str):
+def record_prompt(record: dict, stage: str, sketch_source: str = "draft"):
     dataset = {"babel-formal":"babel_formal_pipeline","hundred-theorems":"hundred_theorems_pipeline"}.get(record.get("source"))
     if dataset is None:
         raise ValueError("unsupported dataset in prompt-length check")
@@ -23,7 +23,9 @@ def record_prompt(record: dict, stage: str):
     if stage=="draft":
         return importlib.import_module(prefix+".prompt").build_draft_prompt(record)
     if stage=="dsp-sketch":
-        record = importlib.import_module(prefix+".v2_dsp.export_dsp").export_record(record)
+        record = importlib.import_module(prefix+".v2_dsp.export_dsp").export_record(record, sketch_source=sketch_source)
+        if sketch_source == "hol-light-proof":
+            return importlib.import_module(prefix+".v2_dsp.direct_sketch_prompt").build_direct_sketch_prompt(record)
         return importlib.import_module(prefix+".v2_dsp.sketch_prompt").build_sketch_prompt(record)
     return importlib.import_module(prefix+".v2_itpeval.sketch_prompt").build_sketch_prompt(record)
 
@@ -34,6 +36,8 @@ def main() -> None:
     parser.add_argument("--smoke",action="store_true",help="Generate a real text response after health checks.")
     parser.add_argument("--records",help="Measure every selected rendered prompt; makes no generation requests.")
     parser.add_argument("--stage",choices=("draft","itpeval-sketch","dsp-sketch"),default="draft")
+    parser.add_argument("--sketch-source", choices=("draft", "hol-light-proof"), default="draft",
+                        help="DSP Sketch input mode; direct mode measures the entire HOL Light proof and masked reference.")
     parser.add_argument("--topic")
     parser.add_argument("--target-key")
     parser.add_argument("--limit",type=int)
@@ -51,7 +55,7 @@ def main() -> None:
         for record in records:
             row = {name:record[name] for name in ("source","theorem_id","topic","target_key")}
             try:
-                prompt = record_prompt(record,args.stage)
+                prompt = record_prompt(record,args.stage,args.sketch_source)
                 row["token_budget"] = token_budget(config,[
                     {"role":"system","content":prompt.system_prompt},
                     {"role":"user","content":prompt.user_prompt}])

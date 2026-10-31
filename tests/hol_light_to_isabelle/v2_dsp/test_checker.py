@@ -1,193 +1,151 @@
-import copy
+"""Orchestration tests use a fake adapter, not a mathematical proof checker."""
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from eval.pipeline.hol_light_to_isabelle.common import RESULTS_DIR, read_jsonl, repo_path, write_jsonl
-from eval.pipeline.hol_light_to_isabelle.v2_dsp.checker import Checker, HEURISTICS
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.checker import CHECKER_VERSION, Checker, HEURISTICS
 from eval.pipeline.hol_light_to_isabelle.v2_dsp.preflight import control_record
 from eval.pipeline.hol_light_to_isabelle.v2_dsp.prove import prove_sketches
-from eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime import DspConfig, PisaSession
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime import DspConfig
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.native_search import NativeFailure
+
+CONFIG = DspConfig()
+BACKEND = {"backend": "isabelle-native", "isabelle_version": "Isabelle2026", "native_adapter_sha256": "a"}
+SKETCH = "proof -\n show True\n sledgehammer\nqed"
+MODULE = "eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp."
 
 
-CONFIG = DspConfig(".", ".", "fake.jar", ".", "Isabelle2021")
-BACKEND = {"isabelle_version": "Isabelle2021", "pisa_jar_sha256": "jar_a"}
-SKETCH = "proof -\n  show True\n    sledgehammer\nqed"
-
-
-class FakeSession:
-    """A transport fixture, not an Isabelle proof validator."""
-
-    force_hammer = False
-    no_reconstruction = False
-    fail_replay = False
-    timeout_hammer = False
-
-    def __init__(self, *args, **kwargs):
-        self.states = {"default": {"open": False, "structured": False, "pending": False}}
+class FakeNative:
+    """Controlled job/replay fixture; it does not interpret Isabelle."""
+    def __init__(self, config):
         self.calls = []
+        self.success = self.closed = self.replay_ok = True
+        self.error = None
+        self.proof = "by simp"
 
-    def __enter__(self):
-        return self
+    def request(self, record, sketch, **options):
+        self.calls.append(("request", sketch, options))
+        if self.error:
+            raise self.error
+        return {"success": self.success, "target_closed": self.closed, "isabelle_proof": self.proof,
+                "failure_category": "missing_reconstruction", "error": "fixture failure",
+                "step_results": [{"mode": "hammer", "success": self.success}],
+                "prover_settings": {"resolved_provers": "e"}}
 
-    def __exit__(self, *exc):
-        pass
-
-    def parse(self, text):
-        return [line.strip() for line in text.splitlines() if line.strip()]
-
-    def step(self, command, old, new, hammer=False):
-        self.calls.append((command, old, new))
-        state = copy.deepcopy(self.states[old])
-        if command.startswith("lemma"):
-            state = {"open": True, "structured": False, "pending": True}
-        elif command == "proof -":
-            state["structured"] = True
-        elif command.startswith("show"):
-            state["pending"] = True
-        elif command.startswith("by") or command == "normalhammer":
-            if self.timeout_hammer and command == "normalhammer":
-                raise TimeoutError("native hammer deadline")
-            if self.force_hammer and "_heuristic_" in new:
-                raise RuntimeError("Step error: heuristic failed")
-            if command not in {"by simp", "by auto", "by (metis TrueI)", "normalhammer"}:
-                raise RuntimeError("Step error: method failed")
-            if self.fail_replay and "_replay_" in new:
-                raise RuntimeError("Step error: replay failed")
-            state["pending"] = False
-            if not state["structured"]:
-                state["open"] = False
-        elif command == "qed":
-            if state["pending"]:
-                raise RuntimeError("Step error: unresolved goals")
-            state["open"] = False
-        elif command == "sorry":
-            state["open"] = state["pending"] = False
-        elif command == "end" and state["open"]:
-            raise RuntimeError("Step error: open proof")
-        self.states[new] = state
-        if command == "normalhammer":
-            return "no reconstruction" if self.no_reconstruction else "by (metis TrueI) <hammer> goal state"
-        return "goal state"
-
-    def finished(self, state):
-        return not self.states[state]["open"]
+    def replay(self, record, proof, **options):
+        self.calls.append(("replay", proof, options))
+        path = options["directory"] / "V2Control.thy"
+        path.parent.mkdir(parents=True)
+        path.write_text("fixture replay artifact", encoding="utf-8")
+        return {"success": self.replay_ok, "replay_theory_path": str(path)}
 
 
 class CheckerTests(unittest.TestCase):
-    def run_checker(self, session_class=FakeSession, proof=SKETCH, replay_only=False):
+    def setUp(self):
         base = repo_path(RESULTS_DIR)
         base.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(prefix="dsp-checker-test-", dir=base) as folder, patch(
-            "eval.pipeline.hol_light_to_isabelle.v2_dsp.checker.repo_path",
-            return_value=Path(folder),
-        ):
-            row = control_record(proof)
-            if replay_only:
-                row["isabelle_proof"] = proof
-            result = Checker(CONFIG, session_factory=session_class).check(
-                row, backend_metadata=BACKEND, replay_only=replay_only)
-            replay_path = result.get("replay_theory_path")
-            if result["verified"]:
-                self.assertTrue(Path(replay_path).is_file())
-            return result
+        self.temp = tempfile.TemporaryDirectory(prefix="native-checker-", dir=base)
+        self.addCleanup(self.temp.cleanup)
+        self.path = Path(self.temp.name)
+        self.fake = FakeNative(CONFIG)
+        self.checker = Checker(CONFIG, native_factory=lambda config: self.fake, results_dir=str(self.path))
 
-    def test_fills_gap_then_replays_without_hammer(self):
-        result = self.run_checker()
+    def check(self, proof=SKETCH, **options):
+        return self.checker.check(control_record(proof), backend_metadata=BACKEND, **options)
+
+    def test_search_then_fresh_replay_and_preserved_sketch(self):
+        result = self.check()
         self.assertTrue(result["verified"], result["verify_error"])
-        self.assertIn("by auto", result["isabelle_proof"])
-        self.assertNotIn("sledgehammer", result["isabelle_proof"])
-        self.assertTrue(result["replay_verified"])
-        replay = [row for row in result["step_results"] if row["mode"] == "replay"]
-        self.assertTrue(replay)
-        self.assertTrue(all("hammer" not in row["command"] for row in replay))
+        self.assertEqual(SKETCH, result["isabelle_sketch"])
+        self.assertEqual("by simp", result["isabelle_proof"])
+        self.assertEqual(["request", "replay"], [x[0] for x in self.fake.calls])
+        self.assertEqual(HEURISTICS, self.fake.calls[0][2]["heuristics"])
+        self.assertNotEqual(self.fake.calls[0][2]["directory"], self.fake.calls[1][2]["directory"])
 
-    def test_portfolio_attempts_start_from_the_same_state(self):
-        class HammerSession(FakeSession):
-            force_hammer = True
-        result = self.run_checker(HammerSession)
-        self.assertTrue(result["verified"], result["verify_error"])
-        attempts = [row for row in result["step_results"] if row["mode"] in {"heuristic", "hammer"}]
-        self.assertEqual(list(HEURISTICS), [row["command"] for row in attempts[:-1]])
-        self.assertEqual(1, len({row["source_state"] for row in attempts}))
-        self.assertIn("by (metis TrueI)", result["isabelle_proof"])
+    def test_forced_hammer_gate_bypasses_heuristics(self):
+        self.assertTrue(self.check(force_hammer=True)["verified"])
+        self.assertEqual((), self.fake.calls[0][2]["heuristics"])
 
-    def test_hammer_success_without_a_replayable_method_cannot_pass(self):
-        class NoMethodSession(FakeSession):
-            force_hammer = no_reconstruction = True
-        result = self.run_checker(NoMethodSession)
-        self.assertFalse(result["verified"])
-        self.assertEqual("missing_reconstruction", result["failure_category"])
+    def test_reconstruction_and_target_closure_are_required(self):
+        for changed in ({"closed": False}, {"success": False}, {"proof": ""}, {"proof": "by sledgehammer"}):
+            self.fake = FakeNative(CONFIG)
+            for name, value in changed.items():
+                setattr(self.fake, name, value)
+            result = self.check()
+            self.assertFalse(result["verified"], changed)
+            self.assertFalse(any(call[0] == "replay" for call in self.fake.calls))
 
-    def test_replay_failure_cannot_be_counted_as_success(self):
-        class ReplayFailure(FakeSession):
-            fail_replay = True
-        result = self.run_checker(ReplayFailure)
+    def test_fresh_replay_failure_cannot_count_as_verified(self):
+        self.fake.replay_ok = False
+        result = self.check()
         self.assertTrue(result["prove_success"])
-        self.assertFalse(result["verified"])
+        self.assertFalse(result["replay_verified"])
         self.assertEqual("replay_failure", result["failure_category"])
 
-    def test_timeout_does_not_fall_through_to_another_attempt(self):
-        class TimeoutSession(FakeSession):
-            force_hammer = timeout_hammer = True
-        result = self.run_checker(TimeoutSession)
-        self.assertFalse(result["verified"])
+    def test_timeout_does_not_continue_or_replay(self):
+        self.fake.error = TimeoutError("fixture timeout")
+        result = self.check()
         self.assertEqual("timeout", result["failure_category"])
+        self.assertEqual(1, len(self.fake.calls))
 
-    def test_admissions_and_malformed_gap_are_rejected(self):
-        for proof in ("proof -\n sorry\nqed", "by sledgehammer"):
-            result = self.run_checker(proof=proof)
-            self.assertFalse(result["verified"])
-        self.assertEqual("rejected_proof", self.run_checker(
-            proof="proof -\n sorry\nqed")["failure_category"])
+    def test_admissions_ml_and_malformed_placeholders_are_rejected_before_native(self):
+        for proof in ("proof -\n sorry\nqed", "by sledgehammer", "proof -\n sledgehammer [timeout=1]\nqed",
+                      "proof -\n ML \\<open>fail ()\\<close>\nqed", "by (tactic \\<open>all_tac\\<close>)"):
+            with self.subTest(proof=proof):
+                result = self.check(proof)
+                self.assertFalse(result["verified"])
+                self.assertEqual("rejected_proof", result["failure_category"])
+        self.assertEqual([], self.fake.calls)
 
-    def test_open_target_is_not_a_completed_helper(self):
-        result = self.run_checker(proof="proof -\n show True\nqed")
-        self.assertFalse(result["verified"])
-        self.assertEqual("sketch_step_failure", result["failure_category"])
+    def test_context_preflight_does_not_require_a_draft(self):
+        row = control_record("by simp")
+        del row["draft"]
+        result = self.checker.check_context(row, backend_metadata=BACKEND)
+        self.assertTrue(result["baseline_ok"])
+        self.assertEqual("context", self.fake.calls[0][2]["action"])
 
-    def test_replay_only_does_not_run_search(self):
-        result = self.run_checker(proof="by simp", replay_only=True)
-        self.assertTrue(result["verified"], result["verify_error"])
-        self.assertFalse(any(row["mode"] in {"search", "heuristic", "hammer"}
-                             for row in result["step_results"]))
+    def test_replay_only_does_not_search(self):
+        row = {**control_record("by simp"), "isabelle_proof": "by simp"}
+        result = self.checker.check(row, backend_metadata=BACKEND, replay_only=True)
+        self.assertTrue(result["verified"])
+        self.assertEqual(["replay"], [c[0] for c in self.fake.calls])
 
-    def test_cleanup_targets_only_its_owned_process_group(self):
-        session = PisaSession.__new__(PisaSession)
-        session.channel, session.log = Mock(), Mock()
-        session.process = Mock(pid=713)
-        with patch("eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime.os.name", "posix"), patch(
-            "eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime.os.killpg", create=True
-        ) as kill, patch(
-            "eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime.signal.SIGKILL", 9, create=True
-        ):
-            session.close()
-        self.assertEqual([713, 713], [call.args[0] for call in kill.call_args_list])
-        session.channel.close.assert_called_once()
+    def test_resume_depends_on_native_adapter_and_budgets(self):
+        source, output = self.path / "sketches.jsonl", self.path / "verified.jsonl"
+        row = control_record(SKETCH)
+        write_jsonl(source, [row])
+        result = {**row, "checker_version": CHECKER_VERSION, "prove_success": True,
+                  "replay_verified": True, "verified": True}
+        with patch.object(DspConfig, "metadata", return_value=BACKEND) as metadata, patch(
+                MODULE + "prove.Checker.check", return_value=result) as check:
+            opts = dict(config=CONFIG, input_path=source, output_path=output, prove_output=None,
+                        expected=[row], expected_samples=1)
+            prove_sketches(**opts)
+            prove_sketches(**opts)
+            self.assertEqual(1, check.call_count)
+            metadata.return_value = {**BACKEND, "native_adapter_sha256": "changed"}
+            prove_sketches(**opts)
+            self.assertEqual(2, check.call_count)
+            from dataclasses import replace
+            prove_sketches(**{**opts, "config": replace(CONFIG, hammer_timeout_s=7)})
+            self.assertEqual(3, check.call_count)
 
-    def test_prove_resume_includes_backend_and_rejects_changed_drafts(self):
-        base = repo_path(RESULTS_DIR)
-        base.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(prefix="dsp-prove-test-", dir=base) as folder:
-            source, output = Path(folder) / "sketches.jsonl", Path(folder) / "verified.jsonl"
-            row = control_record(SKETCH)
-            write_jsonl(source, [row])
-            result = {**row, "checker_version": "babel_formal_v2_dsp_checker_p1",
-                      "prove_success": True, "replay_verified": True, "verified": True,
-                      "isabelle_proof": "by simp"}
-            with patch.object(DspConfig, "metadata", return_value=BACKEND) as metadata, patch(
-                "eval.pipeline.hol_light_to_isabelle.v2_dsp.prove.Checker.check", return_value=result
-            ) as check:
-                options = dict(config=CONFIG, input_path=str(source), output_path=str(output),
-                               prove_output=None, expected=[row], expected_samples=1)
-                prove_sketches(**options)
-                prove_sketches(**options)
-                self.assertEqual(1, check.call_count)
-                metadata.return_value = {**BACKEND, "pisa_jar_sha256": "jar_b"}
-                prove_sketches(**options)
-                self.assertEqual(2, check.call_count)
-            self.assertTrue(read_jsonl(output)[0]["verified"])
+    def test_missing_and_failed_sketches_stay_in_cohort(self):
+        source, output = self.path / "empty.jsonl", self.path / "verified.jsonl"
+        write_jsonl(source, [])
+        targets = [control_record(SKETCH), {**control_record(SKETCH), "target_key": "other"}]
+        with patch.object(DspConfig, "metadata", return_value=BACKEND):
+            rows = prove_sketches(config=CONFIG, input_path=source, output_path=output, prove_output=None,
+                                  expected=targets, expected_samples=2)
+        self.assertEqual(4, len(rows))
+        self.assertTrue(all(row["failure_category"] == "missing_sketch" for row in rows))
+        import json
+        summary = json.loads(output.with_suffix(".summary.json").read_text())
+        self.assertEqual(2, summary["targets"])
+        self.assertEqual(0, summary["verified_samples"])
+        self.assertEqual(4, summary["missing_samples"])
 
 
 if __name__ == "__main__":

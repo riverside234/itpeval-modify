@@ -1,0 +1,15 @@
+{
+  "release": "Isabelle2026",
+  "source_url": "https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2026.tar.gz",
+  "sha256": {
+    "src/HOL/Tools/Sledgehammer/sledgehammer.ML": "4d766d8b0744455d94ecbf0cb001e19478a769bc5536b9c6aa0bc8af17e8b5de",
+    "src/HOL/Tools/Sledgehammer/sledgehammer_commands.ML": "5de7476db6a5744891b9bdd98f385e7d6ef8b0fc85c322a56dc2cb90aaba9bd4",
+    "src/HOL/Tools/Sledgehammer/sledgehammer_prover.ML": "b0d98b31d69dd12542c35d829719020695fc789f62b77235bb318ff111a0aed7",
+    "src/HOL/Tools/Sledgehammer/sledgehammer_proof_methods.ML": "9a22bab05c4edd40c25d59027416ca6cabbb97740faaa24a99bf5213fc5f6d06",
+    "src/Pure/Isar/outer_syntax.ML": "b786f8f8f17ff2e2e15b1f9c9e5e6e7853bd43ba8359d8fc7cb73bd071967002",
+    "src/Pure/Isar/toplevel.ML": "b67baeec68a4cc37638d3309ff31dfaa8092ea19949be0be163ceae5fcabf738",
+    "src/Pure/Isar/proof.ML": "5d43e84bde93218df688b8af85e8055c0bf570d9daf7a0fbd12119a6699a3e2a",
+    "src/Pure/Isar/token.ML": "c19a538c6a2811907f70636e33f296ce62242971d266950d557d9cc8545ba132",
+    "src/Pure/Thy/thy_header.ML": "888fc9665b849b21e09dadc3e1b203faaf9a5d59fa3908d8c75ef7830f23895b"
+  }
+}

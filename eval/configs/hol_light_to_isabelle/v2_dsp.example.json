@@ -1,15 +1,16 @@
 {
-  "check_dsp_repo": false,
-  "pisa_python_path": "external/Portal-to-ISAbelle/src/main/python",
-  "pisa_jar": "external/Portal-to-ISAbelle/target/scala-2.13/pisa-assembly-0.1.jar",
-  "isabelle_home": "itpeval/_toolchains/Isabelle2021",
-  "expected_isabelle_version": "Isabelle2021",
-  "expected_pisa_commit": "56def2c39f85d211e1f40cc5765581a567879106",
-  "java_bin": "java",
-  "port": 9000,
-  "server_class": "pisa.server.PisaOneStageServer{port}",
+  "backend": "isabelle-native",
+  "isabelle_home": "itpeval/_toolchains/Isabelle2026",
+  "expected_isabelle_version": "Isabelle2026",
+  "base_session": "HOL",
+  "session_roots": [],
+  "session_dependencies": [],
+  "threads": 4,
+  "provers": null,
   "startup_timeout_s": 120,
-  "step_timeout_s": 60,
-  "hammer_timeout_s": 60,
-  "target_timeout_s": 1200
+  "step_timeout_s": 10,
+  "hammer_timeout_s": 40,
+  "preplay_timeout_s": 10,
+  "target_timeout_s": 1200,
+  "replay_timeout_s": 1200
 }

@@ -234,3 +234,18 @@ Native acceptance on the lab machine still requires the smoke request,
 largest-prompt checks, one target through both verification baselines, and
 one Hundred Theorems target. Keep identical prompts and sample counts when
 comparing models and report their different reasoning/token budgets.
+
+## Native Isabelle2026 direct Sketch inputs
+
+The DSP-style pipeline supports `--sketch-source hol-light-proof --records ...`
+with `--sketch-llm-config eval/configs/inference/qwen_vllm.example.json`.
+There is no Draft-model call. Measure complete direct prompts with:
+
+~~~bash
+python vllm/check_server.py \
+  --llm-config eval/configs/inference/qwen_vllm.example.json \
+  --stage dsp-sketch --sketch-source hol-light-proof \
+  --records eval/results/hol_light_to_isabelle_v2/single_records.jsonl
+~~~
+
+See [native DSP lab setup and experiment commands](../eval/pipeline/hol_light_to_isabelle/babel_formal_pipeline/v2_dsp/README.md).

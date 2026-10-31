@@ -51,9 +51,9 @@ class CliTests(unittest.TestCase):
             with self.subTest(path=path.name):
                 ast.parse(path.read_text(encoding="utf-8"), filename=str(path), feature_version=(3, 10))
         config = DspConfig.load("eval/configs/hol_light_to_isabelle/v2_dsp.example.json")
-        self.assertEqual(9000, config.port)
-        self.assertEqual(40, len(config.expected_pisa_commit))
-        self.assertTrue(Path(config.pisa_python_path).is_relative_to(repo_path(".")))
+        self.assertEqual("isabelle-native", config.backend)
+        self.assertEqual("Isabelle2026", config.expected_isabelle_version)
+        self.assertTrue(Path(config.isabelle_home).is_relative_to(repo_path(".")))
 
 
 if __name__ == "__main__":

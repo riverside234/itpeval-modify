@@ -188,12 +188,12 @@ class StageTests(unittest.TestCase):
 
     def test_dsp_search_replay_uses_own_directory_with_fake_transport(self):
         # This fixture exercises transport/control flow; it does not prove mathematics.
-        from v2_dsp.test_checker import FakeSession, CONFIG, BACKEND
+        from v2_dsp.test_checker import FakeNative, CONFIG, BACKEND
         sketch = control_record("proof -\n  show True\n    sledgehammer\nqed")
         input_path = self.root/"sketches.jsonl"
         write_jsonl(input_path,[sketch])
         with patch(B+".v2_dsp.runtime.DspConfig.metadata",return_value=BACKEND), patch(
-                B+".v2_dsp.checker.PisaSession",FakeSession):
+                B+".v2_dsp.checker.NativeSearch",FakeNative):
             results = prove_sketches(
                 config=CONFIG,input_path=input_path,output_path=self.root/"verified.jsonl",
                 prove_output=self.root/"prove.jsonl")
@@ -252,14 +252,13 @@ class StageTests(unittest.TestCase):
         self.assertEqual(99,report["record_count"])
         self.assertFalse([row for row in report["file_groups"] if row["issues"]])
 
-    def test_dsp_enables_background_admissions_after_theory_not_documentation(self):
-        from v2_dsp.test_checker import FakeSession, CONFIG, BACKEND
-        from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.checker import Checker
+    def test_dsp_native_replay_enables_admissions_after_theory_not_documentation(self):
+        from v2_dsp.test_checker import CONFIG
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.native_search import NativeSearch
         from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
-        template = ('section \\<open>Documentation first\\<close>\\n'
-                    'theory HeaderTest imports Main begin\\nlemma goal: "True"\\n sorry\\nend\\n')
-        # Turn escaped fixture newlines into actual source line breaks.
-        template = template.replace("\\n","\n")
+        import time
+        template = ('section \\<open>Documentation first\\<close>\n'
+                    'theory HeaderTest imports Main begin\nlemma goal: "True"\n sorry\nend\n')
         target = sanitize_target(template,"goal")
         record = export_record(dict(
             source=SOURCE,theorem_id=0,topic="fixture",target_key="goal",
@@ -268,15 +267,12 @@ class StageTests(unittest.TestCase):
             isabelle_context_before_target=target.context_before_target,
             isabelle_proof_prefix=target.proof_prefix,
             isabelle_target_proof_span=list(target.proof_span)))
-        record["isabelle_sketch"] = "by simp"
-        with patch(B+".v2_dsp.checker.repo_path",return_value=self.root):
-            result = Checker(CONFIG,session_factory=FakeSession).check(record,backend_metadata=BACKEND)
-        self.assertTrue(result["verified"],result["verify_error"])
-        commands = [step["command"] for step in result["step_results"]
-                    if step["mode"] == "search_context"]
-        theory = next(i for i,command in enumerate(commands) if command.startswith("theory"))
-        admission = commands.index("declare [[quick_and_dirty = true]]")
-        self.assertGreater(admission,theory)
+        native = NativeSearch(CONFIG)
+        with patch.object(native,"encode_symbols",side_effect=lambda text:text), patch.object(native,"run_build",return_value=0):
+            result = native.replay(record,"by simp",directory=self.root/"native-replay",deadline=time.monotonic()+10)
+        source = Path(result["replay_theory_path"]).read_text()
+        self.assertGreater(source.index("quick_and_dirty = true"), source.index("theory HeaderTest"))
+        self.assertLess(source.index("quick_and_dirty = false"), source.index("lemma goal"))
 
     def test_all_new_entry_points_import_without_native_runtime(self):
         modules = ["inventory","manifest","extract_hol_light","generate_draft",

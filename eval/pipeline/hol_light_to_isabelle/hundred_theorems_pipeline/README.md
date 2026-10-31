@@ -102,7 +102,7 @@ eval/results/hol_light_to_isabelle_v2/hundred-theorems/
 ├── hundred_theorems_v2_records.jsonl.coverage.json
 ├── hundred_theorems_v2_drafts.jsonl
 ├── v2-itpeval/
-└── v2-dsp/
+└── v2-dsp-isabelle2026/                 # draft/<profile>/ and direct/<profile>/
 ```
 
 The coverage report includes every selected file group and any skipped
@@ -170,58 +170,44 @@ without an installed prover or API call.
 
 ## DSP baseline
 
-Use the same optional dependencies and native configuration as
-[Babel's DSP baseline](../babel_formal_pipeline/README.md#v2-dsp):
+The shared DSP-style backend now uses **Isabelle2026 native search and fresh
+replay**, with saved-Draft and direct HOL Light proof inputs. Install Isabelle
+on the lab computer as described in [the native DSP guide](../babel_formal_pipeline/v2_dsp/README.md).
+The separate `v2_itpeval` baseline retains Isabelle2024.
 
-```bash
-python -m pip install -e '.[isabelle-dsp]'
-```
+Preflight accepts raw records without requiring a Draft:
 
-Configure `eval/configs/hol_light_to_isabelle/v2_dsp.local.json` with the
-actual PISA protobuf files/JAR, Isabelle installation, and runtime pins.
-The example configuration is a placeholder, not a tested native setup.
-
-Preflight the target prefix and proof controls:
-
-```bash
+~~~bash
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.preflight \
   --expected-root /data/not_backed_up/yxu209/ITPEval \
-  --config eval/configs/hol_light_to_isabelle/v2_dsp.local.json \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
   --input eval/results/hol_light_to_isabelle_v2/hundred-theorems/hundred_theorems_v2_records.jsonl \
   --topic 030_the_ballot_problem --target-key all_countings
-```
+~~~
 
-Run the identical saved Draft through Sketch, DSP search, reconstruction,
-and proof replay:
+Direct-mode smoke run:
 
-```bash
-python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.run \
+~~~bash
+python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.run_hundred \
   --expected-root /data/not_backed_up/yxu209/ITPEval \
-  --config eval/configs/hol_light_to_isabelle/v2_dsp.local.json \
-  --drafts eval/results/hol_light_to_isabelle_v2/hundred-theorems/single_drafts.jsonl \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
+  --sketch-source hol-light-proof \
+  --records eval/results/hol_light_to_isabelle_v2/hundred-theorems/hundred_theorems_v2_records.jsonl \
   --topic 030_the_ballot_problem --target-key all_countings \
-  --samples 1 \
-  --dsp-output eval/results/hol_light_to_isabelle_v2/hundred-theorems/v2-dsp/single_input.jsonl \
-  --sketch-output eval/results/hol_light_to_isabelle_v2/hundred-theorems/v2-dsp/single_sketches.jsonl \
-  --prove-output eval/results/hol_light_to_isabelle_v2/hundred-theorems/v2-dsp/single_prove.jsonl \
-  --output eval/results/hol_light_to_isabelle_v2/hundred-theorems/v2-dsp/single_verified.jsonl
-```
+  --samples 1
+~~~
 
-`--skip-sketch` resumes from saved sketches. `--skip-prove` replays completed
-proofs from `--prove-output`, without another model call or proof search.
-`--dry-run` previews the exported Sketch prompt without loading the native
-configuration.
-
-The independent `export_dsp`, `generate_sketch`, and `prove` modules are
-available under `v2_dsp`. The exporter maps `draft` to `informal_proof` and
-`isabelle_statement` to `formal_statement`. Proof gaps use standalone
-`sledgehammer`; the shared checker fills them and requires a successful
-replay with concrete methods.
+For saved-Draft mode, use `--sketch-source draft` and replace `--records` with
+`--drafts <saved_drafts.jsonl>`. `--dry-run` previews prompts without native
+execution or inference; `--sketch-llm-config` selects API or Qwen/vLLM.
+Defaults are under `hundred-theorems/v2-dsp-isabelle2026/`, separated by mode
+and inference profile. Export/Sketch/prove/final flags match Babel's runner.
+`--skip-sketch` searches saved Sketches; `--skip-prove` replays saved proofs.
 
 ## Batch runs and interpretation
 
-For all extracted targets, use the complete default Draft JSONL, omit
-topic/target filters, and omit single-file output overrides in each runner.
+For all targets, use the complete records/Draft JSONL for the selected mode,
+omit topic/target filters and omit single-file output overrides.
 Both baselines preserve all requested samples and failed targets in the
 denominator. Use the same saved Drafts and `--samples K` for a comparison.
 Output paths, work artifacts, and resume state are separate from Babel's.
@@ -232,11 +218,10 @@ developments; their imports and tool versions must be available in the
 configured runtime. A native preflight failure stays an explicit context
 failure. The adapter does not replace imports, add missing mathematical
 assumptions, or silently substitute a theorem from another library.
-The currently shared native runners retain Babel's HOL session setup; if a
-theory requires other session dependencies, provision that native environment
-before treating it as an accepted context.
+Configure compatible Isabelle2026 session roots/dependencies for additional
+imports before treating a target context as accepted.
 
 The local regression suite validates all 58 aligned groups, the 99 emitted
 contexts, compatibility paths, visible-only Draft generation, both handoffs,
-and fake-transport DSP replay. Native Isabelle/PISA and live API experiments
+and fake-adapter DSP replay. Native Isabelle2026 and live API experiments
 still require the lab environment.

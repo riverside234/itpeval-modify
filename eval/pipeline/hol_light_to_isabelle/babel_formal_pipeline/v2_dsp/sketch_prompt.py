@@ -3,9 +3,9 @@ from __future__ import annotations
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import Prompt, _required
 
 
-SKETCH_PROMPT_VERSION = "babel_formal_v2_dsp_isar_sketch_p1"
+SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p2"
 SYSTEM_PROMPT = (
-    "You are an Isabelle/HOL proof engineer. Turn the supplied mathematical proof "
+    "You are an Isabelle2026/HOL proof engineer. Turn the supplied mathematical proof "
     "draft into one Isar proof body of the exact oracle theorem in its original "
     "theory and locale context. Follow the draft's strategy and state useful "
     "intermediate claims explicitly. Use direct proof methods where known. For "

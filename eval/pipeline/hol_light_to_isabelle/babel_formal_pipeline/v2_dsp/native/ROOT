@@ -1,0 +1,3 @@
+session DSP_Native = HOL +
+  options [document = false]
+  theories [global] DSP_Native

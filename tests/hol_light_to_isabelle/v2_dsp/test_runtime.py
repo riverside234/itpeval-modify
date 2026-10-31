@@ -1,102 +1,117 @@
 import json
+import os
 import tempfile
 import unittest
-from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
-from eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime import DspConfig
+from eval.pipeline.hol_light_to_isabelle.common import RESULTS_DIR, repo_path
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime import DspConfig, NATIVE_DIR, OwnedProcess
+
+MODULE = "eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime."
 
 
-MODULE = "eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime."
-
-
-class RuntimeConfigTests(unittest.TestCase):
+class RuntimeTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory(prefix="dsp-optional-source-")
+        base = repo_path(RESULTS_DIR)
+        base.mkdir(parents=True, exist_ok=True)
+        self.temp = tempfile.TemporaryDirectory(prefix="native-runtime-", dir=base)
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
-        pisa = self.root / "pisa"
-        pisa.mkdir()
-        for name in ("server_pb2.py", "server_pb2_grpc.py"):
-            (pisa / name).write_text("# fixture\n", encoding="utf-8")
-        jar = self.root / "pisa.jar"
-        jar.write_bytes(b"fixture")
-        isabelle = self.root / "isabelle"
-        isabelle.mkdir()
-        self.data = {
-            "pisa_python_path": str(pisa), "pisa_jar": str(jar),
-            "isabelle_home": str(isabelle), "expected_isabelle_version": "Isabelle2021",
-        }
+        self.path = Path(self.temp.name)
 
-    def load(self, **options):
-        path = self.root / "config.json"
-        path.write_text(json.dumps({**self.data, **options}), encoding="utf-8")
-        with patch(MODULE + "repo_path", return_value=path):
-            return DspConfig.load(str(path))
+    def load(self, data):
+        path = self.path / "config.json"
+        path.write_text(json.dumps(data), encoding="utf-8")
+        return DspConfig.load(str(path))
 
-    @contextmanager
-    def commands(self, config, *, dsp_commit=None, pisa_commit=None):
-        def run(args, **kwargs):
-            if args[0] == "git":
-                is_pisa = args[2] == config.pisa_python_path
-                value = ((pisa_commit or config.expected_pisa_commit) if is_pisa else
-                         (dsp_commit or config.expected_dsp_commit))
-                return SimpleNamespace(stdout=value + "\n", stderr="")
-            if args[-1] == "version":
-                return SimpleNamespace(stdout="Isabelle2021\n", stderr="")
-            return SimpleNamespace(stdout="", stderr="Java test runtime")
-        with patch(MODULE + "subprocess.run", side_effect=run) as mocked, patch(
-            MODULE + "repository_commit", return_value=None
-        ):
-            yield mocked
+    def test_native_config_defaults_and_root_confinement(self):
+        config = self.load({"isabelle_home": str(self.path)})
+        self.assertEqual("Isabelle2026", config.expected_isabelle_version)
+        self.assertEqual("isabelle-native", config.backend)
+        with self.assertRaises(ValueError):
+            self.load({"isabelle_home": str(self.path.parent.parent.parent.parent.parent.parent)})
 
-    def test_default_does_not_require_a_dsp_path_or_git_checkout(self):
-        config = self.load()
-        self.assertFalse(config.check_dsp_repo)
-        self.assertIsNone(config.dsp_repo_root)
-        with self.commands(config) as commands:
+    def test_old_pisa_configuration_has_explicit_migration_error(self):
+        for data in ({"pisa_jar": "old.jar"}, {"backend": "dsp-pisa"}, {"expected_isabelle_version": "Isabelle2021"}):
+            with self.subTest(data=data), self.assertRaisesRegex(ValueError, "PISA"):
+                self.load(data)
+
+    def test_invalid_limits_provers_and_unknown_fields(self):
+        for data in ({"step_timeout_s": 0}, {"threads": True}, {"threads": 0},
+                     {"provers": []}, {"provers": "e"}, {"session_dependencies": ["bad;session"]},
+                     {"step_timeout_s": float("inf")}, {"bogus": 1}):
+            with self.subTest(data=data), self.assertRaises(ValueError):
+                self.load(data)
+
+    def test_environment_never_changes_home_and_keeps_artifacts_under_repo(self):
+        config = DspConfig()
+        with patch(MODULE + "RUNTIME_DIR", str(self.path)):
+            env = config.environment()
+        self.assertEqual(os.environ.get("HOME"), env.get("HOME"))
+        self.assertEqual(os.environ.get("CODEX_HOME"), env.get("CODEX_HOME"))
+        self.assertTrue(Path(env["USER_HOME"]).is_relative_to(self.path))
+        self.assertEqual("Isabelle2026", env["ISABELLE_IDENTIFIER"])
+        self.assertTrue(Path(env["TMPDIR"]).is_dir())
+        settings = Path(env["USER_HOME"]) / ".isabelle/Isabelle2026/etc/settings"
+        self.assertIn("ISABELLE_HEAPS=", settings.read_text())
+        self.assertNotIn("ISABELLE_SETTINGS_PRESENT", env)
+
+    def test_metadata_checks_release_and_resolved_paths(self):
+        (self.path / "bin").mkdir()
+        (self.path / "bin/isabelle").write_text("fixture")
+        config = DspConfig(isabelle_home=str(self.path))
+        hashes = json.loads((NATIVE_DIR / "release_sources.json").read_text())["sha256"]
+        def run(command, **kwargs):
+            if command[-1] == "version":
+                return SimpleNamespace(stdout="Isabelle2026\n")
+            return SimpleNamespace(stdout=str(self.path / command[-1]) + "\n")
+        def digest(path):
+            relative = str(path.relative_to(self.path)).replace("\\", "/") if path.is_relative_to(self.path) else ""
+            return hashes.get(relative, "a" * 64)
+        fake_os = SimpleNamespace(name="posix", environ=os.environ, access=os.access, X_OK=os.X_OK)
+        with patch(MODULE + "os", fake_os), patch(MODULE + "subprocess.run", side_effect=run), patch(
+                MODULE + "hash_file", side_effect=digest), patch(MODULE + "RUNTIME_DIR", str(self.path / "runtime")):
             metadata = config.metadata()
-        self.assertFalse(metadata["dsp_repo_checked"])
-        self.assertIsNone(metadata["dsp_commit"])
-        git_calls = [call.args[0] for call in commands.call_args_list if call.args[0][0] == "git"]
-        self.assertEqual([["git", "-C", config.pisa_python_path, "rev-parse", "HEAD"]], git_calls)
-
-    def test_disabled_check_ignores_an_unavailable_dsp_checkout_and_pin(self):
-        config = self.load(dsp_repo_root=str(self.root / "not-installed"),
-                           expected_dsp_commit="unused")
-        with self.commands(config):
-            self.assertFalse(config.metadata()["dsp_repo_checked"])
-
-    def test_enabled_check_requires_the_dsp_directory(self):
-        with self.assertRaisesRegex(ValueError, "dsp_repo_root"):
-            self.load(check_dsp_repo=True)
-        config = self.load(check_dsp_repo=True, dsp_repo_root=str(self.root / "not-installed"))
-        with self.assertRaisesRegex(FileNotFoundError, "dsp_repo_root"):
-            config.metadata()
-
-    def test_enabled_check_records_and_enforces_the_dsp_commit(self):
-        dsp = self.root / "dsp"
-        dsp.mkdir()
-        config = self.load(check_dsp_repo=True, dsp_repo_root=str(dsp))
-        with self.commands(config):
-            metadata = config.metadata()
-        self.assertTrue(metadata["dsp_repo_checked"])
-        self.assertEqual(config.expected_dsp_commit, metadata["dsp_commit"])
-        with self.commands(config, dsp_commit="0" * 40):
-            with self.assertRaisesRegex(ValueError, "dsp commit mismatch"):
+            self.assertEqual("isabelle-native", metadata["backend"])
+            self.assertEqual(hashes, metadata["release_sources"])
+            self.assertEqual(64, len(metadata["backend_fingerprint"]))
+        with patch(MODULE + "os", fake_os), patch(MODULE + "hash_file", return_value="wrong"):
+            with self.assertRaisesRegex(ValueError, "source mismatch"):
                 config.metadata()
 
-    def test_pisa_commit_remains_required_when_dsp_check_is_disabled(self):
-        config = self.load()
-        with self.commands(config, pisa_commit="0" * 40):
-            with self.assertRaisesRegex(ValueError, "pisa commit mismatch"):
-                config.metadata()
+    def test_cleanup_uses_only_owned_process_group(self):
+        process = OwnedProcess([], directory=self.path, env={}, log_path=self.path / "log",
+                               timeout_s=1, deadline=1)
+        process.process = Mock(pid=713)
+        fake_os = SimpleNamespace(name="posix", killpg=Mock())
+        with patch(MODULE + "os", fake_os):
+            process.close()
+        self.assertEqual([713, 713], [c.args[0] for c in fake_os.killpg.call_args_list])
 
-    def test_check_flag_requires_a_boolean(self):
-        with self.assertRaisesRegex(ValueError, "boolean"):
-            self.load(check_dsp_repo="false")
+    def test_exhausted_deadline_does_not_start_a_process(self):
+        process = OwnedProcess([], directory=self.path, env={}, log_path=self.path / "log",
+                               timeout_s=1, deadline=0)
+        with patch(MODULE + "subprocess.Popen") as popen, self.assertRaises(TimeoutError):
+            process.run()
+        popen.assert_not_called()
+
+
+    def test_descendant_groups_are_owned_and_recycled_pids_are_ignored(self):
+        process = OwnedProcess([], directory=self.path, env={}, log_path=self.path / "log",
+                               timeout_s=1, deadline=1)
+        process.process = Mock(pid=713)
+        process.owned_processes = {713: {"start_ticks": "1", "group": 713},
+                                   714: {"start_ticks": "2", "group": 714},
+                                   715: {"start_ticks": "3", "group": 715}}
+        fake_os = SimpleNamespace(name="posix", killpg=Mock(), kill=Mock())
+        current = {713: process.owned_processes[713], 714: process.owned_processes[714],
+                   715: {"start_ticks": "recycled", "group": 715}}
+        with patch(MODULE + "os", fake_os), patch.object(process, "capture_owned"), patch.object(
+                process, "process_identity", side_effect=current.get):
+            process.close()
+        self.assertEqual({713, 714}, {call.args[0] for call in fake_os.killpg.call_args_list})
+        fake_os.kill.assert_not_called()
 
 
 if __name__ == "__main__":
