@@ -120,7 +120,7 @@ class NativeSearch:
                 if not destination.is_file() or destination.read_bytes() != source.read_bytes():
                     shutil.copyfile(source, destination)
         root = ('session ' + name + ' = ' + quote(self.config.base_session) +
-                ' +\n  options [document = false]\n  theories [global] DSP_Native\n')
+                ' +\n  options [document = false]\n  theories DSP_Native (global)\n')
         (directory / "ROOT").write_text(root, encoding="utf-8")
         # isabelle build validates heap freshness; no success marker substitutes for that check.
         code = self.run_build(directory, name, timeout_s=self.config.startup_timeout_s,
