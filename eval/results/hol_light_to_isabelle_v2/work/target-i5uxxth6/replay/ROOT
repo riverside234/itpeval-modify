@@ -1,0 +1,3 @@
+session DSP_Replay_ec5a1b2d88ff436fa77c7555fe777099 = "HOL" +
+  options [document = false, quick_and_dirty = false]
+  theories "circle_average"

@@ -1,0 +1,68 @@
+<dsp_result schema="dsp_native_result_v1" request_id="14b90be9ee8948a4b19e1be2fc18f681" input_sha256="7a81593d701afcc74ce2490b10d614539671a21b4c8dae48d3615335d4bdcddd" action="search" success="true" target_closed="true"><proof>by (simp only: circleAverage_def circleMap_def integral_shift)</proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.027"><command>theory circle_average
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="5" source_state="3" duration_seconds="0.017"><command>locale circle_average_setup =
+  fixes zero     :: &quot;&apos;r&quot;
+    and add      :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;     (infixl &quot;+C&quot; 65)
+    and integral :: &quot;(&apos;r \&lt;Rightarrow&gt; &apos;r) \&lt;Rightarrow&gt; &apos;r&quot;
+  assumes add_zero      : &quot;\&lt;And&gt;x. x +C zero = x&quot;
+    and   add_comm      : &quot;\&lt;And&gt;x y. x +C y = y +C x&quot;
+    and   add_assoc     : &quot;\&lt;And&gt;x y z. (x +C y) +C z = x +C (y +C z)&quot;
+    and   integral_ext  : &quot;\&lt;And&gt;g h. (\&lt;forall&gt;\&lt;theta&gt;. g \&lt;theta&gt; = h \&lt;theta&gt;) \&lt;Longrightarrow&gt; integral g = integral h&quot;
+    and   integral_const: &quot;\&lt;And&gt;c. integral (\&lt;lambda&gt;_. c) = c&quot;
+    and   integral_add  : &quot;\&lt;And&gt;f g. integral (\&lt;lambda&gt;\&lt;theta&gt;. f \&lt;theta&gt; +C g \&lt;theta&gt;) = integral f +C integral g&quot;
+    and   integral_shift: &quot;\&lt;And&gt;f c. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="16" source_state="4" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="22" source_state="5" duration_seconds="0.006"><command>definition circleMap :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+  where &quot;circleMap c \&lt;theta&gt; \&lt;equiv&gt; \&lt;theta&gt; +C c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="23" source_state="6" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="8" line="25" source_state="7" duration_seconds="0.007"><command>definition circleAverage :: &quot;(&apos;r \&lt;Rightarrow&gt; &apos;r) \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+  where &quot;circleAverage f c \&lt;equiv&gt; integral (\&lt;lambda&gt;\&lt;theta&gt;. f (circleMap c \&lt;theta&gt;))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="9" line="26" source_state="8" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="10" line="32" source_state="9" duration_seconds="0.002"><command>lemma circleMap_zero: &quot;circleMap zero \&lt;theta&gt; = \&lt;theta&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="11" line="32" source_state="10" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="12" line="33" source_state="11" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="13" line="33" source_state="12" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="14" line="34" source_state="13" duration_seconds="0.001"><command>lemma circleAverage_zero: &quot;circleAverage f zero = integral f&quot;</command><error></error></attempt><attempt mode="context" success="true" index="15" line="34" source_state="14" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="16" line="35" source_state="15" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="17" line="35" source_state="16" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="36" source_state="17" duration_seconds="0.002"><command>lemma circleAverage_add:
+  &quot;circleAverage (\&lt;lambda&gt;z. f z +C g z) c =
+   circleAverage f c +C circleAverage g c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="38" source_state="18" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="20" line="39" source_state="19" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="21" line="39" source_state="20" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="40" source_state="21" duration_seconds="0.001"><command>lemma circleAverage_fun_add:
+  &quot;circleAverage (\&lt;lambda&gt;z. f (z +C c)) zero = circleAverage f c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="23" line="41" source_state="22" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="24" line="42" source_state="23" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="25" line="42" source_state="24" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="26" line="43" source_state="25" duration_seconds="0.001"><command>lemma circleMap_add:
+  &quot;circleMap (c +C d) \&lt;theta&gt; = circleMap c (circleMap d \&lt;theta&gt;)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="27" line="44" source_state="26" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="28" line="45" source_state="27" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="29" line="45" source_state="28" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="30" line="46" source_state="29" duration_seconds="0.002"><command>lemma circleAverage_shift:
+  &quot;circleAverage f (c +C d) = circleAverage (\&lt;lambda&gt;z. f (z +C d)) c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="31" line="47" source_state="30" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="32" line="48" source_state="31" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="33" line="48" source_state="32" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="34" line="49" source_state="33" duration_seconds="0.001"><command>lemma circleAverage_const:
+  &quot;circleAverage (\&lt;lambda&gt;_. k) c = k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="35" line="50" source_state="34" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="36" line="51" source_state="35" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="37" line="51" source_state="36" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="38" line="52" source_state="37" duration_seconds="0.002"><command>lemma circleAverage_add_const:
+  &quot;circleAverage (\&lt;lambda&gt;z. f z +C k) c = circleAverage f c +C k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="39" line="53" source_state="38" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="40" line="54" source_state="39" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="41" line="54" source_state="40" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="42" line="55" source_state="41" duration_seconds="0.002"><command>lemma circleAverage_comm_add:
+  &quot;circleAverage (\&lt;lambda&gt;z. f z +C g z) c =
+   circleAverage (\&lt;lambda&gt;z. g z +C f z) c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="43" line="57" source_state="42" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="44" line="58" source_state="43" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="45" line="58" source_state="44" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="46" line="59" source_state="45" duration_seconds="0.002"><command>lemma circleAverage_add_assoc:
+  &quot;circleAverage (\&lt;lambda&gt;z. (f z +C g z) +C h z) c =
+   circleAverage f c +C (circleAverage g c +C circleAverage h c)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="47" line="61" source_state="46" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="48" line="62" source_state="47" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="49" line="62" source_state="48" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="50" line="63" source_state="49" duration_seconds="0.001"><command>lemma circleAverage_center_comm:
+  &quot;circleAverage f (c +C d) = circleAverage f (d +C c)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="51" line="64" source_state="50" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="52" line="65" source_state="51" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="53" line="65" source_state="52" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="54" line="1" source_state="53" duration_seconds="0.000"><command>declare [[quick_and_dirty = false]]</command><error></error></attempt><attempt mode="target" success="true" index="55" line="1" source_state="54" duration_seconds="0.001"><command>lemma circleAverage_center_independent:
+  &quot;circleAverage f c = integral f&quot;</command><error></error></attempt><attempt mode="target" success="true" index="56" line="2" source_state="55" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="search" success="true" index="57" line="1" source_state="56" duration_seconds="0.001"><command>by (simp only: circleAverage_def circleMap_def integral_shift)</command><error></error></attempt><attempt mode="close_scope" success="true" index="58" line="1" source_state="57" duration_seconds="0.000"><command>end</command><error></error></attempt><attempt mode="close_scope" success="true" index="59" line="1" source_state="58" duration_seconds="0.009"><command>end</command><error></error></attempt></attempts><settings/></dsp_result>
