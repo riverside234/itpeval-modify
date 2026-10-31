@@ -1,9 +1,12 @@
 import importlib.util
 import json
+import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -49,10 +52,49 @@ class ServerToolTests(unittest.TestCase):
             self.assertIn("--help",result.stdout)
 
     def test_native_preflight_refuses_the_client_environment(self):
+        prefix = str(repository_path("."))
         with patch.object(self.serve.platform,"system",return_value="Linux"), patch.object(
-                self.serve.sys,"prefix",str(repository_path("."))):
-            with self.assertRaisesRegex(ValueError,"isolated"):
+                self.serve.sys,"prefix",prefix), patch.dict(os.environ,{"CONDA_PREFIX":prefix}), patch.object(
+                self.serve.sys,"version_info",(3,10,0)):
+            with self.assertRaisesRegex(ValueError,"Python 3.12"):
                 self.serve.preflight(self.settings.read_config())
+
+    def test_native_preflight_requires_an_active_conda_environment(self):
+        with patch.object(self.serve.platform,"system",return_value="Linux"), patch.dict(
+                os.environ,{},clear=True), patch.object(self.serve.packages,"version") as version:
+            with self.assertRaisesRegex(ValueError,"conda activate vllm"):
+                self.serve.preflight(self.settings.read_config())
+            version.assert_not_called()
+
+    def test_native_preflight_rejects_an_interpreter_from_another_environment(self):
+        prefix = str(Path(tempfile.gettempdir())/"existing-conda-envs"/"vllm")
+        with patch.object(self.serve.platform,"system",return_value="Linux"), patch.object(
+                self.serve.sys,"prefix",str(repository_path("."))), patch.dict(
+                os.environ,{"CONDA_PREFIX":prefix}), patch.object(self.serve.packages,"version") as version:
+            with self.assertRaisesRegex(ValueError,"Python must come from the active conda"):
+                self.serve.preflight(self.settings.read_config())
+            version.assert_not_called()
+
+    def test_native_preflight_accepts_existing_conda_environment_outside_repo(self):
+        # Dependency/CUDA fixtures test environment selection, not actual GPU inference.
+        prefix = str(Path(tempfile.gettempdir())/"existing-conda-envs"/"vllm")
+        self.assertFalse(Path(prefix).resolve().is_relative_to(repository_path(".")))
+        config = self.settings.read_config()
+        torch = SimpleNamespace(
+            __version__="fixture",version=SimpleNamespace(cuda="fixture"),
+            cuda=SimpleNamespace(is_available=lambda:True,device_count=lambda:1,
+                get_device_properties=lambda index:SimpleNamespace(
+                    major=8,minor=0,name="FIXTURE GPU",total_memory=1024)))
+        with patch.object(self.serve.platform,"system",return_value="Linux"), patch.object(
+                self.serve.platform,"python_version",return_value="3.12.0"), patch.object(
+                self.serve.sys,"prefix",prefix), patch.object(self.serve.sys,"version_info",(3,12,0)), patch.dict(
+                os.environ,{"CONDA_PREFIX":prefix,"CONDA_DEFAULT_ENV":"vllm"}), patch.object(
+                self.serve.packages,"version",side_effect=config["expected_versions"].__getitem__), patch.object(
+                self.serve,"verify_checkpoint",return_value={"tokenizer_sha256":"a"*64,"template_sha256":"b"*64}), patch.object(
+                self.serve,"package_freeze",return_value="fixture==1\n"), patch.dict(sys.modules,{"torch":torch}):
+            manifest = self.serve.preflight(config)
+        self.assertEqual("3.12.0",manifest["versions"]["python"])
+        self.assertEqual(config["expected_versions"]["vllm"],manifest["versions"]["vllm"])
 
     def test_checkpoint_identity_sizes_and_template_changes_are_checked(self):
         base = repository_path("eval/results/inference_tests")
@@ -76,6 +118,68 @@ class ServerToolTests(unittest.TestCase):
             (directory/"tokenizer_config.json").write_text('{"chat_template":"changed"}')
             with self.assertRaisesRegex(ValueError,"incomplete|modified"):
                 self.settings.verify_checkpoint(config)
+
+
+BASH = (str(Path("C:/Program Files/Git/bin/bash.exe"))
+        if os.name=="nt" and Path("C:/Program Files/Git/bin/bash.exe").is_file()
+        else shutil.which("bash") if os.name!="nt" else None)
+
+
+@unittest.skipUnless(BASH,"Bash is required for launcher routing tests")
+class LauncherTests(unittest.TestCase):
+    def setUp(self):
+        base = repository_path("eval/results/inference_tests")
+        base.mkdir(parents=True,exist_ok=True)
+        self.temp = tempfile.TemporaryDirectory(prefix="conda-launcher-",dir=base)
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        scripts = self.root/"server"
+        scripts.mkdir()
+        self.launcher = scripts/"launch_qwen.sh"
+        self.launcher.write_bytes(repository_path("vllm/launch_qwen.sh").read_bytes())
+        # Avoid creating real server caches; the fake interpreter only prints its arguments.
+        (scripts/"env_vars.sh").write_bytes(b":\n")
+        self.prefix = self.root/"existing conda envs"/"vllm"
+        self.python = self.prefix/"bin"/"python"
+        self.python.parent.mkdir(parents=True)
+        self.env = os.environ.copy()
+
+    @staticmethod
+    def shell_path(path):
+        value = path.resolve().as_posix()
+        return "/"+value[0].lower()+value[2:] if os.name=="nt" else value
+
+    def run_launcher(self,*args):
+        return subprocess.run([BASH,self.shell_path(self.launcher),*args],env=self.env,
+                              capture_output=True,text=True,timeout=15)
+
+    def test_launcher_uses_active_prefix_with_spaces_and_preserves_arguments(self):
+        self.python.write_bytes(b'#!/usr/bin/env bash\nprintf "%s\\n" "ACTIVE_CONDA_PYTHON" "$@"\n')
+        self.python.chmod(0o755)
+        self.env["CONDA_PREFIX"] = self.shell_path(self.prefix)
+        syntax = subprocess.run([BASH,"-n",self.shell_path(self.launcher)],
+                                capture_output=True,text=True,timeout=15)
+        self.assertEqual(0,syntax.returncode,syntax.stderr)
+        result = self.run_launcher("--preflight","--config","server config.json")
+        self.assertEqual(0,result.returncode,result.stderr)
+        lines = result.stdout.splitlines()
+        self.assertEqual("ACTIVE_CONDA_PYTHON",lines[0])
+        self.assertTrue(lines[1].endswith("/server/serve.py"))
+        self.assertEqual(["--preflight","--config","server config.json"],lines[2:])
+
+    def test_launcher_requests_activation_if_no_environment_is_active(self):
+        self.env.pop("CONDA_PREFIX",None)
+        result = self.run_launcher("--preflight")
+        self.assertNotEqual(0,result.returncode)
+        self.assertIn("conda activate vllm",result.stderr)
+        self.assertEqual("",result.stdout)
+
+    def test_launcher_rejects_missing_python_in_the_active_environment(self):
+        self.env["CONDA_PREFIX"] = self.shell_path(self.prefix)
+        result = self.run_launcher("--preflight")
+        self.assertNotEqual(0,result.returncode)
+        self.assertIn("Missing Python interpreter in the active conda environment",result.stderr)
+        self.assertEqual("",result.stdout)
 
 
 if __name__ == "__main__":

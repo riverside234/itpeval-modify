@@ -4,7 +4,7 @@ Both stages now support selectable inference backends. Existing commands use
 the GPT-5.6 Terra API defaults. Add `--llm-config
 eval/configs/inference/qwen_vllm.example.json` to a standalone generator,
 or `--sketch-llm-config` to a saved-Draft runner, for local Qwen inference.
-The server uses its own `vllm/env/` conda prefix and keeps artifacts under
+Start the server after `conda activate vllm` (Python 3.12); it keeps artifacts under
 `vllm/`. See [Qwen setup and run commands](../../../vllm/README.md).
 API/API, Qwen/Qwen, and mixed-stage default outputs are separated.
 

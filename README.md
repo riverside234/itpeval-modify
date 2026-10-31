@@ -91,7 +91,7 @@ The two root requirements files are:
 - `requirements-vllm.txt`: isolated Python 3.12 Linux/CUDA server; includes
   vLLM, Transformers, and Hugging Face Hub.
 
-On the lab machine, create each environment under the repository root:
+On the lab machine, use separate main and server conda environments:
 
 ```bash
 cd /data/not_backed_up/yxu209/ITPEval
@@ -102,14 +102,17 @@ conda create --prefix "$PWD/.venv" python=3.10 pip
 conda activate "$PWD/.venv"
 python -m pip install -r requirements.txt
 
-# Separate server environment; vllm/environment.yml selects Python 3.12.
-conda env create --prefix "$PWD/vllm/env" --file vllm/environment.yml
-"$PWD/vllm/env/bin/python" -m pip install -r requirements-vllm.txt
-"$PWD/vllm/env/bin/python" -m pip check
+# Existing Python 3.12 server environment.
+conda activate vllm
+python -m pip install -r requirements-vllm.txt
+python -m pip check
 ```
 
-The main environment can remain active while `vllm/launch_qwen.sh` uses the
-server interpreter explicitly. Both environment directories are Git-ignored.
+Start `vllm/launch_qwen.sh` after `conda activate vllm`; the launcher uses
+`$CONDA_PREFIX/bin/python`. The existing server environment may be outside
+the repository. Run the main pipeline from its own environment in another
+terminal. If the server environment does not exist yet, create it with
+`conda env create --file vllm/environment.yml` before activating it.
 
 Run commands from the repository root. Extract one Babel Formal theorem:
 

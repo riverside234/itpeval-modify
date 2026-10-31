@@ -1,4 +1,4 @@
-name: itpeval-qwen-vllm
+name: vllm
 channels:
   - conda-forge
 dependencies:

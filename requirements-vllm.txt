@@ -1,5 +1,5 @@
 # Isolated vLLM server environment: Python 3.12, Linux, supported CUDA GPU.
-# Run from the repository root in vllm/env:
+# Run from the repository root after: conda activate vllm
 # python -m pip install -r requirements-vllm.txt
 #
 # Direct dependency pins; not a complete transitive or GPU-validated lock.

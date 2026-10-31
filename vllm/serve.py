@@ -35,8 +35,13 @@ def command(config: dict) -> list[str]:
 def preflight(config: dict) -> dict:
     if platform.system()!="Linux":
         raise ValueError("the native vLLM server requires the Linux lab environment")
-    if Path(sys.prefix).resolve()!=repo_path("vllm/env"):
-        raise ValueError("use the isolated vllm/env interpreter via vllm/launch_qwen.sh")
+    conda_prefix = os.environ.get("CONDA_PREFIX")
+    if not conda_prefix:
+        raise ValueError("activate the Python 3.12 server environment: conda activate vllm")
+    if Path(sys.prefix).resolve()!=Path(conda_prefix).expanduser().resolve():
+        raise ValueError("Python must come from the active conda environment; run conda activate vllm")
+    if sys.version_info[:2]!=(3,12):
+        raise ValueError("the vLLM server requires Python 3.12; run conda activate vllm")
     versions = {name:packages.version(name) for name in config["expected_versions"]}
     for name,expected in config["expected_versions"].items():
         if versions[name]!=expected:

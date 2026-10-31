@@ -4,7 +4,7 @@ This adds local `Qwen/Qwen3.8-27B` inference for Draft and Sketch in both
 Babel Formal and Hundred Theorems. The existing GPT-5.6 Terra API path is the
 default. Both Isabelle verification pipelines use the same inference adapter.
 
-The Python 3.12 server runs in a separate conda prefix, `vllm/env/`. The Python 3.10 ITPEval
+The Python 3.12 server runs in the activated `vllm` conda environment. The Python 3.10 ITPEval
 environment sends HTTP requests to it; it does not import vLLM or PyTorch.
 The `vllm/` directory contains scripts and deliberately has no `__init__.py`.
 
@@ -14,16 +14,19 @@ Run from the repository root:
 
 ```bash
 cd /data/not_backed_up/yxu209/ITPEval
+conda activate vllm
 source vllm/env_vars.sh
 
-conda env create --prefix "$PWD/vllm/env" --file vllm/environment.yml
-"$PWD/vllm/env/bin/python" -m pip install -r requirements-vllm.txt
-"$PWD/vllm/env/bin/python" -m pip check
+python -m pip install -r requirements-vllm.txt
+python -m pip check
 nvidia-smi
 ```
 
-The explicit prefix keeps this environment separate from ITPEval, DSP+, and
-the existing BFS-Prover environment. Server caches, model downloads,
+Reuse the existing Python 3.12 `vllm` environment; its directory may be outside
+the repository. If it has not been created yet, run
+`conda env create --file vllm/environment.yml` before `conda activate vllm`.
+Keep the server environment separate from the main ITPEval environment.
+Server caches, model downloads,
 temporary files, and logs default under `ITPEval/vllm/` and are Git-ignored.
 
 The root `requirements-vllm.txt` contains the server dependency pins.
@@ -60,14 +63,17 @@ It records the revision, file sizes, and tokenizer/template hashes.
 A different revision requires a fresh model directory.
 
 ```bash
-"$PWD/vllm/env/bin/python" vllm/download_model.py
-"$PWD/vllm/env/bin/python" vllm/download_model.py --check
+conda activate vllm
+python vllm/download_model.py
+python vllm/download_model.py --check
 
 bash vllm/launch_qwen.sh --preflight
 bash vllm/launch_qwen.sh
 ```
 
-The launcher uses the isolated interpreter explicitly, checks package pins,
+The launcher uses `$CONDA_PREFIX/bin/python` from the activated environment,
+and preflight checks that the running interpreter matches that environment
+and uses Python 3.12. It also checks package pins,
 CUDA, GPU count, and the checkpoint manifest, then executes the official vLLM
 server. It refuses an occupied port. The server runs in the foreground; use
 another terminal to inspect `vllm/logs/qwen_server.log` or stop this server
