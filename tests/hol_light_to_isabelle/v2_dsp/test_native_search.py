@@ -6,7 +6,7 @@ import time
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from eval.pipeline.hol_light_to_isabelle.common import RESULTS_DIR, repo_path
 from eval.pipeline.hol_light_to_isabelle.v2_dsp.native_search import (
@@ -94,6 +94,9 @@ class NativeSearchTests(unittest.TestCase):
         directory = self.path / "search"
         def build(folder, session, **options):
             request_xml = ET.parse(folder / "request.xml").getroot()
+            self.assertEqual(folder / ("ready-" + request_xml.get("request_id")), options["ready_path"])
+            self.assertIn('File.write (Path.explode "' + options["ready_path"].name + '")',
+                          (folder / "DSP_Driver.thy").read_text())
             attrs = {k: request_xml.get(k) for k in ("request_id", "input_sha256", "action")}
             root = ET.Element("dsp_result", schema=RESULT_VERSION, success="true", target_closed="true", **attrs)
             for name in ("proof", "category", "error", "attempts", "settings"):
@@ -134,6 +137,20 @@ class NativeSearchTests(unittest.TestCase):
         self.assertIn("threads=2", command)
         self.assertNotIn("ML_process", command)
         self.assertEqual(["Main", "HOL-Analysis.Analysis"], imports_of('theory X imports Main "HOL-Analysis.Analysis" begin'))
+
+    def test_driver_startup_budget_is_separate_from_search_budget(self):
+        config = DspConfig(startup_timeout_s=7)
+        factory = Mock()
+        factory.return_value.run.return_value = 0
+        native = NativeSearch(config, process_factory=factory)
+        ready = self.path / "ready-request"
+        with patch.object(DspConfig, "environment", return_value={}):
+            self.assertEqual(0, native.run_build(self.path, "Job", timeout_s=100,
+                                                deadline=200, ready_path=ready))
+        self.assertEqual(7, factory.call_args.kwargs["startup_timeout_s"])
+        self.assertEqual(ready, factory.call_args.kwargs["ready_path"])
+        self.assertEqual(100, factory.call_args.kwargs["timeout_s"])
+        self.assertEqual(200, factory.call_args.kwargs["deadline"])
 
     def test_resources_are_available_through_the_python_package(self):
         root = importlib.resources.files("eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp") / "native"

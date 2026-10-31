@@ -37,6 +37,8 @@ fun search report {provers, hammer_timeout, preplay_timeout} state =
     val proof = Toplevel.proof_of state;
     val raw = [("timeout", Real.toString hammer_timeout),
                ("preplay_timeout", Real.toString preplay_timeout),
+               (* Imported theory defaults must not switch a proof gap to falsification/abduction. *)
+               ("falsify", "false"), ("abduce", "0"),
                ("try0", "false"), ("learn", "false"), ("fact_filter", "mepo"),
                ("isar_proofs", "false"), ("max_proofs", "4")]
       @ (if null provers then [] else [("provers", space_implode " " provers)]);

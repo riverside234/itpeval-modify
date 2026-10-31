@@ -6,7 +6,14 @@ struct
 
 exception Failure of string * string;
 val allowed = space_explode " "
-  "proof qed by apply apply_end done prefer defer back supply using unfolding have show thus hence assume presume fix obtain guess let note from with then next case moreover ultimately also finally interpret include including write";
+  "proof qed by apply apply_end done prefer defer back supply using unfolding have show thus hence assume presume fix obtain guess let note from with then next case moreover ultimately also finally interpret include including write consider define subgoal { } . ..";
+
+(* Token.source_of is compact internal text with DEL padding for removed
+   delimiters. Token.unparse restores executable strings/cartouches and comments. *)
+fun source_text span = implode (map Token.unparse span);
+fun subgoal_count state = Thm.nprems_of (#goal (Proof.goal (Toplevel.proof_of state)));
+fun closes_obligation saved next =
+  not (Toplevel.is_proof next) orelse Toplevel.proof_level next < Toplevel.proof_level saved;
 
 fun fail category message = raise Failure (category, message);
 fun elem name attrs body = XML.Elem ((name, attrs), body);
@@ -85,6 +92,7 @@ fun run driver_theory request_file result_file =
       in
         (case result of
           Exn.Res state => SOME state
+        | Exn.Exn (Failure ("timeout", message)) => fail "timeout" message
         | Exn.Exn (Timeout.TIMEOUT _) => fail "timeout" "native operation timed out; isolated job aborted"
         | Exn.Exn DSP_Sledgehammer.Hammer_Timeout => fail "timeout" "native Sledgehammer timed out"
         | Exn.Exn (DSP_Sledgehammer.No_Reconstruction message) => fail "missing_reconstruction" message
@@ -93,7 +101,7 @@ fun run driver_theory request_file result_file =
     fun execute mode state span =
       let
         val tr = transition state span;
-        val command = implode (map Token.source_of span);
+        val command = source_text span;
         val line = the_default 1 (Position.line_of (Toplevel.pos_of tr));
       in
         (case attempt mode command line
@@ -105,7 +113,7 @@ fun run driver_theory request_file result_file =
     fun ensure_real state =
       if Toplevel.is_skipped state orelse Toplevel.is_skipped_proof state
       then fail "rejected_proof" "skipped target/intermediate proof" else state;
-    fun candidate mode saved proof =
+    fun candidate mode allow_partial saved proof =
       let
         val level = Toplevel.proof_level saved;
         fun apply_candidate () =
@@ -114,41 +122,64 @@ fun run driver_theory request_file result_file =
               let
                 val tr = transition st span;
                 val name = Toplevel.name_of tr;
-                val _ = if name = "" orelse member (op =) ["using", "unfolding", "by", "apply", "done"] name then ()
+                val _ = if name = "" orelse member (op =) ["using", "unfolding", "by", "apply", "prefer", "done"] name then ()
                         else fail "missing_reconstruction" "unsafe reconstructed command";
               in ensure_real (Toplevel.command_exception tr st) end;
             val next = bounded step_budget
               (fn () => fold step (spans saved proof) saved) ();
-            val _ = if not (Toplevel.is_proof next) orelse Toplevel.proof_level next < level then ()
-                    else fail "incomplete_obligation" "candidate did not close the pending obligation";
+            val progress = closes_obligation saved next orelse
+              (allow_partial andalso Toplevel.is_proof next andalso
+               Toplevel.proof_level next = level andalso subgoal_count next < subgoal_count saved);
+            val _ = if progress then ()
+                    else fail "incomplete_obligation" "candidate neither closed nor reduced the pending obligation";
           in next end;
       in attempt mode proof 0 apply_candidate end;
-    fun choose _ _ [] = NONE
-      | choose mode state (proof :: rest) =
-          (case candidate mode state proof of SOME next => SOME (proof, next)
-          | NONE => choose mode state rest);
-    fun gap state =
-      (case choose "heuristic" state (values nodes "heuristics") of
-        SOME selected => selected
-      | NONE =>
-          let
-            val budget = number nodes "hammer_timeout_s";
-            val config = {provers = values nodes "provers", hammer_timeout = budget,
-                          preplay_timeout = number nodes "preplay_timeout_s"};
-            val returned = Unsynchronized.ref (NONE: (string list * (string * string) list) option);
-            val found = attempt "hammer" "native Sledgehammer" 0 (fn () =>
-              (returned := SOME (bounded (budget + #preplay_timeout config)
-                  (DSP_Sledgehammer.search (fn params => settings := params) config) state); state));
-            val (candidates, params) =
-              (case (found, !returned) of
-                (SOME _, SOME result) => result
-              | _ => fail "hammer_failure" "native Sledgehammer returned no executable reconstruction");
-            val _ = settings := params;
-          in
-            (case choose "reconstruction" state candidates of
-              SOME selected => selected
-            | NONE => fail "missing_reconstruction" "all native reconstructions failed to close the obligation")
-          end);
+    fun choose _ _ _ [] = NONE
+      | choose mode allow_partial state (proof :: rest) =
+          (case candidate mode allow_partial state proof of SOME next => SOME (proof, next)
+          | NONE => choose mode allow_partial state rest);
+    fun gap initial =
+      let
+        val _ = Proof.assert_backward (Toplevel.proof_of initial);
+        fun solve state chunks =
+          if closes_obligation initial state then (cat_lines (rev chunks), state)
+          else
+            let
+              fun continue (proof, next) =
+                (state_serial := !state_serial + 1; solve next (proof :: chunks));
+            in
+              if subgoal_count state = 0 then
+                (* An apply command may solve every subgoal without ending the proof. *)
+                (case choose "reconstruction" false state ["done"] of
+                  SOME selected => continue selected
+                | NONE => fail "incomplete_obligation" "could not finish the solved obligation")
+              else
+                (case choose "heuristic" false state (values nodes "heuristics") of
+                  SOME selected => continue selected
+                | NONE =>
+                    let
+                      val budget = number nodes "hammer_timeout_s";
+                      val config = {provers = values nodes "provers", hammer_timeout = budget,
+                                    preplay_timeout = number nodes "preplay_timeout_s"};
+                      val returned = Unsynchronized.ref (NONE: (string list * (string * string) list) option);
+                      val found = attempt "hammer" "native Sledgehammer" 0 (fn () =>
+                        (returned := SOME (bounded (budget + #preplay_timeout config)
+                            (DSP_Sledgehammer.search (fn params => settings := params) config) state); state));
+                      val (candidates, params) =
+                        (case (found, !returned) of
+                          (SOME _, SOME result) => result
+                        | _ => fail "hammer_failure" "native Sledgehammer returned no executable reconstruction");
+                      val _ = settings := params;
+                    in
+                      (* Isabelle emits apply, not by, when more than one subgoal
+                         remains. Accept only strict progress, then solve the rest;
+                         the placeholder succeeds only when its entire obligation closes. *)
+                      (case choose "reconstruction" true state candidates of
+                        SOME selected => continue selected
+                      | NONE => fail "missing_reconstruction" "all native reconstructions failed to make progress")
+                    end)
+            end;
+      in solve initial [] end;
     fun check_proof_span span =
       let
         val proper = filter Token.is_proper span;
@@ -162,10 +193,9 @@ fun run driver_theory request_file result_file =
     fun proof_step span (state, chunks) =
       if check_proof_span span then
         let val (proof, next) = gap state
-            val _ = state_serial := !state_serial + 1
         in (ensure_real next, chunks @ [proof ^ "\n"]) end
       else
-        (ensure_real (execute "search" state span), chunks @ [implode (map Token.source_of span)]);
+        (ensure_real (execute "search" state span), chunks @ [source_text span]);
     fun work () =
       let
         val prefix = value nodes "prefix";

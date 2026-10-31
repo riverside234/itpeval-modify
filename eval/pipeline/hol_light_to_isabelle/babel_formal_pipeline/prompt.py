@@ -4,17 +4,17 @@ import re
 from dataclasses import dataclass
 
 
-DRAFT_PROMPT_VERSION = "babel_formal_v2_hol_light_to_isabelle_p1"
+DRAFT_PROMPT_VERSION = "babel_formal_v2_hol_light_to_isabelle_p2"
 
 SYSTEM_PROMPT = (
-    "You are an expert mathematician fluent in HOL Light and Isabelle/HOL. "
-    "Convert only the selected HOL Light proof into a mathematical proof draft "
-    "for a later Isabelle/HOL proof generator. Follow the source proof strategy "
-    "and preserve important intermediate claims. Use the proof-masked HOL Light "
-    "file for source definitions and facts, and the proof-masked Isabelle context "
-    "for exact target names, locale assumptions, and notation. Return numbered "
-    "mathematical proof steps only. Do not output HOL Light tactics, Isabelle "
-    "proof code, a complete theorem, or hidden reasoning."
+    "You are a mathematician fluent in HOL Light and Isabelle/HOL. Convert the "
+    "selected completed HOL Light proof into a mathematical proof draft that another "
+    "system can formalize in Isabelle/HOL without seeing the source proof. Preserve "
+    "the source argument and its necessary intermediate facts, expressed using the "
+    "exact target declaration's vocabulary and assumptions. Return only numbered "
+    "mathematical proof steps, each containing a claim and its justification. "
+    "Output the proof itself, without formal proof code or commentary about the "
+    "translation process."
 )
 
 
@@ -41,11 +41,11 @@ def build_draft_prompt(record: dict, *, dataset_label: str = "Babel Formal",
     prefix = record.get("isabelle_proof_prefix") or ""
     user = "\n\n".join([
         f"TARGET: {dataset_label} topic {record['topic']}, theorem {record['target_key']}.",
-        _section("ORACLE ISABELLE TARGET STATEMENT (conclusion only)",
+        _section("EXACT ORACLE ISABELLE DECLARATION (goal and hypotheses)",
                  _required(record, "isabelle_statement")),
         _section("PROOF-MASKED ISABELLE CONTEXT BEFORE TARGET",
                  _required(record, "isabelle_context_before_target")),
-        _section("ISABELLE TARGET PROOF PREFIX (preserve if present)",
+        _section("ISABELLE PROOF PREFIX ALREADY PRESENT (if any)",
                  prefix if prefix else "(none)"),
         _section("HOL LIGHT TARGET STATEMENT",
                  _required(record, "hol_light_statement")),
@@ -54,33 +54,44 @@ def build_draft_prompt(record: dict, *, dataset_label: str = "Babel Formal",
         _section("COMPLETE PROOF-MASKED HOL LIGHT REFERENCE FILE",
                  _required(record, "hol_light_reference_context")),
         "DRAFT REQUIREMENTS\n"
-        "- Read the entire selected proof before writing the draft. Translate only "
-        "that proof; the other theorems in the reference file supply definitions "
-        "and helper statements, not proof bodies.\n"
-        "- Follow the source strategy and order. State the mathematical effect of "
-        "quantifier introduction, assumptions, conjunct extraction, rewriting, "
-        "instantiation, witnesses, case splits, and induction.\n"
-        "- If the source uses REPEAT GEN_TAC or DISCH_THEN, identify the introduced "
-        "variables and assumptions. If it selects a conjunct through CONJUNCT1, "
-        "CONJUNCT2, CONJUNCTS, or List.nth, state that conjunct. If it uses "
-        "REWRITE_TAC, MATCH_MP_TAC, SPEC/SPECL, EXISTS_TAC, or ACCEPT_TAC, "
-        "state the resulting claim rather than only naming the tactic.\n"
-        "- HOL Light may pass operations as explicit parameters while Isabelle "
-        "fixes them in a locale. Treat the oracle Isabelle statement and locale "
-        "as authoritative; use their variable names, notation, and assumptions.\n"
-        "- Use exact Isabelle helper and definition names when present in the "
-        "target context. For source-only helpers, such as dest_integral, state "
-        "the extracted mathematical fact instead of inventing an Isabelle name.\n"
-        "- State the useful instantiated equations and hypotheses explicitly. "
-        "Do not invent a different proof or cite later target theorems.\n"
-        "- Treat every sorry placeholder as unavailable proof evidence.\n"
-        "- Do not force brevity; include all intermediate facts useful to the "
-        "later proof generator and omit routine syntax-only moves.\n"
-        "- Use plain inline identifiers and formulas, not LaTeX commands, "
-        "display math, HTML escapes, or invented Isabelle notation.\n"
-        "- Do not output executable Isabelle proof commands or source-language "
-        "tactic code. End by establishing the oracle Isabelle conclusion.\n"
-        "- Output only sections headed ### Step 1, ### Step 2, and so on.",
+        "- Translate only the selected proof. Use the full proof-masked source file "
+        "to interpret relevant definitions and helper statements. Its masked copy "
+        "of the selected theorem is the goal, not a premise.\n"
+        "- The exact Isabelle declaration and preceding context determine the goal, "
+        "types, quantifiers, fixed parameters, assumptions, and notation. Account "
+        "for any supplied proof prefix. Do not add assumptions, weaken the conclusion, "
+        "or treat the theorem's own name as an available fact.\n"
+        "- Match source and target objects by mathematical meaning. HOL Light may "
+        "pass operations explicitly where Isabelle fixes them in a locale. Explain "
+        "any necessary change of representation or definition unfolding; matching "
+        "names alone do not establish equivalence. Use target variable names where "
+        "they express the same objects, and make other substitutions explicit.\n"
+        "- Preserve the source strategy, logical dependencies, case splits, induction "
+        "variable and hypotheses, contradiction assumptions, witnesses, and useful "
+        "intermediate equations. Omit bookkeeping that has no mathematical effect.\n"
+        "- When the source selects a conjunct, rewrites a term, or instantiates a "
+        "helper, state the actual clause or resulting formula and the substitution "
+        "used. Give the premises that make each application valid, including relevant "
+        "side conditions, domains, bounds, and nonzero or positivity requirements.\n"
+        "- Each step should give one principal mathematical claim and explain why "
+        "it follows from definitions, assumptions, earlier steps, or an applicable "
+        "helper fact. A helper's name alone is insufficient: state the instance used. "
+        "For source automation, describe the established claim and supporting facts "
+        "without inventing an internal derivation or narrating tactic calls.\n"
+        "- Cite exact Isabelle helper names only when their statements support the "
+        "application. For a source-only helper, state the needed mathematical fact "
+        "and how it relates to the target definitions or assumptions, without "
+        "inventing an Isabelle counterpart or a missing helper proof. Earlier "
+        "masked Isabelle helper statements are available background facts; their "
+        "sorry placeholders provide no proof details. Do not cite later target facts.\n"
+        "- Do not force brevity or a fixed number of steps. Include the facts and "
+        "justifications needed to reconstruct this argument; a short source proof "
+        "does not need artificial intermediate steps or an alternative strategy.\n"
+        "- Use readable mathematical prose and inline formulas with the supplied "
+        "identifiers and notation. Do not use LaTeX commands, display math, HTML "
+        "escapes, invented notation, tactic transcripts, or executable proof code.\n"
+        "- Output only sections headed ### Step 1, ### Step 2, and so on. The final "
+        "step must derive the exact oracle conclusion from the preceding argument.",
     ])
     return Prompt(SYSTEM_PROMPT, user, version)
 

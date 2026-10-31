@@ -17,6 +17,7 @@ from ..common import fingerprint, repo_path, repository_commit
 
 NATIVE_DIR = Path(__file__).resolve().parent / "native"
 RUNTIME_DIR = "itpeval/.runs/isabelle2026-native"
+PROC_ROOT = Path("/proc")
 
 
 def hash_file(path: Path) -> str:
@@ -198,23 +199,27 @@ class DspConfig:
 class OwnedProcess:
     """One process group with a shared deadline; never kill by executable name."""
     def __init__(self, command: list[str], *, directory: Path, env: dict, log_path: Path,
-                 timeout_s: float, deadline: float):
+                 timeout_s: float, deadline: float, ready_path: Path | None = None,
+                 startup_timeout_s: float | None = None):
         self.command, self.directory, self.env, self.log_path = command, directory, env, log_path
-        self.timeout = min(timeout_s, deadline - time.monotonic())
+        self.timeout, self.deadline = timeout_s, deadline
+        if (ready_path is None) != (startup_timeout_s is None):
+            raise ValueError("worker readiness path and startup timeout must be supplied together")
+        self.ready_path, self.startup_timeout = ready_path, startup_timeout_s
         self.process = None
         self.owned_processes = {}
 
     @staticmethod
     def process_identity(pid):
         try:
-            data = (Path("/proc") / str(pid) / "stat").read_text()
+            data = (PROC_ROOT / str(pid) / "stat").read_text()
             parts = data[data.rfind(")") + 2:].split()
             return {"start_ticks": parts[19], "group": int(parts[2])}
         except (OSError, ValueError, IndexError):
             return None
 
     def capture_owned(self):
-        if self.process is None or not Path("/proc").is_dir():
+        if self.process is None or not PROC_ROOT.is_dir():
             return
         pending = [self.process.pid, *self.owned_processes]
         seen = set()
@@ -229,10 +234,17 @@ class OwnedProcess:
                 continue
             self.owned_processes[pid] = current
             try:
-                children = (Path("/proc") / str(pid) / "task" / str(pid) / "children").read_text()
-                pending.extend(int(child) for child in children.split())
-            except (OSError, ValueError):
-                pass
+                tasks = list((PROC_ROOT / str(pid) / "task").iterdir())
+            except OSError:
+                continue
+            # Linux records children per thread. Scala/ML workers can fork from
+            # a non-leader thread, so inspecting task/<pid>/children misses them.
+            for task in tasks:
+                try:
+                    children = (task / "children").read_text()
+                    pending.extend(int(child) for child in children.split())
+                except (OSError, ValueError):
+                    pass
 
     def close(self):
         if self.process is None:
@@ -246,8 +258,11 @@ class OwnedProcess:
             for sig in (signal.SIGTERM, getattr(signal, "SIGKILL", 9)):
                 # ATP/ML workers can start their own groups. Track descendants and
                 # start times so cleanup cannot signal an unrelated recycled PID.
-                live = {pid: identity for pid, identity in self.owned_processes.items()
-                        if self.process_identity(pid) == identity}
+                live = {}
+                for pid, identity in self.owned_processes.items():
+                    current = self.process_identity(pid)
+                    if current is not None and current["start_ticks"] == identity["start_ticks"]:
+                        live[pid] = current  # A child may have entered a new process group.
                 groups = {pid for pid, identity in live.items() if identity["group"] == pid}
                 if not self.owned_processes or any(identity["group"] == self.process.pid for identity in live.values()):
                     groups.add(self.process.pid)
@@ -273,8 +288,12 @@ class OwnedProcess:
                 json.dumps(self.owned_processes, indent=2) + "\n", encoding="utf-8")
 
     def run(self) -> int:
-        if self.timeout <= 0:
+        started = time.monotonic()
+        expires = min(started + self.timeout, self.deadline)
+        if expires <= started:
             raise TimeoutError("native whole-target deadline exceeded")
+        startup_expires = (min(expires, started + self.startup_timeout)
+                           if self.startup_timeout is not None else None)
         self.directory.mkdir(parents=True, exist_ok=True)
         kwargs = {"start_new_session": True} if os.name != "nt" else {
             "creationflags": subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW}
@@ -282,12 +301,19 @@ class OwnedProcess:
             with self.log_path.open("w", encoding="utf-8") as log:
                 self.process = subprocess.Popen(self.command, cwd=self.directory, env=self.env,
                                                 stdout=log, stderr=subprocess.STDOUT, **kwargs)
-                expires = time.monotonic() + self.timeout
                 while True:
                     self.capture_owned()
-                    remaining = expires - time.monotonic()
+                    now = time.monotonic()
+                    remaining = expires - now
                     if remaining <= 0:
                         raise TimeoutError("native build deadline exceeded; inspect " + str(self.log_path))
+                    if startup_expires is not None:
+                        if self.ready_path.is_file():
+                            startup_expires = None
+                        elif now >= startup_expires:
+                            raise TimeoutError("native worker startup deadline exceeded; inspect " + str(self.log_path))
+                        else:
+                            remaining = min(remaining, startup_expires - now)
                     try:
                         return self.process.wait(timeout=min(0.25, remaining))
                     except subprocess.TimeoutExpired:

@@ -46,7 +46,7 @@ def preflight(record: dict, *, config: DspConfig, controls: bool = True,
             def control(proof, **options):
                 return control_record(proof, source=record["source"], sketch_source=sketch_source, **options)
             good = checker.check(control("by simp"), backend_metadata=backend)
-            hammer = checker.check(control("proof -\n show True\n sledgehammer\nqed"),
+            hammer = checker.check(control('proof -\n show "True"\n sledgehammer\nqed'),
                                     force_hammer=True, backend_metadata=backend)
             bad = checker.check(control("by (v2_missing_negative_control_method)"), backend_metadata=backend)
             admitted = checker.check(control("proof -\n sorry\nqed"), backend_metadata=backend)

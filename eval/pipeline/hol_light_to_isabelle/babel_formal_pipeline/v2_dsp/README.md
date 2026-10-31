@@ -15,6 +15,31 @@ from its normalized artifacts. GPT API and Qwen/vLLM remain selectable with
 `--sketch-llm-config`. Only visible final response content is stored.
 The separate `v2_itpeval` pipeline continues to use its Isabelle2024 configuration.
 
+## Prompt contracts and revisions
+
+Both datasets use the same instructions with dataset-specific prompt versions:
+
+| Stage | Input and expected output | Current version suffix |
+| --- | --- | --- |
+| Draft | Completed selected HOL Light proof, masked source reference and oracle context -> mathematical claims with justifications in target vocabulary | `hol_light_to_isabelle_p2` |
+| Draft to Sketch | Saved mathematical Draft and oracle context -> Isabelle Isar proof body | `isabelle2026_draft_p3` |
+| Direct to Sketch | Completed selected HOL Light proof, masked source reference and oracle context -> Isabelle Isar proof body | `isabelle2026_direct_p2` |
+
+The Draft explains instantiated helper facts, substitutions, and side conditions.
+Both Sketch prompts preserve that argument and use the same rules for available
+facts, proof prefixes, local claims, and standalone `sledgehammer` gaps. Earlier
+masked helper statements are available background; the selected target and later
+declarations cannot justify the target. There is no brevity or step-count target.
+The shared Draft builder also supplies newly generated Drafts to `v2_itpeval`.
+
+Rerun `generate_draft` on the extracted records to use the revised Draft prompt,
+then run saved-Draft mode with that output. The DSP runner consumes saved Drafts
+and does not regenerate them. Direct mode uses the revised prompt on its next
+Sketch generation. Prompt versions and hashes prevent generation from reusing
+old prompt outputs; `--skip-sketch` deliberately uses the saved Sketch instead.
+Use separate output paths to compare prompt revisions, and add `--dry-run` to
+the generation command to inspect the prompt before inference.
+
 ## Install and configure on the lab computer
 
 Use the existing Python >=3.10 ITPEval conda environment. Install the official
@@ -175,15 +200,28 @@ native Sledgehammer. ATP reconstructions require a native `Played` result.
 Isabelle2026's integrated tactic provers return an already executed command
 with no separate preplay list; their structured sendback is also supported.
 Serialization enables PIDE markup locally so batch mode cannot discard the
-sendback wrapper. Every candidate must execute from the saved proof state and
-actually close the pending obligation, including `using ... by ...`.
+sendback wrapper. Every candidate executes from the saved proof state. When
+Isabelle returns `apply` for one of several subgoals, reconstruction requires a
+strict reduction in remaining goals and continues until the entire obligation
+closes. Zero remaining goals are finished with `done` when needed. Partial
+progress never counts as a completed gap or target. Executable proof text uses
+`Token.unparse` to preserve quoted terms, cartouches and comments.
 The reconstructed target must close its original scopes, and a fresh
 `isabelle build` of the resulting theory must succeed without search helpers.
 
 `prove_success` records search completion; `verified` and `replay_verified`
 require fresh replay. Interruptions/timeouts abort the isolated job.
 Startup, method, hammer, preplay and replay budgets are capped by the whole-target
-deadline. Cleanup targets owned process groups/descendants only.
+deadline. `startup_timeout_s` applies separately to infrastructure compilation
+and to worker startup/import loading, ending when that request's readiness
+marker appears. Cleanup tracks children from every Linux thread and checks
+process start times before signaling owned descendants.
+
+The [2026-10-31 prover review](PROVER_REVIEW.md) records the source comparison,
+fixed bugs, and native regression cases. The checker version is
+`dsp_isabelle2026_native_p2`; adapter and checker changes invalidate old
+verification caches. Preflight now includes a quoted goal to exercise proof
+serialization and fresh replay.
 
 Resume fingerprints include consumed text (the direct source proof/reference
 or saved Draft), target context, model/profile, native adapter, release/session

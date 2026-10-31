@@ -26,6 +26,9 @@ local
         (DSP_Sledgehammer.sendbacks (YXML.parse_body plain));
       val _ = expect "played command survives batch mode" (["by simp"], "preplayed")
         (DSP_Sledgehammer.reconstructions 1 (Sledgehammer.SH_Some (external, [played])));
+      val _ = expect "multi-subgoal preplay retains the apply command"
+        (["apply simp"], "preplayed")
+        (DSP_Sledgehammer.reconstructions 2 (Sledgehammer.SH_Some (external, [played])));
       val _ = expect "already executed tactic has no separate preplay" (["by simp"], "native_tactic")
         (DSP_Sledgehammer.reconstructions 1 (Sledgehammer.SH_Some (tactic, [])));
       val _ = expect "native using command retains its local facts"
@@ -42,6 +45,16 @@ local
           (Sledgehammer.SH_Some (tactic, [(Simp_Method, (Play_Timed_Out Time.zeroTime, []))])));
       val _ = expect "native failure yields no reconstruction" ([], "none")
         (DSP_Sledgehammer.reconstructions 1 Sledgehammer.SH_None);
+      val keywords = Thy_Header.get_keywords \<^theory>;
+      val quoted = "have h: \"True\" (* keep comment *)\n  by simp";
+      val quote_tokens = Token.explode keywords Position.start quoted;
+      val _ = expect "old source_of representation loses string delimiters" true
+        (String.isSubstring Symbol.DEL (implode (map Token.source_of quote_tokens)));
+      val _ = expect "quoted terms and comments survive executable serialization" quoted
+        (DSP_Native.source_text quote_tokens);
+      val cartouched = "have h: " ^ cartouche "True" ^ "\n  by simp";
+      val _ = expect "cartouche delimiters survive executable serialization" cartouched
+        (DSP_Native.source_text (Token.explode keywords Position.start cartouched));
       val _ = expect "serialization restores the caller's print mode" false
         (Print_Mode.PIDE_enabled ());
     in () end;

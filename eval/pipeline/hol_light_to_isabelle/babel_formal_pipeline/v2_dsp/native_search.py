@@ -102,12 +102,14 @@ class NativeSearch:
         return command + ["-d", str(directory), session]
 
     def run_build(self, directory: Path, session: str, *, timeout_s: float, deadline: float,
-                  parent_dir=None, heap=False) -> int:
+                  parent_dir=None, heap=False, ready_path: Path | None = None) -> int:
         command = self.build_command(directory, session, parent_dir=parent_dir, heap=heap)
         (directory / "command.json").write_text(json.dumps(command, indent=2) + "\n", encoding="utf-8")
+        startup = ({} if ready_path is None else
+                   {"ready_path": ready_path, "startup_timeout_s": self.config.startup_timeout_s})
         return self.process_factory(command, directory=directory, env=self.config.environment(),
                                     log_path=directory / "build.log", timeout_s=timeout_s,
-                                    deadline=deadline).run()
+                                    deadline=deadline, **startup).run()
 
     def infrastructure(self, *, deadline: float) -> tuple[Path, str]:
         identity = fingerprint({"adapter": adapter_hashes(), "base_session": self.config.base_session})[:16]
@@ -181,8 +183,13 @@ class NativeSearch:
             dependencies = "  sessions " + " ".join(quote(x) for x in self.config.session_dependencies) + "\n"
         (directory / "ROOT").write_text('session ' + session + ' = ' + parent_session +
             ' +\n  options [document = false]\n' + dependencies + '  theories DSP_Driver\n', encoding="utf-8")
+        # A request-specific marker separates worker/session startup from proof search.
+        ready_name = "ready-" + request["request_id"]
         driver = ('theory DSP_Driver imports DSP_Native ' + " ".join(quote(x) for x in imports) +
-                  '\nbegin\n' + r'ML \<open>DSP_Native.run \<^theory> "request.xml" "result.xml"\<close>' + '\nend\n')
+                  '\nbegin\n' + r'ML \<open>' + '\n' +
+                  'val _ = File.write (Path.explode "' + ready_name + '") "ready";\n' +
+                  r'val _ = DSP_Native.run \<^theory> "request.xml" "result.xml";' + '\n' +
+                  r'\<close>' + '\nend\n')
         (directory / "DSP_Driver.thy").write_text(driver, encoding="utf-8")
         (directory / "line_mapping.json").write_text(json.dumps({
             "original_prefix_lines": context.prefix.count("\n") + 1,
@@ -191,7 +198,7 @@ class NativeSearch:
             "note": "native attempt line numbers are relative to the recorded source section; offsets count Isabelle symbols",
         }, indent=2) + "\n", encoding="utf-8")
         code = self.run_build(directory, session, timeout_s=max(0.001, deadline-time.monotonic()),
-                              deadline=deadline, parent_dir=parent_dir)
+                              deadline=deadline, parent_dir=parent_dir, ready_path=directory / ready_name)
         result = read_result(directory / "result.xml", request, returncode=code)
         result["search_directory"] = str(directory)
         return result

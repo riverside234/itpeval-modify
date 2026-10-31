@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -96,6 +97,82 @@ class RuntimeTests(unittest.TestCase):
             process.run()
         popen.assert_not_called()
 
+
+    def test_deadline_is_checked_when_run_starts_not_when_process_is_constructed(self):
+        with patch(MODULE + "time.monotonic", return_value=0):
+            process = OwnedProcess([], directory=self.path, env={}, log_path=self.path / "log",
+                                   timeout_s=20, deadline=5)
+        with patch(MODULE + "time.monotonic", return_value=6), patch(
+                MODULE + "subprocess.Popen") as popen, self.assertRaises(TimeoutError):
+            process.run()
+        popen.assert_not_called()
+
+    def test_worker_startup_timeout_aborts_before_whole_target_timeout(self):
+        process = OwnedProcess(["worker"], directory=self.path, env={}, log_path=self.path / "log",
+                               timeout_s=20, deadline=20, ready_path=self.path / "ready",
+                               startup_timeout_s=1)
+        worker = Mock()
+        worker.wait.side_effect = subprocess.TimeoutExpired("worker", 0.25)
+        with patch(MODULE + "time.monotonic", side_effect=[0, 0.1, 1.1]), patch(
+                MODULE + "subprocess.Popen", return_value=worker), patch.object(
+                process, "capture_owned"), patch.object(process, "close") as close:
+            with self.assertRaisesRegex(TimeoutError, "startup deadline"):
+                process.run()
+        self.assertEqual(1, worker.wait.call_count)
+        close.assert_called_once()
+
+    def test_ready_worker_can_search_beyond_startup_budget(self):
+        ready = self.path / "ready"
+        process = OwnedProcess(["worker"], directory=self.path, env={}, log_path=self.path / "log",
+                               timeout_s=20, deadline=20, ready_path=ready, startup_timeout_s=1)
+        worker = Mock()
+        def wait(**kwargs):
+            if not ready.exists():
+                ready.write_text("ready")
+                raise subprocess.TimeoutExpired("worker", kwargs["timeout"])
+            return 0
+        worker.wait.side_effect = wait
+        with patch(MODULE + "time.monotonic", side_effect=[0, 0.1, 2]), patch(
+                MODULE + "subprocess.Popen", return_value=worker), patch.object(
+                process, "capture_owned"), patch.object(process, "close"):
+            self.assertEqual(0, process.run())
+
+    def test_children_of_nonleader_threads_are_tracked_recursively(self):
+        proc = self.path / "proc"
+        def task(pid, tid, children):
+            folder = proc / str(pid) / "task" / str(tid)
+            folder.mkdir(parents=True, exist_ok=True)
+            (folder / "children").write_text(children)
+        def stat(pid, group):
+            fields = ["S", "1", str(group)] + ["0"] * 16 + [str(pid * 10)]
+            (proc / str(pid) / "stat").write_text(f"{pid} (worker) " + " ".join(fields))
+        task(713, 713, "")
+        task(713, 720, "800")
+        task(800, 800, "801")
+        task(801, 801, "")
+        task(999, 999, "")  # Unrelated process must not be discovered.
+        for pid in (713, 800, 801, 999):
+            stat(pid, pid)
+        process = OwnedProcess([], directory=self.path, env={}, log_path=self.path / "log",
+                               timeout_s=1, deadline=1)
+        process.process = Mock(pid=713)
+        with patch(MODULE + "PROC_ROOT", proc):
+            process.capture_owned()
+        self.assertEqual({713, 800, 801}, set(process.owned_processes))
+
+    def test_cleanup_retains_owned_child_that_changed_process_group(self):
+        process = OwnedProcess([], directory=self.path, env={}, log_path=self.path / "log",
+                               timeout_s=1, deadline=1)
+        process.process = Mock(pid=713)
+        process.owned_processes = {713: {"start_ticks": "1", "group": 713},
+                                   714: {"start_ticks": "2", "group": 713}}
+        current = {713: process.owned_processes[713], 714: {"start_ticks": "2", "group": 714}}
+        fake_os = SimpleNamespace(name="posix", killpg=Mock(), kill=Mock())
+        with patch(MODULE + "os", fake_os), patch.object(process, "capture_owned"), patch.object(
+                process, "process_identity", side_effect=current.get):
+            process.close()
+        self.assertEqual({713, 714}, {call.args[0] for call in fake_os.killpg.call_args_list})
+        fake_os.kill.assert_not_called()
 
     def test_descendant_groups_are_owned_and_recycled_pids_are_ignored(self):
         process = OwnedProcess([], directory=self.path, env={}, log_path=self.path / "log",

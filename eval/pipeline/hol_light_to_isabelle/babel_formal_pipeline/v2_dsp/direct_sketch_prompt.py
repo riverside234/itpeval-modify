@@ -1,26 +1,25 @@
 """Translate one completed HOL Light proof directly into an Isabelle2026 sketch."""
 from ..prompt import Prompt
 from .input_contract import input_metadata, require_text
+from .sketch_prompt import ISABELLE_OUTPUT_RULES, ISABELLE_PROOF_REQUIREMENTS
 
-DIRECT_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_direct_p1"
+DIRECT_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_direct_p2"
 SYSTEM_PROMPT = (
-    "You are a HOL Light and Isabelle/HOL proof engineer. Translate the selected completed "
-    "HOL Light proof directly into one Isabelle2026 Isar proof body for the exact oracle "
-    "declaration in its original theory/locale context. Preserve the source strategy and "
-    "necessary intermediate claims, cases, witnesses and induction hypotheses. The source "
-    "reference contains only definitions and proof-masked helper statements. Source theorem "
-    "names need not exist in Isabelle: use the supplied target vocabulary and available facts. "
-    "Return only the proof body, starting with by or proof. Use standalone sledgehammer "
-    "commands for unresolved obligations; a native prover will replace each with a checked "
-    "proof. Never output a mathematical draft, theory header, repeated declaration, "
-    "commentary, admissions, new axioms, ML, setup commands or hidden reasoning."
+    "You are a proof engineer fluent in HOL Light and Isabelle/HOL. Translate the "
+    "selected completed HOL Light proof directly into an Isabelle proof, preserving "
+    "its mathematical strategy and necessary intermediate facts. Translate the "
+    "mathematical effect of source proof operations into target claims and "
+    "justifications. " + ISABELLE_OUTPUT_RULES + " Do not output an informal draft "
+    "or commentary about the translation."
 )
 
 
 def build_direct_sketch_prompt(record: dict) -> Prompt:
     input_metadata(record, "hol-light-proof")
+
     def section(title, field):
         return title + "\n~~~\n" + require_text(record, field) + "\n~~~"
+
     user = "\n\n".join([
         "TARGET: " + record["topic"] + "/" + record["isabelle_target_name"],
         section("AVAILABLE ISABELLE CONTEXT BEFORE TARGET", "isabelle_context_before_target"),
@@ -30,14 +29,23 @@ def build_direct_sketch_prompt(record: dict) -> Prompt:
         section("SELECTED HOL LIGHT STATEMENT", "hol_light_statement"),
         section("SELECTED COMPLETED HOL LIGHT PROOF TO TRANSLATE", "hol_light_proof"),
         section("COMPLETE PROOF-MASKED HOL LIGHT REFERENCE", "hol_light_reference_context"),
-        "Follow only the selected proof. Use the reference only for relevant definitions and "
-        "helper statements. Treat the oracle statement, fixed locale parameters, notation and "
-        "hypotheses as authoritative. Express useful intermediate claims using have/show. "
-        "Do not assume source tactic or helper names exist in Isabelle. Do not cite later "
-        "target declarations. For an unresolved pending obligation put sledgehammer on its "
-        "own line, with no parameters; never write by sledgehammer. Structured proofs must "
-        "finish with qed. Never use sorry, oops, admit, normalhammer, executable ML or extra "
-        "axioms. Include all useful reasoning; there is no brevity constraint. Return only "
-        "the target Isar proof body.",
+        "TRANSLATION REQUIREMENTS\n"
+        "- Translate only the selected proof. Use the masked source reference for "
+        "relevant definitions and helper statements, not as additional proof bodies. "
+        "Its masked copy of the selected theorem is not a premise.\n"
+        "- Align source and target objects by their mathematical meaning, not just "
+        "their names. Map explicit HOL Light parameters to the corresponding "
+        "Isabelle locale parameters and account for any representation differences "
+        "using the supplied definitions and assumptions.\n"
+        "- Turn introductions, conjunct selection, rewrites, and helper applications "
+        "into the actual instantiated claims and subgoals. Preserve the source "
+        "argument's logical dependencies rather than transcribing tactic names. "
+        "For source automation, expose the claim and supporting facts without "
+        "inventing its internal derivation.\n"
+        "- Justify each helper application with the required premises. When a "
+        "source-only helper is needed, formulate its mathematical instance in the "
+        "target vocabulary and establish it locally; do not assume a theorem with "
+        "the same name exists in Isabelle.",
+        ISABELLE_PROOF_REQUIREMENTS,
     ])
     return Prompt(SYSTEM_PROMPT, user, DIRECT_PROMPT_VERSION)

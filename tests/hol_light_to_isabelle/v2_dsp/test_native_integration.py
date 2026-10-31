@@ -39,11 +39,13 @@ class NativeIntegrationTests(unittest.TestCase):
     def test_native_tactic_without_separate_preplay_is_executed_and_replayed(self):
         config = replace(self.config, provers=("simp",))
         proof = "proof -\n show True\n sledgehammer\nqed"
-        result = Checker(config).check(control_record(proof), force_hammer=True,
-                                       backend_metadata=config.metadata())
+        row = control_record(proof, extra_context="sledgehammer_params [falsify = true, abduce = 1]\n")
+        result = Checker(config).check(row, force_hammer=True, backend_metadata=config.metadata())
         self.assertTrue(result["verified"], result["verify_error"])
         settings = result["prover_settings"]
         self.assertEqual("native_tactic", settings["reconstruction_source"])
+        self.assertIn("falsify = SOME false", " ".join(settings["native_parameters"].split()))
+        self.assertIn("abduce = SOME 0", settings["native_parameters"])
         self.assertEqual("0", settings["preplay_count"])
         self.assertGreater(int(settings["candidate_count"]), 0)
         self.assertTrue(any(row["mode"] == "reconstruction" and row["success"]
@@ -76,6 +78,50 @@ class NativeIntegrationTests(unittest.TestCase):
             result = Checker(self.config).check(control_record(proof, sketch_source=mode), backend_metadata=self.backend)
             self.assertTrue(result["verified"], result["verify_error"])
             self.assertNotIn("sledgehammer", result["isabelle_proof"])
+
+    def test_multiple_subgoals_and_quoted_terms_are_reconstructed_and_replayed(self):
+        config = replace(self.config, provers=("simp",))
+        proof = ('proof -\n have both: "True \\<and> True"\n'
+                 '  apply (rule conjI)\n  sledgehammer\n'
+                 ' from both show "True" by simp\nqed')
+        result = Checker(config).check(control_record(proof), force_hammer=True,
+                                       backend_metadata=config.metadata())
+        self.assertTrue(result["verified"], result["verify_error"])
+        self.assertIn('"True \\<and> True"', result["isabelle_proof"])
+        self.assertNotIn("\x7f", result["isabelle_proof"])
+        steps = [step for step in result["step_results"]
+                 if step["mode"] == "reconstruction" and step["success"]]
+        self.assertGreaterEqual(len(steps), 2)
+        self.assertTrue(any(step["command"].lstrip().startswith("apply") for step in steps))
+        self.assertTrue(result["replay_verified"])
+
+    def test_partial_reconstruction_cannot_admit_the_remaining_subgoal(self):
+        config = replace(self.config, provers=("simp",))
+        proof = ('proof -\n have impossible: "True \\<and> False"\n'
+                 '  apply (rule conjI)\n  sledgehammer\n'
+                 ' then show "True" by simp\nqed')
+        result = Checker(config).check(control_record(proof), force_hammer=True,
+                                       backend_metadata=config.metadata())
+        self.assertFalse(result["verified"])
+        self.assertFalse(result["prove_success"])
+        self.assertNotIn("native_replay", result)
+        self.assertTrue(any(step["mode"] == "reconstruction" and step["success"]
+                            for step in result["step_results"]))
+
+    def test_local_blocks_short_proofs_and_local_definition_commands(self):
+        proofs = [
+            'proof -\n { have "True" .. }\n then show "True" .\nqed',
+            'proof -\n define t where "t = True"\n'
+            ' have ht: t unfolding t_def by simp\n'
+            ' consider t using ht by blast\n then show True by cases simp\nqed',
+            'proof -\n show "True"\n subgoal by simp\n done\nqed',
+            'proof -\n show "True"\n apply simp\n sledgehammer\nqed',
+        ]
+        for proof in proofs:
+            with self.subTest(proof=proof):
+                result = Checker(self.config).check(control_record(proof), backend_metadata=self.backend)
+                self.assertTrue(result["verified"], result["verify_error"])
+                self.assertNotIn("\x7f", result["isabelle_proof"])
 
     def test_unavailable_prover_and_timeout_cannot_pass(self):
         proof = "proof -\n show True\n sledgehammer\nqed"
