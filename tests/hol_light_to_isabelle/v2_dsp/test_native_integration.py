@@ -170,6 +170,17 @@ class NativeIntegrationTests(unittest.TestCase):
                 self.assertTrue(result["verified"], result["verify_error"])
                 self.assertTrue(result["replay_verified"])
 
+    def test_hundred_rsum_bound_original_context_imports(self):
+        """Real import graph + 153 masked helpers; no model or target proof supplied."""
+        from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.extract_hol_light import extract_records as hundred
+        config = replace(self.config, theory_imports={**self.config.theory_imports,
+            "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+            "Tagged_Division": "HOL-Analysis.Tagged_Division"})
+        record = hundred(topic="015_the_fundamental_theorem_of_integral_calculus", target_key="rsum_bound")[0]
+        result = Checker(config).check_context(record, backend_metadata=config.metadata())
+        self.assertTrue(result["baseline_ok"], result)
+        self.assertIn("HOL-Analysis", result["native_result"]["import_resolution"]["session_dependencies"])
+
     def test_fresh_replay_error_is_not_search_success(self):
         from eval.pipeline.hol_light_to_isabelle.v2_dsp.native_search import NativeSearch
         class CorruptedReplay(NativeSearch):

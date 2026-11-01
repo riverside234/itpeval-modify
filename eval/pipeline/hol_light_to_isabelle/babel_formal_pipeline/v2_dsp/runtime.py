@@ -10,7 +10,7 @@ import shlex
 import signal
 import subprocess
 import time
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
 
 from ..common import fingerprint, repo_path, repository_commit
@@ -45,6 +45,8 @@ class DspConfig:
     base_session: str = "HOL"
     session_roots: tuple[str, ...] = ()
     session_dependencies: tuple[str, ...] = ()
+    # Resolve relocated bare imports to the same theory in its owning session.
+    theory_imports: dict[str, str] = field(default_factory=dict)
     threads: int = 4
     provers: tuple[str, ...] | None = None
     startup_timeout_s: float = 120
@@ -71,6 +73,13 @@ class DspConfig:
         for name in [self.base_session, *self.session_dependencies]:
             if not re.fullmatch(r"[A-Za-z_][A-Za-z_0-9.+-]*", name):
                 raise ValueError("invalid session name")
+        if not isinstance(self.theory_imports, dict):
+            raise ValueError("theory_imports must map bare theory names to session-qualified names")
+        for original, qualified in self.theory_imports.items():
+            if (not isinstance(original, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]*", original)
+                    or not isinstance(qualified, str) or not re.fullmatch(
+                        r"[A-Za-z_][A-Za-z_0-9.+-]*\." + re.escape(original), qualified)):
+                raise ValueError("theory_imports may only qualify a bare name without changing its basename")
         if self.provers is not None and (not isinstance(self.provers, (tuple, list)) or not self.provers
                 or any(not isinstance(x, str) or not re.fullmatch(r"[A-Za-z_0-9-]+", x) for x in self.provers)):
             raise ValueError("provers must be null (native defaults) or a nonempty list of names")

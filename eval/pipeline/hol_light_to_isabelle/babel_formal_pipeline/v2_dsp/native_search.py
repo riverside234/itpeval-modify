@@ -19,12 +19,13 @@ RESULT_VERSION = "dsp_native_result_v1"
 
 
 class NativeFailure(RuntimeError):
-    def __init__(self, category: str, message: str):
+    def __init__(self, category: str, message: str, *, details: dict | None = None):
         super().__init__(message)
         self.category = category
+        self.details = details or {}
 
 
-def imports_of(prefix: str) -> list[str]:
+def import_tokens(prefix: str) -> list:
     items = tokens(prefix)
     start = next((i + 1 for i, t in enumerate(items) if t.kind == "word" and t.text == "imports"), None)
     if start is None:
@@ -35,7 +36,59 @@ def imports_of(prefix: str) -> list[str]:
     if not imports or any(not re.fullmatch(r"[A-Za-z_0-9./+-]+", name) or ".." in name.split("/")
                           or name.startswith("/") for name in imports):
         raise ValueError("unsupported import; configure a compatible named session dependency")
-    return imports
+    return items[start:end]
+
+
+def imports_of(prefix: str) -> list[str]:
+    return [item.text.strip('"') for item in import_tokens(prefix)]
+
+
+def resolve_imports(source: str, config: DspConfig, *, theory_name: str) -> tuple[str, dict]:
+    """Qualify configured imports only; never import a replacement target theory."""
+    items = import_tokens(source)
+    original = [item.text.strip('"') for item in items]
+    resolved = [config.theory_imports.get(name, name) for name in original]
+    if any(name.split("/")[-1].rsplit(".", 1)[-1] == theory_name for name in resolved):
+        raise NativeFailure("context_error", "cannot import the selected target theory into native search or replay")
+    sessions = list(config.session_dependencies)
+    for name in resolved:
+        # Dotted theory names identify their owning session. File paths and
+        # global names such as Main do not. Isabelle resolves the transitive graph.
+        if "/" not in name and "." in name and not name.endswith(".thy"):
+            session = name.rsplit(".", 1)[0]
+            if session != config.base_session and session not in sessions:
+                sessions.append(session)
+    # Token offsets preserve comments, original line numbers and all declarations.
+    # Apply to the complete generated replay only after the original proof spans
+    # have been used; the stored dataset template/hashes are never edited.
+    for item, before, after in reversed(list(zip(items, original, resolved))):
+        if before != after:
+            source = source[:item.start] + quote(after) + source[item.end:]
+    return source, {"original_imports": original, "resolved_imports": resolved,
+                    "session_dependencies": sessions}
+
+
+def session_clause(resolution: dict) -> str:
+    sessions = resolution["session_dependencies"]
+    return "  sessions " + " ".join(quote(name) for name in sessions) + "\n" if sessions else ""
+
+
+def build_diagnostics(directory: Path, returncode: int) -> dict:
+    path = directory / "build.log"
+    excerpt = ""
+    if path.is_file():
+        with path.open("rb") as stream:
+            stream.seek(0, 2)
+            stream.seek(max(0, stream.tell() - 16000))
+            excerpt = stream.read().decode("utf-8", errors="replace").strip()
+    return {"build_log_path": str(path), "build_returncode": returncode,
+            "build_log_excerpt": excerpt}
+
+
+def build_error(message: str, diagnostics: dict) -> str:
+    return (message + f" (exit status {diagnostics['build_returncode']}); "
+            + diagnostics["build_log_path"]
+            + ("\n" + diagnostics["build_log_excerpt"] if diagnostics["build_log_excerpt"] else ""))
 
 
 def quote(value: str) -> str:
@@ -44,7 +97,12 @@ def quote(value: str) -> str:
 
 def read_result(path: Path, request: dict, *, returncode: int) -> dict:
     if not path.is_file():
-        raise NativeFailure("worker_failure", "native worker produced no structured result; inspect build.log")
+        details = build_diagnostics(path.parent, returncode)
+        log = details["build_log_excerpt"]
+        category = "import_error" if any(marker in log for marker in (
+            "Cannot load theory", "Bad import of theory", "need to include sessions")) else "worker_failure"
+        raise NativeFailure(category, build_error("native worker produced no structured result", details),
+                            details=details)
     try:
         root = ET.parse(path).getroot()
     except (ET.ParseError, OSError) as exc:
@@ -128,7 +186,9 @@ class NativeSearch:
         code = self.run_build(directory, name, timeout_s=self.config.startup_timeout_s,
                               deadline=deadline, heap=True)
         if code:
-            raise NativeFailure("capability_error", "native infrastructure failed to compile; inspect " + str(directory / "build.log"))
+            details = build_diagnostics(directory, code)
+            raise NativeFailure("capability_error", build_error("native infrastructure failed to compile", details),
+                                details=details)
         return directory, name
 
     def encode_symbols(self, text: str) -> str:
@@ -147,15 +207,15 @@ class NativeSearch:
     def request(self, record: dict, sketch: str, *, directory: Path, action: str,
                 heuristics: tuple[str, ...], deadline: float) -> dict:
         context = validate_context(record)
-        imports = imports_of(context.prefix)
-        if any(name.split("/")[-1].split(".")[-1] == context.theory_name for name in imports):
-            raise ValueError("cannot import the masked target theory into native search")
+        prefix, resolution = resolve_imports(context.prefix, self.config, theory_name=context.theory_name)
+        imports = resolution["resolved_imports"]
         directory.mkdir(parents=True, exist_ok=True)
+        (directory / "import_resolution.json").write_text(json.dumps(resolution, indent=2) + "\n", encoding="utf-8")
         parent_dir, parent_session = self.infrastructure(deadline=deadline)
         forbidden = [d.name for d in inventory_isabelle_declarations(context.template)
                      if d.char_start >= len(context.prefix)]
         request = {"request_id": uuid.uuid4().hex, "action": action,
-                   "prefix": context.prefix, "statement": context.statement,
+                   "prefix": prefix, "statement": context.statement,
                    "proof_prefix": context.proof_prefix, "sketch": sketch, "depth": str(context.depth),
                    "target_name": record["isabelle_target_name"], "forbidden_names": forbidden,
                    "heuristics": list(heuristics), "provers": self.config.provers,
@@ -178,9 +238,7 @@ class NativeSearch:
         ET.ElementTree(root).write(directory / "request.xml", encoding="utf-8", xml_declaration=False)
         (directory / "input.json").write_text(json.dumps(request, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         session = "DSP_Job_" + request["request_id"]
-        dependencies = ""
-        if self.config.session_dependencies:
-            dependencies = "  sessions " + " ".join(quote(x) for x in self.config.session_dependencies) + "\n"
+        dependencies = session_clause(resolution)
         (directory / "ROOT").write_text('session ' + session + ' = ' + parent_session +
             ' +\n  options [document = false]\n' + dependencies + '  theories DSP_Driver\n', encoding="utf-8")
         # A request-specific marker separates worker/session startup from proof search.
@@ -199,8 +257,13 @@ class NativeSearch:
         }, indent=2) + "\n", encoding="utf-8")
         code = self.run_build(directory, session, timeout_s=max(0.001, deadline-time.monotonic()),
                               deadline=deadline, parent_dir=parent_dir, ready_path=directory / ready_name)
-        result = read_result(directory / "result.xml", request, returncode=code)
+        try:
+            result = read_result(directory / "result.xml", request, returncode=code)
+        except NativeFailure as exc:
+            exc.details.update(search_directory=str(directory), import_resolution=resolution)
+            raise
         result["search_directory"] = str(directory)
+        result["import_resolution"] = resolution
         return result
 
     def replay(self, record: dict, proof: str, *, directory: Path, deadline: float) -> dict:
@@ -215,15 +278,20 @@ class NativeSearch:
         source = (original[:begin.end] + "\ndeclare [[quick_and_dirty = true]]\n" +
                   original[begin.end:len(context.prefix)] + "\ndeclare [[quick_and_dirty = false]]\n" +
                   original[len(context.prefix):])
+        source, resolution = resolve_imports(source, self.config, theory_name=context.theory_name)
+        (directory / "import_resolution.json").write_text(json.dumps(resolution, indent=2) + "\n", encoding="utf-8")
         theory_path = directory / (context.theory_name + ".thy")
         theory_path.write_text(self.encode_symbols(source), encoding="utf-8")
         session = "DSP_Replay_" + uuid.uuid4().hex
-        dependencies = ""
-        if self.config.session_dependencies:
-            dependencies = "  sessions " + " ".join(quote(x) for x in self.config.session_dependencies) + "\n"
+        dependencies = session_clause(resolution)
         (directory / "ROOT").write_text('session ' + session + ' = ' + quote(self.config.base_session) +
             ' +\n  options [document = false, quick_and_dirty = false]\n' + dependencies +
             '  theories ' + quote(context.theory_name) + '\n', encoding="utf-8")
         code = self.run_build(directory, session, timeout_s=self.config.replay_timeout_s, deadline=deadline)
-        return {"success": code == 0, "replay_theory_path": str(theory_path),
-                "replay_log_path": str(directory / "build.log"), "returncode": code}
+        result = {"success": code == 0, "replay_theory_path": str(theory_path),
+                  "replay_log_path": str(directory / "build.log"), "returncode": code,
+                  "import_resolution": resolution}
+        if code:
+            details = build_diagnostics(directory, code)
+            result.update(details, error=build_error("fresh Isabelle2026 proof build failed", details))
+        return result

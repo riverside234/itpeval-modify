@@ -104,8 +104,10 @@ The default base session is `HOL`. For other standard/AFP imports, configure
 `session_dependencies` and any `session_roots` containing compatible 2026
 `ROOT`/`ROOTS` files. For example, a theory importing
 `HOL-Analysis.Analysis` needs the compatible `HOL-Analysis` session available.
-Preflight every target prefix; the adapter does not rewrite imports, oracle
-statements or assumptions to make an unavailable context compile.
+Preflight every target prefix. The adapter can qualify explicitly configured
+bare imports to their owning session; it preserves the imported theory's
+basename and never replaces it with a different or broader theory. Oracle
+statements, assumptions and stored dataset contexts remain unchanged.
 
 Python pins the checked ML interfaces against hashes extracted from the
 [Isabelle2026 release source archive](https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2026.tar.gz).
@@ -151,6 +153,51 @@ For all-target context acceptance, remove the topic/target filters and add
 `eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.preflight`
 and its extracted records. Native preflight is required on the lab installation;
 local offline tests do not establish native proof-search compatibility.
+
+## Hundred Theorems: imports after relocating a library theory
+
+Some Hundred Theorems files are copies of standard-library theories whose
+imports were local to their original session. A temporary job cannot find
+`Lebesgue_Measure` or `Tagged_Division` by those bare names. The example config
+and the tracked `v2_dsp_2026.local.json` now include:
+
+~~~json
+"theory_imports": {
+  "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+  "Tagged_Division": "HOL-Analysis.Tagged_Division"
+}
+~~~
+
+Add this field to any separately maintained config used as `$CFG`. The mapping
+only adds a session qualifier to the same theory name. Other unresolved bare
+imports need their own verified mappings; the adapter does not guess owners.
+Global imports such as `Main`, and already qualified imports, are unchanged.
+
+For `015_the_fundamental_theorem_of_integral_calculus/rsum_bound`, both the native
+driver and replay theory import `HOL-Analysis.Lebesgue_Measure`,
+`HOL-Analysis.Tagged_Division`, and `HOL-Real_Asymp.Real_Asymp`. Their generated
+`ROOT` files automatically include `sessions "HOL-Analysis" "HOL-Real_Asymp"`
+from those qualified names, in addition to configured session dependencies.
+The parent stays `HOL`; importing the complete original target theory or using
+its whole library session as the parent could expose the existing target proof.
+
+Only generated runtime headers are qualified. Parsed JSONL records, template
+hashes, proof spans, oracle declarations and all preceding mathematical content
+are preserved. Each job stores `import_resolution.json`; successful native
+results also record that mapping. This behavior follows Isabelle's
+[session-import rules](https://github.com/isabelle-prover/mirror-isabelle/blob/master/src/Doc/System/Sessions.thy).
+
+Missing imports now report `failure_category: "import_error"`, the absolute
+`workdir` and `build_log_path`, the actual `build_returncode`, and a bounded
+`build_log_excerpt`. Context failures with a structured native result keep its
+step diagnostics too. The batch runner preserves the failure category and
+makes no model call for that blocked target. Replay failures retain their build
+errors rather than only saying to inspect a log.
+
+After updating the code and `$CFG`, rerun the original preflight command. See
+[the 52fa4ea review](PROVER_REVIEW.md#hundred-theorems-rsum_bound-preflight-52fa4ea)
+for the exact command and the native regression check. This failure happens
+before Sketch generation or Sledgehammer, so no prompt change addresses it.
 
 ## Run the matched experiments
 
@@ -264,7 +311,7 @@ process start times before signaling owned descendants.
 
 The [2026-10-31 prover review](PROVER_REVIEW.md) records the source comparison,
 fixed bugs, and native regression cases. The checker version is
-`dsp_isabelle2026_native_p3`; adapter and checker changes invalidate old
+`dsp_isabelle2026_native_p4`; adapter and checker changes invalidate old
 verification caches. Preflight now includes a quoted goal to exercise proof
 serialization and fresh replay.
 

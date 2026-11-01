@@ -18,7 +18,7 @@ from .runtime import DspConfig
 
 ProofFailure = NativeFailure  # Preserve the old exception import for callers.
 
-CHECKER_VERSION = "dsp_isabelle2026_native_p3"
+CHECKER_VERSION = "dsp_isabelle2026_native_p4"
 HEURISTICS = (
     "by auto", "by simp", "by blast", "by fastforce", "by force", "by eval",
     "by presburger", "by sos", "by arith", "by linarith", "by (auto simp: field_simps)",
@@ -40,11 +40,21 @@ class Checker:
         context = validate_context(record)  # Raw extracted records need no Draft in either mode.
         backend = backend_metadata or self.config.metadata()
         directory = self.directory("context-")
-        result = self.native_factory(self.config).request(
-            record, "", directory=directory, action="context", heuristics=(),
-            deadline=time.monotonic() + self.config.target_timeout_s)
-        if not result["success"]:
-            raise NativeFailure(result["failure_category"], result["error"])
+        diagnostics = {"workdir": str(directory), "build_log_path": str(directory / "build.log")}
+        try:
+            result = self.native_factory(self.config).request(
+                record, "", directory=directory, action="context", heuristics=(),
+                deadline=time.monotonic() + self.config.target_timeout_s)
+            if not result["success"]:
+                raise NativeFailure(result["failure_category"], result["error"],
+                                    details={"native_result": result})
+        except NativeFailure as exc:
+            for name, value in diagnostics.items():
+                exc.details.setdefault(name, value)
+            raise
+        except Exception as exc:
+            category = "timeout" if isinstance(exc, TimeoutError) else "context_error"
+            raise NativeFailure(category, f"{type(exc).__name__}: {exc}", details=diagnostics) from exc
         return {"baseline_ok": True, "workdir": str(directory), "backend_metadata": backend,
                 **context.metadata, "native_result": result}
 
@@ -92,9 +102,12 @@ class Checker:
             result["native_replay"] = replay
             result.update({k: v for k, v in replay.items() if k in {"replay_theory_path", "replay_log_path"}})
             if not replay["success"]:
-                raise NativeFailure("replay_failure", "fresh Isabelle2026 proof build failed; inspect replay log")
+                raise NativeFailure("replay_failure", replay.get("error") or
+                                    "fresh Isabelle2026 proof build failed; inspect replay log")
             result["prove_success"] = result["replay_verified"] = result["verified"] = True
         except Exception as exc:
+            if isinstance(exc, NativeFailure):
+                result.update(exc.details)
             result["verify_error"] = f"{type(exc).__name__}: {exc}"
             result["failure_category"] = (exc.category if isinstance(exc, NativeFailure) else
                 "timeout" if isinstance(exc, TimeoutError) else

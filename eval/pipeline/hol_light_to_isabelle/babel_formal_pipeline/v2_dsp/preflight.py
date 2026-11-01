@@ -8,6 +8,7 @@ from ..common import LAB_REPO_ROOT, RESULTS_DIR, key, latest_records, repo_path,
 from ..extract_hol_light import DEFAULT_OUTPUT as DEFAULT_INPUT
 from ..sanitize_isabelle import sanitize_target
 from .checker import Checker
+from .native_search import NativeFailure
 from .export_dsp import export_record
 from .input_contract import MODES
 from .runtime import DspConfig
@@ -72,12 +73,16 @@ def preflight(record: dict, *, config: DspConfig, controls: bool = True,
             result["ok"] = True
     except Exception as exc:
         result["error"] = f"{type(exc).__name__}: {exc}"
+        if isinstance(exc, NativeFailure):
+            result.update(exc.details)
+        result["failure_category"] = (exc.category if isinstance(exc, NativeFailure) else
+                                      "timeout" if isinstance(exc, TimeoutError) else "preflight_error")
     directory = repo_path(results_dir) / "preflight"
     directory.mkdir(parents=True, exist_ok=True)
     from ..common import fingerprint
     path = directory / (fingerprint({"key": key(record), "mode": sketch_source})[:20] + ".json")
-    path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     result["report_path"] = str(path)
+    path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return result
 
 

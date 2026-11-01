@@ -92,7 +92,10 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
                 check = preflight(record, config=config, controls=first, backend_metadata=backend,
                                   results_dir=run_dir, sketch_source=mode)
                 if not check["ok"]:
-                    blocked[key(record)] = json.dumps(check)
+                    blocked[key(record)] = {
+                        "failure_category": check.get("failure_category") or "context_error",
+                        "error": json.dumps(check),
+                    }
                     if check.get("baseline_ok"):
                         capability_error = "native capability controls failed: " + json.dumps(check)
                         break

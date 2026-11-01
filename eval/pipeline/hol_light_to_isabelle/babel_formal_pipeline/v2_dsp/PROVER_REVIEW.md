@@ -272,3 +272,94 @@ input modes, model/prompt/provenance changes, failed/missing samples, K reductio
 and summary accounting. Python 3.10 syntax checks passed for all 100 v2 pipeline
 modules. Re-reading the pulled artifacts with the new loader still selects one
 verified sample in each mode and reports zero real-target Sledgehammer calls.
+
+## Hundred Theorems rsum_bound preflight (52fa4ea)
+
+Reviewed `52fa4eaf14b3bd5b7553a811928ce953d1087bc0`. The failure occurs before
+`DSP_Driver` executes its ML worker, before the target proof is checked, and
+before any Sledgehammer or LLM call. It does not indicate a bad generated proof.
+
+The report is
+`eval/results/hol_light_to_isabelle_v2/hundred-theorems/preflight/f9f02a6539f90379b88b.json`.
+Its original message only said the worker produced no structured result. The
+actual cause is in `work/context-_rdyic9a/build.log`:
+
+- Isabelle searched the temporary directory for `Lebesgue_Measure.thy` and
+  `Tagged_Division.thy`, because the driver copied the original bare import names.
+- The generated `ROOT` had no `sessions` clause, so
+  `HOL-Real_Asymp.Real_Asymp` was unavailable too.
+
+The extracted theory is `Henstock_Kurzweil_Integration`; its original header is
+preserved in the record and matches the
+[official library source](https://github.com/isabelle-prover/mirror-isabelle/blob/master/src/HOL/Analysis/Henstock_Kurzweil_Integration.thy).
+It normally belongs to `HOL-Analysis`, as specified by the
+[HOL session ROOT](https://github.com/isabelle-prover/mirror-isabelle/blob/master/src/HOL/ROOT).
+The [system manual](https://github.com/isabelle-prover/mirror-isabelle/blob/master/src/Doc/System/Sessions.thy)
+distinguishes a parent session from imported session namespaces: cross-session
+theory imports need qualified names and matching `sessions` declarations.
+
+### Fix
+
+1. Add a validated `theory_imports` config field. The example and pulled local
+   config map `Lebesgue_Measure` and `Tagged_Division` to their same-named theories
+   in `HOL-Analysis`. Mappings cannot replace a theory with a different basename.
+2. Qualify only the import tokens in generated driver/request/replay headers;
+   preserve the extracted record, mathematical context, theorem statement and
+   proof spans. Record original/resolved imports in `import_resolution.json`.
+3. Derive the direct owning session dependencies from qualified imports and merge
+   them with configured `session_dependencies`. Search and replay both get
+   `HOL-Analysis` and `HOL-Real_Asymp` in `ROOT` for this target.
+4. Preserve the build-log path, bounded log excerpt, process return code, work
+   directory and failure category in preflight/proof diagnostics. Propagate
+   `import_error` through the batch runner without calling the model. Missing or
+   malformed structured results still cannot count as successful verification.
+5. Keep `base_session: "HOL"`. Using `HOL-Analysis` as the parent or importing the
+   complete `Henstock_Kurzweil_Integration` would risk bringing in the existing
+   target theorem. The adapter rejects direct self-imports in search and replay.
+
+The checker version is now `dsp_isabelle2026_native_p4`; configuration and adapter
+hashes invalidate older verification caches. Prompts are unchanged because the
+failure occurs before inference. Historical result logs were not edited.
+
+### Lab rerun
+
+If `$CFG` points to another private config, add the `theory_imports` mapping shown
+in the README. Otherwise the tracked config is already updated. With the user's
+existing Python environment activated:
+
+~~~bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+PIPE=eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline
+CFG=eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
+DATA=eval/results/hol_light_to_isabelle_v2/hundred-theorems
+
+python -m "${PIPE}.v2_dsp.preflight" \
+  --expected-root "$PWD" \
+  --config "$CFG" \
+  --input "$DATA/single_records.jsonl" \
+  --topic 015_the_fundamental_theorem_of_integral_calculus \
+  --target-key rsum_bound
+~~~
+
+The existing parsed record can be reused. No new Draft or Sketch is needed for
+preflight. An opt-in native test checks this exact context without an LLM:
+
+~~~bash
+export ITPEVAL_NATIVE_ISABELLE2026_CONFIG="$CFG"
+python -m unittest discover \
+  -s tests/hol_light_to_isabelle/v2_dsp \
+  -p 'test_native_integration.py' -k hundred_rsum_bound
+~~~
+
+Local regression checks exercise the real extracted record with mocked native
+execution, verify consistent qualified headers and session dependencies, preserve
+original hashes/statements, reject theory substitution/self-import, and retain
+failure details through preflight and the batch runner. These checks validate the
+adapter, not Isabelle's compilation of the 153-helper prefix. That final native
+check requires the lab installation.
+
+Validation for this revision: **150 offline tests passed; 12 native integration
+tests skipped** (162 total). Python 3.10 syntax checks passed for all 100 v2
+pipeline modules, and `git diff --check` passed. No live model calls or native
+Isabelle execution were performed locally. The original `52fa4ea` build log is
+now classified as `import_error` with its actual missing-theory diagnostics.
