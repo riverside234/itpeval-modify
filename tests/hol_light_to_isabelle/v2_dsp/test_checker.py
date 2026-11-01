@@ -140,7 +140,9 @@ class CheckerTests(unittest.TestCase):
         row = {**control_record("by simp"), "isabelle_proof": "by simp"}
         result = self.checker.check(row, backend_metadata=BACKEND, replay_only=True)
         self.assertTrue(result["verified"])
-        self.assertEqual(["replay"], [c[0] for c in self.fake.calls])
+        self.assertEqual(["request", "replay"], [c[0] for c in self.fake.calls])
+        self.assertEqual("context", self.fake.calls[0][2]["action"])
+        self.assertEqual((), self.fake.calls[0][2]["heuristics"])
 
     def test_resume_depends_on_native_adapter_and_budgets(self):
         source, output = self.path / "sketches.jsonl", self.path / "verified.jsonl"

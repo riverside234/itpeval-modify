@@ -9,7 +9,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import (
     LAB_REPO_ROOT, RESULTS_DIR, fingerprint, key, read_jsonl,
     repo_path, require_source, validate_layout,
 )
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.checker import CHECKER_VERSION, Checker
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.checker import CHECKER_VERSION, Checker, verification_input
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.generate_sketch import DEFAULT_OUTPUT as DEFAULT_INPUT
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig
 from .input_contract import (MODES, align_samples, envelope, load_inputs, output_path as native_output_path,
@@ -64,7 +64,7 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
         result = completed.get(identity) if backend_error is None else None
         if result is None:
             if backend_error is not None and not record.get("sketch_error"):
-                result = {**record, **envelope(sketch_source), "verified": False,
+                result = {**verification_input(record, sketch_source), **envelope(sketch_source), "verified": False,
                           "prove_success": False, "replay_verified": False,
                           "checker_version": CHECKER_VERSION, "step_results": [],
                           "failure_category": "toolchain_error",

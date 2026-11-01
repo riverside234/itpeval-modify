@@ -11,7 +11,8 @@ from pathlib import Path
 
 from ..common import fingerprint, repo_path
 from ..isabelle_syntax import inventory_isabelle_declarations, tokens
-from ..theory_context import normalize_body, validate_context
+from ..theory_context import validate_context
+from .input_contract import normalize_proof, normalize_sketch
 from .runtime import DspConfig, NATIVE_DIR, RUNTIME_DIR, OwnedProcess, adapter_hashes
 
 PROTOCOL_VERSION = "dsp_native_request_v1"
@@ -48,7 +49,10 @@ def resolve_imports(source: str, config: DspConfig, *, theory_name: str) -> tupl
     items = import_tokens(source)
     original = [item.text.strip('"') for item in items]
     resolved = [config.theory_imports.get(name, name) for name in original]
-    if any(name.split("/")[-1].rsplit(".", 1)[-1] == theory_name for name in resolved):
+    def basename(name):
+        leaf = name.rsplit("/", 1)[-1]
+        return (leaf[:-4] if leaf.endswith(".thy") else leaf).rsplit(".", 1)[-1]
+    if any(basename(name) == theory_name for name in resolved):
         raise NativeFailure("context_error", "cannot import the selected target theory into native search or replay")
     sessions = list(config.session_dependencies)
     for name in resolved:
@@ -73,7 +77,7 @@ def session_clause(resolution: dict) -> str:
     return "  sessions " + " ".join(quote(name) for name in sessions) + "\n" if sessions else ""
 
 
-def build_diagnostics(directory: Path, returncode: int) -> dict:
+def build_diagnostics(directory: Path, returncode: int | None) -> dict:
     path = directory / "build.log"
     excerpt = ""
     if path.is_file():
@@ -139,7 +143,7 @@ def read_result(path: Path, request: dict, *, returncode: int) -> dict:
     if result["success"] and request["action"] == "search" and not result["target_closed"]:
         raise NativeFailure("protocol_error", "native success did not close the selected target")
     if result["success"] and request["action"] == "search":
-        result["isabelle_proof"] = normalize_body(result["isabelle_proof"])
+        result["isabelle_proof"] = normalize_proof(result["isabelle_proof"])
     return result
 
 
@@ -150,7 +154,7 @@ class NativeSearch:
 
     def build_command(self, directory: Path, session: str, *, parent_dir=None, heap=False) -> list[str]:
         command = [str(self.config.executable), "build", "-j", "1", "-o", "document=false",
-                   "-o", "parallel_proofs=0", "-o", "threads=" + str(self.config.threads)]
+                   "-o", "parallel_proofs=0", "-o", "timeout_scale=1.0", "-o", "threads=" + str(self.config.threads)]
         if heap:
             command.append("-b")
         for root in self.config.session_roots:
@@ -165,9 +169,19 @@ class NativeSearch:
         (directory / "command.json").write_text(json.dumps(command, indent=2) + "\n", encoding="utf-8")
         startup = ({} if ready_path is None else
                    {"ready_path": ready_path, "startup_timeout_s": self.config.startup_timeout_s})
-        return self.process_factory(command, directory=directory, env=self.config.environment(),
-                                    log_path=directory / "build.log", timeout_s=timeout_s,
-                                    deadline=deadline, **startup).run()
+        process = self.process_factory(command, directory=directory, env=self.config.environment(),
+                                       log_path=directory / "build.log", timeout_s=timeout_s,
+                                       deadline=deadline, **startup)
+        try:
+            return process.run()
+        except (TimeoutError, OSError) as exc:
+            # OwnedProcess has already cleaned up its workers. Preserve the log
+            # even if the ML job never had time to produce result.xml.
+            code = getattr(getattr(process, "process", None), "returncode", None)
+            details = build_diagnostics(directory, code)
+            details.update(build_directory=str(directory), build_session=session)
+            category = "timeout" if isinstance(exc, TimeoutError) else "worker_failure"
+            raise NativeFailure(category, build_error(str(exc), details), details=details) from exc
 
     def infrastructure(self, *, deadline: float) -> tuple[Path, str]:
         identity = fingerprint({"adapter": adapter_hashes(), "base_session": self.config.base_session})[:16]
@@ -207,6 +221,10 @@ class NativeSearch:
     def request(self, record: dict, sketch: str, *, directory: Path, action: str,
                 heuristics: tuple[str, ...], deadline: float) -> dict:
         context = validate_context(record)
+        if action not in {"context", "search"}:
+            raise ValueError("unsupported native action")
+        if action == "search":
+            sketch = normalize_sketch(sketch)
         prefix, resolution = resolve_imports(context.prefix, self.config, theory_name=context.theory_name)
         imports = resolution["resolved_imports"]
         directory.mkdir(parents=True, exist_ok=True)
@@ -269,14 +287,14 @@ class NativeSearch:
     def replay(self, record: dict, proof: str, *, directory: Path, deadline: float) -> dict:
         """A fresh build of the reconstructed theory, with no search-helper import."""
         context = validate_context(record)
-        proof = normalize_body(proof)
+        proof = normalize_proof(proof)
         directory.mkdir(parents=True, exist_ok=True)
         original = context.theory(proof)
         items = tokens(original)
         begin = next(t for t in items if t.kind == "word" and t.text == "begin")
         # Admit only the existing prefix, then explicitly disable background admission before the target.
         source = (original[:begin.end] + "\ndeclare [[quick_and_dirty = true]]\n" +
-                  original[begin.end:len(context.prefix)] + "\ndeclare [[quick_and_dirty = false]]\n" +
+                  original[begin.end:len(context.prefix)] + "\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\n" +
                   original[len(context.prefix):])
         source, resolution = resolve_imports(source, self.config, theory_name=context.theory_name)
         (directory / "import_resolution.json").write_text(json.dumps(resolution, indent=2) + "\n", encoding="utf-8")

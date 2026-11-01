@@ -363,3 +363,122 @@ tests skipped** (162 total). Python 3.10 syntax checks passed for all 100 v2
 pipeline modules, and `git diff --check` passed. No live model calls or native
 Isabelle execution were performed locally. The original `52fa4ea` build log is
 now classified as `import_error` with its actual missing-theory diagnostics.
+
+
+## Comprehensive Isabelle2026 audit (after 0be9014)
+
+Scope: configuration and environment isolation, session/import resolution,
+request/result identity, native command execution and obligation closure,
+Sledgehammer reconstruction, process deadlines/cleanup, proof replay, and
+verification-cache/result reporting. Both datasets use this shared engine.
+No API inference, toolchain installation, or historical-result changes were made.
+
+### Findings and fixes
+
+| Finding | Consequence | Fix |
+| --- | --- | --- |
+| High: Isabelle ignores timeouts below 1 ms | A configured microsecond limit, or an almost exhausted ML budget, could execute without the intended ML timeout. The Python whole-job watchdog still bounded the worker. | Reject configured step/hammer/preplay limits below 0.001 s; abort an ML operation when its remaining budget is below that resolution; pin `timeout_scale=1.0` in builds. |
+| High: proof filtering only considered bare words | `by ("tactic" ...)`, qualified `Pure.raw_tactic`, and quoted decimal-escaped names bypassed the Python no-ML policy. | Inspect decoded identifier basenames in Python and native tokens. Apply the same policy to Sketches, reconstructed proofs and saved proof replay. Ordinary quoted methods and mathematical formulas remain supported. |
+| High: proof code could change admission/oracle settings | `supply [[quick_and_dirty = true]]` / `smt_oracle = true` passed the filter. Imported defaults could also enable SMT oracle mode. | Reject those settings in generated proof bodies and explicitly reset both to false immediately before the target in search and replay. Prefix admissions remain explicit. |
+| High: replay-only skipped the native context-leakage gate | Replaying a saved proof against a changed parent/import graph did not run the same target/later-fact checks as search. | Run a context-only native request before replay; keep it in `native_context`; no proof search occurs. Both paths reject the selected theory if it is already an ancestor, before copied declarations execute. Direct self-import checks also recognize `.thy` suffixes. |
+| Medium: rechecks inherited old success diagnostics | A failed new replay could still contain `native_replay.success = true`, old prover settings, paths, or an old verification fingerprint from its input row. | Clear previous verification artifacts before checking. Current diagnostics and the input proof are added only by the current check. Backend setup failures use the same cleanup. |
+| Medium: watchdog/startup failures omitted structured build diagnostics | A killed worker often has no XML result, leaving the important build excerpt outside the reported error. | Wrap build timeout/launch errors with category, build directory/session, log path, bounded excerpt, and available process return code. |
+| Test gap: a successful default hammer control does not prove ATP availability | Isabelle2026's integrated tactics can solve the small control without using an external ATP. | Add an opt-in native case that selects only bundled E, requires a `Played` preplay and reconstruction, and verifies fresh replay. Keep integrated-tactic coverage. |
+
+The offline regressions reproduced the timeout/filter/stale-result failures
+before the fixes. Search success still requires complete target closure and
+independent replay; partial subgoal progress alone never counts as success.
+Heuristic ordering and configured search budgets/provers are unchanged.
+Per-operation timeouts still abort the isolated worker; the audit does not
+introduce retries after an interrupted native state.
+
+Checker version: `dsp_isabelle2026_native_p5`.
+Sketch validator: `isabelle_sketch_structure_v2`.
+Changed adapter/checker fingerprints prevent reuse of old verification results.
+Saved valid Sketches can be rechecked with `--skip-sketch`; this does not require
+regenerating Drafts or making an API call. Generated bodies are revalidated.
+
+### Source checks
+
+All nine locally cached release source files still match
+`native/release_sources.json`. The runtime keeps those Isabelle2026 release
+checks. Additional API/semantic cross-checks used the official repository at
+`bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370`, not an assumption that current master
+is identical to the release:
+
+- [`timeout.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Concurrent/timeout.ML): `Timeout.ignored`, the 1 ms threshold and `timeout_scale`.
+- [`method.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Isar/method.ML): method names use `Parse.name`; `tactic` and `raw_tactic` evaluate ML.
+- [`SMT.thy`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/SMT.thy) and [`smt_solver.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/Tools/SMT/smt_solver.ML): `smt_oracle` controls whether solver output needs proof reconstruction. Standard SMT.thy turns it off; an input context could turn it on again.
+- [`context.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/context.ML) and [`theory.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/theory.ML): ancestor identity and base theory names.
+- Cached release `sledgehammer.ML`, `sledgehammer_proof_methods.ML`, `toplevel.ML`, `outer_syntax.ML`, and `token.ML`: preplay filtering, structured reconstruction, proof-state transitions and executable token serialization. Existing release-compatible handling remains in place.
+
+### Dataset/setup coverage
+
+The offline survey extracted every current aligned target, validated its stored
+statement, proof span and preceding context, and resolved configured imports:
+**163 Babel targets + 99 Hundred targets; no static validation errors.**
+This is not an Isabelle build result. Babel uses `Main`; Hundred has the
+following additional setup concerns:
+
+| Hundred topic | Targets | Import/context concern to check natively |
+| --- | ---: | --- |
+| `011_the_infinitude_of_primes` | 4 | Bare `Euclidean_Algorithm`. |
+| `015_the_fundamental_theorem_of_integral_calculus` | 7 | Existing `Lebesgue_Measure` / `Tagged_Division` qualification fix plus `HOL-Real_Asymp`. |
+| `027_sum_of_the_angles_of_a_triangle`, `065_isosceles_triangle_theorem` | 2 | Bare `Angles`; compatible dependency theory/session required. |
+| `049_the_cayley-hamilton_theorem` | 1 | Bare `Square_Matrix`; compatible dependency theory/session required. |
+| `052_the_number_of_subsets_of_a_set` | 24 | Copy of core theory `Set`, with bare `Lattices` / `Boolean_Algebras`. A loaded original `Set` is rejected as inherited target context. Do not bypass the guard by renaming the copied theory or broadening its parent. |
+| `089_the_factor_and_remainder_theorems` | 15 | Bare `Primes`, plus qualified library imports. |
+| `098_bertrand_s_postulate` | 28 | Explicit AFP `Pratt_Certificate.Pratt_Certificate`; configure a compatible AFP session root. |
+
+The remaining 18 Hundred targets use `Complex_Main` and/or qualified HOL library
+imports. Qualified names alone do not establish release compatibility. Unknown
+bare import owners are not guessed. Missing AFP dependencies are not installed
+automatically. No mathematical statement, imported theorem, or dataset prefix
+was replaced to make a target pass. Targets whose original proof is already in
+the parent need an explicitly redesigned experimental context or exclusion;
+they cannot be counted as isolated proof-translation successes under that parent.
+
+### Validation and lab commands
+
+Final offline run: **173 tests collected; 158 passed and 15 native tests skipped**.
+The eight focused audit regressions also passed after the final formula-name
+handling refinement. Python 3.10 syntax checks passed for 111 pipeline/test files;
+`git diff --check` passed with the repository's existing CRLF handling.
+
+The new offline tests cover the reproduced failures, quoted/escaped/qualified
+names, accepted ordinary proof text, direct self-import variants, failure log
+propagation, replay-only context rejection, and stale-diagnostic removal.
+The native fixture additionally exercises a real interrupted ML operation,
+sub-millisecond rejection without executing the body, decoded token checks,
+and ancestor-theory rejection. New integration cases cover E reconstruction,
+SMT setting reset, and inherited target rejection in search and replay.
+
+Native compilation/execution remains pending on the lab host. The local Windows
+machine has no Isabelle2026 installation; offline tests cannot establish that
+the modified ML compiles or that an ATP works on that machine.
+
+After syncing the changes and activating the main Python 3.10 environment:
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+export ITPEVAL_NATIVE_ISABELLE2026_CONFIG=eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
+
+# Native controls, E, timeout/filter fixtures, representative contexts and replay.
+python -m unittest discover \
+  -s tests/hol_light_to_isabelle/v2_dsp -p 'test_native_integration.py'
+
+# Then repeat the original Hundred single-target preflight.
+PIPE=eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline
+DATA=eval/results/hol_light_to_isabelle_v2/hundred-theorems
+python -m "${PIPE}.v2_dsp.preflight" \
+  --expected-root "$PWD" \
+  --config "$ITPEVAL_NATIVE_ISABELLE2026_CONFIG" \
+  --input "$DATA/single_records.jsonl" \
+  --topic 015_the_fundamental_theorem_of_integral_calculus \
+  --target-key rsum_bound
+```
+
+For a batch, supply the full extracted record file and `--all-targets`, removing
+the single-topic/target filters. Keep failed contexts in the reported cohort.
+The first infrastructure build and large library imports may need the existing
+600 s startup allowance; changing it is an explicit configuration choice.

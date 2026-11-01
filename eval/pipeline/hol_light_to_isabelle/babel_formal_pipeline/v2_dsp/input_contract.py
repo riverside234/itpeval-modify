@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from ..common import (fingerprint, key, public_record, read_jsonl, repo_path,
@@ -13,7 +14,7 @@ from ..isabelle_syntax import tokens
 SCHEMA_VERSION = "hol_light_to_isabelle_dsp_v2"
 ISABELLE_VERSION = "Isabelle2026"
 MODES = ("draft", "hol-light-proof")
-SKETCH_VALIDATOR_VERSION = "isabelle_sketch_structure_v1"
+SKETCH_VALIDATOR_VERSION = "isabelle_sketch_structure_v2"
 CONTEXT_FIELDS = ("isabelle_statement", "isabelle_theory_template",
                   "isabelle_context_before_target", "isabelle_proof_prefix",
                   "isabelle_target_proof_span", "isabelle_target_name")
@@ -272,8 +273,31 @@ obtain consider define subgoal prefer defer back sledgehammer
 """.split())
 
 
+# Parse.name accepts quoted and qualified method names, including decimal
+# escapes in strings. Reject admission controls and executable ML in either
+# spelling, without searching inside mathematical propositions/cartouches.
+_UNSAFE_PROOF_NAMES = frozenset("""
+tactic raw_tactic Skip_Proof skip_proof cheat quick_and_dirty smt_oracle
+""".split())
+
+
+def normalize_proof(proof: str, *, allow_hammer: bool = False) -> str:
+    body = normalize_body(proof, allow_hammer=allow_hammer)
+    for token in tokens(body):
+        if token.kind not in {"word", "string"}:
+            continue
+        name = token.text
+        if token.kind == "string":
+            name = re.sub(r'\\([0-9]{3}|["\\])',
+                          lambda m: chr(int(m[1])) if m[1].isdigit() else m[1], name[1:-1])
+        if (re.fullmatch(r"[A-Za-z_][A-Za-z_0-9'.]*", name)
+                and name.rsplit(".", 1)[-1] in _UNSAFE_PROOF_NAMES):
+            raise ValueError("proof contains forbidden method or admission setting: " + name)
+    return body
+
+
 def normalize_sketch(proof: str) -> str:
-    body = normalize_body(proof, allow_hammer=True)
+    body = normalize_proof(proof, allow_hammer=True)
     items = tokens(body)
     for index, token in enumerate(items):
         if token.kind == "word" and token.text == "by":
