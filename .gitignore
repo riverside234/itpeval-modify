@@ -85,3 +85,7 @@ dist/
 /vllm/logs/
 /vllm/*.local.json
 /eval/configs/inference/*.local.json
+
+# Commit-ready Isabelle lab preflight reports, logs and diagnostic ZIPs.
+!/eval/preflight_results/
+!/eval/preflight_results/**

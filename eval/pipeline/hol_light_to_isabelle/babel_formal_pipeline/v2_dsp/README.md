@@ -116,6 +116,87 @@ Installations, version-specific Isabelle user settings, heaps and temporary
 files stay under the repository. The OS `HOME` and Isabelle2024 installation
 are preserved. Native execution is intended for the Linux lab host.
 
+## Consolidated lab acceptance (recommended)
+
+After syncing these changes and activating the main Python 3.10 environment,
+run this single command from the lab repository root. It uses the existing native
+config, extracts records from the checked-in aligned data, and makes no LLM calls.
+No saved Draft, Sketch, or `ITPEVAL_NATIVE_ISABELLE2026_CONFIG` variable is required.
+
+~~~bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.lab_preflight \
+  --expected-root "$PWD" \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
+~~~
+
+This shared command checks **both datasets**. The default scope currently has
+**65 checks**: input selection, release/configuration identity, one infrastructure
+build, a native ML regression fixture, 26 proof/search/replay controls, three
+real-theorem proof checks, and 32 contexts spanning all 29 available topics.
+The largest preceding context in each topic is selected, plus the historical
+`circleAverage_center_independent`, `all_countings`, and `rsum_bound` regressions.
+This samples context compatibility; it does not establish proof success for all
+targets. The real-theorem controls use fixed diagnostic proofs, not model outputs.
+
+The controls exercise integrated tactics and the external **E** ATP separately,
+`using ... by ...` with whitespace/comments, multiple goals/gaps, partial-goal
+rejection, local Isar constructs, decoded unsafe methods/settings, unavailable
+provers, self/later-fact leakage, inherited theories, ML timeouts, saved-proof
+context checking, and fresh replay (including an intentionally corrupted replay).
+A negative control passes only when it produces the specified rejection. One
+failed control/context does not skip the others. Infrastructure failure blocks
+its dependents explicitly instead of recompiling the same failing setup per case.
+
+Every invocation creates a unique, **Git-trackable** directory:
+
+~~~text
+eval/preflight_results/isabelle2026/<UTC-timestamp>-<run-id>/
+  report.json          # complete scope, check statuses, fingerprints, file references
+  summary.md           # readable results and failure reasons
+  events.jsonl         # incremental check completion history
+  config.json          # effective native configuration
+  backend.json         # release/source/adapter/session/prover identity, when available
+  release_sources.json
+  details/             # individual checks, native results and errors
+  infrastructure/      # copied ROOT, adapter sources, compilation logs
+  fixture/             # native ML regression build artifacts
+  cases/               # proof-control inputs, search output and fresh replay files
+  work/                # selected dataset context jobs
+  diagnostics.zip      # complete run diagnostics; excludes heaps/toolchains
+~~~
+
+The report is checkpointed after each check. Ctrl-C saves completed checks, marks
+unrun checks as blocked, and attempts to finish the diagnostic bundle. Exit codes:
+`0` only when all selected checks pass; `1` for any failure/blocked check or bundle
+failure; `130` for an interrupted run. Inspect `backend_ok` and `contexts_ok`
+separately: missing Hundred dependency theories or inherited target contexts must
+remain failed dataset checks even when the backend controls pass. A stock install
+may therefore pass the backend while the overall report remains unsuccessful.
+
+The report folder is explicitly unignored, including JSON, logs and ZIPs. After
+reviewing the result, stage it normally (no `git add -f` needed):
+
+~~~bash
+git add eval/preflight_results/isabelle2026/
+git commit -m "Record Isabelle2026 lab preflight"
+git push
+~~~
+
+Scope options for the same command:
+
+- `--plan-only`: print the scope and cases without Isabelle, models, or file writes.
+- `--all-targets`: check every available target context (currently 163 Babel + 99 Hundred).
+- `--dataset hundred-theorems` or `--dataset babel-formal`: restrict dataset contexts.
+- `--topic ... --target-key ...`: focus on a particular target; backend controls still run.
+- `--input path/to/records.jsonl`: use saved records instead of extracting; repeat for both datasets.
+- `--output-root ...`: choose another repository-local parent; ensure a custom path is trackable.
+
+The smaller per-target `preflight` gate below remains available for experiment
+runs. Use `lab_preflight` for a consolidated, portable diagnostic report to push.
+The [708e204 review](PROVER_REVIEW.md#lab-result-708e204-and-consolidated-preflight)
+explains the rejected `using integral_shift by metis` reconstruction fixed in p6.
+
 ## Native gate before model calls
 
 ~~~bash
@@ -327,7 +408,7 @@ process start times before signaling owned descendants.
 
 The [2026-10-31 prover review](PROVER_REVIEW.md) records the source comparison,
 fixed bugs, and native regression cases. The checker version is
-`dsp_isabelle2026_native_p5`; adapter and checker changes invalidate old
+`dsp_isabelle2026_native_p6`; adapter and checker changes invalidate old
 verification caches. Preflight now includes a quoted goal to exercise proof
 serialization and fresh replay.
 
@@ -384,8 +465,8 @@ Offline checks, with no native installation or LLM calls:
 python -m unittest discover -s tests/hol_light_to_isabelle -p 'test_*.py'
 ~~~
 
-After lab installation, run the native controls above and opt into the real
-integration tests (no model calls). These include a forced external **E** ATP
+After lab installation, use `lab_preflight` above for the recorded acceptance
+run. Developers can also opt into the real integration tests (no model calls). These include a forced external **E** ATP
 case, in addition to integrated tactic provers: the ordinary `True` preflight
 can succeed using an integrated tactic and alone does not establish that an
 external prover works. The suite also exercises actual ML timeout behavior,

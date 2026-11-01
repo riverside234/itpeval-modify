@@ -46,6 +46,20 @@ local
       val _ = expect "native failure yields no reconstruction" ([], "none")
         (DSP_Sledgehammer.reconstructions 1 Sledgehammer.SH_None);
       val keywords = Thy_Header.get_keywords \<^theory>;
+      fun transitions source = Outer_Syntax.parse_text \<^theory>
+        (fn () => {skip_theory = false, theory = \<^theory>}) Position.start source;
+      val using_steps = transitions "using local_fact (* comment *)\n by metis\n";
+      val _ = expect "using/by has an ignored separator" true
+        (exists Toplevel.is_ignored using_steps);
+      val _ = List.app DSP_Native.check_reconstruction_transition using_steps;
+      val _ = List.app DSP_Native.check_reconstruction_transition
+        (transitions "unfolding local_def\n apply simp\n done\n");
+      val _ = List.app (fn tr => expect "unsafe transition remains rejected" true
+          (case Exn.capture DSP_Native.check_reconstruction_transition tr of
+            Exn.Exn (DSP_Native.Failure ("missing_reconstruction", _)) => true | _ => false))
+        [Toplevel.malformed Position.none "fixture malformed span",
+         Toplevel.make {name = "sorry", kind = "", is_begin = false, pos = Position.none}];
+
       val quoted = "have h: \"True\" (* keep comment *)\n  by simp";
       val quote_tokens = Token.explode keywords Position.start quoted;
       val _ = expect "old source_of representation loses string delimiters" true

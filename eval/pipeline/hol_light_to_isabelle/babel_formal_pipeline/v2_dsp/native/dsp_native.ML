@@ -47,6 +47,16 @@ fun check_imported_target driver_theory name =
     ("selected target theory is already inherited from the parent/imports: " ^ name)
   else ();
 
+(* Whitespace/comments between reconstructed commands produce <ignored>
+   transitions, not an empty command name. Never broaden the command allowlist
+   to malformed or arbitrary outer syntax. *)
+fun check_reconstruction_transition tr =
+  if Toplevel.is_ignored tr orelse
+     member (op =) ["using", "unfolding", "by", "apply", "prefer", "done"] (Toplevel.name_of tr)
+  then ()
+  else fail "missing_reconstruction"
+    ("unsafe reconstructed command: " ^ quote (Toplevel.name_of tr));
+
 fun elem name attrs body = XML.Elem ((name, attrs), body);
 fun clean value = XML.content_of (YXML.parse_body value);
 fun text name value = elem name [] [XML.Text (clean value)];
@@ -153,9 +163,7 @@ fun run driver_theory request_file result_file =
               let
                 val _ = check_proof_tokens span;
                 val tr = transition st span;
-                val name = Toplevel.name_of tr;
-                val _ = if name = "" orelse member (op =) ["using", "unfolding", "by", "apply", "prefer", "done"] name then ()
-                        else fail "missing_reconstruction" "unsafe reconstructed command";
+                val _ = check_reconstruction_transition tr;
               in ensure_real (Toplevel.command_exception tr st) end;
             val next = bounded step_budget
               (fn () => fold step (spans saved proof) saved) ();

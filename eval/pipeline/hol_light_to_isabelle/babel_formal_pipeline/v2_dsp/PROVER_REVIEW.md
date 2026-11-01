@@ -482,3 +482,78 @@ For a batch, supply the full extracted record file and `--all-targets`, removing
 the single-topic/target filters. Keep failed contexts in the reported cohort.
 The first infrastructure build and large library imports may need the existing
 600 s startup allowance; changing it is an explicit configuration choice.
+
+
+## Lab result 708e204 and consolidated preflight
+
+Reviewed the artifact merged by `708e204356f9fff41ac46b6f1de41dd92fdbe4a8`:
+`eval/results/hol_light_to_isabelle_v2/work/target-paafzeb6/search/result.xml`.
+It arrived in `35520b1`, whose parent is `0be9014`; this result predates the p5
+comprehensive audit. Only the XML was included, without its request, build log,
+or aggregate test report. It cannot establish the outcome of the whole native
+suite or whether the subsequent audit changes passed on the lab host.
+
+The target context and goal loaded. Sledgehammer returned an executable candidate
+`using integral_shift by metis` with `native_outcome=some`,
+`reconstruction_source=native_tactic`, and `candidate_count=1`. Search then rejected
+that candidate as `unsafe reconstructed command` and ended with
+`missing_reconstruction`. Zero separate preplay results are valid for this
+integrated tactic path; that is not the failure. The optional failed `sos`
+heuristic is also not the cause of the final rejection.
+
+The adapter's allowlist assumed ignored command spans had an empty name.
+Isabelle parses whitespace/comments between `using` and `by` into an ignored
+transition named `<ignored>`. The released `Outer_Syntax.parse_span` and
+[`Toplevel.is_ignored`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Isar/toplevel.ML#L490)
+confirm this behavior. The matching Isabelle2026 source hashes are already pinned
+in `native/release_sources.json`.
+
+Checker **p6** accepts `Toplevel.is_ignored tr` while retaining the narrow actual
+command allowlist and rejection of malformed/unsafe commands. Unexpected command
+errors now include the parsed command name. The packaged native fixture parses
+actual `using`/`unfolding`/`apply`/`done` spans, including comments and separators;
+it also confirms malformed and `sorry` transitions remain rejected. Two controls
+execute the injected multi-command candidate from a real pending goal and require
+fresh replay, rather than testing serialization alone. The real circle-average
+case additionally forces the integrated `metis` path.
+
+`v2_dsp.lab_preflight` consolidates setup, the native fixture, 26 backend controls,
+three fixed real-theorem proofs, and 32 contexts across both datasets into one
+recorded invocation (65 checks including selection/setup). It builds the shared
+native parent once and uses fresh search/replay jobs for each case. Independent
+failures continue; a shared setup failure explicitly blocks dependent checks.
+It records exact scope and expected negative outcomes, separates backend health
+from dataset compatibility, and supports all 262 contexts via `--all-targets`.
+No LLM calls or new model-generated experiment samples are involved.
+
+Reports now have a dedicated, explicitly unignored destination:
+`eval/preflight_results/isabelle2026/<UTC-timestamp>-<run-id>/`. The consolidated
+runner saves a JSON report, Markdown summary, per-check results, effective config,
+backend/source identity, native requests/results, replay theories, build/process
+logs, and a ZIP. Completed work is checkpointed; an interrupted run marks the
+unexecuted checks as blocked and finalizes diagnostics when possible. Reports
+must be staged normally, without forcing ignored runtime files into Git.
+
+Run on the lab host with the main Python 3.10 environment active:
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.lab_preflight \
+  --expected-root "$PWD" \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
+```
+
+Add `--all-targets` for every extracted target. Default record discovery was checked
+locally: 262 available targets, 29 topics, 32 selected contexts, no extraction
+selection errors. The focused offline tests cover report/bundle preservation,
+setup blocking, continuation after failures, expected rejection categories,
+selection scope, and exact candidate execution/replay requirements. Actual native
+compilation, Sledgehammer execution and proof replay remain pending on the Linux
+lab computer; the local Windows checks do not establish native acceptance.
+
+Validation after this change: **194 tests collected; 178 passed and 16 native
+integration tests skipped**. All 20 consolidated-preflight offline regressions
+passed. Python 3.10 syntax checks passed for 131 pipeline/test files. Git ignore
+checks confirmed report JSON, logs and ZIPs are trackable while experiment/runtime
+outputs stay ignored. The reviewed parser/transition files matched the pinned
+Isabelle2026 hashes; `git diff --check` passed with existing CRLF handling.

@@ -8,7 +8,7 @@ import unittest
 import uuid
 
 from eval.pipeline.hol_light_to_isabelle.v2_dsp.checker import Checker
-from eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime import DspConfig
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime import DspConfig, NATIVE_DIR
 from eval.pipeline.hol_light_to_isabelle.v2_dsp.native_search import NativeSearch
 from eval.pipeline.hol_light_to_isabelle.v2_dsp.preflight import control_record, preflight
 from eval.pipeline.hol_light_to_isabelle.extract_hol_light import extract_records
@@ -58,7 +58,7 @@ class NativeIntegrationTests(unittest.TestCase):
         parent_dir, parent_session = native.infrastructure(deadline=deadline)
         directory = Checker(self.config).directory("reconstruction-regression-")
         theory = "DSP_Reconstruction_Test"
-        source = Path(__file__).parent / "fixtures" / (theory + ".thy")
+        source = NATIVE_DIR / "checks" / (theory + ".thy")
         shutil.copyfile(source, directory / source.name)
         session = "DSP_Reconstruction_Test_" + uuid.uuid4().hex
         (directory / "ROOT").write_text(
@@ -67,6 +67,16 @@ class NativeIntegrationTests(unittest.TestCase):
         code = native.run_build(directory, session, timeout_s=self.config.startup_timeout_s,
                                 deadline=deadline, parent_dir=parent_dir)
         self.assertEqual(0, code, (directory / "build.log").read_text(encoding="utf-8"))
+
+    def test_using_reconstruction_executes_separators_and_comments(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import proof_cases, run_proof_case
+        parent = NativeSearch(self.config).infrastructure(deadline=time.monotonic() + self.config.target_timeout_s)
+        for case in proof_cases():
+            if case.candidate is not None:
+                with self.subTest(case=case.name):
+                    result = run_proof_case(case, config=self.config, backend=self.backend, parent=parent,
+                        directory=Checker(self.config).directory("using-regression-"))
+                    self.assertTrue(result["ok"], result)
 
     def test_nested_isar_multiple_gaps_local_assumptions_and_symbols(self):
         proof = ("proof -\n have first: True\n  sledgehammer\n"
