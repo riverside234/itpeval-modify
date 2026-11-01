@@ -134,6 +134,7 @@ class NativeSearchTests(unittest.TestCase):
         command = native.build_command(self.path, "Job", parent_dir=self.path / "infra")
         self.assertEqual("build", command[1])
         self.assertIn("parallel_proofs=0", command)
+        self.assertIn("timeout_scale=1.0", command)
         self.assertIn("threads=2", command)
         self.assertNotIn("ML_process", command)
         self.assertEqual(["Main", "HOL-Analysis.Analysis"], imports_of('theory X imports Main "HOL-Analysis.Analysis" begin'))

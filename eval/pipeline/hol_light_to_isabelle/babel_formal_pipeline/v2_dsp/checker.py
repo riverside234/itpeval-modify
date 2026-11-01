@@ -11,18 +11,31 @@ import time
 from pathlib import Path
 
 from ..common import RESULTS_DIR, repo_path
-from ..theory_context import normalize_body, validate_context
-from .input_contract import clean_record, envelope, input_metadata, mode_of, validate_artifacts, normalize_sketch
+from ..theory_context import validate_context
+from .input_contract import clean_record, envelope, input_metadata, mode_of, validate_artifacts, normalize_sketch, normalize_proof
 from .native_search import NativeFailure, NativeSearch
 from .runtime import DspConfig
 
 ProofFailure = NativeFailure  # Preserve the old exception import for callers.
 
-CHECKER_VERSION = "dsp_isabelle2026_native_p4"
+CHECKER_VERSION = "dsp_isabelle2026_native_p5"
 HEURISTICS = (
     "by auto", "by simp", "by blast", "by fastforce", "by force", "by eval",
     "by presburger", "by sos", "by arith", "by linarith", "by (auto simp: field_simps)",
 )
+
+
+def verification_input(record: dict, mode: str) -> dict:
+    """A new check cannot inherit diagnostics or success artifacts from an old job."""
+    result = clean_record(record, mode)
+    for name in (
+        "native_search", "native_replay", "native_result", "native_context", "prover_settings", "workdir",
+        "search_directory", "build_directory", "build_session", "build_log_path",
+        "build_log_excerpt", "build_returncode", "replay_theory_path", "replay_log_path",
+        "import_resolution", "verify_fingerprint", "verify_duration_seconds", "backend_metadata", "isabelle_proof",
+    ):
+        result.pop(name, None)
+    return result
 
 
 class Checker:
@@ -61,7 +74,7 @@ class Checker:
     def check(self, record: dict, *, replay_only: bool = False,
               backend_metadata: dict | None = None, force_hammer: bool = False) -> dict:
         mode = mode_of(record)
-        result = {**clean_record(record, mode), **envelope(mode), "checker_version": CHECKER_VERSION,
+        result = {**verification_input(record, mode), **envelope(mode), "checker_version": CHECKER_VERSION,
                   "prove_success": False, "replay_verified": False, "verified": False,
                   "verify_error": "", "failure_category": None, "step_results": []}
         started = time.monotonic()
@@ -74,12 +87,22 @@ class Checker:
                                     record.get("input_error") or record["sketch_error"])
             result.update(input_metadata(record, mode))
             validate_context(record)
-            proof = normalize_body(record.get("isabelle_proof", "")) if replay_only else normalize_sketch(record.get("isabelle_sketch", ""))
+            proof = normalize_proof(record.get("isabelle_proof", "")) if replay_only else normalize_sketch(record.get("isabelle_sketch", ""))
             stage = "toolchain_error"
             result["backend_metadata"] = backend_metadata or self.config.metadata()
             directory = self.directory("target-")
             result["workdir"] = str(directory)
             native = self.native_factory(self.config)
+            if replay_only:
+                # A saved proof may be replayed with a changed parent/session.
+                # Apply the same target/later-fact leak check as normal search.
+                stage = "context_error"
+                checked = native.request(record, "", directory=directory / "context", action="context",
+                                         heuristics=(), deadline=deadline)
+                result["native_context"] = checked
+                if not checked["success"]:
+                    raise NativeFailure(checked.get("failure_category") or "context_error",
+                                        checked.get("error") or "saved proof context failed")
             if not replay_only:
                 stage = "worker_failure"
                 search = native.request(record, proof, directory=directory / "search", action="search",
@@ -94,7 +117,7 @@ class Checker:
                             and last_step["error"] not in message):
                         message += f" (line {last_step.get('line', '?')}): {last_step['error']}"
                     raise NativeFailure(search.get("failure_category") or "incomplete_proof", message)
-                proof = normalize_body(search["isabelle_proof"])
+                proof = normalize_proof(search["isabelle_proof"])
                 result["prove_success"] = True
             result["isabelle_proof"] = proof
             stage = "replay_failure"

@@ -130,10 +130,9 @@ class NativeIntegrationTests(unittest.TestCase):
         self.assertFalse(result["verified"])
         self.assertEqual("hammer_failure", result["failure_category"])
         self.assertEqual("dsp_nonexistent_prover", result["prover_settings"]["resolved_provers"])
-        config = replace(self.config, step_timeout_s=0.000001)
-        result = Checker(config).check(control_record(proof), backend_metadata=config.metadata())
-        self.assertFalse(result["verified"])
-        self.assertEqual("timeout", result["failure_category"])
+        # Sub-millisecond settings are rejected rather than disabling ML timeouts.
+        with self.assertRaisesRegex(ValueError, "0.001"):
+            replace(self.config, step_timeout_s=0.000001)
 
     def test_babel_locale_source_modes_and_hundred_context(self):
         from eval.pipeline.hol_light_to_isabelle.v2_dsp.export_dsp import export_record
@@ -180,6 +179,45 @@ class NativeIntegrationTests(unittest.TestCase):
         result = Checker(config).check_context(record, backend_metadata=config.metadata())
         self.assertTrue(result["baseline_ok"], result)
         self.assertIn("HOL-Analysis", result["native_result"]["import_resolution"]["session_dependencies"])
+
+    def test_external_e_prover_reconstruction_and_fresh_replay(self):
+        # The default True control may be solved by an integrated tactic. This
+        # explicitly tests the bundled external ATP + preplay + reconstruction.
+        config = replace(self.config, provers=("e",))
+        proof = 'proof -\n show "True"\n sledgehammer\nqed'
+        result = Checker(config).check(control_record(proof), force_hammer=True,
+                                       backend_metadata=config.metadata())
+        self.assertTrue(result["verified"], result["verify_error"])
+        settings = result["prover_settings"]
+        self.assertEqual("e", settings["resolved_provers"])
+        self.assertEqual("preplayed", settings["reconstruction_source"])
+        self.assertGreater(int(settings["preplayed_count"]), 0)
+        self.assertTrue(result["replay_verified"])
+
+    def test_replay_context_guard_and_disabled_smt_oracle(self):
+        row = control_record("by simp", extra_context="declare [[smt_oracle = true]]\n")
+        row["isabelle_proof"] = "by simp"
+        result = Checker(self.config).check(row, replay_only=True, backend_metadata=self.backend)
+        self.assertTrue(result["verified"], result["verify_error"])
+        self.assertTrue(result["native_context"]["success"])
+        self.assertNotIn("native_search", result)
+        text = Path(result["replay_theory_path"]).read_text(encoding="utf-8")
+        self.assertIn("quick_and_dirty = false, smt_oracle = false", text)
+
+    def test_inherited_target_theory_is_rejected_in_search_and_replay(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
+        row = control_record("by simp")
+        template = row["isabelle_theory_template"].replace("theory V2Control", "theory Set")
+        target = sanitize_target(template, "v2_control")
+        row.update(isabelle_theory_template=template, isabelle_context_before_target=target.context_before_target,
+                   isabelle_target_proof_span=list(target.proof_span), isabelle_proof="by simp")
+        for replay_only in (False, True):
+            with self.subTest(replay_only=replay_only):
+                result = Checker(self.config).check(row, replay_only=replay_only, backend_metadata=self.backend)
+                self.assertFalse(result["verified"])
+                self.assertEqual("context_error", result["failure_category"])
+                self.assertIn("already inherited", result["verify_error"])
+                self.assertNotIn("native_replay", result)
 
     def test_fresh_replay_error_is_not_search_success(self):
         from eval.pipeline.hol_light_to_isabelle.v2_dsp.native_search import NativeSearch

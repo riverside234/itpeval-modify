@@ -301,17 +301,33 @@ progress never counts as a completed gap or target. Executable proof text uses
 The reconstructed target must close its original scopes, and a fresh
 `isabelle build` of the resulting theory must succeed without search helpers.
 
-`prove_success` records search completion; `verified` and `replay_verified`
-require fresh replay. Interruptions/timeouts abort the isolated job.
+`prove_success` records proof completion; `verified` and `replay_verified`
+require fresh replay. Replay-only verification first runs the native context gate
+without search, so a changed parent/import graph cannot bypass target/later-fact
+checks. A target theory already inherited from the parent/imports is rejected
+before executing its copied prefix. The fresh replay still imports no search
+helper theory. New checks clear old native results and log paths.
+
+Proof bodies cannot use ML tactics via quoted, escaped, or qualified names, or
+change `quick_and_dirty` / `smt_oracle`. Both native search and replay explicitly
+disable those two settings at the target boundary. Earlier masked helpers
+remain admitted background.
+
+Interruptions/timeouts abort the isolated job.
 Startup, method, hammer, preplay and replay budgets are capped by the whole-target
 deadline. `startup_timeout_s` applies separately to infrastructure compilation
 and to worker startup/import loading, ending when that request's readiness
-marker appears. Cleanup tracks children from every Linux thread and checks
+marker appears. ML method, hammer, and preplay limits must be at least 0.001
+seconds: Isabelle ignores smaller timeouts. An exhausted sub-millisecond
+remaining budget aborts before executing another operation. Builds pin
+`timeout_scale=1.0`. Timeout/launch failures retain the actual build directory,
+session, exit status when available, and log excerpt, even without result XML.
+Cleanup tracks children from every Linux thread and checks
 process start times before signaling owned descendants.
 
 The [2026-10-31 prover review](PROVER_REVIEW.md) records the source comparison,
 fixed bugs, and native regression cases. The checker version is
-`dsp_isabelle2026_native_p4`; adapter and checker changes invalidate old
+`dsp_isabelle2026_native_p5`; adapter and checker changes invalidate old
 verification caches. Preflight now includes a quoted goal to exercise proof
 serialization and fresh replay.
 
@@ -369,7 +385,13 @@ python -m unittest discover -s tests/hol_light_to_isabelle -p 'test_*.py'
 ~~~
 
 After lab installation, run the native controls above and opt into the real
-integration tests (no model calls):
+integration tests (no model calls). These include a forced external **E** ATP
+case, in addition to integrated tactic provers: the ordinary `True` preflight
+can succeed using an integrated tactic and alone does not establish that an
+external prover works. The suite also exercises actual ML timeout behavior,
+quoted/escaped method filtering, inherited target theory rejection, and replay
+context checks:
+
 
 ~~~bash
 export ITPEVAL_NATIVE_ISABELLE2026_CONFIG=eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
@@ -380,3 +402,9 @@ Native integration and representative context acceptance for both datasets
 are pending until executed on the lab computer. Run all-target context
 preflight before the matched experiment; source compatibility and proof quality
 are not established by offline mocks.
+
+The [comprehensive audit](PROVER_REVIEW.md#comprehensive-isabelle2026-audit-after-0be9014)
+records the new regressions, source references and the static import/context
+survey of all 163 Babel and 99 Hundred targets. That static survey does not
+replace native acceptance of each target; Hundred topics include unresolved
+bare imports and AFP dependencies absent from a stock Isabelle installation.

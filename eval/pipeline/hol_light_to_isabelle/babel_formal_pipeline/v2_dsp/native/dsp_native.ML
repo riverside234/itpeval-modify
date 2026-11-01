@@ -16,6 +16,37 @@ fun closes_obligation saved next =
   not (Toplevel.is_proof next) orelse Toplevel.proof_level next < Toplevel.proof_level saved;
 
 fun fail category message = raise Failure (category, message);
+(* Isabelle ignores sub-millisecond timeouts: never turn an almost exhausted
+   whole-target budget into an unbounded operation. *)
+fun checked_timeout seconds f arg =
+  let val timeout = Time.fromReal seconds
+  in if seconds <= 0.0 orelse Timeout.ignored timeout then
+       fail "timeout" "native budget below Isabelle's one-millisecond timeout resolution"
+     else Timeout.apply timeout f arg
+  end;
+
+(* Inspect decoded Isabelle names, not their surface spelling. Quoting or
+   qualifying a method must not bypass the no-ML/no-admission policy. *)
+fun check_proof_tokens span =
+  let
+    val forbidden = space_explode " "
+      "tactic raw_tactic Skip_Proof skip_proof cheat quick_and_dirty smt_oracle";
+    fun check token =
+      if member (op =) [Token.Ident, Token.Long_Ident, Token.String] (Token.kind_of token)
+         andalso Long_Name.is_identifier (Token.content_of token)
+         andalso member (op =) forbidden (Long_Name.base_name (Token.content_of token))
+      then fail "rejected_proof" ("forbidden proof method or setting: " ^ Token.content_of token)
+      else ();
+  in List.app check span end;
+
+(* Reject a copy of a theory already loaded through a parent/import, before
+   duplicate declarations or inherited target facts can affect the prefix. *)
+fun check_imported_target driver_theory name =
+  if exists (fn thy => Context.theory_base_name thy = name) (Theory.ancestors_of driver_theory)
+  then fail "context_error"
+    ("selected target theory is already inherited from the parent/imports: " ^ name)
+  else ();
+
 fun elem name attrs body = XML.Elem ((name, attrs), body);
 fun clean value = XML.content_of (YXML.parse_body value);
 fun text name value = elem name [] [XML.Text (clean value)];
@@ -58,7 +89,7 @@ fun run driver_theory request_file result_file =
     fun bounded seconds f arg =
       let val budget = Real.min (seconds, whole_budget - Time.toReal (Timer.checkRealTimer timer))
       in if budget <= 0.0 then fail "timeout" "whole-target deadline exceeded"
-         else Timeout.apply (Time.fromReal budget) f arg end;
+         else checked_timeout budget f arg end;
     fun init () =
       let
         val header = Thy_Header.read Position.none (value nodes "prefix");
@@ -120,6 +151,7 @@ fun run driver_theory request_file result_file =
           let
             fun step span st =
               let
+                val _ = check_proof_tokens span;
                 val tr = transition st span;
                 val name = Toplevel.name_of tr;
                 val _ = if name = "" orelse member (op =) ["using", "unfolding", "by", "apply", "prefer", "done"] name then ()
@@ -182,6 +214,7 @@ fun run driver_theory request_file result_file =
       in solve initial [] end;
     fun check_proof_span span =
       let
+        val _ = check_proof_tokens span;
         val proper = filter Token.is_proper span;
         val name = (case proper of [] => "" | t :: _ => Token.content_of t);
       in
@@ -199,6 +232,8 @@ fun run driver_theory request_file result_file =
     fun work () =
       let
         val prefix = value nodes "prefix";
+        val original_name = #1 (#name (Thy_Header.read Position.none prefix));
+        val _ = check_imported_target driver_theory original_name;
         val prefix_spans = spans (Toplevel.make_state NONE) prefix;
         fun prepare span state =
           let
@@ -211,14 +246,13 @@ fun run driver_theory request_file result_file =
         val _ = if Toplevel.is_proof context then fail "context_error" "prefix leaves an open proof" else ();
         (* Detect target/later facts already present in inherited sessions or prefix. *)
         val ctxt = Toplevel.context_of context;
-        val original_name = #1 (#name (Thy_Header.read Position.none prefix));
         val _ = List.app (fn name =>
           let val qualified = distinct (op =) [original_name ^ "." ^ name,
                                               Proof_Context.full_name ctxt (Binding.name name)]
           in if exists (can (Proof_Context.get_thms ctxt)) qualified then
                fail "context_error" ("target or later fact leaked into the input context: " ^ name)
              else () end) (values nodes "forbidden_names");
-        val clean = execute_text "context" context "declare [[quick_and_dirty = false]]";
+        val clean = execute_text "context" context "declare [[quick_and_dirty = false, smt_oracle = false]]";
         val opened = execute_text "target" clean (value nodes "statement" ^ "\n" ^ value nodes "proof_prefix");
         val _ = if Toplevel.is_proof opened andalso not (Toplevel.is_skipped opened) then ()
                 else fail "context_error" "oracle did not open a real target proof";

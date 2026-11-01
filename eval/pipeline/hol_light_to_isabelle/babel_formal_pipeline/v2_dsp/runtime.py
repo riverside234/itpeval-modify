@@ -66,6 +66,9 @@ class DspConfig:
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, (float, int)) or not math.isfinite(value) or value <= 0:
                 raise ValueError(name + " must be finite and positive")
+            # Timeout.apply deliberately ignores values below one millisecond.
+            if name in {"step_timeout_s", "hammer_timeout_s", "preplay_timeout_s"} and value < 0.001:
+                raise ValueError(name + " must be at least 0.001 seconds (Isabelle timeout resolution)")
         for name in ("session_roots", "session_dependencies"):
             value = getattr(self, name)
             if not isinstance(value, (tuple, list)) or any(not isinstance(x, str) or not x.strip() for x in value):
