@@ -1,0 +1,120 @@
+<dsp_result schema="dsp_native_result_v1" request_id="ee239df62ba1424f99518046a66275f1" input_sha256="89b5ea960508667e29180e959d9ec2f55e090fbdcfbf1da2fd5473be7fb7991b" action="search" success="false" target_closed="false"><proof></proof><category>missing_reconstruction</category><error>all native reconstructions failed to make progress</error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.023"><command>theory circle_average
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="5" source_state="3" duration_seconds="0.017"><command>locale circle_average_setup =
+  fixes zero     :: &quot;&apos;r&quot;
+    and add      :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;     (infixl &quot;+C&quot; 65)
+    and integral :: &quot;(&apos;r \&lt;Rightarrow&gt; &apos;r) \&lt;Rightarrow&gt; &apos;r&quot;
+  assumes add_zero      : &quot;\&lt;And&gt;x. x +C zero = x&quot;
+    and   add_comm      : &quot;\&lt;And&gt;x y. x +C y = y +C x&quot;
+    and   add_assoc     : &quot;\&lt;And&gt;x y z. (x +C y) +C z = x +C (y +C z)&quot;
+    and   integral_ext  : &quot;\&lt;And&gt;g h. (\&lt;forall&gt;\&lt;theta&gt;. g \&lt;theta&gt; = h \&lt;theta&gt;) \&lt;Longrightarrow&gt; integral g = integral h&quot;
+    and   integral_const: &quot;\&lt;And&gt;c. integral (\&lt;lambda&gt;_. c) = c&quot;
+    and   integral_add  : &quot;\&lt;And&gt;f g. integral (\&lt;lambda&gt;\&lt;theta&gt;. f \&lt;theta&gt; +C g \&lt;theta&gt;) = integral f +C integral g&quot;
+    and   integral_shift: &quot;\&lt;And&gt;f c. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="16" source_state="4" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="22" source_state="5" duration_seconds="0.005"><command>definition circleMap :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+  where &quot;circleMap c \&lt;theta&gt; \&lt;equiv&gt; \&lt;theta&gt; +C c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="23" source_state="6" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="8" line="25" source_state="7" duration_seconds="0.006"><command>definition circleAverage :: &quot;(&apos;r \&lt;Rightarrow&gt; &apos;r) \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+  where &quot;circleAverage f c \&lt;equiv&gt; integral (\&lt;lambda&gt;\&lt;theta&gt;. f (circleMap c \&lt;theta&gt;))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="9" line="26" source_state="8" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="10" line="32" source_state="9" duration_seconds="0.002"><command>lemma circleMap_zero: &quot;circleMap zero \&lt;theta&gt; = \&lt;theta&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="11" line="32" source_state="10" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="12" line="33" source_state="11" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="13" line="33" source_state="12" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="14" line="34" source_state="13" duration_seconds="0.001"><command>lemma circleAverage_zero: &quot;circleAverage f zero = integral f&quot;</command><error></error></attempt><attempt mode="context" success="true" index="15" line="34" source_state="14" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="16" line="35" source_state="15" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="17" line="35" source_state="16" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="36" source_state="17" duration_seconds="0.002"><command>lemma circleAverage_add:
+  &quot;circleAverage (\&lt;lambda&gt;z. f z +C g z) c =
+   circleAverage f c +C circleAverage g c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="38" source_state="18" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="20" line="39" source_state="19" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="21" line="39" source_state="20" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="40" source_state="21" duration_seconds="0.002"><command>lemma circleAverage_fun_add:
+  &quot;circleAverage (\&lt;lambda&gt;z. f (z +C c)) zero = circleAverage f c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="23" line="41" source_state="22" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="24" line="42" source_state="23" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="25" line="42" source_state="24" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="26" line="43" source_state="25" duration_seconds="0.001"><command>lemma circleMap_add:
+  &quot;circleMap (c +C d) \&lt;theta&gt; = circleMap c (circleMap d \&lt;theta&gt;)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="27" line="44" source_state="26" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="28" line="45" source_state="27" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="29" line="45" source_state="28" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="30" line="46" source_state="29" duration_seconds="0.002"><command>lemma circleAverage_shift:
+  &quot;circleAverage f (c +C d) = circleAverage (\&lt;lambda&gt;z. f (z +C d)) c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="31" line="47" source_state="30" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="32" line="48" source_state="31" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="33" line="48" source_state="32" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="34" line="49" source_state="33" duration_seconds="0.001"><command>lemma circleAverage_const:
+  &quot;circleAverage (\&lt;lambda&gt;_. k) c = k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="35" line="50" source_state="34" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="36" line="51" source_state="35" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="37" line="51" source_state="36" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="38" line="52" source_state="37" duration_seconds="0.002"><command>lemma circleAverage_add_const:
+  &quot;circleAverage (\&lt;lambda&gt;z. f z +C k) c = circleAverage f c +C k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="39" line="53" source_state="38" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="40" line="54" source_state="39" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="41" line="54" source_state="40" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="42" line="55" source_state="41" duration_seconds="0.002"><command>lemma circleAverage_comm_add:
+  &quot;circleAverage (\&lt;lambda&gt;z. f z +C g z) c =
+   circleAverage (\&lt;lambda&gt;z. g z +C f z) c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="43" line="57" source_state="42" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="44" line="58" source_state="43" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="45" line="58" source_state="44" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="46" line="59" source_state="45" duration_seconds="0.002"><command>lemma circleAverage_add_assoc:
+  &quot;circleAverage (\&lt;lambda&gt;z. (f z +C g z) +C h z) c =
+   circleAverage f c +C (circleAverage g c +C circleAverage h c)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="47" line="61" source_state="46" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="48" line="62" source_state="47" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="49" line="62" source_state="48" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="50" line="63" source_state="49" duration_seconds="0.001"><command>lemma circleAverage_center_comm:
+  &quot;circleAverage f (c +C d) = circleAverage f (d +C c)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="51" line="64" source_state="50" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="52" line="65" source_state="51" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="53" line="65" source_state="52" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="54" line="1" source_state="53" duration_seconds="0.001"><command>declare [[quick_and_dirty = false]]</command><error></error></attempt><attempt mode="target" success="true" index="55" line="1" source_state="54" duration_seconds="0.001"><command>lemma circleAverage_center_independent:
+  &quot;circleAverage f c = integral f&quot;</command><error></error></attempt><attempt mode="target" success="true" index="56" line="2" source_state="55" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="search" success="true" index="57" line="1" source_state="56" duration_seconds="0.000"><command>proof -</command><error></error></attempt><attempt mode="search" success="true" index="58" line="1" source_state="57" duration_seconds="0.000"><command>
+ </command><error></error></attempt><attempt mode="search" success="true" index="59" line="2" source_state="58" duration_seconds="0.001"><command>show ?thesis</command><error></error></attempt><attempt mode="search" success="true" index="60" line="2" source_state="59" duration_seconds="0.000"><command> </command><error></error></attempt><attempt mode="search" success="true" index="61" line="2" source_state="60" duration_seconds="0.000"><command>unfolding circleAverage_def circleMap_def</command><error></error></attempt><attempt mode="search" success="true" index="62" line="2" source_state="61" duration_seconds="0.000"><command>
+ </command><error></error></attempt><attempt mode="heuristic" success="false" index="63" line="0" source_state="62" duration_seconds="0.002"><command>by auto</command><error>Failed to apply initial proof method (line 1):
+goal (1 subgoal):
+ 1. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="heuristic" success="false" index="64" line="0" source_state="62" duration_seconds="0.001"><command>by simp</command><error>Failed to apply initial proof method (line 1):
+goal (1 subgoal):
+ 1. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="heuristic" success="false" index="65" line="0" source_state="62" duration_seconds="0.001"><command>by blast</command><error>Failed to apply initial proof method (line 1):
+goal (1 subgoal):
+ 1. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="heuristic" success="false" index="66" line="0" source_state="62" duration_seconds="0.001"><command>by fastforce</command><error>Failed to apply initial proof method (line 1):
+goal (1 subgoal):
+ 1. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="heuristic" success="false" index="67" line="0" source_state="62" duration_seconds="0.001"><command>by force</command><error>Failed to apply initial proof method (line 1):
+goal (1 subgoal):
+ 1. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="heuristic" success="false" index="68" line="0" source_state="62" duration_seconds="0.000"><command>by eval</command><error>Illegal free variable(s) in term: c, (+C), f, integral
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="heuristic" success="false" index="69" line="0" source_state="62" duration_seconds="0.001"><command>by presburger</command><error>Failed to apply initial proof method (line 1):
+goal (1 subgoal):
+ 1. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="heuristic" success="false" index="70" line="0" source_state="62" duration_seconds="0.000"><command>by sos</command><error>Undefined method: &quot;sos&quot; (line 1)
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="heuristic" success="false" index="71" line="0" source_state="62" duration_seconds="0.002"><command>by arith</command><error>Failed to apply initial proof method (line 1):
+goal (1 subgoal):
+ 1. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="heuristic" success="false" index="72" line="0" source_state="62" duration_seconds="0.001"><command>by linarith</command><error>Failed to apply initial proof method (line 1):
+goal (1 subgoal):
+ 1. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="heuristic" success="false" index="73" line="0" source_state="62" duration_seconds="0.006"><command>by (auto simp: field_simps)</command><error>Failed to apply initial proof method (line 1):
+goal (1 subgoal):
+ 1. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f
+At command &quot;by&quot; (line 1)</error></attempt><attempt mode="hammer" success="true" index="74" line="0" source_state="62" duration_seconds="10.075"><command>native Sledgehammer</command><error></error></attempt><attempt mode="reconstruction" success="false" index="75" line="0" source_state="62" duration_seconds="0.001"><command>using integral_shift by metis</command><error>exception Failure (&quot;missing_reconstruction&quot;, &quot;unsafe reconstructed command&quot;) raised (line 18 of &quot;/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2026-native/infrastructure/89d77c15f8331628/dsp_native.ML&quot;)</error></attempt></attempts><settings><param name="resolved_provers">cvc5 verit z3 e spass vampire zipperposition presburger fastforce linarith algebra order metis meson force blast simp satx fast auto argo</param><param name="native_parameters">{abduce = SOME 0, cache_dir = NONE, compress = NONE, debug = false, expect =
+ &quot;&quot;, fact_filter = SOME &quot;mepo&quot;, fact_thresholds = (0.45, 0.85), falsify =
+ SOME false, induction_rules = NONE, instantiate = NONE, isar_proofs =
+ SOME false, lam_trans = NONE, learn = false, max_facts = NONE,
+ max_mono_iters = NONE, max_new_mono_instances = NONE, max_proofs = 4,
+ minimize = true, overlord = false, preplay_timeout = 10.000, provers =
+ [&quot;cvc5&quot;, &quot;verit&quot;, &quot;z3&quot;, &quot;e&quot;, &quot;spass&quot;, &quot;vampire&quot;, &quot;zipperposition&quot;,
+  &quot;presburger&quot;, &quot;fastforce&quot;, &quot;linarith&quot;, &quot;algebra&quot;, &quot;order&quot;, &quot;metis&quot;,
+  &quot;meson&quot;, &quot;force&quot;, &quot;blast&quot;, &quot;simp&quot;, &quot;satx&quot;, &quot;fast&quot;, &quot;auto&quot;, &quot;argo&quot;],
+ slices = 192, smt_proofs = true, spy = false, strict = false, timeout =
+ 40.000, try0 = false, type_enc = NONE, uncurried_aliases = NONE, verbose =
+ false}</param><param name="caller_pide_enabled">true</param><param name="native_messages">metis found a proof...
+metis found a proof...
+metis: Try this: using integral_shift by metis (7 ms)
+metis: Duplicate proof
+metis found a proof...
+metis: Duplicate proof
+e found a proof...
+zipperposition found a proof...
+e: Duplicate proof
+zipperposition: Duplicate proof
+Done</param><param name="native_outcome">some</param><param name="native_message">Try this: using integral_shift by metis (4 ms)</param><param name="preplay_count">0</param><param name="preplayed_count">0</param><param name="preplay_results"></param><param name="reconstruction_source">native_tactic</param><param name="candidate_count">1</param></settings></dsp_result>
