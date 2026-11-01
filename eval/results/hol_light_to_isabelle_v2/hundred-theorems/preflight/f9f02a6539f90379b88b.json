@@ -1,0 +1,12 @@
+{
+  "pipeline": "v2-dsp",
+  "sketch_source": "draft",
+  "target": [
+    "hundred-theorems",
+    25,
+    "015_the_fundamental_theorem_of_integral_calculus",
+    "rsum_bound"
+  ],
+  "ok": false,
+  "error": "NativeFailure: native worker produced no structured result; inspect build.log"
+}
