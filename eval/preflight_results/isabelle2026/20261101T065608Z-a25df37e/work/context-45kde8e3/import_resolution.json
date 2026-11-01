@@ -1,0 +1,11 @@
+{
+  "original_imports": [
+    "HOL-Analysis.Multivariate_Analysis"
+  ],
+  "resolved_imports": [
+    "HOL-Analysis.Multivariate_Analysis"
+  ],
+  "session_dependencies": [
+    "HOL-Analysis"
+  ]
+}

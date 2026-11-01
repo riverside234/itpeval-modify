@@ -1,0 +1,287 @@
+<dsp_result schema="dsp_native_result_v1" request_id="cce263f8e2204d0eb5413ee8833c2e1f" input_sha256="d265a0d2e7a48182db0221e34e85bef3e2ef29566a09300bc948ff6cbfe69f21" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.000"><command>(* Author: Lukas Bulwahn &lt;lukas.bulwahn-at-gmail.com&gt; *)
+
+</command><error></error></attempt><attempt mode="context" success="true" index="2" line="3" source_state="1" duration_seconds="0.000"><command>section \&lt;open&gt;Ptolemy&apos;s Theorem\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="5" source_state="3" duration_seconds="0.602"><command>theory Ptolemys_Theorem
+imports
+  &quot;HOL-Analysis.Multivariate_Analysis&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="1" source_state="4" duration_seconds="0.000"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="6" line="8" source_state="5" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="7" line="10" source_state="6" duration_seconds="0.000"><command>subsection \&lt;open&gt;Preliminaries\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="8" line="10" source_state="7" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="9" line="12" source_state="8" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Additions to Rat theory\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="10" line="12" source_state="9" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="11" line="14" source_state="10" duration_seconds="0.000"><command>hide_const (open) normalize</command><error></error></attempt><attempt mode="context" success="true" index="12" line="14" source_state="11" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="13" line="16" source_state="12" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Additions to Transcendental theory\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="14" line="16" source_state="13" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="15" line="18" source_state="14" duration_seconds="0.006"><command>text \&lt;open&gt;
+Lemmas about @{const arcsin} and @{const arccos} commonly involve to show that their argument is
+in the domain of those partial functions, i.e., the argument @{term y} is between @{term &quot;-1::real&quot;}
+and @{term &quot;1::real&quot;}.
+As the argumentation for @{term &quot;(-1::real) \&lt;le&gt; y&quot;} and @{term &quot;y \&lt;le&gt; (1::real)&quot;} is often very similar,
+we prefer to prove @{term &quot;\&lt;bar&gt;y\&lt;bar&gt; \&lt;le&gt; (1::real)&quot;} to the two goals above.
+
+The lemma for rewriting the term @{term &quot;cos (arccos y)&quot;} is already provided in the Isabelle
+distribution with name @{thm [source] cos_arccos_abs}. Here, we further provide the analogue on
+@{term &quot;arcsin&quot;} for rewriting @{term &quot;sin (arcsin y)&quot;}.
+\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="16" line="28" source_state="15" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="17" line="30" source_state="16" duration_seconds="0.001"><command>lemma sin_arcsin_abs: &quot;\&lt;bar&gt;y\&lt;bar&gt; \&lt;le&gt; 1 \&lt;Longrightarrow&gt; sin (arcsin y) = y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="18" line="30" source_state="17" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="19" line="32" source_state="18" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="20" line="32" source_state="19" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="21" line="35" source_state="20" duration_seconds="0.001"><command>text \&lt;open&gt;
+The further lemmas are the required variants from existing lemmas @{thm [source] arccos_lbound}
+and @{thm [source] arccos_ubound}.
+\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="22" line="38" source_state="21" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="23" line="40" source_state="22" duration_seconds="0.001"><command>lemma arccos_lbound_abs [simp]:
+  &quot;\&lt;bar&gt;y\&lt;bar&gt; \&lt;le&gt; 1 \&lt;Longrightarrow&gt; 0 \&lt;le&gt; arccos y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="24" line="41" source_state="23" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="25" line="43" source_state="24" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="26" line="43" source_state="25" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="27" line="46" source_state="26" duration_seconds="0.001"><command>lemma arccos_ubound_abs [simp]:
+  &quot;\&lt;bar&gt;y\&lt;bar&gt; \&lt;le&gt; 1 \&lt;Longrightarrow&gt; arccos y \&lt;le&gt; pi&quot;</command><error></error></attempt><attempt mode="context" success="true" index="28" line="47" source_state="27" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="29" line="49" source_state="28" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="30" line="49" source_state="29" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="31" line="52" source_state="30" duration_seconds="0.002"><command>text \&lt;open&gt;
+As we choose angles to be between @{term &quot;0::real&quot;} between @{term &quot;2 * pi&quot;},
+we need some lemmas to reason about the sign of @{term &quot;sin x&quot;}
+for angles @{term &quot;x&quot;}.
+\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="32" line="56" source_state="31" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="33" line="58" source_state="32" duration_seconds="0.001"><command>lemma sin_ge_zero_iff:
+  assumes &quot;0 \&lt;le&gt; x&quot; &quot;x &lt; 2 * pi&quot;
+  shows &quot;0 \&lt;le&gt; sin x \&lt;longleftrightarrow&gt; x \&lt;le&gt; pi&quot;</command><error></error></attempt><attempt mode="context" success="true" index="34" line="60" source_state="33" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="35" line="62" source_state="34" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="36" line="62" source_state="35" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="37" line="65" source_state="36" duration_seconds="0.001"><command>lemma sin_less_zero_iff:
+  assumes &quot;0 \&lt;le&gt; x&quot; &quot;x &lt; 2 * pi&quot;
+  shows &quot;sin x &lt; 0 \&lt;longleftrightarrow&gt; pi &lt; x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="38" line="67" source_state="37" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="39" line="69" source_state="38" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="40" line="69" source_state="39" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="41" line="72" source_state="40" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Addition to Finite-Cartesian-Product theory\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="42" line="72" source_state="41" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="43" line="74" source_state="42" duration_seconds="0.000"><command>text \&lt;open&gt;
+Here follow generally useful additions and specialised equations
+for two-dimensional real-valued vectors.
+\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="44" line="77" source_state="43" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="45" line="79" source_state="44" duration_seconds="0.001"><command>lemma axis_nth_eq_0 [simp]:
+  assumes &quot;i \&lt;noteq&gt; j&quot;
+  shows &quot;axis i x $ j = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="46" line="81" source_state="45" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="47" line="83" source_state="46" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="48" line="83" source_state="47" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="49" line="86" source_state="48" duration_seconds="0.001"><command>lemma norm_axis:
+  fixes x :: real
+  shows &quot;norm (axis i x) = abs x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="50" line="88" source_state="49" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="51" line="90" source_state="50" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="52" line="90" source_state="51" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="53" line="93" source_state="52" duration_seconds="0.001"><command>lemma norm_eq_on_real_2_vec:
+  fixes x :: &quot;real ^ 2&quot;
+  shows &quot;norm x = sqrt ((x $ 1) ^ 2 + (x $ 2) ^ 2)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="54" line="95" source_state="53" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="55" line="97" source_state="54" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="56" line="97" source_state="55" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="57" line="100" source_state="56" duration_seconds="0.002"><command>lemma dist_eq_on_real_2_vec:
+  fixes a b :: &quot;real ^ 2&quot;
+  shows &quot;dist a b = sqrt ((a $ 1 - b $ 1) ^ 2 + (a $ 2 - b $ 2) ^ 2)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="58" line="102" source_state="57" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="59" line="104" source_state="58" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="60" line="104" source_state="59" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="61" line="107" source_state="60" duration_seconds="0.000"><command>subsection \&lt;open&gt;Polar Form of Two-Dimensional Real-Valued Vectors\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="62" line="107" source_state="61" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="63" line="109" source_state="62" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Definitions to Transfer to Polar Form and Back\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="64" line="109" source_state="63" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="65" line="111" source_state="64" duration_seconds="0.007"><command>definition of_radiant :: &quot;real \&lt;Rightarrow&gt; real ^ 2&quot;
+where
+  &quot;of_radiant \&lt;omega&gt; = axis 1 (cos \&lt;omega&gt;) + axis 2 (sin \&lt;omega&gt;)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="66" line="113" source_state="65" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="67" line="115" source_state="66" duration_seconds="0.007"><command>definition normalize :: &quot;real ^ 2 \&lt;Rightarrow&gt; real ^ 2&quot;
+where
+  &quot;normalize p = (if p = 0 then axis 1 1 else (1 / norm p) *\&lt;^sub&gt;R p)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="68" line="117" source_state="67" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="69" line="119" source_state="68" duration_seconds="0.007"><command>definition radiant_of :: &quot;real ^ 2 \&lt;Rightarrow&gt; real&quot;
+where
+  &quot;radiant_of p = (THE \&lt;omega&gt;. 0 \&lt;le&gt; \&lt;omega&gt; \&lt;and&gt; \&lt;omega&gt; &lt; 2 * pi \&lt;and&gt; of_radiant \&lt;omega&gt; = normalize p)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="70" line="121" source_state="69" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="71" line="123" source_state="70" duration_seconds="0.006"><command>text \&lt;open&gt;
+The vector @{term &quot;of_radiant \&lt;omega&gt;&quot;} is the vector with length @{term &quot;1::real&quot;} and angle @{term &quot;\&lt;omega&gt;&quot;}
+to the first axis.
+We normalize vectors to length @{term &quot;1::real&quot;} keeping their orientation with the normalize function.
+Conversely, @{term &quot;radiant_of p&quot;} is the angle of vector @{term p} to the first axis, where we
+choose @{term &quot;radiant_of&quot;} to return angles between @{term &quot;0::real&quot;} and @{term &quot;2 * pi&quot;},
+following the usual high-school convention.
+With these definitions, we can express the main result
+@{term &quot;norm p *\&lt;^sub&gt;R of_radiant (radiant_of p) = p&quot;}.
+Note that the main result holds for any definition of @{term &quot;radiant_of 0&quot;}.
+So, we choose to define @{term &quot;normalize 0&quot;} and @{term &quot;radiant_of 0&quot;}, such that
+@{term &quot;radiant_of 0 = 0&quot;}.
+\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="72" line="135" source_state="71" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="73" line="137" source_state="72" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Lemmas on @{const of_radiant}\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="74" line="137" source_state="73" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="75" line="139" source_state="74" duration_seconds="0.001"><command>lemma nth_of_radiant_1 [simp]:
+  &quot;of_radiant \&lt;omega&gt; $ 1 = cos \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="76" line="140" source_state="75" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="77" line="142" source_state="76" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="78" line="142" source_state="77" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="79" line="145" source_state="78" duration_seconds="0.001"><command>lemma nth_of_radiant_2 [simp]:
+  &quot;of_radiant \&lt;omega&gt; $ 2 = sin \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="80" line="146" source_state="79" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="81" line="148" source_state="80" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="82" line="148" source_state="81" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="83" line="151" source_state="82" duration_seconds="0.001"><command>lemma norm_of_radiant:
+  &quot;norm (of_radiant \&lt;omega&gt;) = 1&quot;</command><error></error></attempt><attempt mode="context" success="true" index="84" line="152" source_state="83" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="85" line="154" source_state="84" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="86" line="154" source_state="85" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="87" line="157" source_state="86" duration_seconds="0.001"><command>lemma of_radiant_plus_2pi:
+  &quot;of_radiant (\&lt;omega&gt; + 2 * pi) = of_radiant \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="88" line="158" source_state="87" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="89" line="160" source_state="88" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="90" line="160" source_state="89" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="91" line="163" source_state="90" duration_seconds="0.001"><command>lemma of_radiant_minus_2pi:
+  &quot;of_radiant (\&lt;omega&gt; - 2 * pi) = of_radiant \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="92" line="164" source_state="91" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="93" line="166" source_state="92" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="94" line="166" source_state="93" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="95" line="169" source_state="94" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Lemmas on @{const normalize}\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="96" line="169" source_state="95" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="97" line="171" source_state="96" duration_seconds="0.001"><command>lemma normalize_eq:
+  &quot;norm p *\&lt;^sub&gt;R normalize p = p&quot;</command><error></error></attempt><attempt mode="context" success="true" index="98" line="172" source_state="97" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="99" line="174" source_state="98" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="100" line="174" source_state="99" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="101" line="177" source_state="100" duration_seconds="0.001"><command>lemma norm_normalize:
+  &quot;norm (normalize p) = 1&quot;</command><error></error></attempt><attempt mode="context" success="true" index="102" line="178" source_state="101" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="103" line="180" source_state="102" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="104" line="180" source_state="103" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="105" line="183" source_state="104" duration_seconds="0.001"><command>lemma nth_normalize [simp]:
+  &quot;\&lt;bar&gt;normalize p $ i\&lt;bar&gt; \&lt;le&gt; 1&quot;</command><error></error></attempt><attempt mode="context" success="true" index="106" line="184" source_state="105" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="107" line="186" source_state="106" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="108" line="186" source_state="107" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="109" line="189" source_state="108" duration_seconds="0.001"><command>lemma normalize_square:
+  &quot;(normalize p $ 1)\&lt;^sup&gt;2 + (normalize p $ 2)\&lt;^sup&gt;2 = 1&quot;</command><error></error></attempt><attempt mode="context" success="true" index="110" line="190" source_state="109" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="111" line="192" source_state="110" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="112" line="192" source_state="111" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="113" line="195" source_state="112" duration_seconds="0.001"><command>lemma nth_normalize_ge_zero_iff:
+  &quot;0 \&lt;le&gt; normalize p $ i \&lt;longleftrightarrow&gt; 0 \&lt;le&gt; p $ i&quot;</command><error></error></attempt><attempt mode="context" success="true" index="114" line="196" source_state="113" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="115" line="198" source_state="114" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="116" line="198" source_state="115" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="117" line="201" source_state="116" duration_seconds="0.001"><command>lemma nth_normalize_less_zero_iff:
+  &quot;normalize p $ i &lt; 0 \&lt;longleftrightarrow&gt; p $ i &lt; 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="118" line="202" source_state="117" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="119" line="204" source_state="118" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="120" line="204" source_state="119" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="121" line="207" source_state="120" duration_seconds="0.001"><command>lemma normalize_boundary_iff:
+  &quot;\&lt;bar&gt;normalize p $ 1\&lt;bar&gt; = 1 \&lt;longleftrightarrow&gt; p $ 2 = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="122" line="208" source_state="121" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="123" line="210" source_state="122" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="124" line="210" source_state="123" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="125" line="213" source_state="124" duration_seconds="0.001"><command>lemma between_normalize_if_distant_from_0:
+  assumes &quot;norm p \&lt;ge&gt; 1&quot;
+  shows &quot;between (0, p) (normalize p)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="126" line="215" source_state="125" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="127" line="217" source_state="126" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="128" line="217" source_state="127" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="129" line="220" source_state="128" duration_seconds="0.001"><command>lemma between_normalize_if_near_0:
+  assumes &quot;norm p \&lt;le&gt; 1&quot;
+  shows &quot;between (0, normalize p) p&quot;</command><error></error></attempt><attempt mode="context" success="true" index="130" line="222" source_state="129" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="131" line="224" source_state="130" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="132" line="224" source_state="131" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="133" line="227" source_state="132" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Lemmas on @{const radiant_of}\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="134" line="227" source_state="133" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="135" line="229" source_state="134" duration_seconds="0.001"><command>lemma radiant_of:
+  &quot;0 \&lt;le&gt; radiant_of p \&lt;and&gt; radiant_of p &lt; 2 * pi \&lt;and&gt; of_radiant (radiant_of p) = normalize p&quot;</command><error></error></attempt><attempt mode="context" success="true" index="136" line="230" source_state="135" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="137" line="232" source_state="136" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="138" line="232" source_state="137" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="139" line="235" source_state="138" duration_seconds="0.001"><command>lemma radiant_of_bounds [simp]:
+  &quot;0 \&lt;le&gt; radiant_of p&quot; &quot;radiant_of p &lt; 2 * pi&quot;</command><error></error></attempt><attempt mode="context" success="true" index="140" line="236" source_state="139" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="141" line="238" source_state="140" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="142" line="238" source_state="141" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="143" line="241" source_state="142" duration_seconds="0.001"><command>lemma radiant_of_weak_ubound [simp]:
+  &quot;radiant_of p \&lt;le&gt; 2 * pi&quot;</command><error></error></attempt><attempt mode="context" success="true" index="144" line="242" source_state="143" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="145" line="244" source_state="144" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="146" line="244" source_state="145" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="147" line="247" source_state="146" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Main Equations for Transforming to Polar Form\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="148" line="247" source_state="147" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="149" line="249" source_state="148" duration_seconds="0.001"><command>lemma polar_form_eq:
+  &quot;norm p *\&lt;^sub&gt;R of_radiant (radiant_of p) = p&quot;</command><error></error></attempt><attempt mode="context" success="true" index="150" line="250" source_state="149" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="151" line="252" source_state="150" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="152" line="252" source_state="151" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="153" line="255" source_state="152" duration_seconds="0.001"><command>lemma relative_polar_form_eq:
+  &quot;Q + dist P Q *\&lt;^sub&gt;R of_radiant (radiant_of (P - Q)) = P&quot;</command><error></error></attempt><attempt mode="context" success="true" index="154" line="256" source_state="153" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="155" line="258" source_state="154" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="156" line="258" source_state="155" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="157" line="261" source_state="156" duration_seconds="0.000"><command>subsection \&lt;open&gt;Ptolemy&apos;s Theorem\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="158" line="261" source_state="157" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="159" line="263" source_state="158" duration_seconds="0.003"><command>lemma dist_circle_segment:
+  assumes &quot;0 \&lt;le&gt; radius&quot; &quot;0 \&lt;le&gt; \&lt;alpha&gt;&quot; &quot;\&lt;alpha&gt; \&lt;le&gt; \&lt;beta&gt;&quot; &quot;\&lt;beta&gt; \&lt;le&gt; 2 * pi&quot;
+  shows &quot;dist (center + radius *\&lt;^sub&gt;R of_radiant \&lt;alpha&gt;) (center + radius *\&lt;^sub&gt;R of_radiant \&lt;beta&gt;) = 2 * radius * sin ((\&lt;beta&gt; - \&lt;alpha&gt;) / 2)&quot;
+    (is &quot;?lhs = ?rhs&quot;)</command><error></error></attempt><attempt mode="context" success="true" index="160" line="266" source_state="159" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="161" line="268" source_state="160" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="162" line="268" source_state="161" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="163" line="271" source_state="162" duration_seconds="0.002"><command>theorem ptolemy_trigonometric:
+  fixes \&lt;omega&gt;\&lt;^sub&gt;1 \&lt;omega&gt;\&lt;^sub&gt;2 \&lt;omega&gt;\&lt;^sub&gt;3 :: real
+  shows &quot;sin (\&lt;omega&gt;\&lt;^sub&gt;1 + \&lt;omega&gt;\&lt;^sub&gt;2) * sin (\&lt;omega&gt;\&lt;^sub&gt;2 + \&lt;omega&gt;\&lt;^sub&gt;3) = sin \&lt;omega&gt;\&lt;^sub&gt;1 * sin \&lt;omega&gt;\&lt;^sub&gt;3 + sin \&lt;omega&gt;\&lt;^sub&gt;2 * sin (\&lt;omega&gt;\&lt;^sub&gt;1 + \&lt;omega&gt;\&lt;^sub&gt;2 + \&lt;omega&gt;\&lt;^sub&gt;3)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="164" line="273" source_state="163" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="165" line="275" source_state="164" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="166" line="275" source_state="165" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="167" line="1" source_state="166" duration_seconds="0.000"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="168" line="1" source_state="167" duration_seconds="0.005"><command>theorem ptolemy:
+  fixes A B C D center :: &quot;real ^ 2&quot;
+  assumes &quot;dist center A = radius&quot; and &quot;dist center B = radius&quot;
+  assumes &quot;dist center C = radius&quot; and &quot;dist center D = radius&quot;
+  assumes ordering_of_points:
+    &quot;radiant_of (A - center) \&lt;le&gt; radiant_of (B - center)&quot;
+    &quot;radiant_of (B - center) \&lt;le&gt; radiant_of (C - center)&quot;
+    &quot;radiant_of (C - center) \&lt;le&gt; radiant_of (D - center)&quot;
+  shows &quot;dist A C * dist B D = dist A B * dist C D + dist A D * dist B C&quot;</command><error></error></attempt><attempt mode="target" success="true" index="169" line="9" source_state="168" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

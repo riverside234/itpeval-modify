@@ -1,0 +1,4 @@
+session DSP_Replay_80e1511f92054db8b6c1b6099ad94b32 = "HOL" +
+  options [document = false, quick_and_dirty = false]
+  sessions "HOL-Library"
+  theories "Ballot"

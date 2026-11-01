@@ -1,0 +1,68 @@
+<dsp_result schema="dsp_native_result_v1" request_id="354ee8b9f5a14967b722487ef4cb157b" input_sha256="a6e97f303bb0fca457695d168aa774391c6b81c3c72c72cfe9259996dc879f43" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.038"><command>theory graph_paths
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="5" source_state="3" duration_seconds="0.028"><command>inductive Path :: &quot;(&apos;a \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; bool&quot;
+  for E :: &quot;&apos;a \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; bool&quot;
+where
+  Pnil:  &quot;Path E v v&quot;
+| Pstep: &quot;Path E u v \&lt;Longrightarrow&gt; E v w \&lt;Longrightarrow&gt; Path E u w&quot;</command><error></error></attempt><attempt mode="context" success="true" index="5" line="9" source_state="4" duration_seconds="0.001"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="11" source_state="5" duration_seconds="0.008"><command>definition undirected :: &quot;(&apos;a \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; bool&quot;
+  where &quot;undirected E \&lt;equiv&gt; \&lt;forall&gt;x y. E x y \&lt;longrightarrow&gt; E y x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="12" source_state="6" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="8" line="14" source_state="7" duration_seconds="0.007"><command>definition Erev :: &quot;(&apos;a \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; bool&quot;
+  where &quot;Erev E x y \&lt;equiv&gt; E y x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="9" line="15" source_state="8" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="10" line="17" source_state="9" duration_seconds="0.001"><command>lemma path_refl: &quot;Path E v v&quot;</command><error></error></attempt><attempt mode="context" success="true" index="11" line="17" source_state="10" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="12" line="18" source_state="11" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="13" line="18" source_state="12" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="14" line="20" source_state="13" duration_seconds="0.003"><command>lemma path_trans:
+  assumes &quot;Path E u v&quot; &quot;Path E v w&quot; shows &quot;Path E u w&quot;</command><error></error></attempt><attempt mode="context" success="true" index="15" line="21" source_state="14" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="16" line="22" source_state="15" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="17" line="22" source_state="16" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="24" source_state="17" duration_seconds="0.003"><command>lemma trans: &quot;Path E u v \&lt;Longrightarrow&gt; Path E v w \&lt;Longrightarrow&gt; Path E u w&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="24" source_state="18" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="20" line="25" source_state="19" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="21" line="25" source_state="20" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="28" source_state="21" duration_seconds="0.002"><command>lemma edge_path: &quot;E u v \&lt;Longrightarrow&gt; Path E u v&quot;</command><error></error></attempt><attempt mode="context" success="true" index="23" line="28" source_state="22" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="24" line="29" source_state="23" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="25" line="29" source_state="24" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="26" line="31" source_state="25" duration_seconds="0.002"><command>lemma concat_edge_right: &quot;Path E u v \&lt;Longrightarrow&gt; E v w \&lt;Longrightarrow&gt; Path E u w&quot;</command><error></error></attempt><attempt mode="context" success="true" index="27" line="31" source_state="26" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="28" line="32" source_state="27" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="29" line="32" source_state="28" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="30" line="34" source_state="29" duration_seconds="0.003"><command>lemma concat: &quot;Path E u v \&lt;Longrightarrow&gt; Path E v w \&lt;Longrightarrow&gt; Path E u w&quot;</command><error></error></attempt><attempt mode="context" success="true" index="31" line="34" source_state="30" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="32" line="35" source_state="31" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="33" line="35" source_state="32" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="34" line="37" source_state="33" duration_seconds="0.002"><command>lemma concat_edge_left: &quot;E u v \&lt;Longrightarrow&gt; Path E v w \&lt;Longrightarrow&gt; Path E u w&quot;</command><error></error></attempt><attempt mode="context" success="true" index="35" line="37" source_state="34" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="36" line="38" source_state="35" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="37" line="38" source_state="36" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="38" line="40" source_state="37" duration_seconds="0.003"><command>lemma concat3:
+  &quot;Path E u v \&lt;Longrightarrow&gt; Path E v w \&lt;Longrightarrow&gt; Path E w t \&lt;Longrightarrow&gt; Path E u t&quot;</command><error></error></attempt><attempt mode="context" success="true" index="39" line="41" source_state="38" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="40" line="42" source_state="39" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="41" line="42" source_state="40" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="42" line="45" source_state="41" duration_seconds="0.003"><command>lemma reverse_cons:
+  assumes hE: &quot;undirected E&quot; and e: &quot;E m v&quot; and ih: &quot;Path E m u&quot;
+  shows &quot;Path E v u&quot;</command><error></error></attempt><attempt mode="context" success="true" index="43" line="47" source_state="42" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="44" line="48" source_state="43" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="45" line="48" source_state="44" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="46" line="50" source_state="45" duration_seconds="0.002"><command>lemma reverse_path:
+  assumes hE: &quot;undirected E&quot; and p: &quot;Path E u v&quot;
+  shows &quot;Path E v u&quot;</command><error></error></attempt><attempt mode="context" success="true" index="47" line="52" source_state="46" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="48" line="53" source_state="47" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="49" line="53" source_state="48" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="50" line="56" source_state="49" duration_seconds="0.003"><command>lemma reverse_cons_Erev:
+  assumes e: &quot;E m v&quot; and ih: &quot;Path (Erev E) m u&quot;
+  shows &quot;Path (Erev E) v u&quot;</command><error></error></attempt><attempt mode="context" success="true" index="51" line="58" source_state="50" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="52" line="59" source_state="51" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="53" line="59" source_state="52" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="54" line="61" source_state="53" duration_seconds="0.002"><command>lemma reverse_in_Erev:
+  assumes p: &quot;Path E u v&quot;
+  shows &quot;Path (Erev E) v u&quot;</command><error></error></attempt><attempt mode="context" success="true" index="55" line="63" source_state="54" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="56" line="64" source_state="55" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="57" line="64" source_state="56" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="58" line="1" source_state="57" duration_seconds="0.001"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="59" line="1" source_state="58" duration_seconds="0.003"><command>lemma cycle_refl:
+  &quot;Path E v w \&lt;Longrightarrow&gt; Path E w v \&lt;Longrightarrow&gt; Path E v v&quot;</command><error></error></attempt><attempt mode="target" success="true" index="60" line="2" source_state="59" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

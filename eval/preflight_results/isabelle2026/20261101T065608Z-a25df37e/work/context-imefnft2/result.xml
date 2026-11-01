@@ -1,0 +1,265 @@
+<dsp_result schema="dsp_native_result_v1" request_id="72e49ab68f0d4a4fa7b2c7a21516027f" input_sha256="e6593542c6cbdfcf164378082fd67f5dfcc5ccd760cfeda2572f606c8227a7e0" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.038"><command>theory polynomial
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="10" source_state="3" duration_seconds="0.339"><command>datatype mynat = Nat_O | Nat_S mynat</command><error></error></attempt><attempt mode="context" success="true" index="5" line="10" source_state="4" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="12" source_state="5" duration_seconds="0.039"><command>fun mynat_add :: &quot;mynat \&lt;Rightarrow&gt; mynat \&lt;Rightarrow&gt; mynat&quot; where
+  &quot;mynat_add Nat_O m = m&quot;
+| &quot;mynat_add (Nat_S n&apos;) m = Nat_S (mynat_add n&apos; m)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="14" source_state="6" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="8" line="16" source_state="7" duration_seconds="0.000"><command>lemma mynat_add_O_left: &quot;mynat_add Nat_O m = m&quot;</command><error></error></attempt><attempt mode="context" success="true" index="9" line="16" source_state="8" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="10" line="17" source_state="9" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="11" line="17" source_state="10" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="12" line="18" source_state="11" duration_seconds="0.001"><command>lemma mynat_add_S_left: &quot;mynat_add (Nat_S n) m = Nat_S (mynat_add n m)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="13" line="18" source_state="12" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="14" line="19" source_state="13" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="15" line="19" source_state="14" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="16" line="20" source_state="15" duration_seconds="0.009"><command>inductive mynat_le :: &quot;mynat \&lt;Rightarrow&gt; mynat \&lt;Rightarrow&gt; bool&quot; where
+  le_n : &quot;mynat_le n n&quot;
+| le_S : &quot;mynat_le n m \&lt;Longrightarrow&gt; mynat_le n (Nat_S m)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="17" line="22" source_state="16" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="24" source_state="17" duration_seconds="0.000"><command>lemma mynat_zero_le: &quot;mynat_le Nat_O n&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="24" source_state="18" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="20" line="25" source_state="19" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="21" line="25" source_state="20" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="26" source_state="21" duration_seconds="0.000"><command>lemma mynat_add_zero_r: &quot;mynat_add n Nat_O = n&quot;</command><error></error></attempt><attempt mode="context" success="true" index="23" line="26" source_state="22" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="24" line="27" source_state="23" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="25" line="27" source_state="24" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="26" line="28" source_state="25" duration_seconds="0.001"><command>lemma mynat_succ_le_succ: &quot;mynat_le n m \&lt;Longrightarrow&gt; mynat_le (Nat_S n) (Nat_S m)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="27" line="28" source_state="26" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="28" line="29" source_state="27" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="29" line="29" source_state="28" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="30" line="30" source_state="29" duration_seconds="0.001"><command>lemma mynat_add_S_r: &quot;mynat_add m (Nat_S n) = Nat_S (mynat_add m n)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="31" line="30" source_state="30" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="32" line="31" source_state="31" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="33" line="31" source_state="32" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="34" line="32" source_state="33" duration_seconds="0.001"><command>lemma mynat_add_comm: &quot;mynat_add n m = mynat_add m n&quot;</command><error></error></attempt><attempt mode="context" success="true" index="35" line="32" source_state="34" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="36" line="33" source_state="35" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="37" line="33" source_state="36" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="38" line="38" source_state="37" duration_seconds="0.321"><command>datatype &apos;a mylist = NilL | ConsL &apos;a &quot;&apos;a mylist&quot;</command><error></error></attempt><attempt mode="context" success="true" index="39" line="38" source_state="38" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="40" line="40" source_state="39" duration_seconds="0.018"><command>inductive InL :: &quot;&apos;a \&lt;Rightarrow&gt; &apos;a mylist \&lt;Rightarrow&gt; bool&quot; where
+  In_head : &quot;InL x (ConsL x xs)&quot;
+| In_tail : &quot;InL x xs \&lt;Longrightarrow&gt; InL x (ConsL y xs)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="41" line="42" source_state="40" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="42" line="44" source_state="41" duration_seconds="0.021"><command>inductive NoDupL :: &quot;&apos;a mylist \&lt;Rightarrow&gt; bool&quot; where
+  ND_nil  : &quot;NoDupL NilL&quot;
+| ND_cons : &quot;\&lt;not&gt; InL x xs \&lt;Longrightarrow&gt; NoDupL xs \&lt;Longrightarrow&gt; NoDupL (ConsL x xs)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="43" line="46" source_state="42" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="44" line="48" source_state="43" duration_seconds="0.061"><command>fun lengthL :: &quot;&apos;a mylist \&lt;Rightarrow&gt; mynat&quot; where
+  &quot;lengthL NilL = Nat_O&quot;
+| &quot;lengthL (ConsL _ rest) = Nat_S (lengthL rest)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="45" line="50" source_state="44" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="46" line="56" source_state="45" duration_seconds="0.073"><command>locale polynomial_setup =
+  fixes zero_r :: &quot;&apos;r&quot;
+    and one_r  :: &quot;&apos;r&quot;
+    and opp_r  :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+    and add_r  :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;  (infixl \&lt;open&gt;+R\&lt;close&gt; 65)
+    and mul_r  :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;  (infixl \&lt;open&gt;*R\&lt;close&gt; 70)
+    and zero_p :: &quot;&apos;p&quot;
+    and one_p  :: &quot;&apos;p&quot;
+    and opp_p  :: &quot;&apos;p \&lt;Rightarrow&gt; &apos;p&quot;
+    and add_p  :: &quot;&apos;p \&lt;Rightarrow&gt; &apos;p \&lt;Rightarrow&gt; &apos;p&quot;  (infixl \&lt;open&gt;+P\&lt;close&gt; 65)
+    and mul_p  :: &quot;&apos;p \&lt;Rightarrow&gt; &apos;p \&lt;Rightarrow&gt; &apos;p&quot;  (infixl \&lt;open&gt;*P\&lt;close&gt; 70)
+    and degree   :: &quot;&apos;p \&lt;Rightarrow&gt; mynat&quot;
+    and monomial :: &quot;mynat \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;p&quot;
+    and eval     :: &quot;&apos;p \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+  assumes
+    r_one_neq_zero  : &quot;one_r \&lt;noteq&gt; zero_r&quot;
+  and r_add_comm    : &quot;\&lt;And&gt;x y.   x +R y = y +R x&quot;
+  and r_add_assoc   : &quot;\&lt;And&gt;x y z. (x +R y) +R z = x +R (y +R z)&quot;
+  and r_add_zero    : &quot;\&lt;And&gt;x.     x +R zero_r = x&quot;
+  and r_add_opp     : &quot;\&lt;And&gt;x.     x +R opp_r x = zero_r&quot;
+  and r_mul_comm    : &quot;\&lt;And&gt;x y.   x *R y = y *R x&quot;
+  and r_mul_assoc   : &quot;\&lt;And&gt;x y z. (x *R y) *R z = x *R (y *R z)&quot;
+  and r_mul_one     : &quot;\&lt;And&gt;x.     x *R one_r = x&quot;
+  and r_dist_l      : &quot;\&lt;And&gt;x y z. x *R (y +R z) = (x *R y) +R (x *R z)&quot;
+  and r_mul_zero    : &quot;\&lt;And&gt;x.     x *R zero_r = zero_r&quot;
+  and r_no_zero_div : &quot;\&lt;And&gt;x y.   x *R y = zero_r \&lt;Longrightarrow&gt; x = zero_r \&lt;or&gt; y = zero_r&quot;
+  and p_one_neq_zero : &quot;one_p \&lt;noteq&gt; zero_p&quot;
+  and p_add_comm    : &quot;\&lt;And&gt;x y.   x +P y = y +P x&quot;
+  and p_add_assoc   : &quot;\&lt;And&gt;x y z. (x +P y) +P z = x +P (y +P z)&quot;
+  and p_add_zero    : &quot;\&lt;And&gt;x.     x +P zero_p = x&quot;
+  and p_add_opp     : &quot;\&lt;And&gt;x.     x +P opp_p x = zero_p&quot;
+  and p_mul_comm    : &quot;\&lt;And&gt;x y.   x *P y = y *P x&quot;
+  and p_mul_assoc   : &quot;\&lt;And&gt;x y z. (x *P y) *P z = x *P (y *P z)&quot;
+  and p_mul_one     : &quot;\&lt;And&gt;x.     x *P one_p = x&quot;
+  and p_dist_l      : &quot;\&lt;And&gt;x y z. x *P (y +P z) = (x *P y) +P (x *P z)&quot;
+  and p_mul_zero    : &quot;\&lt;And&gt;x.     x *P zero_p = zero_p&quot;
+  and p_no_zero_div : &quot;\&lt;And&gt;x y.   x *P y = zero_p \&lt;Longrightarrow&gt; x = zero_p \&lt;or&gt; y = zero_p&quot;
+  and deg_zero      : &quot;degree zero_p = Nat_O&quot;
+  and eval_add      : &quot;\&lt;And&gt;p q x. eval (p +P q) x = eval p x +R eval q x&quot;
+  and eval_mul      : &quot;\&lt;And&gt;p q x. eval (p *P q) x = eval p x *R eval q x&quot;
+  and eval_C_ax     : &quot;\&lt;And&gt;c x.   eval (monomial Nat_O c) x = c&quot;
+  and eval_X_ax     : &quot;\&lt;And&gt;x.     eval (monomial (Nat_S Nat_O) one_r) x = x&quot;
+  and deg_C_ax      : &quot;\&lt;And&gt;c.     c \&lt;noteq&gt; zero_r \&lt;Longrightarrow&gt; degree (monomial Nat_O c) = Nat_O&quot;
+  and deg_constant  : &quot;\&lt;And&gt;p.     (degree p = Nat_O) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;c. p = monomial Nat_O c)&quot;
+  and deg_X_minus_ax : &quot;\&lt;And&gt;a.    degree (monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)) = Nat_S Nat_O&quot;
+  and deg_mul       : &quot;\&lt;And&gt;p q.   p \&lt;noteq&gt; zero_p \&lt;Longrightarrow&gt; q \&lt;noteq&gt; zero_p \&lt;Longrightarrow&gt;
+                                 degree (p *P q) = mynat_add (degree p) (degree q)&quot;
+  and C_zero_ax     : &quot;monomial Nat_O zero_r = zero_p&quot;
+  and C_one_ax      : &quot;monomial Nat_O one_r = one_p&quot;
+  and euclid_X_minus_ax :
+       &quot;\&lt;And&gt;p a. \&lt;exists&gt;q r.
+          p = q *P (monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)) +P r
+          \&lt;and&gt; degree r = Nat_O&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="47" line="109" source_state="46" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="48" line="115" source_state="47" duration_seconds="0.006"><command>definition X :: &quot;&apos;p&quot; where
+  &quot;X = monomial (Nat_S Nat_O) one_r&quot;</command><error></error></attempt><attempt mode="context" success="true" index="49" line="116" source_state="48" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="50" line="118" source_state="49" duration_seconds="0.005"><command>definition C :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;p&quot; where
+  &quot;C c = monomial Nat_O c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="51" line="119" source_state="50" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="52" line="121" source_state="51" duration_seconds="0.006"><command>definition X_minus :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;p&quot; where
+  &quot;X_minus a = X +P C (opp_r a)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="53" line="122" source_state="52" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="54" line="124" source_state="53" duration_seconds="0.055"><command>fun poly_of_roots :: &quot;&apos;r mylist \&lt;Rightarrow&gt; &apos;p&quot; where
+  &quot;poly_of_roots NilL = one_p&quot;
+| &quot;poly_of_roots (ConsL a xs) = X_minus a *P poly_of_roots xs&quot;</command><error></error></attempt><attempt mode="context" success="true" index="55" line="126" source_state="54" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="56" line="128" source_state="55" duration_seconds="0.006"><command>definition is_root :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;p \&lt;Rightarrow&gt; bool&quot; where
+  &quot;is_root a p \&lt;longleftrightarrow&gt; eval p a = zero_r&quot;</command><error></error></attempt><attempt mode="context" success="true" index="57" line="129" source_state="56" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="58" line="135" source_state="57" duration_seconds="0.002"><command>lemma X_minus_unfold:
+  &quot;X_minus a = monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="59" line="136" source_state="58" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="60" line="137" source_state="59" duration_seconds="0.000"><command>unfolding X_minus_def X_def C_def</command><error></error></attempt><attempt mode="context" success="true" index="61" line="137" source_state="60" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="62" line="138" source_state="61" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="63" line="138" source_state="62" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="64" line="139" source_state="63" duration_seconds="0.001"><command>lemma eval_C: &quot;eval (C c) x = c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="65" line="139" source_state="64" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="66" line="140" source_state="65" duration_seconds="0.000"><command>unfolding C_def</command><error></error></attempt><attempt mode="context" success="true" index="67" line="140" source_state="66" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="68" line="141" source_state="67" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="69" line="141" source_state="68" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="70" line="142" source_state="69" duration_seconds="0.001"><command>lemma eval_X: &quot;eval X x = x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="71" line="142" source_state="70" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="72" line="143" source_state="71" duration_seconds="0.000"><command>unfolding X_def</command><error></error></attempt><attempt mode="context" success="true" index="73" line="143" source_state="72" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="74" line="144" source_state="73" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="75" line="144" source_state="74" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="76" line="145" source_state="75" duration_seconds="0.001"><command>lemma deg_X_minus: &quot;degree (X_minus a) = Nat_S Nat_O&quot;</command><error></error></attempt><attempt mode="context" success="true" index="77" line="145" source_state="76" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="78" line="146" source_state="77" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="79" line="146" source_state="78" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="80" line="147" source_state="79" duration_seconds="0.000"><command>lemma C_zero: &quot;C zero_r = zero_p&quot;</command><error></error></attempt><attempt mode="context" success="true" index="81" line="147" source_state="80" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="82" line="148" source_state="81" duration_seconds="0.000"><command>unfolding C_def</command><error></error></attempt><attempt mode="context" success="true" index="83" line="148" source_state="82" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="84" line="149" source_state="83" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="85" line="149" source_state="84" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="86" line="150" source_state="85" duration_seconds="0.000"><command>lemma C_one: &quot;C one_r = one_p&quot;</command><error></error></attempt><attempt mode="context" success="true" index="87" line="150" source_state="86" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="88" line="151" source_state="87" duration_seconds="0.000"><command>unfolding C_def</command><error></error></attempt><attempt mode="context" success="true" index="89" line="151" source_state="88" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="90" line="152" source_state="89" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="91" line="152" source_state="90" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="92" line="153" source_state="91" duration_seconds="0.001"><command>lemma deg_C: &quot;c \&lt;noteq&gt; zero_r \&lt;Longrightarrow&gt; degree (C c) = Nat_O&quot;</command><error></error></attempt><attempt mode="context" success="true" index="93" line="153" source_state="92" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="94" line="154" source_state="93" duration_seconds="0.000"><command>unfolding C_def</command><error></error></attempt><attempt mode="context" success="true" index="95" line="154" source_state="94" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="96" line="155" source_state="95" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="97" line="155" source_state="96" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="98" line="156" source_state="97" duration_seconds="0.001"><command>lemma euclid_X_minus: &quot;\&lt;exists&gt;q r. p = q *P X_minus a +P r \&lt;and&gt; degree r = Nat_O&quot;</command><error></error></attempt><attempt mode="context" success="true" index="99" line="156" source_state="98" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="100" line="157" source_state="99" duration_seconds="0.000"><command>using euclid_X_minus_ax[of p a]</command><error></error></attempt><attempt mode="context" success="true" index="101" line="157" source_state="100" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="102" line="158" source_state="101" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="103" line="158" source_state="102" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="104" line="163" source_state="103" duration_seconds="0.000"><command>lemma r_opp_add: &quot;opp_r x +R x = zero_r&quot;</command><error></error></attempt><attempt mode="context" success="true" index="105" line="163" source_state="104" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="106" line="164" source_state="105" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="107" line="164" source_state="106" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="108" line="165" source_state="107" duration_seconds="0.000"><command>lemma r_add_zero_l: &quot;zero_r +R x = x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="109" line="165" source_state="108" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="110" line="166" source_state="109" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="111" line="166" source_state="110" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="112" line="171" source_state="111" duration_seconds="0.001"><command>lemma sub_eq_zero_l: &quot;x +R opp_r y = zero_r \&lt;Longrightarrow&gt; x = y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="113" line="171" source_state="112" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="114" line="172" source_state="113" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="115" line="172" source_state="114" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="116" line="177" source_state="115" duration_seconds="0.001"><command>lemma eval_X_minus: &quot;eval (X_minus a) b = b +R opp_r a&quot;</command><error></error></attempt><attempt mode="context" success="true" index="117" line="177" source_state="116" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="118" line="178" source_state="117" duration_seconds="0.000"><command>unfolding X_minus_def</command><error></error></attempt><attempt mode="context" success="true" index="119" line="178" source_state="118" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="120" line="179" source_state="119" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="121" line="179" source_state="120" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="122" line="184" source_state="121" duration_seconds="0.001"><command>lemma X_minus_nonzero: &quot;X_minus a \&lt;noteq&gt; zero_p&quot;</command><error></error></attempt><attempt mode="context" success="true" index="123" line="184" source_state="122" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="124" line="185" source_state="123" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="125" line="185" source_state="124" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="126" line="190" source_state="125" duration_seconds="0.000"><command>lemma p_add_zero_l: &quot;zero_p +P x = x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="127" line="190" source_state="126" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="128" line="191" source_state="127" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="129" line="191" source_state="128" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="130" line="192" source_state="129" duration_seconds="0.000"><command>lemma p_mul_zero_l: &quot;zero_p *P x = zero_p&quot;</command><error></error></attempt><attempt mode="context" success="true" index="131" line="192" source_state="130" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="132" line="193" source_state="131" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="133" line="193" source_state="132" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="134" line="194" source_state="133" duration_seconds="0.000"><command>lemma p_mul_one_l: &quot;one_p *P x = x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="135" line="194" source_state="134" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="136" line="195" source_state="135" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="137" line="195" source_state="136" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="138" line="200" source_state="137" duration_seconds="0.001"><command>lemma root_factor: &quot;is_root a p \&lt;Longrightarrow&gt; \&lt;exists&gt;q. p = q *P X_minus a&quot;</command><error></error></attempt><attempt mode="context" success="true" index="139" line="200" source_state="138" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="140" line="201" source_state="139" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="141" line="201" source_state="140" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="142" line="206" source_state="141" duration_seconds="0.001"><command>lemma root_transfer:
+  &quot;p = q *P X_minus a \&lt;Longrightarrow&gt; b \&lt;noteq&gt; a \&lt;Longrightarrow&gt; is_root b p \&lt;Longrightarrow&gt; is_root b q&quot;</command><error></error></attempt><attempt mode="context" success="true" index="143" line="207" source_state="142" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="144" line="208" source_state="143" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="145" line="208" source_state="144" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="146" line="213" source_state="145" duration_seconds="0.001"><command>lemma roots_le_degree:
+  &quot;NoDupL xs \&lt;Longrightarrow&gt; (\&lt;forall&gt;a. InL a xs \&lt;longrightarrow&gt; is_root a p) \&lt;Longrightarrow&gt; p \&lt;noteq&gt; zero_p \&lt;Longrightarrow&gt;
+   mynat_le (lengthL xs) (degree p)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="147" line="215" source_state="146" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="148" line="216" source_state="147" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="149" line="216" source_state="148" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="150" line="221" source_state="149" duration_seconds="0.001"><command>lemma constant_root_zero:
+  &quot;degree p = Nat_O \&lt;Longrightarrow&gt; is_root a p \&lt;Longrightarrow&gt; p = zero_p&quot;</command><error></error></attempt><attempt mode="context" success="true" index="151" line="222" source_state="150" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="152" line="223" source_state="151" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="153" line="223" source_state="152" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="154" line="228" source_state="153" duration_seconds="0.001"><command>lemma root_of_product:
+  &quot;is_root a (p *P q) \&lt;Longrightarrow&gt; is_root a p \&lt;or&gt; is_root a q&quot;</command><error></error></attempt><attempt mode="context" success="true" index="155" line="229" source_state="154" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="156" line="230" source_state="155" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="157" line="230" source_state="156" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="158" line="235" source_state="157" duration_seconds="0.001"><command>lemma root_scale_constant:
+  &quot;c \&lt;noteq&gt; zero_r \&lt;Longrightarrow&gt; (is_root a p \&lt;longleftrightarrow&gt; is_root a (C c *P p))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="159" line="236" source_state="158" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="160" line="237" source_state="159" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="161" line="237" source_state="160" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="162" line="242" source_state="161" duration_seconds="0.001"><command>lemma poly_of_roots_nonzero: &quot;poly_of_roots xs \&lt;noteq&gt; zero_p&quot;</command><error></error></attempt><attempt mode="context" success="true" index="163" line="242" source_state="162" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="164" line="243" source_state="163" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="165" line="243" source_state="164" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="166" line="248" source_state="165" duration_seconds="0.001"><command>lemma deg_poly_of_roots: &quot;degree (poly_of_roots xs) = lengthL xs&quot;</command><error></error></attempt><attempt mode="context" success="true" index="167" line="248" source_state="166" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="168" line="249" source_state="167" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="169" line="249" source_state="168" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="170" line="254" source_state="169" duration_seconds="0.001"><command>lemma root_factor_list:
+  &quot;NoDupL xs \&lt;Longrightarrow&gt; (\&lt;forall&gt;a. InL a xs \&lt;longrightarrow&gt; is_root a p) \&lt;Longrightarrow&gt;
+   \&lt;exists&gt;q. p = q *P poly_of_roots xs&quot;</command><error></error></attempt><attempt mode="context" success="true" index="171" line="256" source_state="170" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="172" line="257" source_state="171" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="173" line="257" source_state="172" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="174" line="1" source_state="173" duration_seconds="0.000"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="175" line="1" source_state="174" duration_seconds="0.001"><command>lemma degree_factorisation:
+  &quot;p = q *P poly_of_roots xs \&lt;Longrightarrow&gt; q \&lt;noteq&gt; zero_p \&lt;Longrightarrow&gt;
+   degree p = mynat_add (degree q) (lengthL xs)&quot;</command><error></error></attempt><attempt mode="target" success="true" index="176" line="3" source_state="175" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

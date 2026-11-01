@@ -1,0 +1,20 @@
+{
+  "request_id": "0eea274ed30b49e6a763903f8d9dcffa",
+  "action": "context",
+  "prefix": "theory set_algebra\n  imports Main\nbegin\n\ndefinition sUnion :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sUnion A B \\<equiv> \\<lambda>x. A x \\<or> B x\"\n\ndefinition sInter :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sInter A B \\<equiv> \\<lambda>x. A x \\<and> B x\"\n\ndefinition sCompl :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sCompl A \\<equiv> \\<lambda>x. \\<not> A x\"\n\nlemma inter_distrib_left:\n  \"\\<forall>x. sInter A (sUnion B C) x \\<longleftrightarrow> sUnion (sInter A B) (sInter A C) x\"\n  sorry\nlemma inter_distrib_right:\n  \"\\<forall>x. sInter (sUnion A B) C x \\<longleftrightarrow> sUnion (sInter A C) (sInter B C) x\"\n  sorry\nlemma de_morgan_union:\n  \"\\<forall>x. sCompl (sUnion A B) x \\<longleftrightarrow> sInter (sCompl A) (sCompl B) x\"\n  sorry\n",
+  "statement": "lemma de_morgan_inter:\n  \"\\<forall>x. sCompl (sInter A B) x \\<longleftrightarrow> sUnion (sCompl A) (sCompl B) x\"",
+  "proof_prefix": "",
+  "sketch": "",
+  "depth": "1",
+  "target_name": "de_morgan_inter",
+  "forbidden_names": [
+    "de_morgan_inter"
+  ],
+  "heuristics": [],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9994286840083",
+  "input_sha256": "87497e55f76155f1b2c0e9b9dac4b100d3197b166c3f21c9961ae978ea98c038"
+}

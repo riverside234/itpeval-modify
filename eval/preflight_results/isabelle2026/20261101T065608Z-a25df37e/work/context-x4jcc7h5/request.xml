@@ -1,0 +1,67 @@
+<dsp_request schema="dsp_native_request_v1" request_id="354ee8b9f5a14967b722487ef4cb157b" input_sha256="a6e97f303bb0fca457695d168aa774391c6b81c3c72c72cfe9259996dc879f43" action="context"><prefix>theory graph_paths
+  imports Main
+begin
+
+inductive Path :: "('a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool"
+  for E :: "'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool"
+where
+  Pnil:  "Path E v v"
+| Pstep: "Path E u v \&lt;Longrightarrow&gt; E v w \&lt;Longrightarrow&gt; Path E u w"
+
+definition undirected :: "('a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; bool"
+  where "undirected E \&lt;equiv&gt; \&lt;forall&gt;x y. E x y \&lt;longrightarrow&gt; E y x"
+
+definition Erev :: "('a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool"
+  where "Erev E x y \&lt;equiv&gt; E y x"
+
+lemma path_refl: "Path E v v"
+  sorry
+
+lemma path_trans:
+  assumes "Path E u v" "Path E v w" shows "Path E u w"
+  sorry
+
+lemma trans: "Path E u v \&lt;Longrightarrow&gt; Path E v w \&lt;Longrightarrow&gt; Path E u w"
+  sorry
+
+
+lemma edge_path: "E u v \&lt;Longrightarrow&gt; Path E u v"
+  sorry
+
+lemma concat_edge_right: "Path E u v \&lt;Longrightarrow&gt; E v w \&lt;Longrightarrow&gt; Path E u w"
+  sorry
+
+lemma concat: "Path E u v \&lt;Longrightarrow&gt; Path E v w \&lt;Longrightarrow&gt; Path E u w"
+  sorry
+
+lemma concat_edge_left: "E u v \&lt;Longrightarrow&gt; Path E v w \&lt;Longrightarrow&gt; Path E u w"
+  sorry
+
+lemma concat3:
+  "Path E u v \&lt;Longrightarrow&gt; Path E v w \&lt;Longrightarrow&gt; Path E w t \&lt;Longrightarrow&gt; Path E u t"
+  sorry
+
+
+lemma reverse_cons:
+  assumes hE: "undirected E" and e: "E m v" and ih: "Path E m u"
+  shows "Path E v u"
+  sorry
+
+lemma reverse_path:
+  assumes hE: "undirected E" and p: "Path E u v"
+  shows "Path E v u"
+  sorry
+
+
+lemma reverse_cons_Erev:
+  assumes e: "E m v" and ih: "Path (Erev E) m u"
+  shows "Path (Erev E) v u"
+  sorry
+
+lemma reverse_in_Erev:
+  assumes p: "Path E u v"
+  shows "Path (Erev E) v u"
+  sorry
+
+</prefix><statement>lemma cycle_refl:
+  "Path E v w \&lt;Longrightarrow&gt; Path E w v \&lt;Longrightarrow&gt; Path E v v"</statement><proof_prefix /><sketch /><depth>1</depth><target_name>cycle_refl</target_name><forbidden_names><item>cycle_refl</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9988543329528</remaining_s></dsp_request>

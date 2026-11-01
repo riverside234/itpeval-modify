@@ -1,0 +1,59 @@
+<dsp_result schema="dsp_native_result_v1" request_id="58248b54a2d44ce98ae7a8ccc97fa367" input_sha256="1601274737d829ebce7ac292adf1a70f2981ca291f0d1fa5332f312650f9f462" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.039"><command>theory ideals
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="5" source_state="3" duration_seconds="0.033"><command>locale cring =
+  fixes zero :: &quot;&apos;r&quot;
+    and one  :: &quot;&apos;r&quot;
+    and add  :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;  (infixl &quot;+R&quot; 65)
+    and mul  :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;  (infixl &quot;*R&quot; 70)
+    and opp  :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+  assumes add_comm  : &quot;\&lt;And&gt;x y. x +R y = y +R x&quot;
+    and   add_assoc : &quot;\&lt;And&gt;x y z. (x +R y) +R z = x +R (y +R z)&quot;
+    and   add_zero  : &quot;\&lt;And&gt;x. x +R zero = x&quot;
+    and   add_opp   : &quot;\&lt;And&gt;x. x +R opp x = zero&quot;
+    and   mul_comm  : &quot;\&lt;And&gt;x y. x *R y = y *R x&quot;
+    and   mul_assoc : &quot;\&lt;And&gt;x y z. (x *R y) *R z = x *R (y *R z)&quot;
+    and   mul_one   : &quot;\&lt;And&gt;x. x *R one = x&quot;
+    and   dist_l    : &quot;\&lt;And&gt;a x y. a *R (x +R y) = (a *R x) +R (a *R y)&quot;
+    and   opp_add   : &quot;\&lt;And&gt;x y. opp (x +R y) = opp x +R opp y&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="20" source_state="4" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="23" source_state="5" duration_seconds="0.004"><command>lemma add_left_comm: &quot;x +R (y +R z) = y +R (x +R z)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="23" source_state="6" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="8" line="24" source_state="7" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="9" line="24" source_state="8" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="10" line="25" source_state="9" duration_seconds="0.001"><command>lemma zero_add: &quot;zero +R x = x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="11" line="25" source_state="10" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="12" line="26" source_state="11" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="13" line="26" source_state="12" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="14" line="31" source_state="13" duration_seconds="0.013"><command>definition IsIdeal :: &quot;(&apos;r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; bool&quot;
+  where &quot;IsIdeal I \&lt;equiv&gt;
+    I zero \&lt;and&gt;
+    (\&lt;forall&gt;x y. I x \&lt;longrightarrow&gt; I y \&lt;longrightarrow&gt; I (x +R y)) \&lt;and&gt;
+    (\&lt;forall&gt;x.   I x \&lt;longrightarrow&gt; I (opp x)) \&lt;and&gt;
+    (\&lt;forall&gt;a x. I x \&lt;longrightarrow&gt; I (a *R x))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="15" line="36" source_state="14" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="16" line="42" source_state="15" duration_seconds="0.012"><command>definition Inter :: &quot;(&apos;i \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;
+  where &quot;Inter F \&lt;equiv&gt; \&lt;lambda&gt;x. \&lt;forall&gt;i. F i x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="17" line="43" source_state="16" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="45" source_state="17" duration_seconds="0.005"><command>lemma inter_isIdeal:
+  assumes h: &quot;\&lt;forall&gt;i. IsIdeal (F i)&quot;
+  shows &quot;IsIdeal (Inter F)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="47" source_state="18" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="20" line="48" source_state="19" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="21" line="48" source_state="20" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="53" source_state="21" duration_seconds="0.011"><command>definition isum :: &quot;(&apos;r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; (&apos;r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;
+  where &quot;isum I J \&lt;equiv&gt; \&lt;lambda&gt;x. \&lt;exists&gt;a b. I a \&lt;and&gt; J b \&lt;and&gt; x = a +R b&quot;</command><error></error></attempt><attempt mode="context" success="true" index="23" line="54" source_state="22" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="24" line="1" source_state="23" duration_seconds="0.001"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="25" line="1" source_state="24" duration_seconds="0.005"><command>lemma sum_isIdeal:
+  assumes hI: &quot;IsIdeal I&quot; and hJ: &quot;IsIdeal J&quot;
+  shows &quot;IsIdeal (isum I J)&quot;</command><error></error></attempt><attempt mode="target" success="true" index="26" line="3" source_state="25" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

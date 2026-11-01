@@ -1,0 +1,21 @@
+<dsp_result schema="dsp_native_result_v1" request_id="ae064879c0504d9aa0c6510abbb49e2f" input_sha256="b833f20037b311fcb297c02f122a6f952691fcfb6365acb17168f8ad949a73b6" action="search" success="true" target_closed="true"><proof>proof -
+ show &quot;True&quot;
+ by simp
+
+qed</proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.023"><command>theory V2Control imports Main begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="1" source_state="2" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="2" source_state="3" duration_seconds="0.000"><command>sledgehammer_params [falsify = true, abduce = 1]</command><error></error></attempt><attempt mode="context" success="true" index="5" line="2" source_state="4" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="1" source_state="5" duration_seconds="0.000"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="7" line="1" source_state="6" duration_seconds="0.000"><command>lemma v2_control: &quot;True&quot;</command><error></error></attempt><attempt mode="target" success="true" index="8" line="1" source_state="7" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="search" success="true" index="9" line="1" source_state="8" duration_seconds="0.000"><command>proof -</command><error></error></attempt><attempt mode="search" success="true" index="10" line="1" source_state="9" duration_seconds="0.000"><command>
+ </command><error></error></attempt><attempt mode="search" success="true" index="11" line="2" source_state="10" duration_seconds="0.000"><command>show &quot;True&quot;</command><error></error></attempt><attempt mode="search" success="true" index="12" line="2" source_state="11" duration_seconds="0.000"><command>
+ </command><error></error></attempt><attempt mode="hammer" success="true" index="13" line="0" source_state="12" duration_seconds="0.572"><command>native Sledgehammer</command><error></error></attempt><attempt mode="reconstruction" success="true" index="14" line="0" source_state="12" duration_seconds="0.001"><command>by simp</command><error></error></attempt><attempt mode="search" success="true" index="15" line="3" source_state="13" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="search" success="true" index="16" line="4" source_state="14" duration_seconds="0.001"><command>qed</command><error></error></attempt><attempt mode="close_scope" success="true" index="17" line="1" source_state="15" duration_seconds="0.010"><command>end</command><error></error></attempt></attempts><settings><param name="resolved_provers">simp</param><param name="native_parameters">{abduce = SOME 0, cache_dir = NONE, compress = NONE, debug = false, expect =
+ &quot;&quot;, fact_filter = SOME &quot;mepo&quot;, fact_thresholds = (0.45, 0.85), falsify =
+ SOME false, induction_rules = NONE, instantiate = NONE, isar_proofs =
+ SOME false, lam_trans = NONE, learn = false, max_facts = NONE,
+ max_mono_iters = NONE, max_new_mono_instances = NONE, max_proofs = 4,
+ minimize = true, overlord = false, preplay_timeout = 10.000, provers =
+ [&quot;simp&quot;], slices = 192, smt_proofs = true, spy = false, strict = false,
+ timeout = 40.000, try0 = false, type_enc = NONE, uncurried_aliases = NONE,
+ verbose = false}</param><param name="caller_pide_enabled">true</param><param name="native_messages">simp found a proof...
+simp: Try this: by simp (0.4 ms)
+Done</param><param name="native_outcome">some</param><param name="native_message">Try this: by simp (0.4 ms)</param><param name="preplay_count">0</param><param name="preplayed_count">0</param><param name="preplay_results"></param><param name="reconstruction_source">native_tactic</param><param name="candidate_count">1</param></settings></dsp_result>

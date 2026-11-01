@@ -1,0 +1,105 @@
+<dsp_result schema="dsp_native_result_v1" request_id="1d3bc3f4182f418f9491f2f48a40ee0d" input_sha256="68ce1203ffe3b05ba94b7b7a34b3007178d2f39351b50c14a2873b7e7f25b331" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.038"><command>theory group
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="7" source_state="3" duration_seconds="0.017"><command>locale group =
+  fixes mul :: &quot;&apos;a =&gt; &apos;a =&gt; &apos;a&quot;  (infixl &quot;**&quot; 70)
+    and one :: &quot;&apos;a&quot;
+    and inv :: &quot;&apos;a =&gt; &apos;a&quot;
+  assumes mul_assoc : &quot;a ** (b ** c) = (a ** b) ** c&quot;
+    and   mul_one   : &quot;a ** one = a&quot;
+    and   one_mul   : &quot;one ** a = a&quot;
+    and   mul_inv_l : &quot;inv a ** a = one&quot;
+    and   mul_inv_r : &quot;a ** inv a = one&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="16" source_state="4" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="20" source_state="5" duration_seconds="0.003"><command>lemma mul_left_cancel:
+  assumes h: &quot;a ** b = a ** c&quot;
+  shows &quot;b = c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="22" source_state="6" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="8" line="23" source_state="7" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="9" line="23" source_state="8" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="10" line="24" source_state="9" duration_seconds="0.002"><command>lemma mul_right_cancel:
+  assumes h: &quot;b ** a = c ** a&quot;
+  shows &quot;b = c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="11" line="26" source_state="10" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="12" line="27" source_state="11" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="13" line="27" source_state="12" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="14" line="28" source_state="13" duration_seconds="0.001"><command>lemma inv_inv: &quot;inv (inv a) = a&quot;</command><error></error></attempt><attempt mode="context" success="true" index="15" line="28" source_state="14" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="16" line="29" source_state="15" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="17" line="29" source_state="16" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="30" source_state="17" duration_seconds="0.002"><command>lemma inv_mul: &quot;inv (a ** b) = inv b ** inv a&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="30" source_state="18" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="20" line="31" source_state="19" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="21" line="31" source_state="20" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="32" source_state="21" duration_seconds="0.002"><command>lemma inv_eq_of_mul_eq_one:
+  assumes h: &quot;a ** b = one&quot;
+  shows &quot;b = inv a&quot;</command><error></error></attempt><attempt mode="context" success="true" index="23" line="34" source_state="22" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="24" line="35" source_state="23" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="25" line="35" source_state="24" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="26" line="36" source_state="25" duration_seconds="0.000"><command>end</command><error></error></attempt><attempt mode="context" success="true" index="27" line="36" source_state="26" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="28" line="41" source_state="27" duration_seconds="0.017"><command>locale group_comm = group +
+  assumes mul_comm : &quot;a ** b = b ** a&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="29" line="43" source_state="28" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="30" line="45" source_state="29" duration_seconds="0.003"><command>lemma mul_rotate&apos;: &quot;a ** (b ** c) = b ** (c ** a)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="31" line="45" source_state="30" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="32" line="46" source_state="31" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="33" line="46" source_state="32" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="34" line="47" source_state="33" duration_seconds="0.000"><command>end</command><error></error></attempt><attempt mode="context" success="true" index="35" line="47" source_state="34" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="36" line="52" source_state="35" duration_seconds="0.025"><command>locale group_action =
+  group mul one inv
+    for mul :: &quot;&apos;a =&gt; &apos;a =&gt; &apos;a&quot;  (infixl &quot;**&quot; 70)
+    and one :: &quot;&apos;a&quot;
+    and inv :: &quot;&apos;a =&gt; &apos;a&quot; +
+  fixes act :: &quot;&apos;a =&gt; &apos;b =&gt; &apos;b&quot;  (infixr &quot;acts&quot; 73)
+  assumes act_one : &quot;one acts x = x&quot;
+    and   act_mul : &quot;(g ** h) acts x = g acts (h acts x)&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="37" line="60" source_state="36" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="38" line="64" source_state="37" duration_seconds="0.004"><command>lemma act_inv: &quot;inv g acts (g acts x) = x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="39" line="64" source_state="38" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="40" line="65" source_state="39" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="41" line="65" source_state="40" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="42" line="66" source_state="41" duration_seconds="0.002"><command>lemma act_inv_r: &quot;g acts (inv g acts x) = x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="43" line="66" source_state="42" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="44" line="67" source_state="43" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="45" line="67" source_state="44" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="46" line="68" source_state="45" duration_seconds="0.009"><command>definition orbit :: &quot;&apos;b =&gt; &apos;b =&gt; bool&quot;
+  where &quot;orbit x y == (EX g. g acts x = y)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="47" line="69" source_state="46" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="48" line="71" source_state="47" duration_seconds="0.011"><command>definition stabilizer :: &quot;&apos;b =&gt; &apos;a =&gt; bool&quot;
+  where &quot;stabilizer x g == g acts x = x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="49" line="72" source_state="48" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="50" line="74" source_state="49" duration_seconds="0.003"><command>lemma orbit_refl: &quot;orbit x x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="51" line="74" source_state="50" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="52" line="75" source_state="51" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="53" line="75" source_state="52" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="54" line="76" source_state="53" duration_seconds="0.002"><command>lemma orbit_sym:
+  assumes &quot;orbit x y&quot;
+  shows &quot;orbit y x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="55" line="78" source_state="54" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="56" line="79" source_state="55" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="57" line="79" source_state="56" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="58" line="80" source_state="57" duration_seconds="0.002"><command>lemma orbit_trans:
+  assumes &quot;orbit x y&quot; &quot;orbit y z&quot;
+  shows &quot;orbit x z&quot;</command><error></error></attempt><attempt mode="context" success="true" index="59" line="82" source_state="58" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="60" line="83" source_state="59" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="61" line="83" source_state="60" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="62" line="84" source_state="61" duration_seconds="0.002"><command>lemma orbit_partition:
+  assumes hxy: &quot;orbit x y&quot;
+  shows &quot;orbit x z = orbit y z&quot;</command><error></error></attempt><attempt mode="context" success="true" index="63" line="86" source_state="62" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="64" line="87" source_state="63" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="65" line="87" source_state="64" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="66" line="88" source_state="65" duration_seconds="0.002"><command>lemma stabilizer_mul:
+  assumes &quot;stabilizer x g&quot; &quot;stabilizer x h&quot;
+  shows &quot;stabilizer x (g ** h)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="67" line="90" source_state="66" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="68" line="91" source_state="67" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="69" line="91" source_state="68" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="70" line="92" source_state="69" duration_seconds="0.002"><command>lemma stabilizer_inv:
+  assumes hg: &quot;stabilizer x g&quot;
+  shows &quot;stabilizer x (inv g)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="71" line="94" source_state="70" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="72" line="95" source_state="71" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="73" line="95" source_state="72" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="74" line="96" source_state="73" duration_seconds="0.001"><command>lemma stabilizer_one: &quot;stabilizer x one&quot;</command><error></error></attempt><attempt mode="context" success="true" index="75" line="96" source_state="74" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="76" line="97" source_state="75" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="77" line="97" source_state="76" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="78" line="98" source_state="77" duration_seconds="0.003"><command>lemma stabilizer_conjugate:
+  assumes hh: &quot;stabilizer x h&quot;
+  shows &quot;stabilizer (g acts x) (g ** h ** inv g)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="79" line="100" source_state="78" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="80" line="101" source_state="79" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="81" line="101" source_state="80" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="82" line="1" source_state="81" duration_seconds="0.001"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="83" line="1" source_state="82" duration_seconds="0.003"><command>lemma stabilizer_conjugate_orbit:
+  assumes hxy: &quot;g acts x = y&quot;
+  shows &quot;stabilizer y h = stabilizer x (inv g ** h ** g)&quot;</command><error></error></attempt><attempt mode="target" success="true" index="84" line="3" source_state="83" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

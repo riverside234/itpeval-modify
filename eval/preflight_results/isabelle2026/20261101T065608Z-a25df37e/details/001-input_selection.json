@@ -1,0 +1,13 @@
+{
+  "name": "input_selection",
+  "domain": "selection",
+  "status": "pass",
+  "duration_seconds": 0.0,
+  "details": "details/001-input_selection.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "payload": {
+    "ok": true,
+    "issues": []
+  }
+}

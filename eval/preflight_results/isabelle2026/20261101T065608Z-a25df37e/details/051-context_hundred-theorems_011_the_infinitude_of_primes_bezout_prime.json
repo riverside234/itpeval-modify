@@ -1,0 +1,29 @@
+{
+  "name": "context_hundred-theorems_011_the_infinitude_of_primes_bezout_prime",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 6.451,
+  "details": "details/051-context_hundred-theorems_011_the_infinitude_of_primes_bezout_prime.json",
+  "failure_category": "import_error",
+  "expected_failure": null,
+  "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/build.log\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/Euclidean_Algorithm.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_eb23f6457a7b481eb114b0c331b32728.Euclidean_Algorithm\"\n*** (required by \"DSP_Job_eb23f6457a7b481eb114b0c331b32728.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/Euclidean_Algorithm.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/Euclidean_Algorithm.thy\"\n*** The error(s) above occurred in session \"DSP_Job_eb23f6457a7b481eb114b0c331b32728\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/ROOT\")",
+  "payload": {
+    "ok": false,
+    "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/build.log\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/Euclidean_Algorithm.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_eb23f6457a7b481eb114b0c331b32728.Euclidean_Algorithm\"\n*** (required by \"DSP_Job_eb23f6457a7b481eb114b0c331b32728.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/Euclidean_Algorithm.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/Euclidean_Algorithm.thy\"\n*** The error(s) above occurred in session \"DSP_Job_eb23f6457a7b481eb114b0c331b32728\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/ROOT\")",
+    "failure_category": "import_error",
+    "build_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/build.log",
+    "build_returncode": 2,
+    "build_log_excerpt": "*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/Euclidean_Algorithm.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_eb23f6457a7b481eb114b0c331b32728.Euclidean_Algorithm\"\n*** (required by \"DSP_Job_eb23f6457a7b481eb114b0c331b32728.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/Euclidean_Algorithm.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/Euclidean_Algorithm.thy\"\n*** The error(s) above occurred in session \"DSP_Job_eb23f6457a7b481eb114b0c331b32728\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh/ROOT\")",
+    "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh",
+    "import_resolution": {
+      "original_imports": [
+        "Euclidean_Algorithm"
+      ],
+      "resolved_imports": [
+        "Euclidean_Algorithm"
+      ],
+      "session_dependencies": []
+    },
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-i1hj4bqh"
+  }
+}

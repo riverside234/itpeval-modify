@@ -1,0 +1,30 @@
+<dsp_request schema="dsp_native_request_v1" request_id="1cd31f8dddfc442ea49746feae560f66" input_sha256="bc9a76727dc976e20350c7f32db097542979f1269ef87456425d93a5d2a339c4" action="context"><prefix>theory lattice_like
+  imports Main
+begin
+
+locale lattice_like =
+  fixes le  :: "'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool"  (infix "\&lt;preceq&gt;" 50)
+    and inf :: "'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; 'a"   (infixl "\&lt;sqinter&gt;" 60)
+    and sup :: "'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; 'a"   (infixl "\&lt;squnion&gt;" 65)
+  assumes le_refl   : "\&lt;And&gt;x. x \&lt;preceq&gt; x"
+    and   le_trans  : "\&lt;And&gt;x y z. x \&lt;preceq&gt; y \&lt;Longrightarrow&gt; y \&lt;preceq&gt; z \&lt;Longrightarrow&gt; x \&lt;preceq&gt; z"
+    and   le_antisym: "\&lt;And&gt;x y. x \&lt;preceq&gt; y \&lt;Longrightarrow&gt; y \&lt;preceq&gt; x \&lt;Longrightarrow&gt; x = y"
+    and   le_inf_left  : "\&lt;And&gt;a b. inf a b \&lt;preceq&gt; a"
+    and   le_inf_right : "\&lt;And&gt;a b. inf a b \&lt;preceq&gt; b"
+    and   le_inf_intro : "\&lt;And&gt;c a b. c \&lt;preceq&gt; a \&lt;Longrightarrow&gt; c \&lt;preceq&gt; b \&lt;Longrightarrow&gt; c \&lt;preceq&gt; inf a b"
+    and   le_sup_left  : "\&lt;And&gt;a b. a \&lt;preceq&gt; sup a b"
+    and   le_sup_right : "\&lt;And&gt;a b. b \&lt;preceq&gt; sup a b"
+    and   sup_le_intro : "\&lt;And&gt;a b c. a \&lt;preceq&gt; c \&lt;Longrightarrow&gt; b \&lt;preceq&gt; c \&lt;Longrightarrow&gt; sup a b \&lt;preceq&gt; c"
+begin
+
+lemma inf_comm: "a \&lt;sqinter&gt; b = b \&lt;sqinter&gt; a"
+  sorry
+lemma sup_comm: "a \&lt;squnion&gt; b = b \&lt;squnion&gt; a"
+  sorry
+lemma inf_assoc: "(a \&lt;sqinter&gt; b) \&lt;sqinter&gt; c = a \&lt;sqinter&gt; (b \&lt;sqinter&gt; c)"
+  sorry
+lemma sup_assoc: "(a \&lt;squnion&gt; b) \&lt;squnion&gt; c = a \&lt;squnion&gt; (b \&lt;squnion&gt; c)"
+  sorry
+lemma inf_absorption: "a \&lt;sqinter&gt; (a \&lt;squnion&gt; b) = a"
+  sorry
+</prefix><statement>lemma sup_absorption: "a \&lt;squnion&gt; (a \&lt;sqinter&gt; b) = a"</statement><proof_prefix /><sketch /><depth>2</depth><target_name>sup_absorption</target_name><forbidden_names><item>sup_absorption</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.999087934033</remaining_s></dsp_request>

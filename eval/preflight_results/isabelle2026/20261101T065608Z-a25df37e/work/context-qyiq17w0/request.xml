@@ -1,0 +1,24 @@
+<dsp_request schema="dsp_native_request_v1" request_id="0eea274ed30b49e6a763903f8d9dcffa" input_sha256="87497e55f76155f1b2c0e9b9dac4b100d3197b166c3f21c9961ae978ea98c038" action="context"><prefix>theory set_algebra
+  imports Main
+begin
+
+definition sUnion :: "('a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; bool)"
+  where "sUnion A B \&lt;equiv&gt; \&lt;lambda&gt;x. A x \&lt;or&gt; B x"
+
+definition sInter :: "('a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; bool)"
+  where "sInter A B \&lt;equiv&gt; \&lt;lambda&gt;x. A x \&lt;and&gt; B x"
+
+definition sCompl :: "('a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; bool)"
+  where "sCompl A \&lt;equiv&gt; \&lt;lambda&gt;x. \&lt;not&gt; A x"
+
+lemma inter_distrib_left:
+  "\&lt;forall&gt;x. sInter A (sUnion B C) x \&lt;longleftrightarrow&gt; sUnion (sInter A B) (sInter A C) x"
+  sorry
+lemma inter_distrib_right:
+  "\&lt;forall&gt;x. sInter (sUnion A B) C x \&lt;longleftrightarrow&gt; sUnion (sInter A C) (sInter B C) x"
+  sorry
+lemma de_morgan_union:
+  "\&lt;forall&gt;x. sCompl (sUnion A B) x \&lt;longleftrightarrow&gt; sInter (sCompl A) (sCompl B) x"
+  sorry
+</prefix><statement>lemma de_morgan_inter:
+  "\&lt;forall&gt;x. sCompl (sInter A B) x \&lt;longleftrightarrow&gt; sUnion (sCompl A) (sCompl B) x"</statement><proof_prefix /><sketch /><depth>1</depth><target_name>de_morgan_inter</target_name><forbidden_names><item>de_morgan_inter</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9994286840083</remaining_s></dsp_request>

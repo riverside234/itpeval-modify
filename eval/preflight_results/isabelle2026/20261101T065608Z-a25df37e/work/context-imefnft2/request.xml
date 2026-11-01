@@ -1,0 +1,264 @@
+<dsp_request schema="dsp_native_request_v1" request_id="72e49ab68f0d4a4fa7b2c7a21516027f" input_sha256="e6593542c6cbdfcf164378082fd67f5dfcc5ccd760cfeda2572f606c8227a7e0" action="context"><prefix>theory polynomial
+  imports Main
+begin
+
+
+
+
+
+
+datatype mynat = Nat_O | Nat_S mynat
+
+fun mynat_add :: "mynat \&lt;Rightarrow&gt; mynat \&lt;Rightarrow&gt; mynat" where
+  "mynat_add Nat_O m = m"
+| "mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)"
+
+lemma mynat_add_O_left: "mynat_add Nat_O m = m"
+  sorry
+lemma mynat_add_S_left: "mynat_add (Nat_S n) m = Nat_S (mynat_add n m)"
+  sorry
+inductive mynat_le :: "mynat \&lt;Rightarrow&gt; mynat \&lt;Rightarrow&gt; bool" where
+  le_n : "mynat_le n n"
+| le_S : "mynat_le n m \&lt;Longrightarrow&gt; mynat_le n (Nat_S m)"
+
+lemma mynat_zero_le: "mynat_le Nat_O n"
+  sorry
+lemma mynat_add_zero_r: "mynat_add n Nat_O = n"
+  sorry
+lemma mynat_succ_le_succ: "mynat_le n m \&lt;Longrightarrow&gt; mynat_le (Nat_S n) (Nat_S m)"
+  sorry
+lemma mynat_add_S_r: "mynat_add m (Nat_S n) = Nat_S (mynat_add m n)"
+  sorry
+lemma mynat_add_comm: "mynat_add n m = mynat_add m n"
+  sorry
+
+
+
+
+datatype 'a mylist = NilL | ConsL 'a "'a mylist"
+
+inductive InL :: "'a \&lt;Rightarrow&gt; 'a mylist \&lt;Rightarrow&gt; bool" where
+  In_head : "InL x (ConsL x xs)"
+| In_tail : "InL x xs \&lt;Longrightarrow&gt; InL x (ConsL y xs)"
+
+inductive NoDupL :: "'a mylist \&lt;Rightarrow&gt; bool" where
+  ND_nil  : "NoDupL NilL"
+| ND_cons : "\&lt;not&gt; InL x xs \&lt;Longrightarrow&gt; NoDupL xs \&lt;Longrightarrow&gt; NoDupL (ConsL x xs)"
+
+fun lengthL :: "'a mylist \&lt;Rightarrow&gt; mynat" where
+  "lengthL NilL = Nat_O"
+| "lengthL (ConsL _ rest) = Nat_S (lengthL rest)"
+
+
+
+
+
+locale polynomial_setup =
+  fixes zero_r :: "'r"
+    and one_r  :: "'r"
+    and opp_r  :: "'r \&lt;Rightarrow&gt; 'r"
+    and add_r  :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"  (infixl \&lt;open&gt;+R\&lt;close&gt; 65)
+    and mul_r  :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"  (infixl \&lt;open&gt;*R\&lt;close&gt; 70)
+    and zero_p :: "'p"
+    and one_p  :: "'p"
+    and opp_p  :: "'p \&lt;Rightarrow&gt; 'p"
+    and add_p  :: "'p \&lt;Rightarrow&gt; 'p \&lt;Rightarrow&gt; 'p"  (infixl \&lt;open&gt;+P\&lt;close&gt; 65)
+    and mul_p  :: "'p \&lt;Rightarrow&gt; 'p \&lt;Rightarrow&gt; 'p"  (infixl \&lt;open&gt;*P\&lt;close&gt; 70)
+    and degree   :: "'p \&lt;Rightarrow&gt; mynat"
+    and monomial :: "mynat \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'p"
+    and eval     :: "'p \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"
+  assumes
+    r_one_neq_zero  : "one_r \&lt;noteq&gt; zero_r"
+  and r_add_comm    : "\&lt;And&gt;x y.   x +R y = y +R x"
+  and r_add_assoc   : "\&lt;And&gt;x y z. (x +R y) +R z = x +R (y +R z)"
+  and r_add_zero    : "\&lt;And&gt;x.     x +R zero_r = x"
+  and r_add_opp     : "\&lt;And&gt;x.     x +R opp_r x = zero_r"
+  and r_mul_comm    : "\&lt;And&gt;x y.   x *R y = y *R x"
+  and r_mul_assoc   : "\&lt;And&gt;x y z. (x *R y) *R z = x *R (y *R z)"
+  and r_mul_one     : "\&lt;And&gt;x.     x *R one_r = x"
+  and r_dist_l      : "\&lt;And&gt;x y z. x *R (y +R z) = (x *R y) +R (x *R z)"
+  and r_mul_zero    : "\&lt;And&gt;x.     x *R zero_r = zero_r"
+  and r_no_zero_div : "\&lt;And&gt;x y.   x *R y = zero_r \&lt;Longrightarrow&gt; x = zero_r \&lt;or&gt; y = zero_r"
+  and p_one_neq_zero : "one_p \&lt;noteq&gt; zero_p"
+  and p_add_comm    : "\&lt;And&gt;x y.   x +P y = y +P x"
+  and p_add_assoc   : "\&lt;And&gt;x y z. (x +P y) +P z = x +P (y +P z)"
+  and p_add_zero    : "\&lt;And&gt;x.     x +P zero_p = x"
+  and p_add_opp     : "\&lt;And&gt;x.     x +P opp_p x = zero_p"
+  and p_mul_comm    : "\&lt;And&gt;x y.   x *P y = y *P x"
+  and p_mul_assoc   : "\&lt;And&gt;x y z. (x *P y) *P z = x *P (y *P z)"
+  and p_mul_one     : "\&lt;And&gt;x.     x *P one_p = x"
+  and p_dist_l      : "\&lt;And&gt;x y z. x *P (y +P z) = (x *P y) +P (x *P z)"
+  and p_mul_zero    : "\&lt;And&gt;x.     x *P zero_p = zero_p"
+  and p_no_zero_div : "\&lt;And&gt;x y.   x *P y = zero_p \&lt;Longrightarrow&gt; x = zero_p \&lt;or&gt; y = zero_p"
+  and deg_zero      : "degree zero_p = Nat_O"
+  and eval_add      : "\&lt;And&gt;p q x. eval (p +P q) x = eval p x +R eval q x"
+  and eval_mul      : "\&lt;And&gt;p q x. eval (p *P q) x = eval p x *R eval q x"
+  and eval_C_ax     : "\&lt;And&gt;c x.   eval (monomial Nat_O c) x = c"
+  and eval_X_ax     : "\&lt;And&gt;x.     eval (monomial (Nat_S Nat_O) one_r) x = x"
+  and deg_C_ax      : "\&lt;And&gt;c.     c \&lt;noteq&gt; zero_r \&lt;Longrightarrow&gt; degree (monomial Nat_O c) = Nat_O"
+  and deg_constant  : "\&lt;And&gt;p.     (degree p = Nat_O) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;c. p = monomial Nat_O c)"
+  and deg_X_minus_ax : "\&lt;And&gt;a.    degree (monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)) = Nat_S Nat_O"
+  and deg_mul       : "\&lt;And&gt;p q.   p \&lt;noteq&gt; zero_p \&lt;Longrightarrow&gt; q \&lt;noteq&gt; zero_p \&lt;Longrightarrow&gt;
+                                 degree (p *P q) = mynat_add (degree p) (degree q)"
+  and C_zero_ax     : "monomial Nat_O zero_r = zero_p"
+  and C_one_ax      : "monomial Nat_O one_r = one_p"
+  and euclid_X_minus_ax :
+       "\&lt;And&gt;p a. \&lt;exists&gt;q r.
+          p = q *P (monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)) +P r
+          \&lt;and&gt; degree r = Nat_O"
+begin
+
+
+
+
+
+definition X :: "'p" where
+  "X = monomial (Nat_S Nat_O) one_r"
+
+definition C :: "'r \&lt;Rightarrow&gt; 'p" where
+  "C c = monomial Nat_O c"
+
+definition X_minus :: "'r \&lt;Rightarrow&gt; 'p" where
+  "X_minus a = X +P C (opp_r a)"
+
+fun poly_of_roots :: "'r mylist \&lt;Rightarrow&gt; 'p" where
+  "poly_of_roots NilL = one_p"
+| "poly_of_roots (ConsL a xs) = X_minus a *P poly_of_roots xs"
+
+definition is_root :: "'r \&lt;Rightarrow&gt; 'p \&lt;Rightarrow&gt; bool" where
+  "is_root a p \&lt;longleftrightarrow&gt; eval p a = zero_r"
+
+
+
+
+
+lemma X_minus_unfold:
+  "X_minus a = monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)"
+  unfolding X_minus_def X_def C_def
+  sorry
+lemma eval_C: "eval (C c) x = c"
+  unfolding C_def
+  sorry
+lemma eval_X: "eval X x = x"
+  unfolding X_def
+  sorry
+lemma deg_X_minus: "degree (X_minus a) = Nat_S Nat_O"
+  sorry
+lemma C_zero: "C zero_r = zero_p"
+  unfolding C_def
+  sorry
+lemma C_one: "C one_r = one_p"
+  unfolding C_def
+  sorry
+lemma deg_C: "c \&lt;noteq&gt; zero_r \&lt;Longrightarrow&gt; degree (C c) = Nat_O"
+  unfolding C_def
+  sorry
+lemma euclid_X_minus: "\&lt;exists&gt;q r. p = q *P X_minus a +P r \&lt;and&gt; degree r = Nat_O"
+  using euclid_X_minus_ax[of p a]
+  sorry
+
+
+
+
+lemma r_opp_add: "opp_r x +R x = zero_r"
+  sorry
+lemma r_add_zero_l: "zero_r +R x = x"
+  sorry
+
+
+
+
+lemma sub_eq_zero_l: "x +R opp_r y = zero_r \&lt;Longrightarrow&gt; x = y"
+  sorry
+
+
+
+
+lemma eval_X_minus: "eval (X_minus a) b = b +R opp_r a"
+  unfolding X_minus_def
+  sorry
+
+
+
+
+lemma X_minus_nonzero: "X_minus a \&lt;noteq&gt; zero_p"
+  sorry
+
+
+
+
+lemma p_add_zero_l: "zero_p +P x = x"
+  sorry
+lemma p_mul_zero_l: "zero_p *P x = zero_p"
+  sorry
+lemma p_mul_one_l: "one_p *P x = x"
+  sorry
+
+
+
+
+lemma root_factor: "is_root a p \&lt;Longrightarrow&gt; \&lt;exists&gt;q. p = q *P X_minus a"
+  sorry
+
+
+
+
+lemma root_transfer:
+  "p = q *P X_minus a \&lt;Longrightarrow&gt; b \&lt;noteq&gt; a \&lt;Longrightarrow&gt; is_root b p \&lt;Longrightarrow&gt; is_root b q"
+  sorry
+
+
+
+
+lemma roots_le_degree:
+  "NoDupL xs \&lt;Longrightarrow&gt; (\&lt;forall&gt;a. InL a xs \&lt;longrightarrow&gt; is_root a p) \&lt;Longrightarrow&gt; p \&lt;noteq&gt; zero_p \&lt;Longrightarrow&gt;
+   mynat_le (lengthL xs) (degree p)"
+  sorry
+
+
+
+
+lemma constant_root_zero:
+  "degree p = Nat_O \&lt;Longrightarrow&gt; is_root a p \&lt;Longrightarrow&gt; p = zero_p"
+  sorry
+
+
+
+
+lemma root_of_product:
+  "is_root a (p *P q) \&lt;Longrightarrow&gt; is_root a p \&lt;or&gt; is_root a q"
+  sorry
+
+
+
+
+lemma root_scale_constant:
+  "c \&lt;noteq&gt; zero_r \&lt;Longrightarrow&gt; (is_root a p \&lt;longleftrightarrow&gt; is_root a (C c *P p))"
+  sorry
+
+
+
+
+lemma poly_of_roots_nonzero: "poly_of_roots xs \&lt;noteq&gt; zero_p"
+  sorry
+
+
+
+
+lemma deg_poly_of_roots: "degree (poly_of_roots xs) = lengthL xs"
+  sorry
+
+
+
+
+lemma root_factor_list:
+  "NoDupL xs \&lt;Longrightarrow&gt; (\&lt;forall&gt;a. InL a xs \&lt;longrightarrow&gt; is_root a p) \&lt;Longrightarrow&gt;
+   \&lt;exists&gt;q. p = q *P poly_of_roots xs"
+  sorry
+
+
+
+
+</prefix><statement>lemma degree_factorisation:
+  "p = q *P poly_of_roots xs \&lt;Longrightarrow&gt; q \&lt;noteq&gt; zero_p \&lt;Longrightarrow&gt;
+   degree p = mynat_add (degree q) (lengthL xs)"</statement><proof_prefix /><sketch /><depth>2</depth><target_name>degree_factorisation</target_name><forbidden_names><item>degree_factorisation</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.996106581064</remaining_s></dsp_request>

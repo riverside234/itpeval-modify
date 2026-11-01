@@ -1,0 +1,105 @@
+<dsp_request schema="dsp_native_request_v1" request_id="9c10720c09724040b37c1394e5a2b1ba" input_sha256="3fc28252465f653a3079fd9ad14278772c5974b1207318cf09d3173b9fe74e12" action="context"><prefix>theory galois
+  imports Main
+begin
+
+
+
+
+
+locale field_like =
+  fixes zero_F one_F :: "'f"
+    and add_F :: "'f \&lt;Rightarrow&gt; 'f \&lt;Rightarrow&gt; 'f"  (infixl "+F" 65)
+    and mul_F :: "'f \&lt;Rightarrow&gt; 'f \&lt;Rightarrow&gt; 'f"  (infixl "*F" 70)
+    and opp_F :: "'f \&lt;Rightarrow&gt; 'f"
+    and inv_F :: "'f \&lt;Rightarrow&gt; 'f"
+  assumes add_comm    : "\&lt;And&gt;x y. x +F y = y +F x"
+    and   add_assoc   : "\&lt;And&gt;x y z. (x +F y) +F z = x +F (y +F z)"
+    and   add_zero    : "\&lt;And&gt;x. x +F zero_F = x"
+    and   add_inv_l   : "\&lt;And&gt;x. opp_F x +F x = zero_F"
+    and   mul_comm    : "\&lt;And&gt;x y. x *F y = y *F x"
+    and   mul_assoc   : "\&lt;And&gt;x y z. (x *F y) *F z = x *F (y *F z)"
+    and   mul_one_l   : "\&lt;And&gt;x. one_F *F x = x"
+    and   mul_inv_l   : "\&lt;And&gt;x. x \&lt;noteq&gt; zero_F \&lt;Longrightarrow&gt; inv_F x *F x = one_F"
+    and   distrib_l   : "\&lt;And&gt;x y z. x *F (y +F z) = (x *F y) +F (x *F z)"
+    and   zero_neq_one: "zero_F \&lt;noteq&gt; one_F"
+    and   inv_nonzero : "\&lt;And&gt;x. x \&lt;noteq&gt; zero_F \&lt;Longrightarrow&gt; inv_F x \&lt;noteq&gt; zero_F"
+begin
+
+
+lemma zero_add: "zero_F +F x = x"
+  sorry
+lemma mul_one_r: "x *F one_F = x"
+  sorry
+lemma mul_inv_r: "x \&lt;noteq&gt; zero_F \&lt;Longrightarrow&gt; x *F inv_F x = one_F"
+  sorry
+
+
+lemma add_cancel_l: "x +F y = x +F z \&lt;Longrightarrow&gt; y = z"
+  sorry
+lemma add_cancel_r: "y +F x = z +F x \&lt;Longrightarrow&gt; y = z"
+  sorry
+lemma mul_cancel_l: "x \&lt;noteq&gt; zero_F \&lt;Longrightarrow&gt; x *F y = x *F z \&lt;Longrightarrow&gt; y = z"
+  sorry
+lemma mul_cancel_r: "x \&lt;noteq&gt; zero_F \&lt;Longrightarrow&gt; y *F x = z *F x \&lt;Longrightarrow&gt; y = z"
+  sorry
+lemma inv_unique: "x \&lt;noteq&gt; zero_F \&lt;Longrightarrow&gt; x *F y = one_F \&lt;Longrightarrow&gt; y = inv_F x"
+  sorry
+lemma inv_involutive: "x \&lt;noteq&gt; zero_F \&lt;Longrightarrow&gt; inv_F (inv_F x) = x"
+  sorry
+end
+
+
+
+
+
+
+
+
+
+locale tower =
+  fixes S    :: "'p \&lt;Rightarrow&gt; bool"
+    and mp   :: "'p \&lt;Rightarrow&gt; 'p"
+    and splt :: "'p \&lt;Rightarrow&gt; bool"
+  assumes scalar_tower : "\&lt;And&gt;p q. S p \&lt;Longrightarrow&gt; S (mp q) \&lt;Longrightarrow&gt; S q"
+    and   map_solv     : "\&lt;And&gt;p. S p \&lt;Longrightarrow&gt; S (mp p)"
+    and   splits_solv  : "\&lt;And&gt;p. splt p \&lt;Longrightarrow&gt; S p"
+begin
+
+lemma gal_isSolvable_tower:
+  "S p \&lt;Longrightarrow&gt; S (mp q) \&lt;Longrightarrow&gt; S q"
+  sorry
+lemma gal_isSolvable_double_tower:
+  "S p \&lt;Longrightarrow&gt; S (mp q) \&lt;Longrightarrow&gt; S (mp r) \&lt;Longrightarrow&gt; S r"
+  sorry
+lemma gal_isSolvable_triple_tower:
+  "S p \&lt;Longrightarrow&gt; S (mp q) \&lt;Longrightarrow&gt; S (mp r) \&lt;Longrightarrow&gt; S (mp s) \&lt;Longrightarrow&gt; S s"
+  sorry
+lemma gal_isSolvable_quadruple_tower:
+  "S p \&lt;Longrightarrow&gt; S (mp q) \&lt;Longrightarrow&gt; S (mp r) \&lt;Longrightarrow&gt; S (mp s) \&lt;Longrightarrow&gt; S (mp t) \&lt;Longrightarrow&gt; S t"
+  sorry
+lemma gal_isSolvable_map_poly:
+  "S p \&lt;Longrightarrow&gt; S (mp p)"
+  sorry
+lemma gal_isSolvable_of_split:
+  "splt p \&lt;Longrightarrow&gt; S p"
+  sorry
+lemma gal_isSolvable_split_tower:
+  "splt q \&lt;Longrightarrow&gt; S q"
+  sorry
+lemma gal_isSolvable_two_step_map:
+  "S p \&lt;Longrightarrow&gt; S (mp (mp p))"
+  sorry
+lemma gal_isSolvable_three_step_map:
+  "S p \&lt;Longrightarrow&gt; S (mp (mp (mp p)))"
+  sorry
+lemma gal_isSolvable_map_poly_comp:
+  "S p \&lt;Longrightarrow&gt; S (mp (mp p))"
+  sorry
+lemma gal_isSolvable_mutual_split:
+  "splt p \&lt;Longrightarrow&gt; splt q \&lt;Longrightarrow&gt; S p \&lt;and&gt; S q"
+  sorry
+lemma gal_isSolvable_map_after_split:
+  "splt p \&lt;Longrightarrow&gt; S (mp p)"
+  sorry
+</prefix><statement>lemma gal_isSolvable_tower_split:
+  "splt q \&lt;Longrightarrow&gt; S (mp r) \&lt;Longrightarrow&gt; S r"</statement><proof_prefix /><sketch /><depth>2</depth><target_name>gal_isSolvable_tower_split</target_name><forbidden_names><item>gal_isSolvable_tower_split</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9981777789071</remaining_s></dsp_request>

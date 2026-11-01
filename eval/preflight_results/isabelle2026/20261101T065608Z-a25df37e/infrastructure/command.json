@@ -1,0 +1,18 @@
+[
+  "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/bin/isabelle",
+  "build",
+  "-j",
+  "1",
+  "-o",
+  "document=false",
+  "-o",
+  "parallel_proofs=0",
+  "-o",
+  "timeout_scale=1.0",
+  "-o",
+  "threads=4",
+  "-b",
+  "-d",
+  "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2026-native/infrastructure/61aa968004dae873",
+  "DSP_Native_61aa968004dae873"
+]

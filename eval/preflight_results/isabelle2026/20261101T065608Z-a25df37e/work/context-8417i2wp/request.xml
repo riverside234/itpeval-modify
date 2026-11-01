@@ -1,0 +1,2714 @@
+<dsp_request schema="dsp_native_request_v1" request_id="df6f80334f8c464b8636b277b8269cdb" input_sha256="809919d1630624c84a3767b142ff298f135903dcb3db0ff67ba0af4f8cc28e3e" action="context"><prefix>(*  Title:      HOL/Set.thy
+    Author:     Tobias Nipkow
+    Author:     Lawrence C Paulson
+    Author:     Markus Wenzel
+*)
+
+section \&lt;open&gt;Set theory for higher-order logic\&lt;close&gt;
+
+theory Set
+  imports Lattices Boolean_Algebras
+begin
+
+subsection \&lt;open&gt;Sets as predicates\&lt;close&gt;
+
+typedecl 'a set
+
+axiomatization Collect :: "('a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; 'a set" \&lt;comment&gt; \&lt;open&gt;comprehension\&lt;close&gt;
+  and member :: "'a \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool" \&lt;comment&gt; \&lt;open&gt;membership\&lt;close&gt;
+  where mem_Collect_eq [iff, code_unfold]: "member a (Collect P) = P a"
+    and Collect_mem_eq [simp, code_unfold]: "Collect (\&lt;lambda&gt;x. member x A) = A"
+
+notation
+  member  (\&lt;open&gt;'(\&lt;in&gt;')\&lt;close&gt;) and
+  member  (\&lt;open&gt;(\&lt;open&gt;notation=\&lt;open&gt;infix \&lt;in&gt;\&lt;close&gt;\&lt;close&gt;_/ \&lt;in&gt; _)\&lt;close&gt; [51, 51] 50)
+
+abbreviation not_member
+  where "not_member x A \&lt;equiv&gt; \&lt;not&gt; (x \&lt;in&gt; A)" \&lt;comment&gt; \&lt;open&gt;non-membership\&lt;close&gt;
+notation
+  not_member  (\&lt;open&gt;'(\&lt;notin&gt;')\&lt;close&gt;) and
+  not_member  (\&lt;open&gt;(\&lt;open&gt;notation=\&lt;open&gt;infix \&lt;notin&gt;\&lt;close&gt;\&lt;close&gt;_/ \&lt;notin&gt; _)\&lt;close&gt; [51, 51] 50)
+
+open_bundle member_ASCII_syntax
+begin
+notation (ASCII)
+  member  (\&lt;open&gt;'(:')\&lt;close&gt;) and
+  member  (\&lt;open&gt;(\&lt;open&gt;notation=\&lt;open&gt;infix :\&lt;close&gt;\&lt;close&gt;_/ : _)\&lt;close&gt; [51, 51] 50) and
+  not_member  (\&lt;open&gt;'(~:')\&lt;close&gt;) and
+  not_member  (\&lt;open&gt;(\&lt;open&gt;notation=\&lt;open&gt;infix ~:\&lt;close&gt;\&lt;close&gt;_/ ~: _)\&lt;close&gt; [51, 51] 50)
+end
+
+
+text \&lt;open&gt;Set comprehensions\&lt;close&gt;
+
+syntax
+  "_Coll" :: "pttrn \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; 'a set"    (\&lt;open&gt;(\&lt;open&gt;indent=1 notation=\&lt;open&gt;mixfix set comprehension\&lt;close&gt;\&lt;close&gt;{_./ _})\&lt;close&gt;)
+syntax_consts
+  "_Coll" \&lt;rightleftharpoons&gt; Collect
+translations
+  "{x. P}" \&lt;rightleftharpoons&gt; "CONST Collect (\&lt;lambda&gt;x. P)"
+
+syntax (ASCII)
+  "_Collect" :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; 'a set"  (\&lt;open&gt;(\&lt;open&gt;indent=1 notation=\&lt;open&gt;mixfix set comprehension\&lt;close&gt;\&lt;close&gt;{(_/: _)./ _})\&lt;close&gt;)
+syntax
+  "_Collect" :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; 'a set"  (\&lt;open&gt;(\&lt;open&gt;indent=1 notation=\&lt;open&gt;mixfix set comprehension\&lt;close&gt;\&lt;close&gt;{(_/ \&lt;in&gt; _)./ _})\&lt;close&gt;)
+translations
+  "{p:A. P}" \&lt;rightharpoonup&gt; "CONST Collect (\&lt;lambda&gt;p. p \&lt;in&gt; A \&lt;and&gt; P)"
+
+ML \&lt;open&gt;
+  fun Collect_binder_tr' c [Abs (x, T, t), Const (\&lt;^const_syntax&gt;\&lt;open&gt;Collect\&lt;close&gt;, _) $ Abs (y, _, P)] =
+        if x = y then
+          let
+            val x' = Syntax_Trans.mark_bound_body (x, T);
+            val t' = subst_bound (x', t);
+            val P' = subst_bound (x', P);
+          in Syntax.const c $ Syntax_Trans.mark_bound_abs (x, T) $ P' $ t' end
+        else raise Match
+    | Collect_binder_tr' _ _ = raise Match
+\&lt;close&gt;
+
+lemma CollectI: "P a \&lt;Longrightarrow&gt; a \&lt;in&gt; {x. P x}"
+  
+  sorry
+
+
+lemma CollectD: "a \&lt;in&gt; {x. P x} \&lt;Longrightarrow&gt; P a"
+  
+  sorry
+
+
+lemma Collect_cong: "(\&lt;And&gt;x. P x = Q x) \&lt;Longrightarrow&gt; {x. P x} = {x. Q x}"
+  
+  sorry
+
+
+text \&lt;open&gt;
+  Simproc for pulling \&lt;open&gt;x = t\&lt;close&gt; in \&lt;open&gt;{x. \&lt;dots&gt; \&lt;and&gt; x = t \&lt;and&gt; \&lt;dots&gt;}\&lt;close&gt;
+  to the front (and similarly for \&lt;open&gt;t = x\&lt;close&gt;):
+\&lt;close&gt;
+
+simproc_setup defined_Collect ("{x. P x \&lt;and&gt; Q x}") = \&lt;open&gt;
+  K (Quantifier1.rearrange_Collect
+    (fn ctxt =&gt;
+      resolve_tac ctxt @{thms Collect_cong} 1 THEN
+      resolve_tac ctxt @{thms iffI} 1 THEN
+      ALLGOALS
+        (EVERY' [REPEAT_DETERM o eresolve_tac ctxt @{thms conjE},
+          DEPTH_SOLVE_1 o (assume_tac ctxt ORELSE' resolve_tac ctxt @{thms conjI})])))
+\&lt;close&gt;
+
+lemmas CollectE = CollectD [elim_format]
+
+lemma set_eqI:
+  assumes "\&lt;And&gt;x. x \&lt;in&gt; A \&lt;longleftrightarrow&gt; x \&lt;in&gt; B"
+  shows "A = B"
+  
+  sorry
+
+
+lemma set_eq_iff: "A = B \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x. x \&lt;in&gt; A \&lt;longleftrightarrow&gt; x \&lt;in&gt; B)"
+  
+  sorry
+
+
+lemma Collect_eqI:
+  assumes "\&lt;And&gt;x. P x = Q x"
+  shows "Collect P = Collect Q"
+  
+  sorry
+
+
+text \&lt;open&gt;Lifting of predicate class instances\&lt;close&gt;
+
+instantiation set :: (type) boolean_algebra
+begin
+
+definition less_eq_set
+  where "A \&lt;le&gt; B \&lt;longleftrightarrow&gt; (\&lt;lambda&gt;x. member x A) \&lt;le&gt; (\&lt;lambda&gt;x. member x B)"
+
+definition less_set
+  where "A &lt; B \&lt;longleftrightarrow&gt; (\&lt;lambda&gt;x. member x A) &lt; (\&lt;lambda&gt;x. member x B)"
+
+definition inf_set
+  where "A \&lt;sqinter&gt; B = Collect ((\&lt;lambda&gt;x. member x A) \&lt;sqinter&gt; (\&lt;lambda&gt;x. member x B))"
+
+definition sup_set
+  where "A \&lt;squnion&gt; B = Collect ((\&lt;lambda&gt;x. member x A) \&lt;squnion&gt; (\&lt;lambda&gt;x. member x B))"
+
+definition bot_set
+  where "\&lt;bottom&gt; = Collect \&lt;bottom&gt;"
+
+definition top_set
+  where "\&lt;top&gt; = Collect \&lt;top&gt;"
+
+definition uminus_set
+  where "- A = Collect (- (\&lt;lambda&gt;x. member x A))"
+
+definition minus_set
+  where "A - B = Collect ((\&lt;lambda&gt;x. member x A) - (\&lt;lambda&gt;x. member x B))"
+
+instance
+  
+  sorry
+
+
+end
+
+text \&lt;open&gt;Set enumerations\&lt;close&gt;
+
+abbreviation empty :: "'a set" (\&lt;open&gt;{}\&lt;close&gt;)
+  where "{} \&lt;equiv&gt; bot"
+
+definition insert :: "'a \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; 'a set"
+  where insert_compr: "insert a B = {x. x = a \&lt;or&gt; x \&lt;in&gt; B}"
+
+open_bundle set_enumeration_syntax
+begin
+
+syntax
+  "_Finset" :: "args \&lt;Rightarrow&gt; 'a set"  (\&lt;open&gt;(\&lt;open&gt;indent=1 notation=\&lt;open&gt;mixfix set enumeration\&lt;close&gt;\&lt;close&gt;{_})\&lt;close&gt;)
+syntax_consts
+  "_Finset" \&lt;rightleftharpoons&gt; insert
+translations
+  "{x, xs}" \&lt;rightleftharpoons&gt; "CONST insert x {xs}"
+  "{x}" \&lt;rightleftharpoons&gt; "CONST insert x {}"
+
+end
+
+
+subsection \&lt;open&gt;Subsets and bounded quantifiers\&lt;close&gt;
+
+abbreviation subset :: "'a set \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool"
+  where "subset \&lt;equiv&gt; less"
+
+abbreviation subset_eq :: "'a set \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool"
+  where "subset_eq \&lt;equiv&gt; less_eq"
+
+notation
+  subset  (\&lt;open&gt;'(\&lt;subset&gt;')\&lt;close&gt;) and
+  subset  (\&lt;open&gt;(\&lt;open&gt;notation=\&lt;open&gt;infix \&lt;subset&gt;\&lt;close&gt;\&lt;close&gt;_/ \&lt;subset&gt; _)\&lt;close&gt; [51, 51] 50) and
+  subset_eq  (\&lt;open&gt;'(\&lt;subseteq&gt;')\&lt;close&gt;) and
+  subset_eq  (\&lt;open&gt;(\&lt;open&gt;notation=\&lt;open&gt;infix \&lt;subseteq&gt;\&lt;close&gt;\&lt;close&gt;_/ \&lt;subseteq&gt; _)\&lt;close&gt; [51, 51] 50)
+
+abbreviation (input)
+  supset :: "'a set \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool" where
+  "supset \&lt;equiv&gt; greater"
+
+abbreviation (input)
+  supset_eq :: "'a set \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool" where
+  "supset_eq \&lt;equiv&gt; greater_eq"
+
+notation
+  supset  (\&lt;open&gt;'(\&lt;supset&gt;')\&lt;close&gt;) and
+  supset  (\&lt;open&gt;(\&lt;open&gt;notation=\&lt;open&gt;infix \&lt;supset&gt;\&lt;close&gt;\&lt;close&gt;_/ \&lt;supset&gt; _)\&lt;close&gt; [51, 51] 50) and
+  supset_eq  (\&lt;open&gt;'(\&lt;supseteq&gt;')\&lt;close&gt;) and
+  supset_eq  (\&lt;open&gt;(\&lt;open&gt;notation=\&lt;open&gt;infix \&lt;supseteq&gt;\&lt;close&gt;\&lt;close&gt;_/ \&lt;supseteq&gt; _)\&lt;close&gt; [51, 51] 50)
+
+notation (ASCII output)
+  subset  (\&lt;open&gt;'(&lt;')\&lt;close&gt;) and
+  subset  (\&lt;open&gt;(\&lt;open&gt;notation=\&lt;open&gt;infix &lt;\&lt;close&gt;\&lt;close&gt;_/ &lt; _)\&lt;close&gt; [51, 51] 50) and
+  subset_eq  (\&lt;open&gt;'(&lt;=')\&lt;close&gt;) and
+  subset_eq  (\&lt;open&gt;(\&lt;open&gt;notation=\&lt;open&gt;infix &lt;=\&lt;close&gt;\&lt;close&gt;_/ &lt;= _)\&lt;close&gt; [51, 51] 50)
+
+definition Ball :: "'a set \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; bool"
+  where "Ball A P \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x. x \&lt;in&gt; A \&lt;longrightarrow&gt; P x)"   \&lt;comment&gt; \&lt;open&gt;bounded universal quantifiers\&lt;close&gt;
+
+definition Bex :: "'a set \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; bool"
+  where "Bex A P \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x. x \&lt;in&gt; A \&lt;and&gt; P x)"   \&lt;comment&gt; \&lt;open&gt;bounded existential quantifiers\&lt;close&gt;
+
+syntax (ASCII)
+  "_Ball"       :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; bool"      (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder ALL :\&lt;close&gt;\&lt;close&gt;ALL (_/:_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_Bex"        :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; bool"      (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder EX :\&lt;close&gt;\&lt;close&gt;EX (_/:_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_Bex1"       :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; bool"      (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder EX! :\&lt;close&gt;\&lt;close&gt;EX! (_/:_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_Bleast"     :: "id \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; 'a"           (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder LEAST :\&lt;close&gt;\&lt;close&gt;LEAST (_/:_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+
+syntax (input)
+  "_Ball"       :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; bool"      (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder ! :\&lt;close&gt;\&lt;close&gt;! (_/:_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_Bex"        :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; bool"      (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder ? :\&lt;close&gt;\&lt;close&gt;? (_/:_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_Bex1"       :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; bool"      (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder ?! :\&lt;close&gt;\&lt;close&gt;?! (_/:_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+
+syntax
+  "_Ball"       :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; bool"      (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder \&lt;forall&gt;\&lt;close&gt;\&lt;close&gt;\&lt;forall&gt;(_/\&lt;in&gt;_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_Bex"        :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; bool"      (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder \&lt;exists&gt;\&lt;close&gt;\&lt;close&gt;\&lt;exists&gt;(_/\&lt;in&gt;_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_Bex1"       :: "pttrn \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; bool"      (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder \&lt;exists&gt;!\&lt;close&gt;\&lt;close&gt;\&lt;exists&gt;!(_/\&lt;in&gt;_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_Bleast"     :: "id \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; 'a"           (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder LEAST\&lt;close&gt;\&lt;close&gt;LEAST(_/\&lt;in&gt;_)./ _)\&lt;close&gt; [0, 0, 10] 10)
+
+syntax_consts
+  "_Ball" \&lt;rightleftharpoons&gt; Ball and
+  "_Bex" \&lt;rightleftharpoons&gt; Bex and
+  "_Bex1" \&lt;rightleftharpoons&gt; Ex1 and
+  "_Bleast" \&lt;rightleftharpoons&gt; Least
+
+translations
+  "\&lt;forall&gt;x\&lt;in&gt;A. P" \&lt;rightleftharpoons&gt; "CONST Ball A (\&lt;lambda&gt;x. P)"
+  "\&lt;exists&gt;x\&lt;in&gt;A. P" \&lt;rightleftharpoons&gt; "CONST Bex A (\&lt;lambda&gt;x. P)"
+  "\&lt;exists&gt;!x\&lt;in&gt;A. P" \&lt;rightharpoonup&gt; "\&lt;exists&gt;!x. x \&lt;in&gt; A \&lt;and&gt; P"
+  "LEAST x:A. P" \&lt;rightharpoonup&gt; "LEAST x. x \&lt;in&gt; A \&lt;and&gt; P"
+
+syntax (ASCII output)
+  "_setlessAll" :: "[idt, 'a, bool] \&lt;Rightarrow&gt; bool"  (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder ALL\&lt;close&gt;\&lt;close&gt;ALL _&lt;_./ _)\&lt;close&gt;  [0, 0, 10] 10)
+  "_setlessEx"  :: "[idt, 'a, bool] \&lt;Rightarrow&gt; bool"  (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder EX\&lt;close&gt;\&lt;close&gt;EX _&lt;_./ _)\&lt;close&gt;  [0, 0, 10] 10)
+  "_setleAll"   :: "[idt, 'a, bool] \&lt;Rightarrow&gt; bool"  (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder ALL\&lt;close&gt;\&lt;close&gt;ALL _&lt;=_./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_setleEx"    :: "[idt, 'a, bool] \&lt;Rightarrow&gt; bool"  (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder EX\&lt;close&gt;\&lt;close&gt;EX _&lt;=_./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_setleEx1"   :: "[idt, 'a, bool] \&lt;Rightarrow&gt; bool"  (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder EX!\&lt;close&gt;\&lt;close&gt;EX! _&lt;=_./ _)\&lt;close&gt; [0, 0, 10] 10)
+
+syntax
+  "_setlessAll" :: "[idt, 'a, bool] \&lt;Rightarrow&gt; bool"   (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder \&lt;forall&gt;\&lt;close&gt;\&lt;close&gt;\&lt;forall&gt;_\&lt;subset&gt;_./ _)\&lt;close&gt;  [0, 0, 10] 10)
+  "_setlessEx"  :: "[idt, 'a, bool] \&lt;Rightarrow&gt; bool"   (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder \&lt;exists&gt;\&lt;close&gt;\&lt;close&gt;\&lt;exists&gt;_\&lt;subset&gt;_./ _)\&lt;close&gt;  [0, 0, 10] 10)
+  "_setleAll"   :: "[idt, 'a, bool] \&lt;Rightarrow&gt; bool"   (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder \&lt;forall&gt;\&lt;close&gt;\&lt;close&gt;\&lt;forall&gt;_\&lt;subseteq&gt;_./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_setleEx"    :: "[idt, 'a, bool] \&lt;Rightarrow&gt; bool"   (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder \&lt;exists&gt;\&lt;close&gt;\&lt;close&gt;\&lt;exists&gt;_\&lt;subseteq&gt;_./ _)\&lt;close&gt; [0, 0, 10] 10)
+  "_setleEx1"   :: "[idt, 'a, bool] \&lt;Rightarrow&gt; bool"   (\&lt;open&gt;(\&lt;open&gt;indent=3 notation=\&lt;open&gt;binder \&lt;exists&gt;!\&lt;close&gt;\&lt;close&gt;\&lt;exists&gt;!_\&lt;subseteq&gt;_./ _)\&lt;close&gt; [0, 0, 10] 10)
+
+syntax_consts
+  "_setlessAll" "_setleAll" \&lt;rightleftharpoons&gt; All and
+  "_setlessEx" "_setleEx" \&lt;rightleftharpoons&gt; Ex and
+  "_setleEx1" \&lt;rightleftharpoons&gt; Ex1
+
+translations
+  "\&lt;forall&gt;A\&lt;subset&gt;B. P" \&lt;rightharpoonup&gt; "\&lt;forall&gt;A. A \&lt;subset&gt; B \&lt;longrightarrow&gt; P"
+  "\&lt;exists&gt;A\&lt;subset&gt;B. P" \&lt;rightharpoonup&gt; "\&lt;exists&gt;A. A \&lt;subset&gt; B \&lt;and&gt; P"
+  "\&lt;forall&gt;A\&lt;subseteq&gt;B. P" \&lt;rightharpoonup&gt; "\&lt;forall&gt;A. A \&lt;subseteq&gt; B \&lt;longrightarrow&gt; P"
+  "\&lt;exists&gt;A\&lt;subseteq&gt;B. P" \&lt;rightharpoonup&gt; "\&lt;exists&gt;A. A \&lt;subseteq&gt; B \&lt;and&gt; P"
+  "\&lt;exists&gt;!A\&lt;subseteq&gt;B. P" \&lt;rightharpoonup&gt; "\&lt;exists&gt;!A. A \&lt;subseteq&gt; B \&lt;and&gt; P"
+
+print_translation \&lt;open&gt;
+  let
+    val All_binder = Mixfix.binder_name \&lt;^const_syntax&gt;\&lt;open&gt;All\&lt;close&gt;;
+    val Ex_binder = Mixfix.binder_name \&lt;^const_syntax&gt;\&lt;open&gt;Ex\&lt;close&gt;;
+    val impl = \&lt;^const_syntax&gt;\&lt;open&gt;HOL.implies\&lt;close&gt;;
+    val conj = \&lt;^const_syntax&gt;\&lt;open&gt;HOL.conj\&lt;close&gt;;
+    val sbset = \&lt;^const_syntax&gt;\&lt;open&gt;subset\&lt;close&gt;;
+    val sbset_eq = \&lt;^const_syntax&gt;\&lt;open&gt;subset_eq\&lt;close&gt;;
+
+    val trans =
+     [((All_binder, impl, sbset), \&lt;^syntax_const&gt;\&lt;open&gt;_setlessAll\&lt;close&gt;),
+      ((All_binder, impl, sbset_eq), \&lt;^syntax_const&gt;\&lt;open&gt;_setleAll\&lt;close&gt;),
+      ((Ex_binder, conj, sbset), \&lt;^syntax_const&gt;\&lt;open&gt;_setlessEx\&lt;close&gt;),
+      ((Ex_binder, conj, sbset_eq), \&lt;^syntax_const&gt;\&lt;open&gt;_setleEx\&lt;close&gt;)];
+
+    fun mk v (v', T) c n P =
+      if v = v' andalso not (Term.exists_subterm (fn Free (x, _) =&gt; x = v | _ =&gt; false) n)
+      then Syntax.const c $ Syntax_Trans.mark_bound_body (v', T) $ n $ P
+      else raise Match;
+
+    fun tr' q = (q, fn _ =&gt;
+      (fn [Const (\&lt;^syntax_const&gt;\&lt;open&gt;_bound\&lt;close&gt;, _) $ Free (v, \&lt;^Type&gt;\&lt;open&gt;set _\&lt;close&gt;),
+          Const (c, _) $
+            (Const (d, _) $ (Const (\&lt;^syntax_const&gt;\&lt;open&gt;_bound\&lt;close&gt;, _) $ Free (v', T)) $ n) $ P] =&gt;
+          (case AList.lookup (=) trans (q, c, d) of
+            NONE =&gt; raise Match
+          | SOME l =&gt; mk v (v', T) l n P)
+        | _ =&gt; raise Match));
+  in
+    [tr' All_binder, tr' Ex_binder]
+  end
+\&lt;close&gt;
+
+
+text \&lt;open&gt;
+  \&lt;^medskip&gt;
+  Translate between \&lt;open&gt;{e | x1\&lt;dots&gt;xn. P}\&lt;close&gt; and \&lt;open&gt;{u. \&lt;exists&gt;x1\&lt;dots&gt;xn. u = e \&lt;and&gt; P}\&lt;close&gt;;
+  \&lt;open&gt;{y. \&lt;exists&gt;x1\&lt;dots&gt;xn. y = e \&lt;and&gt; P}\&lt;close&gt; is only translated if \&lt;open&gt;[0..n] \&lt;subseteq&gt; bvs e\&lt;close&gt;.
+\&lt;close&gt;
+
+syntax
+  "_Setcompr" :: "'a \&lt;Rightarrow&gt; idts \&lt;Rightarrow&gt; bool \&lt;Rightarrow&gt; 'a set"
+    (\&lt;open&gt;(\&lt;open&gt;indent=1 notation=\&lt;open&gt;mixfix set comprehension\&lt;close&gt;\&lt;close&gt;{_ |/_./ _})\&lt;close&gt;)
+syntax_consts
+  "_Setcompr" \&lt;rightleftharpoons&gt; Collect
+
+parse_translation \&lt;open&gt;
+  let
+    val ex_tr = snd (Syntax_Trans.mk_binder_tr ("EX ", \&lt;^const_syntax&gt;\&lt;open&gt;Ex\&lt;close&gt;));
+
+    fun nvars (Const (\&lt;^syntax_const&gt;\&lt;open&gt;_idts\&lt;close&gt;, _) $ _ $ idts) = nvars idts + 1
+      | nvars _ = 1;
+
+    fun setcompr_tr ctxt [e, idts, b] =
+      let
+        val eq = Syntax.const \&lt;^const_syntax&gt;\&lt;open&gt;HOL.eq\&lt;close&gt; $ Bound (nvars idts) $ e;
+        val P = Syntax.const \&lt;^const_syntax&gt;\&lt;open&gt;HOL.conj\&lt;close&gt; $ eq $ b;
+        val exP = ex_tr ctxt [idts, P];
+      in Syntax.const \&lt;^const_syntax&gt;\&lt;open&gt;Collect\&lt;close&gt; $ absdummy dummyT exP end;
+
+  in [(\&lt;^syntax_const&gt;\&lt;open&gt;_Setcompr\&lt;close&gt;, setcompr_tr)] end
+\&lt;close&gt;
+
+typed_print_translation \&lt;open&gt;
+ [(\&lt;^const_syntax&gt;\&lt;open&gt;Ball\&lt;close&gt;, Syntax_Trans.preserve_binder_abs2_tr' \&lt;^syntax_const&gt;\&lt;open&gt;_Ball\&lt;close&gt;),
+  (\&lt;^const_syntax&gt;\&lt;open&gt;Bex\&lt;close&gt;, Syntax_Trans.preserve_binder_abs2_tr' \&lt;^syntax_const&gt;\&lt;open&gt;_Bex\&lt;close&gt;)]
+\&lt;close&gt; \&lt;comment&gt; \&lt;open&gt;to avoid eta-contraction of body\&lt;close&gt;
+
+print_translation \&lt;open&gt;
+let
+  val ex_tr' = snd (Syntax_Trans.mk_binder_tr' (\&lt;^const_syntax&gt;\&lt;open&gt;Ex\&lt;close&gt;, "DUMMY"));
+
+  fun setcompr_tr' ctxt [Abs (abs as (_, _, P))] =
+    let
+      fun check (Const (\&lt;^const_syntax&gt;\&lt;open&gt;Ex\&lt;close&gt;, _) $ Abs (_, _, P), n) = check (P, n + 1)
+        | check (Const (\&lt;^const_syntax&gt;\&lt;open&gt;HOL.conj\&lt;close&gt;, _) $
+              (Const (\&lt;^const_syntax&gt;\&lt;open&gt;HOL.eq\&lt;close&gt;, _) $ Bound m $ e) $ P, n) =
+            n &gt; 0 andalso m = n andalso not (loose_bvar1 (P, n)) andalso
+            subset (=) (0 upto (n - 1), add_loose_bnos (e, 0, []))
+        | check _ = false;
+
+        fun tr' (_ $ abs) =
+          let val _ $ idts $ (_ $ (_ $ _ $ e) $ Q) = ex_tr' ctxt [abs]
+          in Syntax.const \&lt;^syntax_const&gt;\&lt;open&gt;_Setcompr\&lt;close&gt; $ e $ idts $ Q end;
+    in
+      if check (P, 0) then tr' P
+      else
+        let
+          val (x as _ $ Free(xN, _), t) = Syntax_Trans.atomic_abs_tr' ctxt abs;
+          val M = Syntax.const \&lt;^syntax_const&gt;\&lt;open&gt;_Coll\&lt;close&gt; $ x $ t;
+        in
+          case t of
+            Const (\&lt;^const_syntax&gt;\&lt;open&gt;HOL.conj\&lt;close&gt;, _) $
+              (Const (\&lt;^const_syntax&gt;\&lt;open&gt;Set.member\&lt;close&gt;, _) $
+                (Const (\&lt;^syntax_const&gt;\&lt;open&gt;_bound\&lt;close&gt;, _) $ Free (yN, _)) $ A) $ P =&gt;
+            if xN = yN then Syntax.const \&lt;^syntax_const&gt;\&lt;open&gt;_Collect\&lt;close&gt; $ x $ A $ P else M
+          | _ =&gt; M
+        end
+    end;
+  in [(\&lt;^const_syntax&gt;\&lt;open&gt;Collect\&lt;close&gt;, setcompr_tr')] end
+\&lt;close&gt;
+
+simproc_setup defined_Bex ("\&lt;exists&gt;x\&lt;in&gt;A. P x \&lt;and&gt; Q x") = \&lt;open&gt;
+  K (Quantifier1.rearrange_Bex (fn ctxt =&gt; unfold_tac ctxt @{thms Bex_def}))
+\&lt;close&gt;
+
+simproc_setup defined_All ("\&lt;forall&gt;x\&lt;in&gt;A. P x \&lt;longrightarrow&gt; Q x") = \&lt;open&gt;
+  K (Quantifier1.rearrange_Ball (fn ctxt =&gt; unfold_tac ctxt @{thms Ball_def}))
+\&lt;close&gt;
+
+lemma ballI [intro!]: "(\&lt;And&gt;x. x \&lt;in&gt; A \&lt;Longrightarrow&gt; P x) \&lt;Longrightarrow&gt; \&lt;forall&gt;x\&lt;in&gt;A. P x"
+  
+  sorry
+
+
+lemmas strip = impI allI ballI
+
+lemma bspec [dest?]: "\&lt;forall&gt;x\&lt;in&gt;A. P x \&lt;Longrightarrow&gt; x \&lt;in&gt; A \&lt;Longrightarrow&gt; P x"
+  
+  sorry
+
+
+text \&lt;open&gt;Gives better instantiation for bound:\&lt;close&gt;
+setup \&lt;open&gt;
+  map_theory_claset (fn ctxt =&gt;
+    ctxt addbefore ("bspec", fn ctxt' =&gt; dresolve_tac ctxt' @{thms bspec} THEN' assume_tac ctxt'))
+\&lt;close&gt;
+
+ML \&lt;open&gt;
+structure Simpdata =
+struct
+  open Simpdata;
+  val mksimps_pairs = [(\&lt;^const_name&gt;\&lt;open&gt;Ball\&lt;close&gt;, @{thms bspec})] @ mksimps_pairs;
+end;
+
+open Simpdata;
+\&lt;close&gt;
+
+declaration \&lt;open&gt;fn _ =&gt; Simplifier.map_simpset (Simplifier.set_mksimps (mksimps mksimps_pairs))\&lt;close&gt;
+
+lemma ballE [elim]: "\&lt;forall&gt;x\&lt;in&gt;A. P x \&lt;Longrightarrow&gt; (P x \&lt;Longrightarrow&gt; Q) \&lt;Longrightarrow&gt; (x \&lt;notin&gt; A \&lt;Longrightarrow&gt; Q) \&lt;Longrightarrow&gt; Q"
+  
+  sorry
+
+
+lemma bexI [intro]: "P x \&lt;Longrightarrow&gt; x \&lt;in&gt; A \&lt;Longrightarrow&gt; \&lt;exists&gt;x\&lt;in&gt;A. P x"
+  \&lt;comment&gt; \&lt;open&gt;Normally the best argument order: \&lt;open&gt;P x\&lt;close&gt; constrains the choice of \&lt;open&gt;x \&lt;in&gt; A\&lt;close&gt;.\&lt;close&gt;
+  
+  sorry
+
+
+lemma rev_bexI [intro?]: "x \&lt;in&gt; A \&lt;Longrightarrow&gt; P x \&lt;Longrightarrow&gt; \&lt;exists&gt;x\&lt;in&gt;A. P x"
+  \&lt;comment&gt; \&lt;open&gt;The best argument order when there is only one \&lt;open&gt;x \&lt;in&gt; A\&lt;close&gt;.\&lt;close&gt;
+  
+  sorry
+
+
+lemma bexCI: "(\&lt;forall&gt;x\&lt;in&gt;A. \&lt;not&gt; P x \&lt;Longrightarrow&gt; P a) \&lt;Longrightarrow&gt; a \&lt;in&gt; A \&lt;Longrightarrow&gt; \&lt;exists&gt;x\&lt;in&gt;A. P x"
+  
+  sorry
+
+
+lemma bexE [elim!]: "\&lt;exists&gt;x\&lt;in&gt;A. P x \&lt;Longrightarrow&gt; (\&lt;And&gt;x. x \&lt;in&gt; A \&lt;Longrightarrow&gt; P x \&lt;Longrightarrow&gt; Q) \&lt;Longrightarrow&gt; Q"
+  
+  sorry
+
+
+lemma ball_triv [simp]: "(\&lt;forall&gt;x\&lt;in&gt;A. P) \&lt;longleftrightarrow&gt; ((\&lt;exists&gt;x. x \&lt;in&gt; A) \&lt;longrightarrow&gt; P)"
+  \&lt;comment&gt; \&lt;open&gt;trivial rewrite rule.\&lt;close&gt;
+  
+  sorry
+
+
+lemma bex_triv [simp]: "(\&lt;exists&gt;x\&lt;in&gt;A. P) \&lt;longleftrightarrow&gt; ((\&lt;exists&gt;x. x \&lt;in&gt; A) \&lt;and&gt; P)"
+  \&lt;comment&gt; \&lt;open&gt;Dual form for existentials.\&lt;close&gt;
+  
+  sorry
+
+
+lemma bex_triv_one_point1 [simp]: "(\&lt;exists&gt;x\&lt;in&gt;A. x = a) \&lt;longleftrightarrow&gt; a \&lt;in&gt; A"
+  
+  sorry
+
+
+lemma bex_triv_one_point2 [simp]: "(\&lt;exists&gt;x\&lt;in&gt;A. a = x) \&lt;longleftrightarrow&gt; a \&lt;in&gt; A"
+  
+  sorry
+
+
+lemma bex_one_point1 [simp]: "(\&lt;exists&gt;x\&lt;in&gt;A. x = a \&lt;and&gt; P x) \&lt;longleftrightarrow&gt; a \&lt;in&gt; A \&lt;and&gt; P a"
+  
+  sorry
+
+
+lemma bex_one_point2 [simp]: "(\&lt;exists&gt;x\&lt;in&gt;A. a = x \&lt;and&gt; P x) \&lt;longleftrightarrow&gt; a \&lt;in&gt; A \&lt;and&gt; P a"
+  
+  sorry
+
+
+lemma ball_one_point1 [simp]: "(\&lt;forall&gt;x\&lt;in&gt;A. x = a \&lt;longrightarrow&gt; P x) \&lt;longleftrightarrow&gt; (a \&lt;in&gt; A \&lt;longrightarrow&gt; P a)"
+  
+  sorry
+
+
+lemma ball_one_point2 [simp]: "(\&lt;forall&gt;x\&lt;in&gt;A. a = x \&lt;longrightarrow&gt; P x) \&lt;longleftrightarrow&gt; (a \&lt;in&gt; A \&lt;longrightarrow&gt; P a)"
+  
+  sorry
+
+
+lemma ball_conj_distrib: "(\&lt;forall&gt;x\&lt;in&gt;A. P x \&lt;and&gt; Q x) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;A. P x) \&lt;and&gt; (\&lt;forall&gt;x\&lt;in&gt;A. Q x)"
+  
+  sorry
+
+
+lemma bex_disj_distrib: "(\&lt;exists&gt;x\&lt;in&gt;A. P x \&lt;or&gt; Q x) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x\&lt;in&gt;A. P x) \&lt;or&gt; (\&lt;exists&gt;x\&lt;in&gt;A. Q x)"
+  
+  sorry
+
+
+
+text \&lt;open&gt;Congruence rules\&lt;close&gt;
+
+lemma ball_cong:
+  "\&lt;lbrakk&gt; A = B;  \&lt;And&gt;x. x \&lt;in&gt; B \&lt;Longrightarrow&gt; P x \&lt;longleftrightarrow&gt; Q x \&lt;rbrakk&gt; \&lt;Longrightarrow&gt;
+    (\&lt;forall&gt;x\&lt;in&gt;A. P x) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;B. Q x)"
+  
+  sorry
+
+
+lemma ball_cong_simp [cong]:
+  "\&lt;lbrakk&gt; A = B;  \&lt;And&gt;x. x \&lt;in&gt; B =simp=&gt; P x \&lt;longleftrightarrow&gt; Q x \&lt;rbrakk&gt; \&lt;Longrightarrow&gt;
+    (\&lt;forall&gt;x\&lt;in&gt;A. P x) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;B. Q x)"
+  
+  sorry
+
+
+lemma bex_cong:
+  "\&lt;lbrakk&gt; A = B;  \&lt;And&gt;x. x \&lt;in&gt; B \&lt;Longrightarrow&gt; P x \&lt;longleftrightarrow&gt; Q x \&lt;rbrakk&gt; \&lt;Longrightarrow&gt;
+    (\&lt;exists&gt;x\&lt;in&gt;A. P x) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x\&lt;in&gt;B. Q x)"
+  
+  sorry
+
+
+lemma bex_cong_simp [cong]:
+  "\&lt;lbrakk&gt; A = B;  \&lt;And&gt;x. x \&lt;in&gt; B =simp=&gt; P x \&lt;longleftrightarrow&gt; Q x \&lt;rbrakk&gt; \&lt;Longrightarrow&gt;
+    (\&lt;exists&gt;x\&lt;in&gt;A. P x) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x\&lt;in&gt;B. Q x)"
+  
+  sorry
+
+
+lemma bex1_def: "(\&lt;exists&gt;!x\&lt;in&gt;X. P x) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x\&lt;in&gt;X. P x) \&lt;and&gt; (\&lt;forall&gt;x\&lt;in&gt;X. \&lt;forall&gt;y\&lt;in&gt;X. P x \&lt;longrightarrow&gt; P y \&lt;longrightarrow&gt; x = y)"
+  
+  sorry
+
+
+
+subsection \&lt;open&gt;Basic operations\&lt;close&gt;
+
+subsubsection \&lt;open&gt;Subsets\&lt;close&gt;
+
+lemma subsetI [intro!]: "(\&lt;And&gt;x. x \&lt;in&gt; A \&lt;Longrightarrow&gt; x \&lt;in&gt; B) \&lt;Longrightarrow&gt; A \&lt;subseteq&gt; B"
+  
+  sorry
+
+
+text \&lt;open&gt;
+  \&lt;^medskip&gt;
+  Map the type \&lt;open&gt;'a set \&lt;Rightarrow&gt; anything\&lt;close&gt; to just \&lt;open&gt;'a\&lt;close&gt;; for overloading constants
+  whose first argument has type \&lt;open&gt;'a set\&lt;close&gt;.
+\&lt;close&gt;
+
+lemma subsetD [elim, intro?]: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; c \&lt;in&gt; A \&lt;Longrightarrow&gt; c \&lt;in&gt; B"
+  
+  sorry
+
+
+lemma rev_subsetD [intro?,no_atp]: "c \&lt;in&gt; A \&lt;Longrightarrow&gt; A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; c \&lt;in&gt; B"
+  \&lt;comment&gt; \&lt;open&gt;The same, with reversed premises for use with @{method erule} -- cf. @{thm rev_mp}.\&lt;close&gt;
+  
+  sorry
+
+
+lemma subsetCE [elim,no_atp]: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; (c \&lt;notin&gt; A \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; (c \&lt;in&gt; B \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; P"
+  \&lt;comment&gt; \&lt;open&gt;Classical elimination rule.\&lt;close&gt;
+  
+  sorry
+
+
+lemma subset_eq: "A \&lt;subseteq&gt; B \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;A. x \&lt;in&gt; B)"
+  
+  sorry
+
+
+lemma contra_subsetD [no_atp]: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; c \&lt;notin&gt; B \&lt;Longrightarrow&gt; c \&lt;notin&gt; A"
+  
+  sorry
+
+
+lemma subset_refl: "A \&lt;subseteq&gt; A"
+  
+  sorry
+
+
+lemma subset_trans: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; B \&lt;subseteq&gt; C \&lt;Longrightarrow&gt; A \&lt;subseteq&gt; C"
+  
+  sorry
+
+
+lemma subset_not_subset_eq [code]: "A \&lt;subset&gt; B \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; B \&lt;and&gt; \&lt;not&gt; B \&lt;subseteq&gt; A"
+  
+  sorry
+
+
+lemma eq_mem_trans: "a = b \&lt;Longrightarrow&gt; b \&lt;in&gt; A \&lt;Longrightarrow&gt; a \&lt;in&gt; A"
+  
+  sorry
+
+
+lemmas basic_trans_rules [trans] =
+  order_trans_rules rev_subsetD subsetD eq_mem_trans
+
+
+subsubsection \&lt;open&gt;Equality\&lt;close&gt;
+
+lemma subset_antisym [intro!]: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; B \&lt;subseteq&gt; A \&lt;Longrightarrow&gt; A = B"
+  \&lt;comment&gt; \&lt;open&gt;Anti-symmetry of the subset relation.\&lt;close&gt;
+  
+  sorry
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Equality rules from ZF set theory -- are they appropriate here?\&lt;close&gt;
+
+lemma equalityD1: "A = B \&lt;Longrightarrow&gt; A \&lt;subseteq&gt; B"
+  
+  sorry
+
+
+lemma equalityD2: "A = B \&lt;Longrightarrow&gt; B \&lt;subseteq&gt; A"
+  
+  sorry
+
+
+text \&lt;open&gt;
+  \&lt;^medskip&gt;
+  Be careful when adding this to the claset as \&lt;open&gt;subset_empty\&lt;close&gt; is in the
+  simpset: \&lt;^prop&gt;\&lt;open&gt;A = {}\&lt;close&gt; goes to \&lt;^prop&gt;\&lt;open&gt;{} \&lt;subseteq&gt; A\&lt;close&gt; and \&lt;^prop&gt;\&lt;open&gt;A \&lt;subseteq&gt; {}\&lt;close&gt;
+  and then back to \&lt;^prop&gt;\&lt;open&gt;A = {}\&lt;close&gt;!
+\&lt;close&gt;
+
+lemma equalityE: "A = B \&lt;Longrightarrow&gt; (A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; B \&lt;subseteq&gt; A \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+lemma equalityCE [elim]: "A = B \&lt;Longrightarrow&gt; (c \&lt;in&gt; A \&lt;Longrightarrow&gt; c \&lt;in&gt; B \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; (c \&lt;notin&gt; A \&lt;Longrightarrow&gt; c \&lt;notin&gt; B \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+lemma eqset_imp_iff: "A = B \&lt;Longrightarrow&gt; x \&lt;in&gt; A \&lt;longleftrightarrow&gt; x \&lt;in&gt; B"
+  
+  sorry
+
+
+lemma eqelem_imp_iff: "x = y \&lt;Longrightarrow&gt; x \&lt;in&gt; A \&lt;longleftrightarrow&gt; y \&lt;in&gt; A"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;The empty set\&lt;close&gt;
+
+lemma empty_def: "{} = {x. False}"
+  
+  sorry
+
+
+lemma empty_iff [simp]: "c \&lt;in&gt; {} \&lt;longleftrightarrow&gt; False"
+  
+  sorry
+
+
+lemma emptyE [elim!]: "a \&lt;in&gt; {} \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+lemma empty_subsetI [iff]: "{} \&lt;subseteq&gt; A"
+  \&lt;comment&gt; \&lt;open&gt;One effect is to delete the ASSUMPTION \&lt;^prop&gt;\&lt;open&gt;{} \&lt;subseteq&gt; A\&lt;close&gt;\&lt;close&gt;
+  
+  sorry
+
+
+lemma equals0I: "(\&lt;And&gt;y. y \&lt;in&gt; A \&lt;Longrightarrow&gt; False) \&lt;Longrightarrow&gt; A = {}"
+  
+  sorry
+
+
+lemma equals0D: "A = {} \&lt;Longrightarrow&gt; a \&lt;notin&gt; A"
+  \&lt;comment&gt; \&lt;open&gt;Use for reasoning about disjointness: \&lt;open&gt;A \&lt;inter&gt; B = {}\&lt;close&gt;\&lt;close&gt;
+  
+  sorry
+
+
+lemma ball_empty [simp]: "Ball {} P \&lt;longleftrightarrow&gt; True"
+  
+  sorry
+
+
+lemma bex_empty [simp]: "Bex {} P \&lt;longleftrightarrow&gt; False"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;The universal set -- UNIV\&lt;close&gt;
+
+abbreviation UNIV :: "'a set"
+  where "UNIV \&lt;equiv&gt; top"
+
+lemma UNIV_def: "UNIV = {x. True}"
+  
+  sorry
+
+
+lemma UNIV_I [simp]: "x \&lt;in&gt; UNIV"
+  
+  sorry
+
+
+declare UNIV_I [intro]  \&lt;comment&gt; \&lt;open&gt;unsafe makes it less likely to cause problems\&lt;close&gt;
+
+lemma UNIV_witness [intro?]: "\&lt;exists&gt;x. x \&lt;in&gt; UNIV"
+  
+  sorry
+
+
+lemma subset_UNIV: "A \&lt;subseteq&gt; UNIV"
+  
+  sorry
+
+
+text \&lt;open&gt;
+  \&lt;^medskip&gt;
+  Eta-contracting these two rules (to remove \&lt;open&gt;P\&lt;close&gt;) causes them
+  to be ignored because of their interaction with congruence rules.
+\&lt;close&gt;
+
+lemma ball_UNIV [simp]: "Ball UNIV P \&lt;longleftrightarrow&gt; All P"
+  
+  sorry
+
+
+lemma bex_UNIV [simp]: "Bex UNIV P \&lt;longleftrightarrow&gt; Ex P"
+  
+  sorry
+
+
+lemma UNIV_eq_I: "(\&lt;And&gt;x. x \&lt;in&gt; A) \&lt;Longrightarrow&gt; UNIV = A"
+  
+  sorry
+
+
+lemma UNIV_not_empty [iff]: "UNIV \&lt;noteq&gt; {}"
+  
+  sorry
+
+
+lemma empty_not_UNIV[simp]: "{} \&lt;noteq&gt; UNIV"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;The Powerset operator -- Pow\&lt;close&gt;
+
+definition Pow :: "'a set \&lt;Rightarrow&gt; 'a set set"
+  where Pow_def: "Pow A = {B. B \&lt;subseteq&gt; A}"
+
+lemma Pow_iff [iff]: "A \&lt;in&gt; Pow B \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; B"
+  
+  sorry
+
+
+lemma PowI: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; A \&lt;in&gt; Pow B"
+  
+  sorry
+
+
+lemma PowD: "A \&lt;in&gt; Pow B \&lt;Longrightarrow&gt; A \&lt;subseteq&gt; B"
+  
+  sorry
+
+
+lemma Pow_bottom: "{} \&lt;in&gt; Pow B"
+  
+  sorry
+
+
+lemma Pow_top: "A \&lt;in&gt; Pow A"
+  
+  sorry
+
+
+lemma Pow_not_empty: "Pow A \&lt;noteq&gt; {}"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Set complement\&lt;close&gt;
+
+lemma Compl_iff [simp]: "c \&lt;in&gt; - A \&lt;longleftrightarrow&gt; c \&lt;notin&gt; A"
+  
+  sorry
+
+
+lemma ComplI [intro!]: "(c \&lt;in&gt; A \&lt;Longrightarrow&gt; False) \&lt;Longrightarrow&gt; c \&lt;in&gt; - A"
+  
+  sorry
+
+
+text \&lt;open&gt;
+  \&lt;^medskip&gt;
+  This form, with negated conclusion, works well with the Classical prover.
+  Negated assumptions behave like formulae on the right side of the
+  notional turnstile \dots
+\&lt;close&gt;
+
+lemma ComplD [dest!]: "c \&lt;in&gt; - A \&lt;Longrightarrow&gt; c \&lt;notin&gt; A"
+  
+  sorry
+
+
+lemmas ComplE = ComplD [elim_format]
+
+lemma Compl_eq: "- A = {x. \&lt;not&gt; x \&lt;in&gt; A}"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Binary intersection\&lt;close&gt;
+
+abbreviation inter :: "'a set \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; 'a set"  (infixl \&lt;open&gt;\&lt;inter&gt;\&lt;close&gt; 70)
+  where "(\&lt;inter&gt;) \&lt;equiv&gt; inf"
+
+notation (ASCII)
+  inter  (infixl \&lt;open&gt;Int\&lt;close&gt; 70)
+
+lemma Int_def: "A \&lt;inter&gt; B = {x. x \&lt;in&gt; A \&lt;and&gt; x \&lt;in&gt; B}"
+  
+  sorry
+
+
+lemma Int_iff [simp]: "c \&lt;in&gt; A \&lt;inter&gt; B \&lt;longleftrightarrow&gt; c \&lt;in&gt; A \&lt;and&gt; c \&lt;in&gt; B"
+  
+  sorry
+
+
+lemma IntI [intro!]: "c \&lt;in&gt; A \&lt;Longrightarrow&gt; c \&lt;in&gt; B \&lt;Longrightarrow&gt; c \&lt;in&gt; A \&lt;inter&gt; B"
+  
+  sorry
+
+
+lemma IntD1: "c \&lt;in&gt; A \&lt;inter&gt; B \&lt;Longrightarrow&gt; c \&lt;in&gt; A"
+  
+  sorry
+
+
+lemma IntD2: "c \&lt;in&gt; A \&lt;inter&gt; B \&lt;Longrightarrow&gt; c \&lt;in&gt; B"
+  
+  sorry
+
+
+lemma IntE [elim!]: "c \&lt;in&gt; A \&lt;inter&gt; B \&lt;Longrightarrow&gt; (c \&lt;in&gt; A \&lt;Longrightarrow&gt; c \&lt;in&gt; B \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Binary union\&lt;close&gt;
+
+abbreviation union :: "'a set \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; 'a set"  (infixl \&lt;open&gt;\&lt;union&gt;\&lt;close&gt; 65)
+  where "union \&lt;equiv&gt; sup"
+
+notation (ASCII)
+  union  (infixl \&lt;open&gt;Un\&lt;close&gt; 65)
+
+lemma Un_def: "A \&lt;union&gt; B = {x. x \&lt;in&gt; A \&lt;or&gt; x \&lt;in&gt; B}"
+  
+  sorry
+
+
+lemma Un_iff [simp]: "c \&lt;in&gt; A \&lt;union&gt; B \&lt;longleftrightarrow&gt; c \&lt;in&gt; A \&lt;or&gt; c \&lt;in&gt; B"
+  
+  sorry
+
+
+lemma UnI1 [elim?]: "c \&lt;in&gt; A \&lt;Longrightarrow&gt; c \&lt;in&gt; A \&lt;union&gt; B"
+  
+  sorry
+
+
+lemma UnI2 [elim?]: "c \&lt;in&gt; B \&lt;Longrightarrow&gt; c \&lt;in&gt; A \&lt;union&gt; B"
+  
+  sorry
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Classical introduction rule: no commitment to \&lt;open&gt;A\&lt;close&gt; vs. \&lt;open&gt;B\&lt;close&gt;.\&lt;close&gt;
+lemma UnCI [intro!]: "(c \&lt;notin&gt; B \&lt;Longrightarrow&gt; c \&lt;in&gt; A) \&lt;Longrightarrow&gt; c \&lt;in&gt; A \&lt;union&gt; B"
+  
+  sorry
+
+
+lemma UnE [elim!]: "c \&lt;in&gt; A \&lt;union&gt; B \&lt;Longrightarrow&gt; (c \&lt;in&gt; A \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; (c \&lt;in&gt; B \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+lemma insert_def: "insert a B = {x. x = a} \&lt;union&gt; B"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Set difference\&lt;close&gt;
+
+text \&lt;open&gt;The minius-sign syntax continues to be accepted\&lt;close&gt;
+abbreviation set_difference :: "['a set, 'a set] \&lt;Rightarrow&gt; 'a set" 
+  (infixl "\&lt;setminus&gt;" 65) where "A \&lt;setminus&gt; B \&lt;equiv&gt; A-B"
+
+lemma Diff_iff [simp]: "c \&lt;in&gt; A - B \&lt;longleftrightarrow&gt; c \&lt;in&gt; A \&lt;and&gt; c \&lt;notin&gt; B"
+  
+  sorry
+
+
+lemma DiffI [intro!]: "c \&lt;in&gt; A \&lt;Longrightarrow&gt; c \&lt;notin&gt; B \&lt;Longrightarrow&gt; c \&lt;in&gt; A - B"
+  
+  sorry
+
+
+lemma DiffD1: "c \&lt;in&gt; A - B \&lt;Longrightarrow&gt; c \&lt;in&gt; A"
+  
+  sorry
+
+
+lemma DiffD2: "c \&lt;in&gt; A - B \&lt;Longrightarrow&gt; c \&lt;in&gt; B \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+lemma DiffE [elim!]: "c \&lt;in&gt; A - B \&lt;Longrightarrow&gt; (c \&lt;in&gt; A \&lt;Longrightarrow&gt; c \&lt;notin&gt; B \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+lemma set_diff_eq: "A - B = {x. x \&lt;in&gt; A \&lt;and&gt; x \&lt;notin&gt; B}"
+  
+  sorry
+
+
+lemma Compl_eq_Diff_UNIV: "- A = (UNIV - A)"
+  
+  sorry
+
+
+abbreviation sym_diff :: "'a set \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; 'a set" where
+  "sym_diff A B \&lt;equiv&gt; ((A - B) \&lt;union&gt; (B-A))"
+
+
+subsubsection \&lt;open&gt;Augmenting a set -- \&lt;^const&gt;\&lt;open&gt;insert\&lt;close&gt;\&lt;close&gt;
+
+lemma insert_iff [simp]: "a \&lt;in&gt; insert b A \&lt;longleftrightarrow&gt; a = b \&lt;or&gt; a \&lt;in&gt; A"
+  
+  sorry
+
+
+lemma insertI1: "a \&lt;in&gt; insert a B"
+  
+  sorry
+
+
+lemma insertI2: "a \&lt;in&gt; B \&lt;Longrightarrow&gt; a \&lt;in&gt; insert b B"
+  
+  sorry
+
+
+lemma insertE [elim!]: "a \&lt;in&gt; insert b A \&lt;Longrightarrow&gt; (a = b \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; (a \&lt;in&gt; A \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+lemma insertCI [intro!]: "(a \&lt;notin&gt; B \&lt;Longrightarrow&gt; a = b) \&lt;Longrightarrow&gt; a \&lt;in&gt; insert b B"
+  \&lt;comment&gt; \&lt;open&gt;Classical introduction rule.\&lt;close&gt;
+  
+  sorry
+
+
+lemma subset_insert_iff: "A \&lt;subseteq&gt; insert x B \&lt;longleftrightarrow&gt; (if x \&lt;in&gt; A then A - {x} \&lt;subseteq&gt; B else A \&lt;subseteq&gt; B)"
+  
+  sorry
+
+
+lemma set_insert:
+  assumes "x \&lt;in&gt; A"
+  obtains B where "A = insert x B" and "x \&lt;notin&gt; B"
+  
+  sorry
+
+
+lemma insert_ident: "x \&lt;notin&gt; A \&lt;Longrightarrow&gt; x \&lt;notin&gt; B \&lt;Longrightarrow&gt; insert x A = insert x B \&lt;longleftrightarrow&gt; A = B"
+  
+  sorry
+
+
+lemma insert_eq_iff:
+  assumes "a \&lt;notin&gt; A" "b \&lt;notin&gt; B"
+  shows "insert a A = insert b B \&lt;longleftrightarrow&gt;
+    (if a = b then A = B else \&lt;exists&gt;C. A = insert b C \&lt;and&gt; b \&lt;notin&gt; C \&lt;and&gt; B = insert a C \&lt;and&gt; a \&lt;notin&gt; C)"
+    (is "?L \&lt;longleftrightarrow&gt; ?R")
+  
+  sorry
+
+
+lemma insert_UNIV[simp]: "insert x UNIV = UNIV"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Singletons, using insert\&lt;close&gt;
+
+lemma singletonI [intro!]: "a \&lt;in&gt; {a}"
+  \&lt;comment&gt; \&lt;open&gt;Redundant? But unlike \&lt;open&gt;insertCI\&lt;close&gt;, it proves the subgoal immediately!\&lt;close&gt;
+  
+  sorry
+
+
+lemma singletonD [dest!]: "b \&lt;in&gt; {a} \&lt;Longrightarrow&gt; b = a"
+  
+  sorry
+
+
+lemmas singletonE = singletonD [elim_format]
+
+lemma singleton_iff: "b \&lt;in&gt; {a} \&lt;longleftrightarrow&gt; b = a"
+  
+  sorry
+
+
+lemma singleton_inject [dest!]: "{a} = {b} \&lt;Longrightarrow&gt; a = b"
+  
+  sorry
+
+
+lemma singleton_insert_inj_eq [iff]: "{b} = insert a A \&lt;longleftrightarrow&gt; a = b \&lt;and&gt; A \&lt;subseteq&gt; {b}"
+  
+  sorry
+
+
+lemma singleton_insert_inj_eq' [iff]: "insert a A = {b} \&lt;longleftrightarrow&gt; a = b \&lt;and&gt; A \&lt;subseteq&gt; {b}"
+  
+  sorry
+
+
+lemma subset_singletonD: "A \&lt;subseteq&gt; {x} \&lt;Longrightarrow&gt; A = {} \&lt;or&gt; A = {x}"
+  
+  sorry
+
+
+lemma subset_singleton_iff: "X \&lt;subseteq&gt; {a} \&lt;longleftrightarrow&gt; X = {} \&lt;or&gt; X = {a}"
+  
+  sorry
+
+
+lemma subset_singleton_iff_Uniq: "(\&lt;exists&gt;a. A \&lt;subseteq&gt; {a}) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;\&lt;^sub&gt;\&lt;le&gt;\&lt;^sub&gt;1x. x \&lt;in&gt; A)"
+  
+  sorry
+
+
+lemma singleton_conv [simp]: "{x. x = a} = {a}"
+  
+  sorry
+
+
+lemma singleton_conv2 [simp]: "{x. a = x} = {a}"
+  
+  sorry
+
+
+lemma Diff_single_insert: "A - {x} \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; A \&lt;subseteq&gt; insert x B"
+  
+  sorry
+
+
+lemma subset_Diff_insert: "A \&lt;subseteq&gt; B - insert x C \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; B - C \&lt;and&gt; x \&lt;notin&gt; A"
+  
+  sorry
+
+
+lemma doubleton_eq_iff: "{a, b} = {c, d} \&lt;longleftrightarrow&gt; a = c \&lt;and&gt; b = d \&lt;or&gt; a = d \&lt;and&gt; b = c"
+  
+  sorry
+
+
+lemma Un_singleton_iff: "A \&lt;union&gt; B = {x} \&lt;longleftrightarrow&gt; A = {} \&lt;and&gt; B = {x} \&lt;or&gt; A = {x} \&lt;and&gt; B = {} \&lt;or&gt; A = {x} \&lt;and&gt; B = {x}"
+  
+  sorry
+
+
+lemma singleton_Un_iff: "{x} = A \&lt;union&gt; B \&lt;longleftrightarrow&gt; A = {} \&lt;and&gt; B = {x} \&lt;or&gt; A = {x} \&lt;and&gt; B = {} \&lt;or&gt; A = {x} \&lt;and&gt; B = {x}"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Image of a set under a function\&lt;close&gt;
+
+text \&lt;open&gt;Frequently \&lt;open&gt;b\&lt;close&gt; does not have the syntactic form of \&lt;open&gt;f x\&lt;close&gt;.\&lt;close&gt;
+
+definition image :: "('a \&lt;Rightarrow&gt; 'b) \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; 'b set"    (infixr \&lt;open&gt;`\&lt;close&gt; 90)
+  where "f ` A = {y. \&lt;exists&gt;x\&lt;in&gt;A. y = f x}"
+
+lemma image_eqI [simp, intro]: "b = f x \&lt;Longrightarrow&gt; x \&lt;in&gt; A \&lt;Longrightarrow&gt; b \&lt;in&gt; f ` A"
+  
+  sorry
+
+
+lemma imageI: "x \&lt;in&gt; A \&lt;Longrightarrow&gt; f x \&lt;in&gt; f ` A"
+  
+  sorry
+
+
+lemma rev_image_eqI: "x \&lt;in&gt; A \&lt;Longrightarrow&gt; b = f x \&lt;Longrightarrow&gt; b \&lt;in&gt; f ` A"
+  \&lt;comment&gt; \&lt;open&gt;This version's more effective when we already have the required \&lt;open&gt;x\&lt;close&gt;.\&lt;close&gt;
+  
+  sorry
+
+
+lemma imageE [elim!]:
+  assumes "b \&lt;in&gt; (\&lt;lambda&gt;x. f x) ` A"  \&lt;comment&gt; \&lt;open&gt;The eta-expansion gives variable-name preservation.\&lt;close&gt;
+  obtains x where "b = f x" and "x \&lt;in&gt; A"
+  
+  sorry
+
+
+lemma Compr_image_eq: "{x \&lt;in&gt; f ` A. P x} = f ` {x \&lt;in&gt; A. P (f x)}"
+  
+  sorry
+
+
+lemma image_Un: "f ` (A \&lt;union&gt; B) = f ` A \&lt;union&gt; f ` B"
+  
+  sorry
+
+
+lemma image_iff: "z \&lt;in&gt; f ` A \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x\&lt;in&gt;A. z = f x)"
+  
+  sorry
+
+
+lemma image_subsetI: "(\&lt;And&gt;x. x \&lt;in&gt; A \&lt;Longrightarrow&gt; f x \&lt;in&gt; B) \&lt;Longrightarrow&gt; f ` A \&lt;subseteq&gt; B"
+  \&lt;comment&gt; \&lt;open&gt;Replaces the three steps \&lt;open&gt;subsetI\&lt;close&gt;, \&lt;open&gt;imageE\&lt;close&gt;,
+    \&lt;open&gt;hypsubst\&lt;close&gt;, but breaks too many existing proofs.\&lt;close&gt;
+  
+  sorry
+
+
+lemma image_subset_iff: "f ` A \&lt;subseteq&gt; B \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;A. f x \&lt;in&gt; B)"
+  \&lt;comment&gt; \&lt;open&gt;This rewrite rule would confuse users if made default.\&lt;close&gt;
+  
+  sorry
+
+
+lemma subset_imageE:
+  assumes "B \&lt;subseteq&gt; f ` A"
+  obtains C where "C \&lt;subseteq&gt; A" and "B = f ` C"
+  
+  sorry
+
+
+lemma subset_image_iff: "B \&lt;subseteq&gt; f ` A \&lt;longleftrightarrow&gt; (\&lt;exists&gt;AA\&lt;subseteq&gt;A. B = f ` AA)"
+  
+  sorry
+
+
+lemma image_ident [simp]: "(\&lt;lambda&gt;x. x) ` Y = Y"
+  
+  sorry
+
+
+lemma image_empty [simp]: "f ` {} = {}"
+  
+  sorry
+
+
+lemma image_insert [simp]: "f ` insert a B = insert (f a) (f ` B)"
+  
+  sorry
+
+
+lemma image_constant: "x \&lt;in&gt; A \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. c) ` A = {c}"
+  
+  sorry
+
+
+lemma image_constant_conv: "(\&lt;lambda&gt;x. c) ` A = (if A = {} then {} else {c})"
+  
+  sorry
+
+
+lemma image_image: "f ` (g ` A) = (\&lt;lambda&gt;x. f (g x)) ` A"
+  
+  sorry
+
+
+lemma insert_image [simp]: "x \&lt;in&gt; A \&lt;Longrightarrow&gt; insert (f x) (f ` A) = f ` A"
+  
+  sorry
+
+
+lemma image_is_empty [iff]: "f ` A = {} \&lt;longleftrightarrow&gt; A = {}"
+  
+  sorry
+
+
+lemma empty_is_image [iff]: "{} = f ` A \&lt;longleftrightarrow&gt; A = {}"
+  
+  sorry
+
+
+lemma image_Collect: "f ` {x. P x} = {f x | x. P x}"
+  \&lt;comment&gt; \&lt;open&gt;NOT suitable as a default simp rule: the RHS isn't simpler than the LHS,
+      with its implicit quantifier and conjunction.  Also image enjoys better
+      equational properties than does the RHS.\&lt;close&gt;
+  
+  sorry
+
+
+lemma if_image_distrib [simp]:
+  "(\&lt;lambda&gt;x. if P x then f x else g x) ` S = f ` (S \&lt;inter&gt; {x. P x}) \&lt;union&gt; g ` (S \&lt;inter&gt; {x. \&lt;not&gt; P x})"
+  
+  sorry
+
+
+lemma image_cong:
+  "f ` M = g ` N" if "M = N" "\&lt;And&gt;x. x \&lt;in&gt; N \&lt;Longrightarrow&gt; f x = g x"
+  
+  sorry
+
+
+lemma image_cong_simp [cong]:
+  "f ` M = g ` N" if "M = N" "\&lt;And&gt;x. x \&lt;in&gt; N =simp=&gt; f x = g x"
+  
+  sorry
+
+
+lemma image_Int_subset: "f ` (A \&lt;inter&gt; B) \&lt;subseteq&gt; f ` A \&lt;inter&gt; f ` B"
+  
+  sorry
+
+
+lemma image_diff_subset: "f ` A - f ` B \&lt;subseteq&gt; f ` (A - B)"
+  
+  sorry
+
+
+lemma Setcompr_eq_image: "{f x |x. x \&lt;in&gt; A} = f ` A"
+  
+  sorry
+
+
+lemma setcompr_eq_image: "{f x |x. P x} = f ` {x. P x}"
+  
+  sorry
+
+
+lemma ball_imageD: "\&lt;forall&gt;x\&lt;in&gt;f ` A. P x \&lt;Longrightarrow&gt; \&lt;forall&gt;x\&lt;in&gt;A. P (f x)"
+  
+  sorry
+
+
+lemma bex_imageD: "\&lt;exists&gt;x\&lt;in&gt;f ` A. P x \&lt;Longrightarrow&gt; \&lt;exists&gt;x\&lt;in&gt;A. P (f x)"
+  
+  sorry
+
+
+lemma image_add_0 [simp]: "(+) (0::'a::comm_monoid_add) ` S = S"
+  
+  sorry
+
+
+theorem Cantors_theorem: "\&lt;nexists&gt;f. f ` A = Pow A"
+  
+  sorry
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Range of a function -- just an abbreviation for image!\&lt;close&gt;
+
+abbreviation range :: "('a \&lt;Rightarrow&gt; 'b) \&lt;Rightarrow&gt; 'b set"  \&lt;comment&gt; \&lt;open&gt;of function\&lt;close&gt;
+  where "range f \&lt;equiv&gt; f ` UNIV"
+
+lemma range_eqI: "b = f x \&lt;Longrightarrow&gt; b \&lt;in&gt; range f"
+  
+  sorry
+
+
+lemma rangeI: "f x \&lt;in&gt; range f"
+  
+  sorry
+
+
+lemma rangeE [elim?]: "b \&lt;in&gt; range (\&lt;lambda&gt;x. f x) \&lt;Longrightarrow&gt; (\&lt;And&gt;x. b = f x \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+lemma range_subsetD: "range f \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; f i \&lt;in&gt; B"
+  
+  sorry
+
+
+lemma full_SetCompr_eq: "{u. \&lt;exists&gt;x. u = f x} = range f"
+  
+  sorry
+
+
+lemma range_composition: "range (\&lt;lambda&gt;x. f (g x)) = f ` range g"
+  
+  sorry
+
+
+lemma range_constant [simp]: "range (\&lt;lambda&gt;_. x) = {x}"
+  
+  sorry
+
+
+lemma range_eq_singletonD: "range f = {a} \&lt;Longrightarrow&gt; f x = a"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Some rules with \&lt;open&gt;if\&lt;close&gt;\&lt;close&gt;
+
+text \&lt;open&gt;Elimination of \&lt;open&gt;{x. \&lt;dots&gt; \&lt;and&gt; x = t \&lt;and&gt; \&lt;dots&gt;}\&lt;close&gt;.\&lt;close&gt;
+
+lemma Collect_conv_if: "{x. x = a \&lt;and&gt; P x} = (if P a then {a} else {})"
+  
+  sorry
+
+
+lemma Collect_conv_if2: "{x. a = x \&lt;and&gt; P x} = (if P a then {a} else {})"
+  
+  sorry
+
+
+text \&lt;open&gt;
+  Rewrite rules for boolean case-splitting: faster than \&lt;open&gt;if_split [split]\&lt;close&gt;.
+\&lt;close&gt;
+
+lemma if_split_eq1: "(if Q then x else y) = b \&lt;longleftrightarrow&gt; (Q \&lt;longrightarrow&gt; x = b) \&lt;and&gt; (\&lt;not&gt; Q \&lt;longrightarrow&gt; y = b)"
+  
+  sorry
+
+
+lemma if_split_eq2: "a = (if Q then x else y) \&lt;longleftrightarrow&gt; (Q \&lt;longrightarrow&gt; a = x) \&lt;and&gt; (\&lt;not&gt; Q \&lt;longrightarrow&gt; a = y)"
+  
+  sorry
+
+
+text \&lt;open&gt;
+  Split ifs on either side of the membership relation.
+  Not for \&lt;open&gt;[simp]\&lt;close&gt; -- can cause goals to blow up!
+\&lt;close&gt;
+
+lemma if_split_mem1: "(if Q then x else y) \&lt;in&gt; b \&lt;longleftrightarrow&gt; (Q \&lt;longrightarrow&gt; x \&lt;in&gt; b) \&lt;and&gt; (\&lt;not&gt; Q \&lt;longrightarrow&gt; y \&lt;in&gt; b)"
+  
+  sorry
+
+
+lemma if_split_mem2: "(a \&lt;in&gt; (if Q then x else y)) \&lt;longleftrightarrow&gt; (Q \&lt;longrightarrow&gt; a \&lt;in&gt; x) \&lt;and&gt; (\&lt;not&gt; Q \&lt;longrightarrow&gt; a \&lt;in&gt; y)"
+  
+  sorry
+
+
+lemmas split_ifs = if_bool_eq_conj if_split_eq1 if_split_eq2 if_split_mem1 if_split_mem2
+
+(*Would like to add these, but the existing code only searches for the
+  outer-level constant, which in this case is just Set.member; we instead need
+  to use term-nets to associate patterns with rules.  Also, if a rule fails to
+  apply, then the formula should be kept.
+  [("uminus", Compl_iff RS iffD1), ("minus", [Diff_iff RS iffD1]),
+   ("Int", [IntD1,IntD2]),
+   ("Collect", [CollectD]), ("Inter", [InterD]), ("INTER", [INT_D])]
+ *)
+
+
+subsection \&lt;open&gt;Further operations and lemmas\&lt;close&gt;
+
+subsubsection \&lt;open&gt;The ``proper subset'' relation\&lt;close&gt;
+
+lemma psubsetI [intro!]: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; A \&lt;noteq&gt; B \&lt;Longrightarrow&gt; A \&lt;subset&gt; B"
+  
+  sorry
+
+
+lemma psubsetE [elim!]: "A \&lt;subset&gt; B \&lt;Longrightarrow&gt; (A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; \&lt;not&gt; B \&lt;subseteq&gt; A \&lt;Longrightarrow&gt; R) \&lt;Longrightarrow&gt; R"
+  
+  sorry
+
+
+lemma psubset_insert_iff:
+  "A \&lt;subset&gt; insert x B \&lt;longleftrightarrow&gt; (if x \&lt;in&gt; B then A \&lt;subset&gt; B else if x \&lt;in&gt; A then A - {x} \&lt;subset&gt; B else A \&lt;subseteq&gt; B)"
+  
+  sorry
+
+
+lemma psubset_eq: "A \&lt;subset&gt; B \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; B \&lt;and&gt; A \&lt;noteq&gt; B"
+  
+  sorry
+
+
+lemma psubset_imp_subset: "A \&lt;subset&gt; B \&lt;Longrightarrow&gt; A \&lt;subseteq&gt; B"
+  
+  sorry
+
+
+lemma psubset_trans: "A \&lt;subset&gt; B \&lt;Longrightarrow&gt; B \&lt;subset&gt; C \&lt;Longrightarrow&gt; A \&lt;subset&gt; C"
+  
+  sorry
+
+
+lemma psubsetD: "A \&lt;subset&gt; B \&lt;Longrightarrow&gt; c \&lt;in&gt; A \&lt;Longrightarrow&gt; c \&lt;in&gt; B"
+  
+  sorry
+
+
+lemma psubset_subset_trans: "A \&lt;subset&gt; B \&lt;Longrightarrow&gt; B \&lt;subseteq&gt; C \&lt;Longrightarrow&gt; A \&lt;subset&gt; C"
+  
+  sorry
+
+
+lemma subset_psubset_trans: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; B \&lt;subset&gt; C \&lt;Longrightarrow&gt; A \&lt;subset&gt; C"
+  
+  sorry
+
+
+lemma psubset_imp_ex_mem: "A \&lt;subset&gt; B \&lt;Longrightarrow&gt; \&lt;exists&gt;b. b \&lt;in&gt; B - A"
+  
+  sorry
+
+
+lemma atomize_ball: "(\&lt;And&gt;x. x \&lt;in&gt; A \&lt;Longrightarrow&gt; P x) \&lt;equiv&gt; Trueprop (\&lt;forall&gt;x\&lt;in&gt;A. P x)"
+  
+  sorry
+
+
+lemmas [symmetric, rulify] = atomize_ball
+  and [symmetric, defn] = atomize_ball
+
+lemma image_Pow_mono: "f ` A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; image f ` Pow A \&lt;subseteq&gt; Pow B"
+  
+  sorry
+
+
+lemma image_Pow_surj: "f ` A = B \&lt;Longrightarrow&gt; image f ` Pow A = Pow B"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Derived rules involving subsets.\&lt;close&gt;
+
+text \&lt;open&gt;\&lt;open&gt;insert\&lt;close&gt;.\&lt;close&gt;
+
+lemma subset_insertI: "B \&lt;subseteq&gt; insert a B"
+  
+  sorry
+
+
+lemma subset_insertI2: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; A \&lt;subseteq&gt; insert b B"
+  
+  sorry
+
+
+lemma subset_insert: "x \&lt;notin&gt; A \&lt;Longrightarrow&gt; A \&lt;subseteq&gt; insert x B \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; B"
+  
+  sorry
+
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Finite Union -- the least upper bound of two sets.\&lt;close&gt;
+
+lemma Un_upper1: "A \&lt;subseteq&gt; A \&lt;union&gt; B"
+  
+  sorry
+
+
+lemma Un_upper2: "B \&lt;subseteq&gt; A \&lt;union&gt; B"
+  
+  sorry
+
+
+lemma Un_least: "A \&lt;subseteq&gt; C \&lt;Longrightarrow&gt; B \&lt;subseteq&gt; C \&lt;Longrightarrow&gt; A \&lt;union&gt; B \&lt;subseteq&gt; C"
+  
+  sorry
+
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Finite Intersection -- the greatest lower bound of two sets.\&lt;close&gt;
+
+lemma Int_lower1: "A \&lt;inter&gt; B \&lt;subseteq&gt; A"
+  
+  sorry
+
+
+lemma Int_lower2: "A \&lt;inter&gt; B \&lt;subseteq&gt; B"
+  
+  sorry
+
+
+lemma Int_greatest: "C \&lt;subseteq&gt; A \&lt;Longrightarrow&gt; C \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; C \&lt;subseteq&gt; A \&lt;inter&gt; B"
+  
+  sorry
+
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Set difference.\&lt;close&gt;
+
+lemma Diff_subset[simp]: "A - B \&lt;subseteq&gt; A"
+  
+  sorry
+
+
+lemma Diff_subset_conv: "A - B \&lt;subseteq&gt; C \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; B \&lt;union&gt; C"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Equalities involving union, intersection, inclusion, etc.\&lt;close&gt;
+
+text \&lt;open&gt;\&lt;open&gt;{}\&lt;close&gt;.\&lt;close&gt;
+
+lemma Collect_const [simp]: "{s. P} = (if P then UNIV else {})"
+  \&lt;comment&gt; \&lt;open&gt;supersedes \&lt;open&gt;Collect_False_empty\&lt;close&gt;\&lt;close&gt;
+  
+  sorry
+
+
+lemma subset_empty [simp]: "A \&lt;subseteq&gt; {} \&lt;longleftrightarrow&gt; A = {}"
+  
+  sorry
+
+
+lemma not_psubset_empty [iff]: "\&lt;not&gt; (A &lt; {})"
+  
+  sorry
+
+
+lemma Collect_subset [simp]: "{x\&lt;in&gt;A. P x} \&lt;subseteq&gt; A" 
+  sorry
+
+
+lemma Collect_empty_eq [simp]: "Collect P = {} \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x. \&lt;not&gt; P x)"
+  
+  sorry
+
+
+lemma empty_Collect_eq [simp]: "{} = Collect P \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x. \&lt;not&gt; P x)"
+  
+  sorry
+
+
+lemma Collect_neg_eq: "{x. \&lt;not&gt; P x} = - {x. P x}"
+  
+  sorry
+
+
+lemma Collect_disj_eq: "{x. P x \&lt;or&gt; Q x} = {x. P x} \&lt;union&gt; {x. Q x}"
+  
+  sorry
+
+
+lemma Collect_imp_eq: "{x. P x \&lt;longrightarrow&gt; Q x} = - {x. P x} \&lt;union&gt; {x. Q x}"
+  
+  sorry
+
+
+lemma Collect_conj_eq: "{x. P x \&lt;and&gt; Q x} = {x. P x} \&lt;inter&gt; {x. Q x}"
+  
+  sorry
+
+
+lemma Collect_conj_eq2: "{x \&lt;in&gt; A. P x \&lt;and&gt; Q x} = {x \&lt;in&gt; A. P x} \&lt;inter&gt; {x \&lt;in&gt; A. Q x}"
+  
+  sorry
+
+
+lemma Collect_mono_iff: "Collect P \&lt;subseteq&gt; Collect Q \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x. P x \&lt;longrightarrow&gt; Q x)"
+  
+  sorry
+
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; \&lt;open&gt;insert\&lt;close&gt;.\&lt;close&gt;
+
+lemma insert_is_Un: "insert a A = {a} \&lt;union&gt; A"
+  \&lt;comment&gt; \&lt;open&gt;NOT SUITABLE FOR REWRITING since \&lt;open&gt;{a} \&lt;equiv&gt; insert a {}\&lt;close&gt;\&lt;close&gt;
+  
+  sorry
+
+
+lemma insert_not_empty [simp]: "insert a A \&lt;noteq&gt; {}"
+  and empty_not_insert [simp]: "{} \&lt;noteq&gt; insert a A"
+  
+  sorry
+
+
+lemma insert_absorb: "a \&lt;in&gt; A \&lt;Longrightarrow&gt; insert a A = A"
+  \&lt;comment&gt; \&lt;open&gt;\&lt;open&gt;[simp]\&lt;close&gt; causes recursive calls when there are nested inserts\&lt;close&gt;
+  \&lt;comment&gt; \&lt;open&gt;with \&lt;^emph&gt;\&lt;open&gt;quadratic\&lt;close&gt; running time\&lt;close&gt;
+  
+  sorry
+
+
+lemma insert_absorb2 [simp]: "insert x (insert x A) = insert x A"
+  
+  sorry
+
+
+lemma insert_commute: "insert x (insert y A) = insert y (insert x A)"
+  
+  sorry
+
+
+lemma insert_subset [simp]: "insert x A \&lt;subseteq&gt; B \&lt;longleftrightarrow&gt; x \&lt;in&gt; B \&lt;and&gt; A \&lt;subseteq&gt; B"
+  
+  sorry
+
+
+lemma mk_disjoint_insert: "a \&lt;in&gt; A \&lt;Longrightarrow&gt; \&lt;exists&gt;B. A = insert a B \&lt;and&gt; a \&lt;notin&gt; B"
+  \&lt;comment&gt; \&lt;open&gt;use new \&lt;open&gt;B\&lt;close&gt; rather than \&lt;open&gt;A - {a}\&lt;close&gt; to avoid infinite unfolding\&lt;close&gt;
+  
+  sorry
+
+
+lemma insert_Collect: "insert a (Collect P) = {u. u \&lt;noteq&gt; a \&lt;longrightarrow&gt; P u}"
+  
+  sorry
+
+
+lemma insert_inter_insert [simp]: "insert a A \&lt;inter&gt; insert a B = insert a (A \&lt;inter&gt; B)"
+  
+  sorry
+
+
+lemma insert_disjoint [simp]:
+  "insert a A \&lt;inter&gt; B = {} \&lt;longleftrightarrow&gt; a \&lt;notin&gt; B \&lt;and&gt; A \&lt;inter&gt; B = {}"
+  "{} = insert a A \&lt;inter&gt; B \&lt;longleftrightarrow&gt; a \&lt;notin&gt; B \&lt;and&gt; {} = A \&lt;inter&gt; B"
+  
+  sorry
+
+
+lemma disjoint_insert [simp]:
+  "B \&lt;inter&gt; insert a A = {} \&lt;longleftrightarrow&gt; a \&lt;notin&gt; B \&lt;and&gt; B \&lt;inter&gt; A = {}"
+  "{} = A \&lt;inter&gt; insert b B \&lt;longleftrightarrow&gt; b \&lt;notin&gt; A \&lt;and&gt; {} = A \&lt;inter&gt; B"
+  
+  sorry
+
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; \&lt;open&gt;Int\&lt;close&gt;\&lt;close&gt;
+
+lemma Int_absorb: "A \&lt;inter&gt; A = A"
+  
+  sorry
+
+
+lemma Int_left_absorb: "A \&lt;inter&gt; (A \&lt;inter&gt; B) = A \&lt;inter&gt; B"
+  
+  sorry
+
+
+lemma Int_commute: "A \&lt;inter&gt; B = B \&lt;inter&gt; A"
+  
+  sorry
+
+
+lemma Int_left_commute: "A \&lt;inter&gt; (B \&lt;inter&gt; C) = B \&lt;inter&gt; (A \&lt;inter&gt; C)"
+  
+  sorry
+
+
+lemma Int_assoc: "(A \&lt;inter&gt; B) \&lt;inter&gt; C = A \&lt;inter&gt; (B \&lt;inter&gt; C)"
+  
+  sorry
+
+
+lemmas Int_ac = Int_assoc Int_left_absorb Int_commute Int_left_commute
+  \&lt;comment&gt; \&lt;open&gt;Intersection is an AC-operator\&lt;close&gt;
+
+lemma Int_absorb1: "B \&lt;subseteq&gt; A \&lt;Longrightarrow&gt; A \&lt;inter&gt; B = B"
+  
+  sorry
+
+
+lemma Int_absorb2: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; A \&lt;inter&gt; B = A"
+  
+  sorry
+
+
+lemma Int_empty_left: "{} \&lt;inter&gt; B = {}"
+  
+  sorry
+
+
+lemma Int_empty_right: "A \&lt;inter&gt; {} = {}"
+  
+  sorry
+
+
+lemma disjoint_eq_subset_Compl: "A \&lt;inter&gt; B = {} \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; - B"
+  
+  sorry
+
+
+lemma disjoint_iff: "A \&lt;inter&gt; B = {} \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x. x\&lt;in&gt;A \&lt;longrightarrow&gt; x \&lt;notin&gt; B)"
+  
+  sorry
+
+
+lemma disjoint_iff_not_equal: "A \&lt;inter&gt; B = {} \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;A. \&lt;forall&gt;y\&lt;in&gt;B. x \&lt;noteq&gt; y)"
+  
+  sorry
+
+
+lemma Int_UNIV_left: "UNIV \&lt;inter&gt; B = B"
+  
+  sorry
+
+
+lemma Int_UNIV_right: "A \&lt;inter&gt; UNIV = A"
+  
+  sorry
+
+
+lemma Int_Un_distrib: "A \&lt;inter&gt; (B \&lt;union&gt; C) = (A \&lt;inter&gt; B) \&lt;union&gt; (A \&lt;inter&gt; C)"
+  
+  sorry
+
+
+lemma Int_Un_distrib2: "(B \&lt;union&gt; C) \&lt;inter&gt; A = (B \&lt;inter&gt; A) \&lt;union&gt; (C \&lt;inter&gt; A)"
+  
+  sorry
+
+
+lemma Int_UNIV: "A \&lt;inter&gt; B = UNIV \&lt;longleftrightarrow&gt; A = UNIV \&lt;and&gt; B = UNIV"
+  
+  sorry
+
+
+lemma Int_subset_iff: "C \&lt;subseteq&gt; A \&lt;inter&gt; B \&lt;longleftrightarrow&gt; C \&lt;subseteq&gt; A \&lt;and&gt; C \&lt;subseteq&gt; B"
+  
+  sorry
+
+
+lemma Int_Collect: "x \&lt;in&gt; A \&lt;inter&gt; {x. P x} \&lt;longleftrightarrow&gt; x \&lt;in&gt; A \&lt;and&gt; P x"
+  
+  sorry
+
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; \&lt;open&gt;Un\&lt;close&gt;.\&lt;close&gt;
+
+lemma Un_absorb: "A \&lt;union&gt; A = A"
+  
+  sorry
+
+
+lemma Un_left_absorb: "A \&lt;union&gt; (A \&lt;union&gt; B) = A \&lt;union&gt; B"
+  
+  sorry
+
+
+lemma Un_commute: "A \&lt;union&gt; B = B \&lt;union&gt; A"
+  
+  sorry
+
+
+lemma Un_left_commute: "A \&lt;union&gt; (B \&lt;union&gt; C) = B \&lt;union&gt; (A \&lt;union&gt; C)"
+  
+  sorry
+
+
+lemma Un_assoc: "(A \&lt;union&gt; B) \&lt;union&gt; C = A \&lt;union&gt; (B \&lt;union&gt; C)"
+  
+  sorry
+
+
+lemmas Un_ac = Un_assoc Un_left_absorb Un_commute Un_left_commute
+  \&lt;comment&gt; \&lt;open&gt;Union is an AC-operator\&lt;close&gt;
+
+lemma Un_absorb1: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; A \&lt;union&gt; B = B"
+  
+  sorry
+
+
+lemma Un_absorb2: "B \&lt;subseteq&gt; A \&lt;Longrightarrow&gt; A \&lt;union&gt; B = A"
+  
+  sorry
+
+
+lemma Un_empty_left: "{} \&lt;union&gt; B = B"
+  
+  sorry
+
+
+lemma Un_empty_right: "A \&lt;union&gt; {} = A"
+  
+  sorry
+
+
+lemma Un_UNIV_left: "UNIV \&lt;union&gt; B = UNIV"
+  
+  sorry
+
+
+lemma Un_UNIV_right: "A \&lt;union&gt; UNIV = UNIV"
+  
+  sorry
+
+
+lemma Un_insert_left [simp]: "(insert a B) \&lt;union&gt; C = insert a (B \&lt;union&gt; C)"
+  
+  sorry
+
+
+lemma Un_insert_right [simp]: "A \&lt;union&gt; (insert a B) = insert a (A \&lt;union&gt; B)"
+  
+  sorry
+
+
+lemma Int_insert_left: "(insert a B) \&lt;inter&gt; C = (if a \&lt;in&gt; C then insert a (B \&lt;inter&gt; C) else B \&lt;inter&gt; C)"
+  
+  sorry
+
+
+lemma Int_insert_left_if0 [simp]: "a \&lt;notin&gt; C \&lt;Longrightarrow&gt; (insert a B) \&lt;inter&gt; C = B \&lt;inter&gt; C"
+  
+  sorry
+
+
+lemma Int_insert_left_if1 [simp]: "a \&lt;in&gt; C \&lt;Longrightarrow&gt; (insert a B) \&lt;inter&gt; C = insert a (B \&lt;inter&gt; C)"
+  
+  sorry
+
+
+lemma Int_insert_right: "A \&lt;inter&gt; (insert a B) = (if a \&lt;in&gt; A then insert a (A \&lt;inter&gt; B) else A \&lt;inter&gt; B)"
+  
+  sorry
+
+
+lemma Int_insert_right_if0 [simp]: "a \&lt;notin&gt; A \&lt;Longrightarrow&gt; A \&lt;inter&gt; (insert a B) = A \&lt;inter&gt; B"
+  
+  sorry
+
+
+lemma Int_insert_right_if1 [simp]: "a \&lt;in&gt; A \&lt;Longrightarrow&gt; A \&lt;inter&gt; (insert a B) = insert a (A \&lt;inter&gt; B)"
+  
+  sorry
+
+
+lemma Un_Int_distrib: "A \&lt;union&gt; (B \&lt;inter&gt; C) = (A \&lt;union&gt; B) \&lt;inter&gt; (A \&lt;union&gt; C)"
+  
+  sorry
+
+
+lemma Un_Int_distrib2: "(B \&lt;inter&gt; C) \&lt;union&gt; A = (B \&lt;union&gt; A) \&lt;inter&gt; (C \&lt;union&gt; A)"
+  
+  sorry
+
+
+lemma Un_Int_crazy: "(A \&lt;inter&gt; B) \&lt;union&gt; (B \&lt;inter&gt; C) \&lt;union&gt; (C \&lt;inter&gt; A) = (A \&lt;union&gt; B) \&lt;inter&gt; (B \&lt;union&gt; C) \&lt;inter&gt; (C \&lt;union&gt; A)"
+  
+  sorry
+
+
+lemma subset_Un_eq: "A \&lt;subseteq&gt; B \&lt;longleftrightarrow&gt; A \&lt;union&gt; B = B"
+  
+  sorry
+
+
+lemma Un_empty [iff]: "A \&lt;union&gt; B = {} \&lt;longleftrightarrow&gt; A = {} \&lt;and&gt; B = {}"
+  
+  sorry
+
+
+lemma Un_subset_iff: "A \&lt;union&gt; B \&lt;subseteq&gt; C \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; C \&lt;and&gt; B \&lt;subseteq&gt; C"
+  
+  sorry
+
+
+lemma Un_Diff_Int: "(A - B) \&lt;union&gt; (A \&lt;inter&gt; B) = A"
+  
+  sorry
+
+
+lemma Diff_Int2: "A \&lt;inter&gt; C - B \&lt;inter&gt; C = A \&lt;inter&gt; C - B"
+  
+  sorry
+
+
+lemma subset_UnE:
+  assumes "C \&lt;subseteq&gt; A \&lt;union&gt; B"
+  obtains A' B' where "A' \&lt;subseteq&gt; A" "B' \&lt;subseteq&gt; B" "C = A' \&lt;union&gt; B'"
+  
+  sorry
+
+
+lemma Un_Int_eq [simp]: "(S \&lt;union&gt; T) \&lt;inter&gt; S = S" "(S \&lt;union&gt; T) \&lt;inter&gt; T = T" "S \&lt;inter&gt; (S \&lt;union&gt; T) = S" "T \&lt;inter&gt; (S \&lt;union&gt; T) = T"
+  
+  sorry
+
+
+lemma Int_Un_eq [simp]: "(S \&lt;inter&gt; T) \&lt;union&gt; S = S" "(S \&lt;inter&gt; T) \&lt;union&gt; T = T" "S \&lt;union&gt; (S \&lt;inter&gt; T) = S" "T \&lt;union&gt; (S \&lt;inter&gt; T) = T"
+  
+  sorry
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Set complement\&lt;close&gt;
+
+lemma Compl_disjoint [simp]: "A \&lt;inter&gt; - A = {}"
+  
+  sorry
+
+
+lemma Compl_disjoint2 [simp]: "- A \&lt;inter&gt; A = {}"
+  
+  sorry
+
+
+lemma Compl_partition: "A \&lt;union&gt; - A = UNIV"
+  
+  sorry
+
+
+lemma Compl_partition2: "- A \&lt;union&gt; A = UNIV"
+  
+  sorry
+
+
+lemma double_complement: "- (-A) = A" for A :: "'a set"
+  
+  sorry
+
+
+lemma Compl_Un: "- (A \&lt;union&gt; B) = (- A) \&lt;inter&gt; (- B)"
+  
+  sorry
+
+
+lemma Compl_Int: "- (A \&lt;inter&gt; B) = (- A) \&lt;union&gt; (- B)"
+  
+  sorry
+
+
+lemma subset_Compl_self_eq: "A \&lt;subseteq&gt; - A \&lt;longleftrightarrow&gt; A = {}"
+  
+  sorry
+
+
+lemma Un_Int_assoc_eq: "(A \&lt;inter&gt; B) \&lt;union&gt; C = A \&lt;inter&gt; (B \&lt;union&gt; C) \&lt;longleftrightarrow&gt; C \&lt;subseteq&gt; A"
+  \&lt;comment&gt; \&lt;open&gt;Halmos, Naive Set Theory, page 16.\&lt;close&gt;
+  
+  sorry
+
+
+lemma Compl_UNIV_eq: "- UNIV = {}"
+  
+  sorry
+
+
+lemma Compl_empty_eq: "- {} = UNIV"
+  
+  sorry
+
+
+lemma Compl_subset_Compl_iff [iff]: "- A \&lt;subseteq&gt; - B \&lt;longleftrightarrow&gt; B \&lt;subseteq&gt; A"
+  
+  sorry
+
+
+lemma Compl_eq_Compl_iff [iff]: "- A = - B \&lt;longleftrightarrow&gt; A = B"
+  for A B :: "'a set"
+  
+  sorry
+
+
+lemma Compl_insert: "- insert x A = (- A) - {x}"
+  
+  sorry
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Bounded quantifiers.
+
+  The following are not added to the default simpset because
+  (a) they duplicate the body and (b) there are no similar rules for \&lt;open&gt;Int\&lt;close&gt;.
+\&lt;close&gt;
+
+lemma ball_Un: "(\&lt;forall&gt;x \&lt;in&gt; A \&lt;union&gt; B. P x) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;A. P x) \&lt;and&gt; (\&lt;forall&gt;x\&lt;in&gt;B. P x)"
+  
+  sorry
+
+
+lemma bex_Un: "(\&lt;exists&gt;x \&lt;in&gt; A \&lt;union&gt; B. P x) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x\&lt;in&gt;A. P x) \&lt;or&gt; (\&lt;exists&gt;x\&lt;in&gt;B. P x)"
+  
+  sorry
+
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Set difference.\&lt;close&gt;
+
+lemma Diff_eq: "A - B = A \&lt;inter&gt; (- B)"
+  
+  sorry
+
+
+lemma Diff_eq_empty_iff: "A - B = {} \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; B"
+  
+  sorry
+
+
+lemma Diff_cancel [simp]: "A - A = {}"
+  
+  sorry
+
+
+lemma Diff_idemp [simp]: "(A - B) - B = A - B"
+  for A B :: "'a set"
+  
+  sorry
+
+
+lemma Diff_triv: "A \&lt;inter&gt; B = {} \&lt;Longrightarrow&gt; A - B = A"
+  
+  sorry
+
+
+lemma empty_Diff [simp]: "{} - A = {}"
+  
+  sorry
+
+
+lemma Diff_empty [simp]: "A - {} = A"
+  
+  sorry
+
+
+lemma Diff_UNIV [simp]: "A - UNIV = {}"
+  
+  sorry
+
+
+lemma Diff_insert0 [simp]: "x \&lt;notin&gt; A \&lt;Longrightarrow&gt; A - insert x B = A - B"
+  
+  sorry
+
+
+lemma Diff_insert: "A - insert a B = A - B - {a}"
+  \&lt;comment&gt; \&lt;open&gt;NOT SUITABLE FOR REWRITING since \&lt;open&gt;{a} \&lt;equiv&gt; insert a 0\&lt;close&gt;\&lt;close&gt;
+  
+  sorry
+
+
+lemma Diff_insert2: "A - insert a B = A - {a} - B"
+  \&lt;comment&gt; \&lt;open&gt;NOT SUITABLE FOR REWRITING since \&lt;open&gt;{a} \&lt;equiv&gt; insert a 0\&lt;close&gt;\&lt;close&gt;
+  
+  sorry
+
+
+lemma insert_Diff_if: "insert x A - B = (if x \&lt;in&gt; B then A - B else insert x (A - B))"
+  
+  sorry
+
+
+lemma insert_Diff1 [simp]: "x \&lt;in&gt; B \&lt;Longrightarrow&gt; insert x A - B = A - B"
+  
+  sorry
+
+
+lemma insert_Diff_single[simp]: "insert a (A - {a}) = insert a A"
+  
+  sorry
+
+
+lemma insert_Diff: "a \&lt;in&gt; A \&lt;Longrightarrow&gt; insert a (A - {a}) = A"
+  
+  sorry
+
+
+lemma Diff_insert_absorb: "x \&lt;notin&gt; A \&lt;Longrightarrow&gt; (insert x A) - {x} = A"
+  
+  sorry
+
+
+lemma Diff_disjoint [simp]: "A \&lt;inter&gt; (B - A) = {}"
+  
+  sorry
+
+
+lemma Diff_partition: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; A \&lt;union&gt; (B - A) = B"
+  
+  sorry
+
+
+lemma double_diff: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; B \&lt;subseteq&gt; C \&lt;Longrightarrow&gt; B - (C - A) = A"
+  
+  sorry
+
+
+lemma Un_Diff_cancel [simp]: "A \&lt;union&gt; (B - A) = A \&lt;union&gt; B"
+  
+  sorry
+
+
+lemma Un_Diff_cancel2 [simp]: "(B - A) \&lt;union&gt; A = B \&lt;union&gt; A"
+  
+  sorry
+
+
+lemma Diff_Un: "A - (B \&lt;union&gt; C) = (A - B) \&lt;inter&gt; (A - C)"
+  
+  sorry
+
+
+lemma Diff_Int: "A - (B \&lt;inter&gt; C) = (A - B) \&lt;union&gt; (A - C)"
+  
+  sorry
+
+
+lemma Diff_Diff_Int: "A - (A - B) = A \&lt;inter&gt; B"
+  
+  sorry
+
+
+lemma Un_Diff: "(A \&lt;union&gt; B) - C = (A - C) \&lt;union&gt; (B - C)"
+  
+  sorry
+
+
+lemma Int_Diff: "(A \&lt;inter&gt; B) - C = A \&lt;inter&gt; (B - C)"
+  
+  sorry
+
+
+lemma Diff_Int_distrib: "C \&lt;inter&gt; (A - B) = (C \&lt;inter&gt; A) - (C \&lt;inter&gt; B)"
+  
+  sorry
+
+
+lemma Diff_Int_distrib2: "(A - B) \&lt;inter&gt; C = (A \&lt;inter&gt; C) - (B \&lt;inter&gt; C)"
+  
+  sorry
+
+
+lemma Diff_Compl [simp]: "A - (- B) = A \&lt;inter&gt; B"
+  
+  sorry
+
+
+lemma Compl_Diff_eq [simp]: "- (A - B) = - A \&lt;union&gt; B"
+  
+  sorry
+
+
+lemma subset_Compl_singleton [simp]: "A \&lt;subseteq&gt; - {b} \&lt;longleftrightarrow&gt; b \&lt;notin&gt; A"
+  
+  sorry
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Quantification over type \&lt;^typ&gt;\&lt;open&gt;bool\&lt;close&gt;.\&lt;close&gt;
+
+lemma bool_induct: "P True \&lt;Longrightarrow&gt; P False \&lt;Longrightarrow&gt; P x"
+  
+  sorry
+
+
+lemma all_bool_eq: "(\&lt;forall&gt;b. P b) \&lt;longleftrightarrow&gt; P True \&lt;and&gt; P False"
+  
+  sorry
+
+
+lemma bool_contrapos: "P x \&lt;Longrightarrow&gt; \&lt;not&gt; P False \&lt;Longrightarrow&gt; P True"
+  
+  sorry
+
+
+lemma ex_bool_eq: "(\&lt;exists&gt;b. P b) \&lt;longleftrightarrow&gt; P True \&lt;or&gt; P False"
+  
+  sorry
+
+
+lemma UNIV_bool: "UNIV = {False, True}"
+  
+  sorry
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; \&lt;open&gt;Pow\&lt;close&gt;\&lt;close&gt;
+
+lemma Pow_empty [simp]: "Pow {} = {{}}"
+  
+  sorry
+
+
+lemma Pow_singleton_iff [simp]: "Pow X = {Y} \&lt;longleftrightarrow&gt; X = {} \&lt;and&gt; Y = {}"
+  
+  sorry
+
+
+lemma Pow_insert: "Pow (insert a A) = Pow A \&lt;union&gt; (insert a ` Pow A)"
+  
+  sorry
+
+
+lemma Pow_Compl: "Pow (- A) = {- B | B. A \&lt;in&gt; Pow B}"
+  
+  sorry
+
+
+lemma Pow_UNIV [simp]: "Pow UNIV = UNIV"
+  
+  sorry
+
+
+lemma Un_Pow_subset: "Pow A \&lt;union&gt; Pow B \&lt;subseteq&gt; Pow (A \&lt;union&gt; B)"
+  
+  sorry
+
+
+lemma Pow_Int_eq [simp]: "Pow (A \&lt;inter&gt; B) = Pow A \&lt;inter&gt; Pow B"
+  
+  sorry
+
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Miscellany.\&lt;close&gt;
+
+lemma Int_Diff_disjoint: "A \&lt;inter&gt; B \&lt;inter&gt; (A - B) = {}"
+  
+  sorry
+
+
+lemma Int_Diff_Un: "A \&lt;inter&gt; B \&lt;union&gt; (A - B) = A"
+  
+  sorry
+
+
+lemma set_eq_subset: "A = B \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; B \&lt;and&gt; B \&lt;subseteq&gt; A"
+  
+  sorry
+
+
+lemma subset_iff: "A \&lt;subseteq&gt; B \&lt;longleftrightarrow&gt; (\&lt;forall&gt;t. t \&lt;in&gt; A \&lt;longrightarrow&gt; t \&lt;in&gt; B)"
+  
+  sorry
+
+
+lemma subset_iff_psubset_eq: "A \&lt;subseteq&gt; B \&lt;longleftrightarrow&gt; A \&lt;subset&gt; B \&lt;or&gt; A = B"
+  
+  sorry
+
+
+lemma all_not_in_conv [simp]: "(\&lt;forall&gt;x. x \&lt;notin&gt; A) \&lt;longleftrightarrow&gt; A = {}"
+  
+  sorry
+
+
+lemma ex_in_conv: "(\&lt;exists&gt;x. x \&lt;in&gt; A) \&lt;longleftrightarrow&gt; A \&lt;noteq&gt; {}"
+  
+  sorry
+
+
+lemma ball_simps [simp, no_atp]:
+  "\&lt;And&gt;A P Q. (\&lt;forall&gt;x\&lt;in&gt;A. P x \&lt;or&gt; Q) \&lt;longleftrightarrow&gt; ((\&lt;forall&gt;x\&lt;in&gt;A. P x) \&lt;or&gt; Q)"
+  "\&lt;And&gt;A P Q. (\&lt;forall&gt;x\&lt;in&gt;A. P \&lt;or&gt; Q x) \&lt;longleftrightarrow&gt; (P \&lt;or&gt; (\&lt;forall&gt;x\&lt;in&gt;A. Q x))"
+  "\&lt;And&gt;A P Q. (\&lt;forall&gt;x\&lt;in&gt;A. P \&lt;longrightarrow&gt; Q x) \&lt;longleftrightarrow&gt; (P \&lt;longrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;A. Q x))"
+  "\&lt;And&gt;A P Q. (\&lt;forall&gt;x\&lt;in&gt;A. P x \&lt;longrightarrow&gt; Q) \&lt;longleftrightarrow&gt; ((\&lt;exists&gt;x\&lt;in&gt;A. P x) \&lt;longrightarrow&gt; Q)"
+  "\&lt;And&gt;P. (\&lt;forall&gt;x\&lt;in&gt;{}. P x) \&lt;longleftrightarrow&gt; True"
+  "\&lt;And&gt;P. (\&lt;forall&gt;x\&lt;in&gt;UNIV. P x) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x. P x)"
+  "\&lt;And&gt;a B P. (\&lt;forall&gt;x\&lt;in&gt;insert a B. P x) \&lt;longleftrightarrow&gt; (P a \&lt;and&gt; (\&lt;forall&gt;x\&lt;in&gt;B. P x))"
+  "\&lt;And&gt;P Q. (\&lt;forall&gt;x\&lt;in&gt;Collect Q. P x) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x. Q x \&lt;longrightarrow&gt; P x)"
+  "\&lt;And&gt;A P f. (\&lt;forall&gt;x\&lt;in&gt;f`A. P x) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;A. P (f x))"
+  "\&lt;And&gt;A P. (\&lt;not&gt; (\&lt;forall&gt;x\&lt;in&gt;A. P x)) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x\&lt;in&gt;A. \&lt;not&gt; P x)"
+  
+  sorry
+
+
+lemma bex_simps [simp, no_atp]:
+  "\&lt;And&gt;A P Q. (\&lt;exists&gt;x\&lt;in&gt;A. P x \&lt;and&gt; Q) \&lt;longleftrightarrow&gt; ((\&lt;exists&gt;x\&lt;in&gt;A. P x) \&lt;and&gt; Q)"
+  "\&lt;And&gt;A P Q. (\&lt;exists&gt;x\&lt;in&gt;A. P \&lt;and&gt; Q x) \&lt;longleftrightarrow&gt; (P \&lt;and&gt; (\&lt;exists&gt;x\&lt;in&gt;A. Q x))"
+  "\&lt;And&gt;P. (\&lt;exists&gt;x\&lt;in&gt;{}. P x) \&lt;longleftrightarrow&gt; False"
+  "\&lt;And&gt;P. (\&lt;exists&gt;x\&lt;in&gt;UNIV. P x) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x. P x)"
+  "\&lt;And&gt;a B P. (\&lt;exists&gt;x\&lt;in&gt;insert a B. P x) \&lt;longleftrightarrow&gt; (P a \&lt;or&gt; (\&lt;exists&gt;x\&lt;in&gt;B. P x))"
+  "\&lt;And&gt;P Q. (\&lt;exists&gt;x\&lt;in&gt;Collect Q. P x) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x. Q x \&lt;and&gt; P x)"
+  "\&lt;And&gt;A P f. (\&lt;exists&gt;x\&lt;in&gt;f`A. P x) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x\&lt;in&gt;A. P (f x))"
+  "\&lt;And&gt;A P. (\&lt;not&gt;(\&lt;exists&gt;x\&lt;in&gt;A. P x)) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;A. \&lt;not&gt; P x)"
+  
+  sorry
+
+
+lemma ex_image_cong_iff [simp, no_atp]:
+  "(\&lt;exists&gt;x. x\&lt;in&gt;f`A) \&lt;longleftrightarrow&gt; A \&lt;noteq&gt; {}" "(\&lt;exists&gt;x. x\&lt;in&gt;f`A \&lt;and&gt; P x) \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x\&lt;in&gt;A. P (f x))"
+  
+  sorry
+
+
+subsubsection \&lt;open&gt;Monotonicity of various operations\&lt;close&gt;
+
+lemma image_mono: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; f ` A \&lt;subseteq&gt; f ` B"
+  
+  sorry
+
+
+lemma Pow_mono: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; Pow A \&lt;subseteq&gt; Pow B"
+  
+  sorry
+
+
+lemma insert_mono: "C \&lt;subseteq&gt; D \&lt;Longrightarrow&gt; insert a C \&lt;subseteq&gt; insert a D"
+  
+  sorry
+
+
+lemma Un_mono: "A \&lt;subseteq&gt; C \&lt;Longrightarrow&gt; B \&lt;subseteq&gt; D \&lt;Longrightarrow&gt; A \&lt;union&gt; B \&lt;subseteq&gt; C \&lt;union&gt; D"
+  
+  sorry
+
+
+lemma Int_mono: "A \&lt;subseteq&gt; C \&lt;Longrightarrow&gt; B \&lt;subseteq&gt; D \&lt;Longrightarrow&gt; A \&lt;inter&gt; B \&lt;subseteq&gt; C \&lt;inter&gt; D"
+  
+  sorry
+
+
+lemma Diff_mono: "A \&lt;subseteq&gt; C \&lt;Longrightarrow&gt; D \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; A - B \&lt;subseteq&gt; C - D"
+  
+  sorry
+
+
+lemma Compl_anti_mono: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; - B \&lt;subseteq&gt; - A"
+  
+  sorry
+
+
+text \&lt;open&gt;\&lt;^medskip&gt; Monotonicity of implications.\&lt;close&gt;
+
+lemma in_mono: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; x \&lt;in&gt; A \&lt;longrightarrow&gt; x \&lt;in&gt; B"
+  
+  sorry
+
+
+lemma conj_mono: "P1 \&lt;longrightarrow&gt; Q1 \&lt;Longrightarrow&gt; P2 \&lt;longrightarrow&gt; Q2 \&lt;Longrightarrow&gt; (P1 \&lt;and&gt; P2) \&lt;longrightarrow&gt; (Q1 \&lt;and&gt; Q2)"
+  
+  sorry
+
+
+lemma disj_mono: "P1 \&lt;longrightarrow&gt; Q1 \&lt;Longrightarrow&gt; P2 \&lt;longrightarrow&gt; Q2 \&lt;Longrightarrow&gt; (P1 \&lt;or&gt; P2) \&lt;longrightarrow&gt; (Q1 \&lt;or&gt; Q2)"
+  
+  sorry
+
+
+lemma imp_mono: "Q1 \&lt;longrightarrow&gt; P1 \&lt;Longrightarrow&gt; P2 \&lt;longrightarrow&gt; Q2 \&lt;Longrightarrow&gt; (P1 \&lt;longrightarrow&gt; P2) \&lt;longrightarrow&gt; (Q1 \&lt;longrightarrow&gt; Q2)"
+  
+  sorry
+
+
+lemma imp_refl: "P \&lt;longrightarrow&gt; P" 
+  sorry
+
+
+lemma not_mono: "Q \&lt;longrightarrow&gt; P \&lt;Longrightarrow&gt; \&lt;not&gt; P \&lt;longrightarrow&gt; \&lt;not&gt; Q"
+  
+  sorry
+
+
+lemma ex_mono: "(\&lt;And&gt;x. P x \&lt;longrightarrow&gt; Q x) \&lt;Longrightarrow&gt; (\&lt;exists&gt;x. P x) \&lt;longrightarrow&gt; (\&lt;exists&gt;x. Q x)"
+  
+  sorry
+
+
+lemma all_mono: "(\&lt;And&gt;x. P x \&lt;longrightarrow&gt; Q x) \&lt;Longrightarrow&gt; (\&lt;forall&gt;x. P x) \&lt;longrightarrow&gt; (\&lt;forall&gt;x. Q x)"
+  
+  sorry
+
+
+lemma Collect_mono: "(\&lt;And&gt;x. P x \&lt;longrightarrow&gt; Q x) \&lt;Longrightarrow&gt; Collect P \&lt;subseteq&gt; Collect Q"
+  
+  sorry
+
+
+lemma Int_Collect_mono: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; (\&lt;And&gt;x. x \&lt;in&gt; A \&lt;Longrightarrow&gt; P x \&lt;longrightarrow&gt; Q x) \&lt;Longrightarrow&gt; A \&lt;inter&gt; Collect P \&lt;subseteq&gt; B \&lt;inter&gt; Collect Q"
+  
+  sorry
+
+
+lemmas basic_monos =
+  subset_refl imp_refl disj_mono conj_mono ex_mono Collect_mono in_mono
+
+lemma eq_to_mono: "a = b \&lt;Longrightarrow&gt; c = d \&lt;Longrightarrow&gt; b \&lt;longrightarrow&gt; d \&lt;Longrightarrow&gt; a \&lt;longrightarrow&gt; c"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Inverse image of a function\&lt;close&gt;
+
+definition vimage :: "('a \&lt;Rightarrow&gt; 'b) \&lt;Rightarrow&gt; 'b set \&lt;Rightarrow&gt; 'a set"  (infixr \&lt;open&gt;-`\&lt;close&gt; 90)
+  where "f -` B \&lt;equiv&gt; {x. f x \&lt;in&gt; B}"
+
+lemma vimage_eq [simp]: "a \&lt;in&gt; f -` B \&lt;longleftrightarrow&gt; f a \&lt;in&gt; B"
+  
+  sorry
+
+
+lemma vimage_singleton_eq: "a \&lt;in&gt; f -` {b} \&lt;longleftrightarrow&gt; f a = b"
+  
+  sorry
+
+
+lemma vimageI [intro]: "f a = b \&lt;Longrightarrow&gt; b \&lt;in&gt; B \&lt;Longrightarrow&gt; a \&lt;in&gt; f -` B"
+  
+  sorry
+
+
+lemma vimageI2: "f a \&lt;in&gt; A \&lt;Longrightarrow&gt; a \&lt;in&gt; f -` A"
+  
+  sorry
+
+
+lemma vimageE [elim!]: "a \&lt;in&gt; f -` B \&lt;Longrightarrow&gt; (\&lt;And&gt;x. f a = x \&lt;Longrightarrow&gt; x \&lt;in&gt; B \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+lemma vimageD: "a \&lt;in&gt; f -` A \&lt;Longrightarrow&gt; f a \&lt;in&gt; A"
+  
+  sorry
+
+
+lemma vimage_empty [simp]: "f -` {} = {}"
+  
+  sorry
+
+
+lemma vimage_Compl: "f -` (- A) = - (f -` A)"
+  
+  sorry
+
+
+lemma vimage_Un [simp]: "f -` (A \&lt;union&gt; B) = (f -` A) \&lt;union&gt; (f -` B)"
+  
+  sorry
+
+
+lemma vimage_Int [simp]: "f -` (A \&lt;inter&gt; B) = (f -` A) \&lt;inter&gt; (f -` B)"
+  
+  sorry
+
+
+lemma vimage_Collect_eq [simp]: "f -` Collect P = {y. P (f y)}"
+  
+  sorry
+
+
+lemma vimage_Collect: "(\&lt;And&gt;x. P (f x) = Q x) \&lt;Longrightarrow&gt; f -` (Collect P) = Collect Q"
+  
+  sorry
+
+
+lemma vimage_insert: "f -` (insert a B) = (f -` {a}) \&lt;union&gt; (f -` B)"
+  \&lt;comment&gt; \&lt;open&gt;NOT suitable for rewriting because of the recurrence of \&lt;open&gt;{a}\&lt;close&gt;.\&lt;close&gt;
+  
+  sorry
+
+
+lemma vimage_Diff: "f -` (A - B) = (f -` A) - (f -` B)"
+  
+  sorry
+
+
+lemma vimage_UNIV [simp]: "f -` UNIV = UNIV"
+  
+  sorry
+
+
+lemma vimage_mono: "A \&lt;subseteq&gt; B \&lt;Longrightarrow&gt; f -` A \&lt;subseteq&gt; f -` B"
+  \&lt;comment&gt; \&lt;open&gt;monotonicity\&lt;close&gt;
+  
+  sorry
+
+
+lemma vimage_image_eq: "f -` (f ` A) = {y. \&lt;exists&gt;x\&lt;in&gt;A. f x = f y}"
+  
+  sorry
+
+
+lemma image_vimage_subset: "f ` (f -` A) \&lt;subseteq&gt; A"
+  
+  sorry
+
+
+lemma image_vimage_eq [simp]: "f ` (f -` A) = A \&lt;inter&gt; range f"
+  
+  sorry
+
+
+lemma image_subset_iff_subset_vimage: "f ` A \&lt;subseteq&gt; B \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; f -` B"
+  
+  sorry
+
+
+lemma subset_vimage_iff: "A \&lt;subseteq&gt; f -` B \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;A. f x \&lt;in&gt; B)"
+  
+  sorry
+
+
+lemma vimage_const [simp]: "((\&lt;lambda&gt;x. c) -` A) = (if c \&lt;in&gt; A then UNIV else {})"
+  
+  sorry
+
+
+lemma vimage_if [simp]: "((\&lt;lambda&gt;x. if x \&lt;in&gt; B then c else d) -` A) =
+   (if c \&lt;in&gt; A then (if d \&lt;in&gt; A then UNIV else B)
+    else if d \&lt;in&gt; A then - B else {})"
+  
+  sorry
+
+
+lemma vimage_inter_cong: "(\&lt;And&gt; w. w \&lt;in&gt; S \&lt;Longrightarrow&gt; f w = g w) \&lt;Longrightarrow&gt; f -` y \&lt;inter&gt; S = g -` y \&lt;inter&gt; S"
+  
+  sorry
+
+
+lemma vimage_ident [simp]: "(\&lt;lambda&gt;x. x) -` Y = Y"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Singleton sets\&lt;close&gt;
+
+definition is_singleton :: "'a set \&lt;Rightarrow&gt; bool"
+  where "is_singleton A \&lt;longleftrightarrow&gt; (\&lt;exists&gt;x. A = {x})"
+
+lemma is_singletonI [simp, intro!]: "is_singleton {x}"
+  
+  sorry
+
+
+lemma is_singletonI': "A \&lt;noteq&gt; {} \&lt;Longrightarrow&gt; (\&lt;And&gt;x y. x \&lt;in&gt; A \&lt;Longrightarrow&gt; y \&lt;in&gt; A \&lt;Longrightarrow&gt; x = y) \&lt;Longrightarrow&gt; is_singleton A"
+  
+  sorry
+
+
+lemma is_singletonE: "is_singleton A \&lt;Longrightarrow&gt; (\&lt;And&gt;x. A = {x} \&lt;Longrightarrow&gt; P) \&lt;Longrightarrow&gt; P"
+  
+  sorry
+
+
+lemma is_singleton_iff_ex1:
+  \&lt;open&gt;is_singleton A \&lt;longleftrightarrow&gt; (\&lt;exists&gt;!x. x \&lt;in&gt; A)\&lt;close&gt;
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Getting the contents of a singleton set\&lt;close&gt;
+
+definition the_elem :: "'a set \&lt;Rightarrow&gt; 'a"
+  where "the_elem X = (THE x. X = {x})"
+
+lemma the_elem_eq [simp]: "the_elem {x} = x"
+  
+  sorry
+
+
+lemma is_singleton_the_elem: "is_singleton A \&lt;longleftrightarrow&gt; A = {the_elem A}"
+  
+  sorry
+
+
+lemma the_elem_image_unique:
+  assumes "A \&lt;noteq&gt; {}"
+    and *: "\&lt;And&gt;y. y \&lt;in&gt; A \&lt;Longrightarrow&gt; f y = a"
+  shows "the_elem (f ` A) = a"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Monad operation\&lt;close&gt;
+
+definition bind :: "'a set \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; 'b set) \&lt;Rightarrow&gt; 'b set"
+  where "bind A f = {x. \&lt;exists&gt;B \&lt;in&gt; f`A. x \&lt;in&gt; B}"
+
+hide_const (open) bind
+
+lemma bind_bind: "Set.bind (Set.bind A B) C = Set.bind A (\&lt;lambda&gt;x. Set.bind (B x) C)"
+  for A :: "'a set"
+  
+  sorry
+
+
+lemma empty_bind [simp]: "Set.bind {} f = {}"
+  
+  sorry
+
+
+lemma nonempty_bind_const: "A \&lt;noteq&gt; {} \&lt;Longrightarrow&gt; Set.bind A (\&lt;lambda&gt;_. B) = B"
+  
+  sorry
+
+
+lemma bind_const: "Set.bind A (\&lt;lambda&gt;_. B) = (if A = {} then {} else B)"
+  
+  sorry
+
+
+lemma bind_singleton_conv_image: "Set.bind A (\&lt;lambda&gt;x. {f x}) = f ` A"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Operations for execution\&lt;close&gt;
+
+text \&lt;open&gt;
+  Use those operations only for generating executable / efficient code.
+  Otherwise use the RHSs directly.
+\&lt;close&gt;
+
+context
+begin
+
+qualified definition is_empty :: "'a set \&lt;Rightarrow&gt; bool" \&lt;comment&gt; \&lt;open&gt;only for code generation\&lt;close&gt;
+  where is_empty_iff [code_abbrev, simp]: "is_empty A \&lt;longleftrightarrow&gt; A = {}"
+
+qualified definition remove :: "'a \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; 'a set" \&lt;comment&gt; \&lt;open&gt;only for code generation\&lt;close&gt;
+  where remove_eq [code_abbrev, simp]: "remove x A = A - {x}"
+
+qualified definition filter :: "('a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; 'a set" \&lt;comment&gt; \&lt;open&gt;only for code generation\&lt;close&gt;
+  where filter_eq [code_abbrev, simp]: "filter P A = {a \&lt;in&gt; A. P a}"
+
+qualified definition can_select :: "('a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool" \&lt;comment&gt; \&lt;open&gt;only for code generation\&lt;close&gt;
+  where can_select_iff [code_abbrev, simp]: "can_select P A = (\&lt;exists&gt;!x\&lt;in&gt;A. P x)"
+
+qualified lemma can_select_iff_is_singleton:
+  \&lt;open&gt;Set.can_select P A \&lt;longleftrightarrow&gt; is_singleton (Set.filter P A)\&lt;close&gt;
+  
+  sorry
+
+
+end
+
+instantiation set :: (equal) equal
+begin
+
+definition "HOL.equal A B \&lt;longleftrightarrow&gt; A \&lt;subseteq&gt; B \&lt;and&gt; B \&lt;subseteq&gt; A"
+
+instance
+  
+  sorry
+
+
+end
+
+
+text \&lt;open&gt;Misc\&lt;close&gt;
+
+definition pairwise :: "('a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; 'a set \&lt;Rightarrow&gt; bool"
+  where "pairwise R S \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x \&lt;in&gt; S. \&lt;forall&gt;y \&lt;in&gt; S. x \&lt;noteq&gt; y \&lt;longrightarrow&gt; R x y)"
+
+lemma pairwise_alt: "pairwise R S \&lt;longleftrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;S. \&lt;forall&gt;y\&lt;in&gt;S-{x}. R x y)"
+  
+  sorry
+
+
+lemma pairwise_trivial [simp]: "pairwise (\&lt;lambda&gt;i j. j \&lt;noteq&gt; i) I"
+  
+  sorry
+
+
+lemma pairwiseI [intro?]:
+  "pairwise R S" if "\&lt;And&gt;x y. x \&lt;in&gt; S \&lt;Longrightarrow&gt; y \&lt;in&gt; S \&lt;Longrightarrow&gt; x \&lt;noteq&gt; y \&lt;Longrightarrow&gt; R x y"
+  
+  sorry
+
+
+lemma pairwiseD:
+  "R x y" and "R y x"
+  if "pairwise R S" "x \&lt;in&gt; S" and "y \&lt;in&gt; S" and "x \&lt;noteq&gt; y"
+  
+  sorry
+
+
+lemma pairwise_empty [simp]: "pairwise P {}"
+  
+  sorry
+
+
+lemma pairwise_singleton [simp]: "pairwise P {A}"
+  
+  sorry
+
+
+lemma pairwise_insert:
+  "pairwise r (insert x s) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;y. y \&lt;in&gt; s \&lt;and&gt; y \&lt;noteq&gt; x \&lt;longrightarrow&gt; r x y \&lt;and&gt; r y x) \&lt;and&gt; pairwise r s"
+  
+  sorry
+
+
+lemma pairwise_subset: "pairwise P S \&lt;Longrightarrow&gt; T \&lt;subseteq&gt; S \&lt;Longrightarrow&gt; pairwise P T"
+  
+  sorry
+
+
+lemma pairwise_mono: "\&lt;lbrakk&gt;pairwise P A; \&lt;And&gt;x y. P x y \&lt;Longrightarrow&gt; Q x y; B \&lt;subseteq&gt; A\&lt;rbrakk&gt; \&lt;Longrightarrow&gt; pairwise Q B"
+  
+  sorry
+
+
+lemma pairwise_imageI:
+  "pairwise P (f ` A)"
+  if "\&lt;And&gt;x y. x \&lt;in&gt; A \&lt;Longrightarrow&gt; y \&lt;in&gt; A \&lt;Longrightarrow&gt; x \&lt;noteq&gt; y \&lt;Longrightarrow&gt; f x \&lt;noteq&gt; f y \&lt;Longrightarrow&gt; P (f x) (f y)"
+  
+  sorry
+
+
+</prefix><statement>lemma pairwise_image: "pairwise r (f ` s) \&lt;longleftrightarrow&gt; pairwise (\&lt;lambda&gt;x y. (f x \&lt;noteq&gt; f y) \&lt;longrightarrow&gt; r (f x) (f y)) s"</statement><proof_prefix /><sketch /><depth>1</depth><target_name>pairwise_image</target_name><forbidden_names><item>pairwise_image</item><item>disjnt_self_iff_empty</item><item>disjnt_commute</item><item>disjnt_iff</item><item>disjnt_sym</item><item>disjnt_empty1</item><item>disjnt_insert1</item><item>disjnt_insert2</item><item>disjnt_subset1</item><item>disjnt_subset2</item><item>disjnt_Un1</item><item>disjnt_Un2</item><item>disjnt_Diff1</item><item>disjoint_image_subset</item><item>pairwise_disjnt_iff</item><item>disjnt_insert</item><item>Int_emptyI</item><item>in_image_insert_iff</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9530952349305</remaining_s></dsp_request>

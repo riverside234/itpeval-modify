@@ -1,0 +1,46 @@
+<dsp_request schema="dsp_native_request_v1" request_id="f8da3e8648f340b19460d99b1cfb810f" input_sha256="3f5f6a95b0c5b7ba19d0cae9b1590e8fb120192d282fb91293e9725e4443eab5" action="context"><prefix>theory comp_commute
+  imports Main
+begin
+
+definition myComp :: "('b \&lt;Rightarrow&gt; 'c) \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; 'b) \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; 'c)"
+  where "myComp g f \&lt;equiv&gt; \&lt;lambda&gt;x. g (f x)"
+
+definition myId :: "'a \&lt;Rightarrow&gt; 'a"
+  where "myId \&lt;equiv&gt; \&lt;lambda&gt;x. x"
+
+
+
+lemma comp_assoc:
+  "myComp h (myComp g f) = myComp (myComp h g) f"
+  sorry
+lemma comp_id_l:
+  "myComp myId f = f"
+  sorry
+lemma comp_id_r:
+  "myComp f myId = f"
+  sorry
+
+
+definition commute :: "('a \&lt;Rightarrow&gt; 'a) \&lt;Rightarrow&gt; ('a \&lt;Rightarrow&gt; 'a) \&lt;Rightarrow&gt; bool"
+  where "commute f g \&lt;equiv&gt; myComp f g = myComp g f"
+
+lemma commute_symm:
+  "commute f g \&lt;Longrightarrow&gt; commute g f"
+  sorry
+lemma commute_with_id_l:
+  "commute f myId"
+  sorry
+lemma commute_with_id_r:
+  "commute myId f"
+  sorry
+lemma commute_refl:
+  "commute f f"
+  sorry
+lemma commute_congr:
+  "f1 = f2 \&lt;Longrightarrow&gt; g1 = g2 \&lt;Longrightarrow&gt; commute f1 g1 \&lt;Longrightarrow&gt; commute f2 g2"
+  sorry
+lemma commute_transport_left_id:
+  "commute f g \&lt;Longrightarrow&gt; commute (myComp myId f) g"
+  sorry
+</prefix><statement>lemma commute_transport_right_id:
+  "commute f g \&lt;Longrightarrow&gt; commute f (myComp myId g)"</statement><proof_prefix /><sketch /><depth>1</depth><target_name>commute_transport_right_id</target_name><forbidden_names><item>commute_transport_right_id</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9992600869155</remaining_s></dsp_request>

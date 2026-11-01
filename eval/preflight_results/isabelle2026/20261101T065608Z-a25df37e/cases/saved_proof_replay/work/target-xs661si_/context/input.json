@@ -1,0 +1,20 @@
+{
+  "request_id": "73626d2f239e4ac490f11c437e6fa41b",
+  "action": "context",
+  "prefix": "theory V2Control imports Main begin\ndeclare [[smt_oracle = true]]\n",
+  "statement": "lemma v2_control: \"True\"",
+  "proof_prefix": "",
+  "sketch": "",
+  "depth": "1",
+  "target_name": "v2_control",
+  "forbidden_names": [
+    "v2_control"
+  ],
+  "heuristics": [],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.999268803047",
+  "input_sha256": "885bab748c3007715ef74e48bd8889ebff27a7fe04a4b0e900040d8d29eeac1b"
+}

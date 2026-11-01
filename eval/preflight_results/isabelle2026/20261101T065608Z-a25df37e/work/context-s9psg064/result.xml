@@ -1,0 +1,1539 @@
+<dsp_result schema="dsp_native_result_v1" request_id="0ffbaaf8e4bc436099afeb39e2ea8056" input_sha256="1781f3dff5324bc9eb4d5090429527b32ecfc60209cb216af628f0d87a97319a" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.000"><command>(*  Author:     John Harrison
+    Author:     Robert Himmelmann, TU Muenchen (Translation from HOL light)
+                Huge cleanup by LCP
+*)
+
+</command><error></error></attempt><attempt mode="context" success="true" index="2" line="6" source_state="1" duration_seconds="0.000"><command>section \&lt;open&gt;Henstock-Kurzweil Gauge Integration in Many Dimensions\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="3" line="6" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="8" source_state="3" duration_seconds="1.231"><command>theory Henstock_Kurzweil_Integration
+imports
+  &quot;HOL-Analysis.Lebesgue_Measure&quot; &quot;HOL-Analysis.Tagged_Division&quot; &quot;HOL-Real_Asymp.Real_Asymp&quot;
+
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="1" source_state="4" duration_seconds="0.000"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="6" line="12" source_state="5" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="7" line="14" source_state="6" duration_seconds="0.003"><command>lemma norm_diff2: &quot;\&lt;lbrakk&gt;y = y1 + y2; x = x1 + x2; e = e1 + e2; norm(y1 - x1) \&lt;le&gt; e1; norm(y2 - x2) \&lt;le&gt; e2\&lt;rbrakk&gt;
+  \&lt;Longrightarrow&gt; norm(y-x) \&lt;le&gt; e&quot;</command><error></error></attempt><attempt mode="context" success="true" index="8" line="15" source_state="7" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="9" line="17" source_state="8" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="10" line="17" source_state="9" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="11" line="20" source_state="10" duration_seconds="0.002"><command>lemma setcomp_dot1: &quot;{z. P (z \&lt;bullet&gt; (i,0))} = {(x,y). P(x \&lt;bullet&gt; i)}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="12" line="20" source_state="11" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="13" line="22" source_state="12" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="14" line="22" source_state="13" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="15" line="25" source_state="14" duration_seconds="0.002"><command>lemma setcomp_dot2: &quot;{z. P (z \&lt;bullet&gt; (0,i))} = {(x,y). P(y \&lt;bullet&gt; i)}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="16" line="25" source_state="15" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="17" line="27" source_state="16" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="18" line="27" source_state="17" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="19" line="30" source_state="18" duration_seconds="0.002"><command>lemma Sigma_Int_Paircomp1: &quot;(Sigma A B) \&lt;inter&gt; {(x, y). P x} = Sigma (A \&lt;inter&gt; {x. P x}) B&quot;</command><error></error></attempt><attempt mode="context" success="true" index="20" line="30" source_state="19" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="21" line="32" source_state="20" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="22" line="32" source_state="21" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="23" line="35" source_state="22" duration_seconds="0.003"><command>lemma Sigma_Int_Paircomp2: &quot;(Sigma A B) \&lt;inter&gt; {(x, y). P y} = Sigma A (\&lt;lambda&gt;z. B z \&lt;inter&gt; {y. P y})&quot;</command><error></error></attempt><attempt mode="context" success="true" index="24" line="35" source_state="23" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="25" line="37" source_state="24" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="26" line="37" source_state="25" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="27" line="40" source_state="26" duration_seconds="0.000"><command>subsection \&lt;open&gt;Content (length, area, volume, etc.) of an interval\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="28" line="40" source_state="27" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="29" line="42" source_state="28" duration_seconds="0.001"><command>abbreviation content :: &quot;&apos;a::euclidean_space set \&lt;Rightarrow&gt; real&quot;
+  where &quot;content s \&lt;equiv&gt; measure lborel s&quot;</command><error></error></attempt><attempt mode="context" success="true" index="30" line="43" source_state="29" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="31" line="45" source_state="30" duration_seconds="0.003"><command>lemma content_cbox_cases:
+  &quot;content (cbox a b) = (if \&lt;forall&gt;i\&lt;in&gt;Basis. a\&lt;bullet&gt;i \&lt;le&gt; b\&lt;bullet&gt;i then prod (\&lt;lambda&gt;i. b\&lt;bullet&gt;i - a\&lt;bullet&gt;i) Basis else 0)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="32" line="46" source_state="31" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="33" line="48" source_state="32" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="34" line="48" source_state="33" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="35" line="51" source_state="34" duration_seconds="0.003"><command>lemma content_cbox: &quot;\&lt;forall&gt;i\&lt;in&gt;Basis. a\&lt;bullet&gt;i \&lt;le&gt; b\&lt;bullet&gt;i \&lt;Longrightarrow&gt; content (cbox a b) = (\&lt;Prod&gt;i\&lt;in&gt;Basis. b\&lt;bullet&gt;i - a\&lt;bullet&gt;i)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="36" line="51" source_state="35" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="37" line="53" source_state="36" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="38" line="53" source_state="37" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="39" line="56" source_state="38" duration_seconds="0.002"><command>lemma content_cbox&apos;: &quot;cbox a b \&lt;noteq&gt; {} \&lt;Longrightarrow&gt; content (cbox a b) = (\&lt;Prod&gt;i\&lt;in&gt;Basis. b\&lt;bullet&gt;i - a\&lt;bullet&gt;i)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="40" line="56" source_state="39" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="41" line="58" source_state="40" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="42" line="58" source_state="41" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="43" line="61" source_state="42" duration_seconds="0.002"><command>lemma content_cbox_if: &quot;content (cbox a b) = (if cbox a b = {} then 0 else \&lt;Prod&gt;i\&lt;in&gt;Basis. b\&lt;bullet&gt;i - a\&lt;bullet&gt;i)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="44" line="61" source_state="43" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="45" line="63" source_state="44" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="46" line="63" source_state="45" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="47" line="66" source_state="46" duration_seconds="0.003"><command>lemma content_cbox_cart:
+   &quot;cbox a b \&lt;noteq&gt; {} \&lt;Longrightarrow&gt; content(cbox a b) = prod (\&lt;lambda&gt;i. b$i - a$i) UNIV&quot;</command><error></error></attempt><attempt mode="context" success="true" index="48" line="67" source_state="47" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="49" line="69" source_state="48" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="50" line="69" source_state="49" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="51" line="72" source_state="50" duration_seconds="0.003"><command>lemma content_cbox_if_cart:
+   &quot;content(cbox a b) = (if cbox a b = {} then 0 else prod (\&lt;lambda&gt;i. b$i - a$i) UNIV)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="52" line="73" source_state="51" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="53" line="75" source_state="52" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="54" line="75" source_state="53" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="55" line="78" source_state="54" duration_seconds="0.003"><command>lemma content_division_of:
+  assumes &quot;K \&lt;in&gt; \&lt;D&gt;&quot; &quot;\&lt;D&gt; division_of S&quot;
+  shows &quot;content K = (\&lt;Prod&gt;i \&lt;in&gt; Basis. interval_upperbound K \&lt;bullet&gt; i - interval_lowerbound K \&lt;bullet&gt; i)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="56" line="80" source_state="55" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="57" line="82" source_state="56" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="58" line="82" source_state="57" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="59" line="85" source_state="58" duration_seconds="0.001"><command>lemma content_real: &quot;a \&lt;le&gt; b \&lt;Longrightarrow&gt; content {a..b} = b - a&quot;</command><error></error></attempt><attempt mode="context" success="true" index="60" line="85" source_state="59" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="61" line="87" source_state="60" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="62" line="87" source_state="61" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="63" line="90" source_state="62" duration_seconds="0.002"><command>lemma abs_eq_content: &quot;\&lt;bar&gt;y - x\&lt;bar&gt; = (if x\&lt;le&gt;y then content {x..y} else content {y..x})&quot;</command><error></error></attempt><attempt mode="context" success="true" index="64" line="90" source_state="63" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="65" line="92" source_state="64" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="66" line="92" source_state="65" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="67" line="95" source_state="66" duration_seconds="0.001"><command>lemma content_singleton: &quot;content {a} = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="68" line="95" source_state="67" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="69" line="97" source_state="68" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="70" line="97" source_state="69" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="71" line="100" source_state="70" duration_seconds="0.001"><command>lemma content_unit[iff]: &quot;content (cbox 0 (One::&apos;a::euclidean_space)) = 1&quot;</command><error></error></attempt><attempt mode="context" success="true" index="72" line="100" source_state="71" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="73" line="102" source_state="72" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="74" line="102" source_state="73" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="75" line="105" source_state="74" duration_seconds="0.001"><command>lemma content_pos_le [iff]: &quot;0 \&lt;le&gt; content X&quot;</command><error></error></attempt><attempt mode="context" success="true" index="76" line="105" source_state="75" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="77" line="107" source_state="76" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="78" line="107" source_state="77" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="79" line="110" source_state="78" duration_seconds="0.001"><command>corollary\&lt;^marker&gt;\&lt;open&gt;tag unimportant\&lt;close&gt; content_nonneg [simp]: &quot;\&lt;not&gt; content (cbox a b) &lt; 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="80" line="110" source_state="79" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="81" line="112" source_state="80" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="82" line="112" source_state="81" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="83" line="115" source_state="82" duration_seconds="0.002"><command>lemma content_pos_lt: &quot;\&lt;forall&gt;i\&lt;in&gt;Basis. a\&lt;bullet&gt;i &lt; b\&lt;bullet&gt;i \&lt;Longrightarrow&gt; 0 &lt; content (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="84" line="115" source_state="83" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="85" line="117" source_state="84" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="86" line="117" source_state="85" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="87" line="120" source_state="86" duration_seconds="0.001"><command>lemma content_eq_0: &quot;content (cbox a b) = 0 \&lt;longleftrightarrow&gt; (\&lt;exists&gt;i\&lt;in&gt;Basis. b\&lt;bullet&gt;i \&lt;le&gt; a\&lt;bullet&gt;i)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="88" line="120" source_state="87" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="89" line="122" source_state="88" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="90" line="122" source_state="89" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="91" line="125" source_state="90" duration_seconds="0.001"><command>lemma content_eq_0_interior: &quot;content (cbox a b) = 0 \&lt;longleftrightarrow&gt; interior(cbox a b) = {}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="92" line="125" source_state="91" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="93" line="127" source_state="92" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="94" line="127" source_state="93" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="95" line="130" source_state="94" duration_seconds="0.001"><command>lemma content_pos_lt_eq: &quot;0 &lt; content (cbox a (b::&apos;a::euclidean_space)) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;i\&lt;in&gt;Basis. a\&lt;bullet&gt;i &lt; b\&lt;bullet&gt;i)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="96" line="130" source_state="95" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="97" line="132" source_state="96" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="98" line="132" source_state="97" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="99" line="135" source_state="98" duration_seconds="0.001"><command>lemma content_empty [simp]: &quot;content {} = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="100" line="135" source_state="99" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="101" line="137" source_state="100" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="102" line="137" source_state="101" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="103" line="140" source_state="102" duration_seconds="0.001"><command>lemma content_real_if [simp]: &quot;content {a..b} = (if a \&lt;le&gt; b then b - a else 0)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="104" line="140" source_state="103" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="105" line="142" source_state="104" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="106" line="142" source_state="105" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="107" line="145" source_state="106" duration_seconds="0.002"><command>lemma content_subset: &quot;cbox a b \&lt;subseteq&gt; cbox c d \&lt;Longrightarrow&gt; content (cbox a b) \&lt;le&gt; content (cbox c d)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="108" line="145" source_state="107" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="109" line="147" source_state="108" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="110" line="147" source_state="109" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="111" line="150" source_state="110" duration_seconds="0.001"><command>lemma content_lt_nz: &quot;0 &lt; content (cbox a b) \&lt;longleftrightarrow&gt; content (cbox a b) \&lt;noteq&gt; 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="112" line="150" source_state="111" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="113" line="152" source_state="112" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="114" line="152" source_state="113" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="115" line="155" source_state="114" duration_seconds="0.002"><command>lemma content_Pair: &quot;content (cbox (a,c) (b,d)) = content (cbox a b) * content (cbox c d)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="116" line="155" source_state="115" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="117" line="157" source_state="116" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="118" line="157" source_state="117" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="119" line="160" source_state="118" duration_seconds="0.003"><command>lemma content_cbox_pair_eq0_D:
+   &quot;content (cbox (a,c) (b,d)) = 0 \&lt;Longrightarrow&gt; content (cbox a b) = 0 \&lt;or&gt; content (cbox c d) = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="120" line="161" source_state="119" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="121" line="163" source_state="120" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="122" line="163" source_state="121" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="123" line="166" source_state="122" duration_seconds="0.002"><command>lemma content_cbox_plus:
+  fixes x :: &quot;&apos;a::euclidean_space&quot;
+  shows &quot;content(cbox x (x + h *\&lt;^sub&gt;R One)) = (if h \&lt;ge&gt; 0 then h ^ DIM(&apos;a) else 0)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="124" line="168" source_state="123" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="125" line="170" source_state="124" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="126" line="170" source_state="125" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="127" line="173" source_state="126" duration_seconds="0.002"><command>lemma content_0_subset: &quot;content(cbox a b) = 0 \&lt;Longrightarrow&gt; s \&lt;subseteq&gt; cbox a b \&lt;Longrightarrow&gt; content s = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="128" line="173" source_state="127" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="129" line="175" source_state="128" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="130" line="175" source_state="129" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="131" line="178" source_state="130" duration_seconds="0.001"><command>lemma content_ball_pos:
+  assumes &quot;r &gt; 0&quot;
+  shows   &quot;content (ball c r) &gt; 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="132" line="180" source_state="131" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="133" line="182" source_state="132" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="134" line="182" source_state="133" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="135" line="185" source_state="134" duration_seconds="0.001"><command>lemma content_cball_pos:
+  assumes &quot;r &gt; 0&quot;
+  shows   &quot;content (cball c r) &gt; 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="136" line="187" source_state="135" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="137" line="189" source_state="136" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="138" line="189" source_state="137" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="139" line="192" source_state="138" duration_seconds="0.003"><command>lemma content_split:
+  fixes a :: &quot;&apos;a::euclidean_space&quot;
+  assumes &quot;k \&lt;in&gt; Basis&quot;
+  shows &quot;content (cbox a b) = content(cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c}) + content(cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c})&quot;
+  \&lt;comment&gt; \&lt;open&gt;Prove using measure theory\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="140" line="196" source_state="139" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="141" line="198" source_state="140" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="142" line="198" source_state="141" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="143" line="201" source_state="142" duration_seconds="0.002"><command>lemma division_of_content_0:
+  assumes &quot;content (cbox a b) = 0&quot; &quot;d division_of (cbox a b)&quot; &quot;K \&lt;in&gt; d&quot;
+  shows &quot;content K = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="144" line="203" source_state="143" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="145" line="205" source_state="144" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="146" line="205" source_state="145" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="147" line="208" source_state="146" duration_seconds="0.003"><command>lemma sum_content_null:
+  assumes &quot;content (cbox a b) = 0&quot;
+    and &quot;p tagged_division_of (cbox a b)&quot;
+  shows &quot;(\&lt;Sum&gt;(x,K)\&lt;in&gt;p. content K *\&lt;^sub&gt;R f x) = (0::&apos;a::real_normed_vector)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="148" line="211" source_state="147" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="149" line="213" source_state="148" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="150" line="213" source_state="149" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="151" line="216" source_state="150" duration_seconds="0.003"><command>global_interpretation sum_content: operative plus 0 content
+  rewrites &quot;comm_monoid_set.F plus 0 = sum&quot;</command><error></error></attempt><attempt mode="context" success="true" index="152" line="217" source_state="151" duration_seconds="0.000"><command>
+
+  </command><error></error></attempt><attempt mode="context" success="true" index="153" line="219" source_state="152" duration_seconds="0.004"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="154" line="219" source_state="153" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="155" line="222" source_state="154" duration_seconds="0.002"><command>lemma additive_content_division: &quot;d division_of (cbox a b) \&lt;Longrightarrow&gt; sum content d = content (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="156" line="222" source_state="155" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="157" line="224" source_state="156" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="158" line="224" source_state="157" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="159" line="227" source_state="158" duration_seconds="0.002"><command>lemma additive_content_tagged_division:
+  &quot;d tagged_division_of (cbox a b) \&lt;Longrightarrow&gt; sum (\&lt;lambda&gt;(x,l). content l) d = content (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="160" line="228" source_state="159" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="161" line="230" source_state="160" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="162" line="230" source_state="161" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="163" line="233" source_state="162" duration_seconds="0.002"><command>lemma subadditive_content_division:
+  assumes &quot;\&lt;D&gt; division_of S&quot; &quot;S \&lt;subseteq&gt; cbox a b&quot;
+  shows &quot;sum content \&lt;D&gt; \&lt;le&gt; content(cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="164" line="235" source_state="163" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="165" line="237" source_state="164" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="166" line="237" source_state="165" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="167" line="240" source_state="166" duration_seconds="0.001"><command>lemma content_real_eq_0: &quot;content {a..b::real} = 0 \&lt;longleftrightarrow&gt; a \&lt;ge&gt; b&quot;</command><error></error></attempt><attempt mode="context" success="true" index="168" line="240" source_state="167" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="169" line="242" source_state="168" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="170" line="242" source_state="169" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="171" line="245" source_state="170" duration_seconds="0.002"><command>lemma property_empty_interval: &quot;\&lt;forall&gt;a b. content (cbox a b) = 0 \&lt;longrightarrow&gt; P (cbox a b) \&lt;Longrightarrow&gt; P {}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="172" line="245" source_state="171" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="173" line="247" source_state="172" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="174" line="247" source_state="173" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="175" line="250" source_state="174" duration_seconds="0.002"><command>lemma interval_bounds_nz_content [simp]:
+  assumes &quot;content (cbox a b) \&lt;noteq&gt; 0&quot;
+  shows &quot;interval_upperbound (cbox a b) = b&quot;
+    and &quot;interval_lowerbound (cbox a b) = a&quot;</command><error></error></attempt><attempt mode="context" success="true" index="176" line="253" source_state="175" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="177" line="255" source_state="176" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="178" line="255" source_state="177" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="179" line="258" source_state="178" duration_seconds="0.000"><command>subsection \&lt;open&gt;Gauge integral\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="180" line="258" source_state="179" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="181" line="260" source_state="180" duration_seconds="0.000"><command>text \&lt;open&gt;Case distinction to define it first on compact intervals first, then use a limit. This is only
+much later unified. In Fremlin: Measure Theory, Volume 4I this is generalized using residual sets.\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="182" line="261" source_state="181" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="183" line="263" source_state="182" duration_seconds="0.020"><command>definition has_integral :: &quot;(&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;b::real_normed_vector) \&lt;Rightarrow&gt; &apos;b \&lt;Rightarrow&gt; &apos;n set \&lt;Rightarrow&gt; bool&quot;
+  (infixr \&lt;open&gt;has&apos;_integral\&lt;close&gt; 46)
+  where &quot;(f has_integral I) s \&lt;longleftrightarrow&gt;
+    (if \&lt;exists&gt;a b. s = cbox a b
+      then ((\&lt;lambda&gt;p. \&lt;Sum&gt;(x,k)\&lt;in&gt;p. content k *\&lt;^sub&gt;R f x) \&lt;longlongrightarrow&gt; I) (division_filter s)
+      else (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;B&gt;0. \&lt;forall&gt;a b. ball 0 B \&lt;subseteq&gt; cbox a b \&lt;longrightarrow&gt;
+        (\&lt;exists&gt;z. ((\&lt;lambda&gt;p. \&lt;Sum&gt;(x,k)\&lt;in&gt;p. content k *\&lt;^sub&gt;R (if x \&lt;in&gt; s then f x else 0)) \&lt;longlongrightarrow&gt; z) (division_filter (cbox a b)) \&lt;and&gt;
+          norm (z - I) &lt; e)))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="184" line="270" source_state="183" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="185" line="272" source_state="184" duration_seconds="0.005"><command>lemma has_integral_cbox:
+  &quot;(f has_integral I) (cbox a b) \&lt;longleftrightarrow&gt; ((\&lt;lambda&gt;p. \&lt;Sum&gt;(x,k)\&lt;in&gt;p. content k *\&lt;^sub&gt;R f x) \&lt;longlongrightarrow&gt; I) (division_filter (cbox a b))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="186" line="273" source_state="185" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="187" line="275" source_state="186" duration_seconds="0.003"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="188" line="275" source_state="187" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="189" line="278" source_state="188" duration_seconds="0.005"><command>lemma has_integral:
+  &quot;(f has_integral y) (cbox a b) \&lt;longleftrightarrow&gt;
+    (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;\&lt;gamma&gt;. gauge \&lt;gamma&gt; \&lt;and&gt;
+      (\&lt;forall&gt;\&lt;D&gt;. \&lt;D&gt; tagged_division_of (cbox a b) \&lt;and&gt; \&lt;gamma&gt; fine \&lt;D&gt; \&lt;longrightarrow&gt;
+        norm ((\&lt;Sum&gt;(x, k)\&lt;in&gt;\&lt;D&gt;. content k *\&lt;^sub&gt;R f x) - y) &lt; e))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="190" line="282" source_state="189" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="191" line="284" source_state="190" duration_seconds="0.004"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="192" line="284" source_state="191" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="193" line="287" source_state="192" duration_seconds="0.004"><command>lemma has_integral_real:
+  &quot;(f has_integral y) {a..b::real} \&lt;longleftrightarrow&gt;
+    (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;\&lt;gamma&gt;. gauge \&lt;gamma&gt; \&lt;and&gt;
+      (\&lt;forall&gt;\&lt;D&gt;. \&lt;D&gt; tagged_division_of {a..b} \&lt;and&gt; \&lt;gamma&gt; fine \&lt;D&gt; \&lt;longrightarrow&gt;
+        norm (sum (\&lt;lambda&gt;(x,k). content(k) *\&lt;^sub&gt;R f x) \&lt;D&gt; - y) &lt; e))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="194" line="291" source_state="193" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="195" line="293" source_state="194" duration_seconds="0.003"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="196" line="293" source_state="195" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="197" line="296" source_state="196" duration_seconds="0.005"><command>lemma has_integralD[dest]:
+  assumes &quot;(f has_integral y) (cbox a b)&quot;
+    and &quot;e &gt; 0&quot;
+  obtains \&lt;gamma&gt;
+    where &quot;gauge \&lt;gamma&gt;&quot;
+      and &quot;\&lt;And&gt;\&lt;D&gt;. \&lt;D&gt; tagged_division_of (cbox a b) \&lt;Longrightarrow&gt; \&lt;gamma&gt; fine \&lt;D&gt; \&lt;Longrightarrow&gt;
+        norm ((\&lt;Sum&gt;(x,k)\&lt;in&gt;\&lt;D&gt;. content k *\&lt;^sub&gt;R f x) - y) &lt; e&quot;</command><error></error></attempt><attempt mode="context" success="true" index="198" line="302" source_state="197" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="199" line="304" source_state="198" duration_seconds="0.006"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="200" line="304" source_state="199" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="201" line="307" source_state="200" duration_seconds="0.006"><command>lemma has_integral_alt:
+  &quot;(f has_integral y) i \&lt;longleftrightarrow&gt;
+    (if \&lt;exists&gt;a b. i = cbox a b
+     then (f has_integral y) i
+     else (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;B&gt;0. \&lt;forall&gt;a b. ball 0 B \&lt;subseteq&gt; cbox a b \&lt;longrightarrow&gt;
+      (\&lt;exists&gt;z. ((\&lt;lambda&gt;x. if x \&lt;in&gt; i then f x else 0) has_integral z) (cbox a b) \&lt;and&gt; norm (z - y) &lt; e)))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="202" line="312" source_state="201" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="203" line="314" source_state="202" duration_seconds="0.004"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="204" line="314" source_state="203" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="205" line="317" source_state="204" duration_seconds="0.006"><command>lemma has_integral_altD:
+  assumes &quot;(f has_integral y) i&quot;
+    and &quot;\&lt;not&gt; (\&lt;exists&gt;a b. i = cbox a b)&quot;
+    and &quot;e&gt;0&quot;
+  obtains B where &quot;B &gt; 0&quot;
+    and &quot;\&lt;forall&gt;a b. ball 0 B \&lt;subseteq&gt; cbox a b \&lt;longrightarrow&gt;
+      (\&lt;exists&gt;z. ((\&lt;lambda&gt;x. if x \&lt;in&gt; i then f(x) else 0) has_integral z) (cbox a b) \&lt;and&gt; norm(z - y) &lt; e)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="206" line="323" source_state="205" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="207" line="325" source_state="206" duration_seconds="0.004"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="208" line="325" source_state="207" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="209" line="328" source_state="208" duration_seconds="0.011"><command>definition integrable_on (infixr \&lt;open&gt;integrable&apos;_on\&lt;close&gt; 46)
+  where &quot;f integrable_on i \&lt;longleftrightarrow&gt; (\&lt;exists&gt;y. (f has_integral y) i)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="210" line="329" source_state="209" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="211" line="331" source_state="210" duration_seconds="0.009"><command>definition &quot;integral i f = (SOME y. (f has_integral y) i \&lt;or&gt; \&lt;not&gt; f integrable_on i \&lt;and&gt; y=0)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="212" line="331" source_state="211" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="213" line="333" source_state="212" duration_seconds="0.001"><command>lemma integrable_integral[intro]: &quot;f integrable_on i \&lt;Longrightarrow&gt; (f has_integral (integral i f)) i&quot;</command><error></error></attempt><attempt mode="context" success="true" index="214" line="333" source_state="213" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="215" line="335" source_state="214" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="216" line="335" source_state="215" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="217" line="338" source_state="216" duration_seconds="0.001"><command>lemma not_integrable_integral: &quot;\&lt;not&gt; f integrable_on i \&lt;Longrightarrow&gt; integral i f = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="218" line="338" source_state="217" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="219" line="340" source_state="218" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="220" line="340" source_state="219" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="221" line="343" source_state="220" duration_seconds="0.001"><command>lemma has_integral_integrable[dest]: &quot;(f has_integral i) s \&lt;Longrightarrow&gt; f integrable_on s&quot;</command><error></error></attempt><attempt mode="context" success="true" index="222" line="343" source_state="221" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="223" line="345" source_state="222" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="224" line="345" source_state="223" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="225" line="348" source_state="224" duration_seconds="0.001"><command>lemma has_integral_integral: &quot;f integrable_on s \&lt;longleftrightarrow&gt; (f has_integral (integral s f)) s&quot;</command><error></error></attempt><attempt mode="context" success="true" index="226" line="348" source_state="225" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="227" line="350" source_state="226" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="228" line="350" source_state="227" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="229" line="353" source_state="228" duration_seconds="0.000"><command>subsection \&lt;open&gt;Basic theorems about integrals\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="230" line="353" source_state="229" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="231" line="355" source_state="230" duration_seconds="0.001"><command>lemma has_integral_eq_rhs: &quot;(f has_integral j) S \&lt;Longrightarrow&gt; i = j \&lt;Longrightarrow&gt; (f has_integral i) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="232" line="355" source_state="231" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="233" line="357" source_state="232" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="234" line="357" source_state="233" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="235" line="360" source_state="234" duration_seconds="0.002"><command>lemma has_integral_unique_cbox:
+  fixes f :: &quot;&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  shows &quot;(f has_integral k1) (cbox a b) \&lt;Longrightarrow&gt; (f has_integral k2) (cbox a b) \&lt;Longrightarrow&gt; k1 = k2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="236" line="362" source_state="235" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="237" line="364" source_state="236" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="238" line="364" source_state="237" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="239" line="367" source_state="238" duration_seconds="0.001"><command>lemma has_integral_unique:
+  fixes f :: &quot;&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  assumes &quot;(f has_integral k1) i&quot; &quot;(f has_integral k2) i&quot;
+  shows &quot;k1 = k2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="240" line="370" source_state="239" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="241" line="372" source_state="240" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="242" line="372" source_state="241" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="243" line="375" source_state="242" duration_seconds="0.001"><command>lemma integral_unique [intro]: &quot;(f has_integral y) k \&lt;Longrightarrow&gt; integral k f = y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="244" line="375" source_state="243" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="245" line="377" source_state="244" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="246" line="377" source_state="245" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="247" line="380" source_state="246" duration_seconds="0.002"><command>lemma has_integral_iff: &quot;(f has_integral i) S \&lt;longleftrightarrow&gt; (f integrable_on S \&lt;and&gt; integral S f = i)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="248" line="380" source_state="247" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="249" line="382" source_state="248" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="250" line="382" source_state="249" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="251" line="385" source_state="250" duration_seconds="0.002"><command>lemma eq_integralD: &quot;integral k f = y \&lt;Longrightarrow&gt; (f has_integral y) k \&lt;or&gt; \&lt;not&gt; f integrable_on k \&lt;and&gt; y=0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="252" line="385" source_state="251" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="253" line="387" source_state="252" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="254" line="387" source_state="253" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="255" line="390" source_state="254" duration_seconds="0.002"><command>lemma has_integral_const [intro]:
+  fixes a b :: &quot;&apos;a::euclidean_space&quot;
+  shows &quot;((\&lt;lambda&gt;x. c) has_integral (content (cbox a b) *\&lt;^sub&gt;R c)) (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="256" line="392" source_state="255" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="257" line="394" source_state="256" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="258" line="394" source_state="257" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="259" line="397" source_state="258" duration_seconds="0.002"><command>lemma has_integral_const_real [intro]:
+  fixes a b :: real
+  shows &quot;((\&lt;lambda&gt;x. c) has_integral (content {a..b} *\&lt;^sub&gt;R c)) {a..b}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="260" line="399" source_state="259" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="261" line="401" source_state="260" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="262" line="401" source_state="261" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="263" line="404" source_state="262" duration_seconds="0.001"><command>lemma has_integral_integrable_integral: &quot;(f has_integral i) s \&lt;longleftrightarrow&gt; f integrable_on s \&lt;and&gt; integral s f = i&quot;</command><error></error></attempt><attempt mode="context" success="true" index="264" line="404" source_state="263" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="265" line="406" source_state="264" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="266" line="406" source_state="265" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="267" line="409" source_state="266" duration_seconds="0.002"><command>lemma integral_const [simp]:
+  fixes a b :: &quot;&apos;a::euclidean_space&quot;
+  shows &quot;integral (cbox a b) (\&lt;lambda&gt;x. c) = content (cbox a b) *\&lt;^sub&gt;R c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="268" line="411" source_state="267" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="269" line="413" source_state="268" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="270" line="413" source_state="269" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="271" line="416" source_state="270" duration_seconds="0.002"><command>lemma integral_const_real [simp]:
+  fixes a b :: real
+  shows &quot;integral {a..b} (\&lt;lambda&gt;x. c) = content {a..b} *\&lt;^sub&gt;R c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="272" line="418" source_state="271" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="273" line="420" source_state="272" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="274" line="420" source_state="273" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="275" line="423" source_state="274" duration_seconds="0.002"><command>lemma has_integral_is_0_cbox:
+  fixes f :: &quot;&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  assumes &quot;\&lt;And&gt;x. x \&lt;in&gt; cbox a b \&lt;Longrightarrow&gt; f x = 0&quot;
+  shows &quot;(f has_integral 0) (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="276" line="426" source_state="275" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="277" line="428" source_state="276" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="278" line="428" source_state="277" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="279" line="431" source_state="278" duration_seconds="0.001"><command>lemma has_integral_is_0:
+  fixes f :: &quot;&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  assumes &quot;\&lt;And&gt;x. x \&lt;in&gt; S \&lt;Longrightarrow&gt; f x = 0&quot;
+  shows &quot;(f has_integral 0) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="280" line="434" source_state="279" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="281" line="436" source_state="280" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="282" line="436" source_state="281" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="283" line="439" source_state="282" duration_seconds="0.001"><command>lemma has_integral_0[simp]: &quot;((\&lt;lambda&gt;x::&apos;n::euclidean_space. 0) has_integral 0) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="284" line="439" source_state="283" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="285" line="441" source_state="284" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="286" line="441" source_state="285" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="287" line="444" source_state="286" duration_seconds="0.041"><command>lemma has_integral_0_eq[simp]: &quot;((\&lt;lambda&gt;x. 0) has_integral i) S \&lt;longleftrightarrow&gt; i = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="288" line="444" source_state="287" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="289" line="446" source_state="288" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="290" line="446" source_state="289" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="291" line="449" source_state="290" duration_seconds="0.002"><command>lemma has_integral_linear_cbox:
+  fixes f :: &quot;&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  assumes f: &quot;(f has_integral y) (cbox a b)&quot;
+    and h: &quot;bounded_linear h&quot;
+  shows &quot;((h \&lt;circ&gt; f) has_integral (h y)) (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="292" line="453" source_state="291" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="293" line="455" source_state="292" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="294" line="455" source_state="293" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="295" line="458" source_state="294" duration_seconds="0.002"><command>lemma has_integral_linear:
+  fixes f :: &quot;&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  assumes f: &quot;(f has_integral y) S&quot;
+    and h: &quot;bounded_linear h&quot;
+  shows &quot;((h \&lt;circ&gt; f) has_integral (h y)) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="296" line="462" source_state="295" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="297" line="464" source_state="296" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="298" line="464" source_state="297" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="299" line="467" source_state="298" duration_seconds="0.001"><command>lemma has_integral_of_real:
+  &quot;(f has_integral I) A \&lt;Longrightarrow&gt;
+     ((\&lt;lambda&gt;x::&apos;a::euclidean_space. of_real (f x) :: &apos;b :: {real_normed_vector,real_normed_algebra_1}) 
+        has_integral of_real I) A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="300" line="470" source_state="299" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="301" line="472" source_state="300" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="302" line="472" source_state="301" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="303" line="475" source_state="302" duration_seconds="0.002"><command>lemma has_integral_scaleR_left:
+  &quot;(f has_integral y) S \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. f x *\&lt;^sub&gt;R c) has_integral (y *\&lt;^sub&gt;R c)) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="304" line="476" source_state="303" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="305" line="478" source_state="304" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="306" line="478" source_state="305" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="307" line="481" source_state="306" duration_seconds="0.001"><command>lemma integrable_on_scaleR_left:
+  assumes &quot;f integrable_on A&quot;
+  shows &quot;(\&lt;lambda&gt;x. f x *\&lt;^sub&gt;R y) integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="308" line="483" source_state="307" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="309" line="485" source_state="308" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="310" line="485" source_state="309" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="311" line="488" source_state="310" duration_seconds="0.002"><command>lemma has_integral_mult_left:
+  fixes c :: &quot;_ :: real_normed_algebra&quot;
+  shows &quot;(f has_integral y) S \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. f x * c) has_integral (y * c)) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="312" line="490" source_state="311" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="313" line="492" source_state="312" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="314" line="492" source_state="313" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="315" line="495" source_state="314" duration_seconds="0.001"><command>lemma integrable_on_mult_left:
+  fixes c :: &quot;&apos;a :: real_normed_algebra&quot;
+  assumes &quot;f integrable_on A&quot;
+  shows   &quot;(\&lt;lambda&gt;x. f x * c) integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="316" line="498" source_state="315" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="317" line="500" source_state="316" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="318" line="500" source_state="317" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="319" line="503" source_state="318" duration_seconds="0.002"><command>lemma has_integral_divide:
+  fixes c :: &quot;_ :: real_normed_div_algebra&quot;
+  shows &quot;(f has_integral y) S \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. f x / c) has_integral (y / c)) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="320" line="505" source_state="319" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="321" line="507" source_state="320" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="322" line="507" source_state="321" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="323" line="510" source_state="322" duration_seconds="0.001"><command>lemma integrable_on_divide:
+  fixes c :: &quot;&apos;a :: real_normed_div_algebra&quot;
+  assumes &quot;f integrable_on A&quot;
+  shows   &quot;(\&lt;lambda&gt;x. f x / c) integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="324" line="513" source_state="323" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="325" line="515" source_state="324" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="326" line="515" source_state="325" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="327" line="518" source_state="326" duration_seconds="0.001"><command>text\&lt;open&gt;The case analysis eliminates the condition \&lt;^term&gt;\&lt;open&gt;f integrable_on S\&lt;close&gt; at the cost
+     of the type class constraint \&lt;open&gt;division_ring\&lt;close&gt;\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="328" line="519" source_state="327" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="329" line="520" source_state="328" duration_seconds="0.001"><command>corollary integral_mult_left [simp]:
+  fixes c:: &quot;&apos;a::{real_normed_algebra,division_ring}&quot;
+  shows &quot;integral S (\&lt;lambda&gt;x. f x * c) = integral S f * c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="330" line="522" source_state="329" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="331" line="524" source_state="330" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="332" line="524" source_state="331" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="333" line="527" source_state="332" duration_seconds="0.001"><command>corollary integral_mult_right [simp]:
+  fixes c:: &quot;&apos;a::{real_normed_field}&quot;
+  shows &quot;integral S (\&lt;lambda&gt;x. c * f x) = c * integral S f&quot;</command><error></error></attempt><attempt mode="context" success="true" index="334" line="529" source_state="333" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="335" line="531" source_state="334" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="336" line="531" source_state="335" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="337" line="534" source_state="336" duration_seconds="0.002"><command>corollary integral_divide [simp]:
+  fixes z :: &quot;&apos;a::real_normed_field&quot;
+  shows &quot;integral S (\&lt;lambda&gt;x. f x / z) = integral S (\&lt;lambda&gt;x. f x) / z&quot;</command><error></error></attempt><attempt mode="context" success="true" index="338" line="536" source_state="337" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="339" line="538" source_state="338" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="340" line="538" source_state="339" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="341" line="541" source_state="340" duration_seconds="0.002"><command>lemma has_integral_mult_right:
+  fixes c :: &quot;&apos;a :: real_normed_algebra&quot;
+  shows &quot;(f has_integral y) A \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. c * f x) has_integral (c * y)) A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="342" line="543" source_state="341" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="343" line="545" source_state="342" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="344" line="545" source_state="343" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="345" line="548" source_state="344" duration_seconds="0.001"><command>lemma integrable_on_mult_right:
+  fixes c :: &quot;&apos;a :: real_normed_algebra&quot;
+  assumes &quot;f integrable_on A&quot;
+  shows   &quot;(\&lt;lambda&gt;x. c * f x) integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="346" line="551" source_state="345" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="347" line="553" source_state="346" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="348" line="553" source_state="347" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="349" line="556" source_state="348" duration_seconds="0.002"><command>lemma has_integral_mult_right_iff:
+  fixes c :: &quot;&apos;a :: real_normed_field&quot;
+  assumes &quot;c \&lt;noteq&gt; 0&quot;
+  shows &quot;((\&lt;lambda&gt;x. c * f x) has_integral y) A \&lt;longleftrightarrow&gt; (f has_integral (y / c)) A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="350" line="559" source_state="349" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="351" line="561" source_state="350" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="352" line="561" source_state="351" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="353" line="564" source_state="352" duration_seconds="0.001"><command>lemma integrable_on_mult_right_iff [simp]:
+  fixes c :: &quot;&apos;a :: real_normed_field&quot;
+  assumes &quot;c \&lt;noteq&gt; 0&quot;
+  shows   &quot;(\&lt;lambda&gt;x. c * f x) integrable_on A \&lt;longleftrightarrow&gt; f integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="354" line="567" source_state="353" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="355" line="569" source_state="354" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="356" line="569" source_state="355" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="357" line="572" source_state="356" duration_seconds="0.001"><command>lemma integrable_on_mult_left_iff [simp]:
+  fixes c :: &quot;&apos;a :: real_normed_field&quot;
+  assumes &quot;c \&lt;noteq&gt; 0&quot;
+  shows   &quot;(\&lt;lambda&gt;x. f x * c) integrable_on A \&lt;longleftrightarrow&gt; f integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="358" line="575" source_state="357" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="359" line="577" source_state="358" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="360" line="577" source_state="359" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="361" line="580" source_state="360" duration_seconds="0.001"><command>lemma integrable_on_div_iff [simp]:
+  fixes c :: &quot;&apos;a :: real_normed_field&quot;
+  assumes &quot;c \&lt;noteq&gt; 0&quot;
+  shows   &quot;(\&lt;lambda&gt;x. f x / c) integrable_on A \&lt;longleftrightarrow&gt; f integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="362" line="583" source_state="361" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="363" line="585" source_state="362" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="364" line="585" source_state="363" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="365" line="588" source_state="364" duration_seconds="0.001"><command>lemma has_integral_cmul: &quot;(f has_integral k) S \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. c *\&lt;^sub&gt;R f x) has_integral (c *\&lt;^sub&gt;R k)) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="366" line="588" source_state="365" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="367" line="590" source_state="366" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="368" line="590" source_state="367" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="369" line="593" source_state="368" duration_seconds="0.002"><command>lemma has_integral_cmult_real:
+  fixes c :: real
+  assumes &quot;c \&lt;noteq&gt; 0 \&lt;Longrightarrow&gt; (f has_integral x) A&quot;
+  shows &quot;((\&lt;lambda&gt;x. c * f x) has_integral c * x) A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="370" line="596" source_state="369" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="371" line="598" source_state="370" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="372" line="598" source_state="371" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="373" line="601" source_state="372" duration_seconds="0.001"><command>lemma has_integral_neg: &quot;(f has_integral k) S \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. -(f x)) has_integral -k) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="374" line="601" source_state="373" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="375" line="603" source_state="374" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="376" line="603" source_state="375" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="377" line="606" source_state="376" duration_seconds="0.001"><command>lemma has_integral_neg_iff: &quot;((\&lt;lambda&gt;x. - f x) has_integral k) S \&lt;longleftrightarrow&gt; (f has_integral - k) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="378" line="606" source_state="377" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="379" line="608" source_state="378" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="380" line="608" source_state="379" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="381" line="611" source_state="380" duration_seconds="0.002"><command>lemma has_integral_add_cbox:
+  fixes f :: &quot;&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  assumes &quot;(f has_integral k) (cbox a b)&quot; &quot;(g has_integral l) (cbox a b)&quot;
+  shows &quot;((\&lt;lambda&gt;x. f x + g x) has_integral (k + l)) (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="382" line="614" source_state="381" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="383" line="616" source_state="382" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="384" line="616" source_state="383" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="385" line="619" source_state="384" duration_seconds="0.002"><command>lemma has_integral_add:
+  fixes f :: &quot;&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  assumes f: &quot;(f has_integral k) S&quot; and g: &quot;(g has_integral l) S&quot;
+  shows &quot;((\&lt;lambda&gt;x. f x + g x) has_integral (k + l)) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="386" line="622" source_state="385" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="387" line="624" source_state="386" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="388" line="624" source_state="387" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="389" line="627" source_state="388" duration_seconds="0.002"><command>lemma has_integral_diff:
+  &quot;(f has_integral k) S \&lt;Longrightarrow&gt; (g has_integral l) S \&lt;Longrightarrow&gt;
+    ((\&lt;lambda&gt;x. f x - g x) has_integral (k - l)) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="390" line="629" source_state="389" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="391" line="631" source_state="390" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="392" line="631" source_state="391" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="393" line="634" source_state="392" duration_seconds="0.001"><command>lemma integral_0 [simp]:
+  &quot;integral S (\&lt;lambda&gt;x::&apos;n::euclidean_space. 0::&apos;m::real_normed_vector) = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="394" line="635" source_state="393" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="395" line="637" source_state="394" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="396" line="637" source_state="395" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="397" line="640" source_state="396" duration_seconds="0.002"><command>lemma integral_add: &quot;f integrable_on S \&lt;Longrightarrow&gt; g integrable_on S \&lt;Longrightarrow&gt;
+    integral S (\&lt;lambda&gt;x. f x + g x) = integral S f + integral S g&quot;</command><error></error></attempt><attempt mode="context" success="true" index="398" line="641" source_state="397" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="399" line="643" source_state="398" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="400" line="643" source_state="399" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="401" line="646" source_state="400" duration_seconds="0.001"><command>lemma integral_cmul [simp]: &quot;integral S (\&lt;lambda&gt;x. c *\&lt;^sub&gt;R f x) = c *\&lt;^sub&gt;R integral S f&quot;</command><error></error></attempt><attempt mode="context" success="true" index="402" line="646" source_state="401" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="403" line="648" source_state="402" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="404" line="648" source_state="403" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="405" line="651" source_state="404" duration_seconds="0.001"><command>lemma integral_mult:
+  fixes K::real
+  shows &quot;f integrable_on X \&lt;Longrightarrow&gt; K * integral X f = integral X (\&lt;lambda&gt;x. K * f x)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="406" line="653" source_state="405" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="407" line="655" source_state="406" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="408" line="655" source_state="407" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="409" line="658" source_state="408" duration_seconds="0.001"><command>lemma integral_neg [simp]: &quot;integral S (\&lt;lambda&gt;x. - f x) = - integral S f&quot;</command><error></error></attempt><attempt mode="context" success="true" index="410" line="658" source_state="409" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="411" line="660" source_state="410" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="412" line="660" source_state="411" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="413" line="663" source_state="412" duration_seconds="0.002"><command>lemma integral_diff: &quot;f integrable_on S \&lt;Longrightarrow&gt; g integrable_on S \&lt;Longrightarrow&gt;
+    integral S (\&lt;lambda&gt;x. f x - g x) = integral S f - integral S g&quot;</command><error></error></attempt><attempt mode="context" success="true" index="414" line="664" source_state="413" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="415" line="666" source_state="414" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="416" line="666" source_state="415" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="417" line="669" source_state="416" duration_seconds="0.001"><command>lemma integrable_0: &quot;(\&lt;lambda&gt;x. 0) integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="418" line="669" source_state="417" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="419" line="671" source_state="418" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="420" line="671" source_state="419" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="421" line="674" source_state="420" duration_seconds="0.001"><command>lemma integrable_add: &quot;f integrable_on S \&lt;Longrightarrow&gt; g integrable_on S \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. f x + g x) integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="422" line="674" source_state="421" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="423" line="676" source_state="422" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="424" line="676" source_state="423" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="425" line="679" source_state="424" duration_seconds="0.001"><command>lemma integrable_cmul: &quot;f integrable_on S \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. c *\&lt;^sub&gt;R f(x)) integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="426" line="679" source_state="425" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="427" line="681" source_state="426" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="428" line="681" source_state="427" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="429" line="684" source_state="428" duration_seconds="0.002"><command>lemma integrable_on_scaleR_iff [simp]:
+  fixes c :: real
+  assumes &quot;c \&lt;noteq&gt; 0&quot;
+  shows &quot;(\&lt;lambda&gt;x. c *\&lt;^sub&gt;R f x) integrable_on S \&lt;longleftrightarrow&gt; f integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="430" line="687" source_state="429" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="431" line="689" source_state="430" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="432" line="689" source_state="431" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="433" line="692" source_state="432" duration_seconds="0.001"><command>lemma integrable_on_cmult_iff [simp]:
+  fixes c :: real
+  assumes &quot;c \&lt;noteq&gt; 0&quot;
+  shows &quot;(\&lt;lambda&gt;x. c * f x) integrable_on S \&lt;longleftrightarrow&gt; f integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="434" line="695" source_state="433" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="435" line="697" source_state="434" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="436" line="697" source_state="435" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="437" line="700" source_state="436" duration_seconds="0.001"><command>lemma integrable_on_cmult_left:
+  assumes &quot;f integrable_on S&quot;
+  shows &quot;(\&lt;lambda&gt;x. of_real c * f x) integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="438" line="702" source_state="437" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="439" line="704" source_state="438" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="440" line="704" source_state="439" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="441" line="707" source_state="440" duration_seconds="0.001"><command>lemma integrable_neg: &quot;f integrable_on S \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. -f(x)) integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="442" line="707" source_state="441" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="443" line="709" source_state="442" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="444" line="709" source_state="443" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="445" line="712" source_state="444" duration_seconds="0.001"><command>lemma integrable_neg_iff: &quot;(\&lt;lambda&gt;x. -f(x)) integrable_on S \&lt;longleftrightarrow&gt; f integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="446" line="712" source_state="445" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="447" line="714" source_state="446" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="448" line="714" source_state="447" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="449" line="717" source_state="448" duration_seconds="0.001"><command>lemma integrable_diff:
+  &quot;f integrable_on S \&lt;Longrightarrow&gt; g integrable_on S \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. f x - g x) integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="450" line="718" source_state="449" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="451" line="720" source_state="450" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="452" line="720" source_state="451" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="453" line="723" source_state="452" duration_seconds="0.001"><command>lemma integrable_linear:
+  &quot;f integrable_on S \&lt;Longrightarrow&gt; bounded_linear h \&lt;Longrightarrow&gt; (h \&lt;circ&gt; f) integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="454" line="724" source_state="453" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="455" line="726" source_state="454" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="456" line="726" source_state="455" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="457" line="729" source_state="456" duration_seconds="0.002"><command>lemma integral_linear:
+  &quot;f integrable_on S \&lt;Longrightarrow&gt; bounded_linear h \&lt;Longrightarrow&gt; integral S (h \&lt;circ&gt; f) = h (integral S f)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="458" line="730" source_state="457" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="459" line="732" source_state="458" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="460" line="732" source_state="459" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="461" line="735" source_state="460" duration_seconds="0.001"><command>lemma integrable_on_cnj_iff:
+  &quot;(\&lt;lambda&gt;x. cnj (f x)) integrable_on A \&lt;longleftrightarrow&gt; f integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="462" line="736" source_state="461" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="463" line="738" source_state="462" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="464" line="738" source_state="463" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="465" line="741" source_state="464" duration_seconds="0.001"><command>lemma integral_cnj: &quot;cnj (integral A f) = integral A (\&lt;lambda&gt;x. cnj (f x))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="466" line="741" source_state="465" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="467" line="743" source_state="466" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="468" line="743" source_state="467" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="469" line="746" source_state="468" duration_seconds="0.001"><command>lemma has_integral_cnj: &quot;(cnj \&lt;circ&gt; f has_integral (cnj I)) A  = (f has_integral I) A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="470" line="746" source_state="469" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="471" line="748" source_state="470" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="472" line="748" source_state="471" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="473" line="751" source_state="472" duration_seconds="0.001"><command>lemma integral_component_eq[simp]:
+  fixes f :: &quot;&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;m::euclidean_space&quot;
+  assumes &quot;f integrable_on S&quot;
+  shows &quot;integral S (\&lt;lambda&gt;x. f x \&lt;bullet&gt; k) = integral S f \&lt;bullet&gt; k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="474" line="754" source_state="473" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="475" line="756" source_state="474" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="476" line="756" source_state="475" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="477" line="759" source_state="476" duration_seconds="0.002"><command>lemma integral_eq_iff_componentwise:
+  fixes f :: &quot;&apos;a :: euclidean_space \&lt;Rightarrow&gt; &apos;b :: euclidean_space&quot;
+  assumes &quot;f integrable_on A&quot;
+  shows &quot;integral A f = I \&lt;longleftrightarrow&gt; (\&lt;forall&gt;b\&lt;in&gt;Basis. integral A (\&lt;lambda&gt;x. f x \&lt;bullet&gt; b) = I \&lt;bullet&gt; b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="478" line="762" source_state="477" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="479" line="764" source_state="478" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="480" line="764" source_state="479" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="481" line="767" source_state="480" duration_seconds="0.003"><command>lemma has_integral_sum:
+  assumes &quot;finite T&quot;
+    and &quot;\&lt;And&gt;a. a \&lt;in&gt; T \&lt;Longrightarrow&gt; ((f a) has_integral (i a)) S&quot;
+  shows &quot;((\&lt;lambda&gt;x. sum (\&lt;lambda&gt;a. f a x) T) has_integral (sum i T)) S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="482" line="770" source_state="481" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="483" line="772" source_state="482" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="484" line="772" source_state="483" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="485" line="775" source_state="484" duration_seconds="0.003"><command>lemma integral_sum:
+  &quot;\&lt;lbrakk&gt;finite I;  \&lt;And&gt;a. a \&lt;in&gt; I \&lt;Longrightarrow&gt; f a integrable_on S\&lt;rbrakk&gt; \&lt;Longrightarrow&gt;
+   integral S (\&lt;lambda&gt;x. \&lt;Sum&gt;a\&lt;in&gt;I. f a x) = (\&lt;Sum&gt;a\&lt;in&gt;I. integral S (f a))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="486" line="777" source_state="485" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="487" line="779" source_state="486" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="488" line="779" source_state="487" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="489" line="782" source_state="488" duration_seconds="0.002"><command>lemma integrable_sum:
+  &quot;\&lt;lbrakk&gt;finite I;  \&lt;And&gt;a. a \&lt;in&gt; I \&lt;Longrightarrow&gt; f a integrable_on S\&lt;rbrakk&gt; \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. \&lt;Sum&gt;a\&lt;in&gt;I. f a x) integrable_on S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="490" line="783" source_state="489" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="491" line="785" source_state="490" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="492" line="785" source_state="491" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="493" line="788" source_state="492" duration_seconds="0.002"><command>lemma has_integral_eq:
+  assumes &quot;\&lt;And&gt;x. x \&lt;in&gt; s \&lt;Longrightarrow&gt; f x = g x&quot;
+    and f: &quot;(f has_integral k) s&quot;
+  shows &quot;(g has_integral k) s&quot;</command><error></error></attempt><attempt mode="context" success="true" index="494" line="791" source_state="493" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="495" line="793" source_state="494" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="496" line="793" source_state="495" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="497" line="796" source_state="496" duration_seconds="0.002"><command>lemma integrable_eq: &quot;\&lt;lbrakk&gt;f integrable_on s; \&lt;And&gt;x. x \&lt;in&gt; s \&lt;Longrightarrow&gt; f x = g x\&lt;rbrakk&gt; \&lt;Longrightarrow&gt; g integrable_on s&quot;</command><error></error></attempt><attempt mode="context" success="true" index="498" line="796" source_state="497" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="499" line="798" source_state="498" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="500" line="798" source_state="499" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="501" line="801" source_state="500" duration_seconds="0.002"><command>lemma has_integral_cong:
+  assumes &quot;\&lt;And&gt;x. x \&lt;in&gt; s \&lt;Longrightarrow&gt; f x = g x&quot;
+  shows &quot;(f has_integral i) s = (g has_integral i) s&quot;</command><error></error></attempt><attempt mode="context" success="true" index="502" line="803" source_state="501" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="503" line="805" source_state="502" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="504" line="805" source_state="503" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="505" line="808" source_state="504" duration_seconds="0.002"><command>lemma integrable_cong:
+  assumes &quot;\&lt;And&gt;x. x \&lt;in&gt; A \&lt;Longrightarrow&gt; f x = g x&quot;
+  shows   &quot;f integrable_on A \&lt;longleftrightarrow&gt; g integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="506" line="810" source_state="505" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="507" line="812" source_state="506" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="508" line="812" source_state="507" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="509" line="815" source_state="508" duration_seconds="0.002"><command>lemma integral_cong:
+  assumes &quot;\&lt;And&gt;x. x \&lt;in&gt; s \&lt;Longrightarrow&gt; f x = g x&quot;
+  shows &quot;integral s f = integral s g&quot;</command><error></error></attempt><attempt mode="context" success="true" index="510" line="817" source_state="509" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="511" line="819" source_state="510" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="512" line="819" source_state="511" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="513" line="822" source_state="512" duration_seconds="0.002"><command>lemma integrable_on_cmult_left_iff [simp]:
+  assumes &quot;c \&lt;noteq&gt; 0&quot;
+  shows &quot;(\&lt;lambda&gt;x. of_real c * f x) integrable_on s \&lt;longleftrightarrow&gt; f integrable_on s&quot;
+        (is &quot;?lhs = ?rhs&quot;)</command><error></error></attempt><attempt mode="context" success="true" index="514" line="825" source_state="513" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="515" line="827" source_state="514" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="516" line="827" source_state="515" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="517" line="830" source_state="516" duration_seconds="0.001"><command>lemma integrable_on_cmult_right:
+  fixes f :: &quot;_ \&lt;Rightarrow&gt; &apos;b :: {comm_ring,real_algebra_1,real_normed_vector}&quot;
+  assumes &quot;f integrable_on s&quot;
+  shows &quot;(\&lt;lambda&gt;x. f x * of_real c) integrable_on s&quot;</command><error></error></attempt><attempt mode="context" success="true" index="518" line="833" source_state="517" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="519" line="835" source_state="518" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="520" line="835" source_state="519" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="521" line="838" source_state="520" duration_seconds="0.002"><command>lemma integrable_on_cmult_right_iff [simp]:
+  fixes f :: &quot;_ \&lt;Rightarrow&gt; &apos;b :: {comm_ring,real_algebra_1,real_normed_vector}&quot;
+  assumes &quot;c \&lt;noteq&gt; 0&quot;
+  shows &quot;(\&lt;lambda&gt;x. f x * of_real c) integrable_on s \&lt;longleftrightarrow&gt; f integrable_on s&quot;</command><error></error></attempt><attempt mode="context" success="true" index="522" line="841" source_state="521" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="523" line="843" source_state="522" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="524" line="843" source_state="523" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="525" line="846" source_state="524" duration_seconds="0.002"><command>lemma integrable_on_cdivide_iff [simp]:
+  fixes f :: &quot;_ \&lt;Rightarrow&gt; &apos;b :: real_normed_field&quot;
+  assumes &quot;c \&lt;noteq&gt; 0&quot;
+  shows &quot;(\&lt;lambda&gt;x. f x / of_real c) integrable_on s \&lt;longleftrightarrow&gt; f integrable_on s&quot;</command><error></error></attempt><attempt mode="context" success="true" index="526" line="849" source_state="525" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="527" line="851" source_state="526" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="528" line="851" source_state="527" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="529" line="854" source_state="528" duration_seconds="0.001"><command>lemma has_integral_null [intro]: &quot;content(cbox a b) = 0 \&lt;Longrightarrow&gt; (f has_integral 0) (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="530" line="854" source_state="529" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="531" line="856" source_state="530" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="532" line="856" source_state="531" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="533" line="859" source_state="532" duration_seconds="0.001"><command>lemma has_integral_null_real [intro]: &quot;content {a..b::real} = 0 \&lt;Longrightarrow&gt; (f has_integral 0) {a..b}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="534" line="859" source_state="533" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="535" line="861" source_state="534" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="536" line="861" source_state="535" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="537" line="864" source_state="536" duration_seconds="0.002"><command>lemma has_integral_null_eq[simp]: &quot;content (cbox a b) = 0 \&lt;Longrightarrow&gt; (f has_integral i) (cbox a b) \&lt;longleftrightarrow&gt; i = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="538" line="864" source_state="537" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="539" line="866" source_state="538" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="540" line="866" source_state="539" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="541" line="869" source_state="540" duration_seconds="0.001"><command>lemma integral_null [simp]: &quot;content (cbox a b) = 0 \&lt;Longrightarrow&gt; integral (cbox a b) f = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="542" line="869" source_state="541" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="543" line="871" source_state="542" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="544" line="871" source_state="543" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="545" line="874" source_state="544" duration_seconds="0.001"><command>lemma integrable_on_null [intro]: &quot;content (cbox a b) = 0 \&lt;Longrightarrow&gt; f integrable_on (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="546" line="874" source_state="545" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="547" line="876" source_state="546" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="548" line="876" source_state="547" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="549" line="879" source_state="548" duration_seconds="0.001"><command>lemma has_integral_empty[intro]: &quot;(f has_integral 0) {}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="550" line="879" source_state="549" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="551" line="881" source_state="550" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="552" line="881" source_state="551" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="553" line="884" source_state="552" duration_seconds="0.001"><command>lemma has_integral_empty_eq[simp]: &quot;(f has_integral i) {} \&lt;longleftrightarrow&gt; i = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="554" line="884" source_state="553" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="555" line="886" source_state="554" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="556" line="886" source_state="555" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="557" line="889" source_state="556" duration_seconds="0.000"><command>lemma integrable_on_empty[intro]: &quot;f integrable_on {}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="558" line="889" source_state="557" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="559" line="891" source_state="558" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="560" line="891" source_state="559" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="561" line="894" source_state="560" duration_seconds="0.001"><command>lemma integral_empty[simp]: &quot;integral {} f = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="562" line="894" source_state="561" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="563" line="896" source_state="562" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="564" line="896" source_state="563" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="565" line="899" source_state="564" duration_seconds="0.001"><command>lemma has_integral_refl[intro]:
+  fixes a :: &quot;&apos;a::euclidean_space&quot;
+  shows &quot;(f has_integral 0) (cbox a a)&quot;
+    and &quot;(f has_integral 0) {a}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="566" line="902" source_state="565" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="567" line="904" source_state="566" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="568" line="904" source_state="567" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="569" line="907" source_state="568" duration_seconds="0.001"><command>lemma integrable_on_refl[intro]: &quot;f integrable_on cbox a a&quot;</command><error></error></attempt><attempt mode="context" success="true" index="570" line="907" source_state="569" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="571" line="909" source_state="570" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="572" line="909" source_state="571" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="573" line="912" source_state="572" duration_seconds="0.001"><command>lemma integral_refl [simp]: &quot;integral (cbox a a) f = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="574" line="912" source_state="573" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="575" line="914" source_state="574" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="576" line="914" source_state="575" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="577" line="917" source_state="576" duration_seconds="0.001"><command>lemma integral_singleton [simp]: &quot;integral {a} f = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="578" line="917" source_state="577" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="579" line="919" source_state="578" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="580" line="919" source_state="579" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="581" line="922" source_state="580" duration_seconds="0.002"><command>lemma integral_blinfun_apply:
+  assumes &quot;f integrable_on s&quot;
+  shows &quot;integral s (\&lt;lambda&gt;x. blinfun_apply h (f x)) = blinfun_apply h (integral s f)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="582" line="924" source_state="581" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="583" line="926" source_state="582" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="584" line="926" source_state="583" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="585" line="929" source_state="584" duration_seconds="0.002"><command>lemma blinfun_apply_integral:
+  assumes &quot;f integrable_on s&quot;
+  shows &quot;blinfun_apply (integral s f) x = integral s (\&lt;lambda&gt;y. blinfun_apply (f y) x)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="586" line="931" source_state="585" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="587" line="933" source_state="586" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="588" line="933" source_state="587" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="589" line="936" source_state="588" duration_seconds="0.002"><command>lemma has_integral_componentwise_iff:
+  fixes f :: &quot;&apos;a :: euclidean_space \&lt;Rightarrow&gt; &apos;b :: euclidean_space&quot;
+  shows &quot;(f has_integral y) A \&lt;longleftrightarrow&gt; (\&lt;forall&gt;b\&lt;in&gt;Basis. ((\&lt;lambda&gt;x. f x \&lt;bullet&gt; b) has_integral (y \&lt;bullet&gt; b)) A)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="590" line="938" source_state="589" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="591" line="940" source_state="590" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="592" line="940" source_state="591" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="593" line="943" source_state="592" duration_seconds="0.002"><command>lemma has_integral_componentwise:
+  fixes f :: &quot;&apos;a :: euclidean_space \&lt;Rightarrow&gt; &apos;b :: euclidean_space&quot;
+  shows &quot;(\&lt;And&gt;b. b \&lt;in&gt; Basis \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. f x \&lt;bullet&gt; b) has_integral (y \&lt;bullet&gt; b)) A) \&lt;Longrightarrow&gt; (f has_integral y) A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="594" line="945" source_state="593" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="595" line="947" source_state="594" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="596" line="947" source_state="595" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="597" line="950" source_state="596" duration_seconds="0.001"><command>lemma integrable_componentwise_iff:
+  fixes f :: &quot;&apos;a :: euclidean_space \&lt;Rightarrow&gt; &apos;b :: euclidean_space&quot;
+  shows &quot;f integrable_on A \&lt;longleftrightarrow&gt; (\&lt;forall&gt;b\&lt;in&gt;Basis. (\&lt;lambda&gt;x. f x \&lt;bullet&gt; b) integrable_on A)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="598" line="952" source_state="597" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="599" line="954" source_state="598" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="600" line="954" source_state="599" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="601" line="957" source_state="600" duration_seconds="0.001"><command>lemma integrable_componentwise:
+  fixes f :: &quot;&apos;a :: euclidean_space \&lt;Rightarrow&gt; &apos;b :: euclidean_space&quot;
+  shows &quot;(\&lt;And&gt;b. b \&lt;in&gt; Basis \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. f x \&lt;bullet&gt; b) integrable_on A) \&lt;Longrightarrow&gt; f integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="602" line="959" source_state="601" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="603" line="961" source_state="602" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="604" line="961" source_state="603" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="605" line="964" source_state="604" duration_seconds="0.002"><command>lemma integral_componentwise:
+  fixes f :: &quot;&apos;a :: euclidean_space \&lt;Rightarrow&gt; &apos;b :: euclidean_space&quot;
+  assumes &quot;f integrable_on A&quot;
+  shows &quot;integral A f = (\&lt;Sum&gt;b\&lt;in&gt;Basis. integral A (\&lt;lambda&gt;x. (f x \&lt;bullet&gt; b) *\&lt;^sub&gt;R b))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="606" line="967" source_state="605" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="607" line="969" source_state="606" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="608" line="969" source_state="607" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="609" line="972" source_state="608" duration_seconds="0.001"><command>lemma integrable_component:
+  &quot;f integrable_on A \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. f x \&lt;bullet&gt; (y :: &apos;b :: euclidean_space)) integrable_on A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="610" line="973" source_state="609" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="611" line="975" source_state="610" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="612" line="975" source_state="611" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="613" line="978" source_state="612" duration_seconds="0.002"><command>lemma
+  assumes &quot;(f has_integral I) A &quot;
+  shows has_integral_Re: &quot;((\&lt;lambda&gt;x. Re (f x)) has_integral (Re I)) A&quot;
+  and   has_integral_Im: &quot;((\&lt;lambda&gt;x. Im (f x)) has_integral (Im I)) A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="614" line="981" source_state="613" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="615" line="983" source_state="614" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="616" line="983" source_state="615" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="617" line="987" source_state="616" duration_seconds="0.000"><command>subsection \&lt;open&gt;Cauchy-type criterion for integrability\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="618" line="987" source_state="617" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="619" line="989" source_state="618" duration_seconds="0.006"><command>proposition integrable_Cauchy:
+  fixes f :: &quot;&apos;n::euclidean_space \&lt;Rightarrow&gt; &apos;a::{real_normed_vector,complete_space}&quot;
+  shows &quot;f integrable_on cbox a b \&lt;longleftrightarrow&gt;
+        (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;\&lt;gamma&gt;. gauge \&lt;gamma&gt; \&lt;and&gt;
+          (\&lt;forall&gt;\&lt;D&gt;1 \&lt;D&gt;2. \&lt;D&gt;1 tagged_division_of (cbox a b) \&lt;and&gt; \&lt;gamma&gt; fine \&lt;D&gt;1 \&lt;and&gt;
+            \&lt;D&gt;2 tagged_division_of (cbox a b) \&lt;and&gt; \&lt;gamma&gt; fine \&lt;D&gt;2 \&lt;longrightarrow&gt;
+            norm ((\&lt;Sum&gt;(x,K)\&lt;in&gt;\&lt;D&gt;1. content K *\&lt;^sub&gt;R f x) - (\&lt;Sum&gt;(x,K)\&lt;in&gt;\&lt;D&gt;2. content K *\&lt;^sub&gt;R f x)) &lt; e))&quot;
+  (is &quot;?l = (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;\&lt;gamma&gt;. ?P e \&lt;gamma&gt;)&quot;)</command><error></error></attempt><attempt mode="context" success="true" index="620" line="996" source_state="619" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="621" line="998" source_state="620" duration_seconds="0.004"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="622" line="998" source_state="621" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="623" line="1002" source_state="622" duration_seconds="0.000"><command>subsection \&lt;open&gt;Additivity of integral on abutting intervals\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="624" line="1002" source_state="623" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="625" line="1004" source_state="624" duration_seconds="0.004"><command>lemma tagged_division_split_left_inj_content:
+  assumes \&lt;D&gt;: &quot;\&lt;D&gt; tagged_division_of S&quot;
+    and &quot;(x1, K1) \&lt;in&gt; \&lt;D&gt;&quot; &quot;(x2, K2) \&lt;in&gt; \&lt;D&gt;&quot; &quot;K1 \&lt;noteq&gt; K2&quot; &quot;K1 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c} = K2 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c}&quot; &quot;k \&lt;in&gt; Basis&quot;
+  shows &quot;content (K1 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c}) = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="626" line="1007" source_state="625" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="627" line="1009" source_state="626" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="628" line="1009" source_state="627" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="629" line="1012" source_state="628" duration_seconds="0.005"><command>lemma tagged_division_split_right_inj_content:
+  assumes \&lt;D&gt;: &quot;\&lt;D&gt; tagged_division_of S&quot;
+    and &quot;(x1, K1) \&lt;in&gt; \&lt;D&gt;&quot; &quot;(x2, K2) \&lt;in&gt; \&lt;D&gt;&quot; &quot;K1 \&lt;noteq&gt; K2&quot; &quot;K1 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c} = K2 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c}&quot; &quot;k \&lt;in&gt; Basis&quot;
+  shows &quot;content (K1 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c}) = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="630" line="1015" source_state="629" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="631" line="1017" source_state="630" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="632" line="1017" source_state="631" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="633" line="1021" source_state="632" duration_seconds="0.004"><command>proposition has_integral_split:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::real_normed_vector&quot;
+  assumes fi: &quot;(f has_integral i) (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c})&quot;
+      and fj: &quot;(f has_integral j) (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c})&quot;
+      and k: &quot;k \&lt;in&gt; Basis&quot;
+shows &quot;(f has_integral (i + j)) (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="634" line="1026" source_state="633" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="635" line="1028" source_state="634" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="636" line="1028" source_state="635" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="637" line="1032" source_state="636" duration_seconds="0.000"><command>subsection \&lt;open&gt;A sort of converse, integrability on subintervals\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="638" line="1032" source_state="637" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="639" line="1034" source_state="638" duration_seconds="0.007"><command>lemma has_integral_separate_sides:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::real_normed_vector&quot;
+  assumes f: &quot;(f has_integral i) (cbox a b)&quot;
+    and &quot;e &gt; 0&quot;
+    and k: &quot;k \&lt;in&gt; Basis&quot;
+  obtains d where &quot;gauge d&quot;
+    &quot;\&lt;forall&gt;p1 p2. p1 tagged_division_of (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c}) \&lt;and&gt; d fine p1 \&lt;and&gt;
+        p2 tagged_division_of (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c}) \&lt;and&gt; d fine p2 \&lt;longrightarrow&gt;
+        norm ((sum (\&lt;lambda&gt;(x,k). content k *\&lt;^sub&gt;R f x) p1 + sum (\&lt;lambda&gt;(x,k). content k *\&lt;^sub&gt;R f x) p2) - i) &lt; e&quot;</command><error></error></attempt><attempt mode="context" success="true" index="640" line="1042" source_state="639" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="641" line="1044" source_state="640" duration_seconds="0.005"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="642" line="1044" source_state="641" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="643" line="1047" source_state="642" duration_seconds="0.003"><command>lemma integrable_split [intro]:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::{real_normed_vector,complete_space}&quot;
+  assumes f: &quot;f integrable_on cbox a b&quot;
+      and k: &quot;k \&lt;in&gt; Basis&quot;
+    shows &quot;f integrable_on (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c})&quot;   (is ?thesis1)
+    and   &quot;f integrable_on (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c})&quot;   (is ?thesis2)</command><error></error></attempt><attempt mode="context" success="true" index="644" line="1052" source_state="643" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="645" line="1054" source_state="644" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="646" line="1054" source_state="645" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="647" line="1057" source_state="646" duration_seconds="0.002"><command>lemma operative_integralI:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::banach&quot;
+  shows &quot;operative (lift_option (+)) (Some 0)
+    (\&lt;lambda&gt;i. if f integrable_on i then Some (integral i f) else None)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="648" line="1060" source_state="647" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="649" line="1062" source_state="648" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="650" line="1062" source_state="649" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="651" line="1065" source_state="650" duration_seconds="0.000"><command>subsection \&lt;open&gt;Bounds on the norm of Riemann sums and the integral itself\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="652" line="1065" source_state="651" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="653" line="1067" source_state="652" duration_seconds="0.002"><command>lemma dsum_bound:
+  assumes p: &quot;p division_of (cbox a b)&quot;
+    and &quot;norm c \&lt;le&gt; e&quot;
+  shows &quot;norm (\&lt;Sum&gt;l\&lt;in&gt;p. content l *\&lt;^sub&gt;R c) \&lt;le&gt; e * content(cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="654" line="1070" source_state="653" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="655" line="1072" source_state="654" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="656" line="1072" source_state="655" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="657" line="1075" source_state="656" duration_seconds="0.003"><command>lemma rsum_bound:
+  assumes p: &quot;p tagged_division_of (cbox a b)&quot;
+      and &quot;\&lt;forall&gt;x\&lt;in&gt;cbox a b. norm (f x) \&lt;le&gt; e&quot;
+    shows &quot;norm (\&lt;Sum&gt;(x, k)\&lt;in&gt;p. content k *\&lt;^sub&gt;R f x) \&lt;le&gt; e * content (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="658" line="1078" source_state="657" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="659" line="1080" source_state="658" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="660" line="1080" source_state="659" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="661" line="1083" source_state="660" duration_seconds="0.005"><command>lemma rsum_diff_bound:
+  assumes &quot;p tagged_division_of (cbox a b)&quot;
+    and &quot;\&lt;forall&gt;x\&lt;in&gt;cbox a b. norm (f x - g x) \&lt;le&gt; e&quot;
+  shows &quot;norm (sum (\&lt;lambda&gt;(x,k). content k *\&lt;^sub&gt;R f x) p - sum (\&lt;lambda&gt;(x,k). content k *\&lt;^sub&gt;R g x) p) \&lt;le&gt;
+         e * content (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="662" line="1087" source_state="661" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="663" line="1089" source_state="662" duration_seconds="0.003"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="664" line="1089" source_state="663" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="665" line="1092" source_state="664" duration_seconds="0.003"><command>lemma has_integral_bound:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::real_normed_vector&quot;
+  assumes &quot;0 \&lt;le&gt; B&quot;
+      and f: &quot;(f has_integral i) (cbox a b)&quot;
+      and &quot;\&lt;And&gt;x. x\&lt;in&gt;cbox a b \&lt;Longrightarrow&gt; norm (f x) \&lt;le&gt; B&quot;
+    shows &quot;norm i \&lt;le&gt; B * content (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="666" line="1097" source_state="665" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="667" line="1099" source_state="666" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="668" line="1099" source_state="667" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="669" line="1102" source_state="668" duration_seconds="0.003"><command>corollary integrable_bound:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::real_normed_vector&quot;
+  assumes &quot;0 \&lt;le&gt; B&quot;
+    and &quot;f integrable_on (cbox a b)&quot;
+    and &quot;\&lt;And&gt;x. x\&lt;in&gt;cbox a b \&lt;Longrightarrow&gt; norm (f x) \&lt;le&gt; B&quot;
+  shows &quot;norm (integral (cbox a b) f) \&lt;le&gt; B * content (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="670" line="1107" source_state="669" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="671" line="1109" source_state="670" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="672" line="1109" source_state="671" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="673" line="1113" source_state="672" duration_seconds="0.000"><command>subsection \&lt;open&gt;Similar theorems about relationship among components\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="674" line="1113" source_state="673" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="675" line="1115" source_state="674" duration_seconds="0.004"><command>lemma rsum_component_le:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::euclidean_space&quot;
+  assumes p: &quot;p tagged_division_of (cbox a b)&quot;
+      and &quot;\&lt;And&gt;x. x \&lt;in&gt; cbox a b \&lt;Longrightarrow&gt; (f x)\&lt;bullet&gt;i \&lt;le&gt; (g x)\&lt;bullet&gt;i&quot;
+    shows &quot;(\&lt;Sum&gt;(x, K)\&lt;in&gt;p. content K *\&lt;^sub&gt;R f x) \&lt;bullet&gt; i \&lt;le&gt; (\&lt;Sum&gt;(x, K)\&lt;in&gt;p. content K *\&lt;^sub&gt;R g x) \&lt;bullet&gt; i&quot;</command><error></error></attempt><attempt mode="context" success="true" index="676" line="1119" source_state="675" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="677" line="1121" source_state="676" duration_seconds="0.003"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="678" line="1121" source_state="677" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="679" line="1124" source_state="678" duration_seconds="0.003"><command>lemma has_integral_component_le:
+  fixes f g :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::euclidean_space&quot;
+  assumes k: &quot;k \&lt;in&gt; Basis&quot;
+  assumes &quot;(f has_integral i) S&quot; &quot;(g has_integral j) S&quot;
+    and f_le_g: &quot;\&lt;And&gt;x. x \&lt;in&gt; S \&lt;Longrightarrow&gt; (f x)\&lt;bullet&gt;k \&lt;le&gt; (g x)\&lt;bullet&gt;k&quot;
+  shows &quot;i\&lt;bullet&gt;k \&lt;le&gt; j\&lt;bullet&gt;k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="680" line="1129" source_state="679" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="681" line="1131" source_state="680" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="682" line="1131" source_state="681" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="683" line="1134" source_state="682" duration_seconds="0.003"><command>lemma integral_component_le:
+  fixes g f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::euclidean_space&quot;
+  assumes &quot;k \&lt;in&gt; Basis&quot;
+    and &quot;f integrable_on S&quot; &quot;g integrable_on S&quot;
+    and &quot;\&lt;And&gt;x. x \&lt;in&gt; S \&lt;Longrightarrow&gt; (f x)\&lt;bullet&gt;k \&lt;le&gt; (g x)\&lt;bullet&gt;k&quot;
+  shows &quot;(integral S f)\&lt;bullet&gt;k \&lt;le&gt; (integral S g)\&lt;bullet&gt;k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="684" line="1139" source_state="683" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="685" line="1141" source_state="684" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="686" line="1141" source_state="685" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="687" line="1144" source_state="686" duration_seconds="0.002"><command>lemma has_integral_component_nonneg:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::euclidean_space&quot;
+  assumes &quot;k \&lt;in&gt; Basis&quot;
+    and &quot;(f has_integral i) S&quot;
+    and &quot;\&lt;And&gt;x. x \&lt;in&gt; S \&lt;Longrightarrow&gt; 0 \&lt;le&gt; (f x)\&lt;bullet&gt;k&quot;
+  shows &quot;0 \&lt;le&gt; i\&lt;bullet&gt;k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="688" line="1149" source_state="687" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="689" line="1151" source_state="688" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="690" line="1151" source_state="689" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="691" line="1154" source_state="690" duration_seconds="0.002"><command>lemma integral_component_nonneg:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::euclidean_space&quot;
+  assumes &quot;k \&lt;in&gt; Basis&quot;
+    and  &quot;\&lt;And&gt;x. x \&lt;in&gt; S \&lt;Longrightarrow&gt; 0 \&lt;le&gt; (f x)\&lt;bullet&gt;k&quot;
+  shows &quot;0 \&lt;le&gt; (integral S f)\&lt;bullet&gt;k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="692" line="1158" source_state="691" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="693" line="1160" source_state="692" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="694" line="1160" source_state="693" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="695" line="1163" source_state="694" duration_seconds="0.002"><command>lemma has_integral_component_neg:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::euclidean_space&quot;
+  assumes &quot;k \&lt;in&gt; Basis&quot;
+    and &quot;(f has_integral i) S&quot;
+    and &quot;\&lt;And&gt;x. x \&lt;in&gt; S \&lt;Longrightarrow&gt; (f x)\&lt;bullet&gt;k \&lt;le&gt; 0&quot;
+  shows &quot;i\&lt;bullet&gt;k \&lt;le&gt; 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="696" line="1168" source_state="695" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="697" line="1170" source_state="696" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="698" line="1170" source_state="697" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="699" line="1173" source_state="698" duration_seconds="0.003"><command>lemma has_integral_component_lbound:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::euclidean_space&quot;
+  assumes &quot;(f has_integral i) (cbox a b)&quot;
+    and &quot;\&lt;forall&gt;x\&lt;in&gt;cbox a b. B \&lt;le&gt; f(x)\&lt;bullet&gt;k&quot;
+    and &quot;k \&lt;in&gt; Basis&quot;
+  shows &quot;B * content (cbox a b) \&lt;le&gt; i\&lt;bullet&gt;k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="700" line="1178" source_state="699" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="701" line="1180" source_state="700" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="702" line="1180" source_state="701" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="703" line="1183" source_state="702" duration_seconds="0.003"><command>lemma has_integral_component_ubound:
+  fixes f::&quot;&apos;a::euclidean_space =&gt; &apos;b::euclidean_space&quot;
+  assumes &quot;(f has_integral i) (cbox a b)&quot;
+    and &quot;\&lt;forall&gt;x\&lt;in&gt;cbox a b. f x\&lt;bullet&gt;k \&lt;le&gt; B&quot;
+    and &quot;k \&lt;in&gt; Basis&quot;
+  shows &quot;i\&lt;bullet&gt;k \&lt;le&gt; B * content (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="704" line="1188" source_state="703" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="705" line="1190" source_state="704" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="706" line="1190" source_state="705" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="707" line="1193" source_state="706" duration_seconds="0.003"><command>lemma integral_component_lbound:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::euclidean_space&quot;
+  assumes &quot;f integrable_on cbox a b&quot;
+    and &quot;\&lt;forall&gt;x\&lt;in&gt;cbox a b. B \&lt;le&gt; f(x)\&lt;bullet&gt;k&quot;
+    and &quot;k \&lt;in&gt; Basis&quot;
+  shows &quot;B * content (cbox a b) \&lt;le&gt; (integral(cbox a b) f)\&lt;bullet&gt;k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="708" line="1198" source_state="707" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="709" line="1200" source_state="708" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="710" line="1200" source_state="709" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="711" line="1203" source_state="710" duration_seconds="0.003"><command>lemma integral_component_lbound_real:
+  assumes &quot;f integrable_on {a ::real..b}&quot;
+    and &quot;\&lt;forall&gt;x\&lt;in&gt;{a..b}. B \&lt;le&gt; f(x)\&lt;bullet&gt;k&quot;
+    and &quot;k \&lt;in&gt; Basis&quot;
+  shows &quot;B * content {a..b} \&lt;le&gt; (integral {a..b} f)\&lt;bullet&gt;k&quot;</command><error></error></attempt><attempt mode="context" success="true" index="712" line="1207" source_state="711" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="713" line="1209" source_state="712" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="714" line="1209" source_state="713" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="715" line="1212" source_state="714" duration_seconds="0.003"><command>lemma integral_component_ubound:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::euclidean_space&quot;
+  assumes &quot;f integrable_on cbox a b&quot;
+    and &quot;\&lt;forall&gt;x\&lt;in&gt;cbox a b. f x\&lt;bullet&gt;k \&lt;le&gt; B&quot;
+    and &quot;k \&lt;in&gt; Basis&quot;
+  shows &quot;(integral (cbox a b) f)\&lt;bullet&gt;k \&lt;le&gt; B * content (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="716" line="1217" source_state="715" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="717" line="1219" source_state="716" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="718" line="1219" source_state="717" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="719" line="1222" source_state="718" duration_seconds="0.003"><command>lemma integral_component_ubound_real:
+  fixes f :: &quot;real \&lt;Rightarrow&gt; &apos;a::euclidean_space&quot;
+  assumes &quot;f integrable_on {a..b}&quot;
+    and &quot;\&lt;forall&gt;x\&lt;in&gt;{a..b}. f x\&lt;bullet&gt;k \&lt;le&gt; B&quot;
+    and &quot;k \&lt;in&gt; Basis&quot;
+  shows &quot;(integral {a..b} f)\&lt;bullet&gt;k \&lt;le&gt; B * content {a..b}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="720" line="1227" source_state="719" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="721" line="1229" source_state="720" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="722" line="1229" source_state="721" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="723" line="1232" source_state="722" duration_seconds="0.000"><command>subsection \&lt;open&gt;Uniform limit of integrable functions is integrable\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="724" line="1232" source_state="723" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="725" line="1234" source_state="724" duration_seconds="0.001"><command>lemma real_arch_invD:
+  &quot;0 &lt; (e::real) \&lt;Longrightarrow&gt; (\&lt;exists&gt;n::nat. n \&lt;noteq&gt; 0 \&lt;and&gt; 0 &lt; inverse (real n) \&lt;and&gt; inverse (real n) &lt; e)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="726" line="1235" source_state="725" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="727" line="1237" source_state="726" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="728" line="1237" source_state="727" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="729" line="1241" source_state="728" duration_seconds="0.002"><command>lemma integrable_uniform_limit:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::banach&quot;
+  assumes &quot;\&lt;And&gt;e. e &gt; 0 \&lt;Longrightarrow&gt; \&lt;exists&gt;g. (\&lt;forall&gt;x\&lt;in&gt;cbox a b. norm (f x - g x) \&lt;le&gt; e) \&lt;and&gt; g integrable_on cbox a b&quot;
+  shows &quot;f integrable_on cbox a b&quot;</command><error></error></attempt><attempt mode="context" success="true" index="730" line="1244" source_state="729" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="731" line="1246" source_state="730" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="732" line="1246" source_state="731" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="733" line="1249" source_state="732" duration_seconds="0.005"><command>lemmas integrable_uniform_limit_real = integrable_uniform_limit [where &apos;a=real, simplified]</command><error></error></attempt><attempt mode="context" success="true" index="734" line="1249" source_state="733" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="735" line="1252" source_state="734" duration_seconds="0.000"><command>subsection \&lt;open&gt;Negligible sets\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="736" line="1252" source_state="735" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="737" line="1254" source_state="736" duration_seconds="0.008"><command>definition &quot;negligible (s:: &apos;a::euclidean_space set) \&lt;longleftrightarrow&gt;
+  (\&lt;forall&gt;a b. ((indicator s :: &apos;a\&lt;Rightarrow&gt;real) has_integral 0) (cbox a b))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="738" line="1255" source_state="737" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="739" line="1258" source_state="738" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Negligibility of hyperplane\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="740" line="1258" source_state="739" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="741" line="1260" source_state="740" duration_seconds="0.003"><command>lemma content_doublesplit:
+  fixes a :: &quot;&apos;a::euclidean_space&quot;
+  assumes &quot;0 &lt; e&quot;
+    and k: &quot;k \&lt;in&gt; Basis&quot;
+  obtains d where &quot;0 &lt; d&quot; and &quot;content (cbox a b \&lt;inter&gt; {x. \&lt;bar&gt;x\&lt;bullet&gt;k - c\&lt;bar&gt; \&lt;le&gt; d}) &lt; e&quot;</command><error></error></attempt><attempt mode="context" success="true" index="742" line="1264" source_state="741" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="743" line="1266" source_state="742" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="744" line="1266" source_state="743" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="745" line="1270" source_state="744" duration_seconds="0.001"><command>proposition negligible_standard_hyperplane[intro]:
+  fixes k :: &quot;&apos;a::euclidean_space&quot;
+  assumes k: &quot;k \&lt;in&gt; Basis&quot;
+  shows &quot;negligible {x. x\&lt;bullet&gt;k = c}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="746" line="1273" source_state="745" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="747" line="1275" source_state="746" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="748" line="1275" source_state="747" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="749" line="1278" source_state="748" duration_seconds="0.001"><command>corollary negligible_standard_hyperplane_cart:
+  fixes k :: &quot;&apos;a::finite&quot;
+  shows &quot;negligible {x. x$k = (0::real)}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="750" line="1280" source_state="749" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="751" line="1282" source_state="750" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="752" line="1282" source_state="751" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="753" line="1286" source_state="752" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Hence the main theorem about negligible sets\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="754" line="1286" source_state="753" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="755" line="1289" source_state="754" duration_seconds="0.002"><command>lemma has_integral_negligible_cbox:
+  fixes f :: &quot;&apos;b::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  assumes negs: &quot;negligible S&quot;
+    and 0: &quot;\&lt;And&gt;x. x \&lt;notin&gt; S \&lt;Longrightarrow&gt; f x = 0&quot;
+  shows &quot;(f has_integral 0) (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="756" line="1293" source_state="755" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="757" line="1295" source_state="756" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="758" line="1295" source_state="757" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="759" line="1299" source_state="758" duration_seconds="0.002"><command>proposition has_integral_negligible:
+  fixes f :: &quot;&apos;b::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  assumes negs: &quot;negligible S&quot;
+    and &quot;\&lt;And&gt;x. x \&lt;in&gt; (T - S) \&lt;Longrightarrow&gt; f x = 0&quot;
+  shows &quot;(f has_integral 0) T&quot;</command><error></error></attempt><attempt mode="context" success="true" index="760" line="1303" source_state="759" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="761" line="1305" source_state="760" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="762" line="1305" source_state="761" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="763" line="1308" source_state="762" duration_seconds="0.001"><command>lemma
+  assumes &quot;negligible S&quot;
+  shows integrable_negligible: &quot;f integrable_on S&quot; and integral_negligible: &quot;integral S f = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="764" line="1310" source_state="763" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="765" line="1312" source_state="764" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="766" line="1312" source_state="765" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="767" line="1315" source_state="766" duration_seconds="0.002"><command>lemma has_integral_spike:
+  fixes f :: &quot;&apos;b::euclidean_space \&lt;Rightarrow&gt; &apos;a::real_normed_vector&quot;
+  assumes &quot;negligible S&quot;
+    and gf: &quot;\&lt;And&gt;x. x \&lt;in&gt; T - S \&lt;Longrightarrow&gt; g x = f x&quot;
+    and fint: &quot;(f has_integral y) T&quot;
+  shows &quot;(g has_integral y) T&quot;</command><error></error></attempt><attempt mode="context" success="true" index="768" line="1320" source_state="767" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="769" line="1322" source_state="768" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="770" line="1322" source_state="769" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="771" line="1325" source_state="770" duration_seconds="0.002"><command>lemma has_integral_spike_eq:
+  assumes &quot;negligible S&quot; and &quot;\&lt;And&gt;x. x \&lt;in&gt; T - S \&lt;Longrightarrow&gt; g x = f x&quot;
+  shows &quot;(f has_integral y) T \&lt;longleftrightarrow&gt; (g has_integral y) T&quot;</command><error></error></attempt><attempt mode="context" success="true" index="772" line="1327" source_state="771" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="773" line="1329" source_state="772" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="774" line="1329" source_state="773" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="775" line="1332" source_state="774" duration_seconds="0.002"><command>lemma integrable_spike:
+  assumes &quot;f integrable_on T&quot; &quot;negligible S&quot; &quot;\&lt;And&gt;x. x \&lt;in&gt; T - S \&lt;Longrightarrow&gt; g x = f x&quot;
+    shows &quot;g integrable_on T&quot;</command><error></error></attempt><attempt mode="context" success="true" index="776" line="1334" source_state="775" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="777" line="1336" source_state="776" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="778" line="1336" source_state="777" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="779" line="1339" source_state="778" duration_seconds="0.002"><command>lemma integral_spike:
+  assumes &quot;negligible S&quot; and &quot;\&lt;And&gt;x. x \&lt;in&gt; T - S \&lt;Longrightarrow&gt; g x = f x&quot;
+  shows &quot;integral T f = integral T g&quot;</command><error></error></attempt><attempt mode="context" success="true" index="780" line="1341" source_state="779" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="781" line="1343" source_state="780" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="782" line="1343" source_state="781" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="783" line="1347" source_state="782" duration_seconds="0.000"><command>subsection \&lt;open&gt;Some other trivialities about negligible sets\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="784" line="1347" source_state="783" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="785" line="1349" source_state="784" duration_seconds="0.001"><command>lemma negligible_subset:
+  assumes &quot;negligible S&quot; &quot;T \&lt;subseteq&gt; S&quot;
+  shows &quot;negligible T&quot;</command><error></error></attempt><attempt mode="context" success="true" index="786" line="1351" source_state="785" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="787" line="1353" source_state="786" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="788" line="1353" source_state="787" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="789" line="1356" source_state="788" duration_seconds="0.001"><command>lemma negligible_diff[intro?]:
+  assumes &quot;negligible S&quot;
+  shows &quot;negligible (S - T)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="790" line="1358" source_state="789" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="791" line="1360" source_state="790" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="792" line="1360" source_state="791" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="793" line="1363" source_state="792" duration_seconds="0.001"><command>lemma negligible_Int:
+  assumes &quot;negligible S \&lt;or&gt; negligible T&quot;
+  shows &quot;negligible (S \&lt;inter&gt; T)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="794" line="1365" source_state="793" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="795" line="1367" source_state="794" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="796" line="1367" source_state="795" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="797" line="1370" source_state="796" duration_seconds="0.001"><command>lemma negligible_Un:
+  assumes &quot;negligible S&quot; and T: &quot;negligible T&quot;
+  shows &quot;negligible (S \&lt;union&gt; T)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="798" line="1372" source_state="797" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="799" line="1374" source_state="798" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="800" line="1374" source_state="799" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="801" line="1377" source_state="800" duration_seconds="0.001"><command>lemma negligible_Un_eq[simp]: &quot;negligible (S \&lt;union&gt; T) \&lt;longleftrightarrow&gt; negligible S \&lt;and&gt; negligible T&quot;</command><error></error></attempt><attempt mode="context" success="true" index="802" line="1377" source_state="801" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="803" line="1379" source_state="802" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="804" line="1379" source_state="803" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="805" line="1382" source_state="804" duration_seconds="0.001"><command>lemma negligible_sing[intro]: &quot;negligible {a::&apos;a::euclidean_space}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="806" line="1382" source_state="805" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="807" line="1384" source_state="806" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="808" line="1384" source_state="807" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="809" line="1387" source_state="808" duration_seconds="0.001"><command>lemma negligible_insert[simp]: &quot;negligible (insert a S) \&lt;longleftrightarrow&gt; negligible S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="810" line="1387" source_state="809" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="811" line="1389" source_state="810" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="812" line="1389" source_state="811" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="813" line="1392" source_state="812" duration_seconds="0.000"><command>lemma negligible_empty[iff]: &quot;negligible {}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="814" line="1392" source_state="813" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="815" line="1394" source_state="814" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="816" line="1394" source_state="815" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="817" line="1397" source_state="816" duration_seconds="0.000"><command>text\&lt;open&gt;Useful in this form for backchaining\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="818" line="1397" source_state="817" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="819" line="1398" source_state="818" duration_seconds="0.001"><command>lemma empty_imp_negligible: &quot;S = {} \&lt;Longrightarrow&gt; negligible S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="820" line="1398" source_state="819" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="821" line="1400" source_state="820" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="822" line="1400" source_state="821" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="823" line="1403" source_state="822" duration_seconds="0.001"><command>lemma negligible_finite[intro]:
+  assumes &quot;finite S&quot;
+  shows &quot;negligible S&quot;</command><error></error></attempt><attempt mode="context" success="true" index="824" line="1405" source_state="823" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="825" line="1407" source_state="824" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="826" line="1407" source_state="825" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="827" line="1410" source_state="826" duration_seconds="0.001"><command>lemma negligible_Union[intro]:
+  assumes &quot;finite \&lt;T&gt;&quot;
+    and &quot;\&lt;And&gt;T. T \&lt;in&gt; \&lt;T&gt; \&lt;Longrightarrow&gt; negligible T&quot;
+  shows &quot;negligible(\&lt;Union&gt;\&lt;T&gt;)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="828" line="1413" source_state="827" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="829" line="1415" source_state="828" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="830" line="1415" source_state="829" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="831" line="1418" source_state="830" duration_seconds="0.001"><command>lemma negligible: &quot;negligible S \&lt;longleftrightarrow&gt; (\&lt;forall&gt;T. (indicat_real S has_integral 0) T)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="832" line="1418" source_state="831" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="833" line="1420" source_state="832" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="834" line="1420" source_state="833" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="835" line="1423" source_state="834" duration_seconds="0.000"><command>subsection \&lt;open&gt;Finite case of the spike theorem is quite commonly needed\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="836" line="1423" source_state="835" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="837" line="1425" source_state="836" duration_seconds="0.002"><command>lemma has_integral_spike_finite:
+  assumes &quot;finite S&quot;
+    and &quot;\&lt;And&gt;x. x \&lt;in&gt; T - S \&lt;Longrightarrow&gt; g x = f x&quot;
+    and &quot;(f has_integral y) T&quot;
+  shows &quot;(g has_integral y) T&quot;</command><error></error></attempt><attempt mode="context" success="true" index="838" line="1429" source_state="837" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="839" line="1431" source_state="838" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="840" line="1431" source_state="839" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="841" line="1434" source_state="840" duration_seconds="0.002"><command>lemma has_integral_spike_finite_eq:
+  assumes &quot;finite S&quot;
+    and &quot;\&lt;And&gt;x. x \&lt;in&gt; T - S \&lt;Longrightarrow&gt; g x = f x&quot;
+  shows &quot;((f has_integral y) T \&lt;longleftrightarrow&gt; (g has_integral y) T)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="842" line="1437" source_state="841" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="843" line="1439" source_state="842" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="844" line="1439" source_state="843" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="845" line="1442" source_state="844" duration_seconds="0.002"><command>lemma integrable_spike_finite:
+  assumes &quot;finite S&quot;
+    and &quot;\&lt;And&gt;x. x \&lt;in&gt; T - S \&lt;Longrightarrow&gt; g x = f x&quot;
+    and &quot;f integrable_on T&quot;
+  shows &quot;g integrable_on T&quot;</command><error></error></attempt><attempt mode="context" success="true" index="846" line="1446" source_state="845" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="847" line="1448" source_state="846" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="848" line="1448" source_state="847" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="849" line="1451" source_state="848" duration_seconds="0.002"><command>lemma integrable_spike_finite_eq:
+  assumes &quot;finite S&quot;
+    and &quot;\&lt;And&gt;x. x \&lt;in&gt; T - S \&lt;Longrightarrow&gt; f x = g x&quot;
+  shows &quot;f integrable_on T \&lt;longleftrightarrow&gt; g integrable_on T&quot;</command><error></error></attempt><attempt mode="context" success="true" index="850" line="1454" source_state="849" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="851" line="1456" source_state="850" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="852" line="1456" source_state="851" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="853" line="1459" source_state="852" duration_seconds="0.003"><command>lemma has_integral_bound_spike_finite:
+  fixes f :: &quot;&apos;a::euclidean_space \&lt;Rightarrow&gt; &apos;b::real_normed_vector&quot;
+  assumes &quot;0 \&lt;le&gt; B&quot; &quot;finite S&quot;
+      and f: &quot;(f has_integral i) (cbox a b)&quot;
+      and leB: &quot;\&lt;And&gt;x. x \&lt;in&gt; cbox a b - S \&lt;Longrightarrow&gt; norm (f x) \&lt;le&gt; B&quot;
+    shows &quot;norm i \&lt;le&gt; B * content (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="854" line="1464" source_state="853" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="855" line="1466" source_state="854" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="856" line="1466" source_state="855" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="857" line="1469" source_state="856" duration_seconds="0.004"><command>corollary has_integral_bound_real:
+  fixes f :: &quot;real \&lt;Rightarrow&gt; &apos;b::real_normed_vector&quot;
+  assumes &quot;0 \&lt;le&gt; B&quot; &quot;finite S&quot;
+      and &quot;(f has_integral i) {a..b}&quot;
+      and &quot;\&lt;And&gt;x. x \&lt;in&gt; {a..b} - S \&lt;Longrightarrow&gt; norm (f x) \&lt;le&gt; B&quot;
+    shows &quot;norm i \&lt;le&gt; B * content {a..b}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="858" line="1474" source_state="857" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="859" line="1476" source_state="858" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="860" line="1476" source_state="859" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="861" line="1480" source_state="860" duration_seconds="0.000"><command>subsection \&lt;open&gt;In particular, the boundary of an interval is negligible\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="862" line="1480" source_state="861" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="863" line="1482" source_state="862" duration_seconds="0.001"><command>lemma negligible_frontier_interval: &quot;negligible(cbox a b - box a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="864" line="1482" source_state="863" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="865" line="1484" source_state="864" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="866" line="1484" source_state="865" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="867" line="1487" source_state="866" duration_seconds="0.003"><command>lemma has_integral_spike_interior:
+  assumes f: &quot;(f has_integral y) (cbox a b)&quot; and gf: &quot;\&lt;And&gt;x. x \&lt;in&gt; box a b \&lt;Longrightarrow&gt; g x = f x&quot;
+  shows &quot;(g has_integral y) (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="868" line="1489" source_state="867" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="869" line="1491" source_state="868" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="870" line="1491" source_state="869" duration_seconds="0.000"><command>
+
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="871" line="1494" source_state="870" duration_seconds="0.002"><command>lemma has_integral_spike_interior_eq:
+  assumes &quot;\&lt;And&gt;x. x \&lt;in&gt; box a b \&lt;Longrightarrow&gt; g x = f x&quot;
+  shows &quot;(f has_integral y) (cbox a b) \&lt;longleftrightarrow&gt; (g has_integral y) (cbox a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="872" line="1496" source_state="871" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="873" line="1498" source_state="872" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="874" line="1498" source_state="873" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="875" line="1501" source_state="874" duration_seconds="0.002"><command>lemma integrable_spike_interior:
+  assumes &quot;\&lt;And&gt;x. x \&lt;in&gt; box a b \&lt;Longrightarrow&gt; g x = f x&quot;
+    and &quot;f integrable_on cbox a b&quot;
+  shows &quot;g integrable_on cbox a b&quot;</command><error></error></attempt><attempt mode="context" success="true" index="876" line="1504" source_state="875" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="877" line="1506" source_state="876" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="878" line="1506" source_state="877" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="879" line="1510" source_state="878" duration_seconds="0.000"><command>subsection \&lt;open&gt;Integrability of continuous functions\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="880" line="1510" source_state="879" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="881" line="1512" source_state="880" duration_seconds="0.002"><command>lemma operative_approximableI:
+  fixes f :: &quot;&apos;b::euclidean_space \&lt;Rightarrow&gt; &apos;a::banach&quot;
+  assumes &quot;0 \&lt;le&gt; e&quot;
+  shows &quot;operative conj True (\&lt;lambda&gt;i. \&lt;exists&gt;g. (\&lt;forall&gt;x\&lt;in&gt;i. norm (f x - g (x::&apos;b)) \&lt;le&gt; e) \&lt;and&gt; g integrable_on i)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="882" line="1515" source_state="881" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="883" line="1517" source_state="882" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="884" line="1517" source_state="883" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="885" line="1520" source_state="884" duration_seconds="0.001"><command>lemma comm_monoid_set_F_and: &quot;comm_monoid_set.F (\&lt;and&gt;) True f s \&lt;longleftrightarrow&gt; (finite s \&lt;longrightarrow&gt; (\&lt;forall&gt;x\&lt;in&gt;s. f x))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="886" line="1520" source_state="885" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="887" line="1522" source_state="886" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="888" line="1522" source_state="887" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="889" line="1525" source_state="888" duration_seconds="0.003"><command>lemma approximable_on_division:
+  fixes f :: &quot;&apos;b::euclidean_space \&lt;Rightarrow&gt; &apos;a::banach&quot;
+  assumes &quot;0 \&lt;le&gt; e&quot;
+    and d: &quot;d division_of (cbox a b)&quot;
+    and f: &quot;\&lt;forall&gt;i\&lt;in&gt;d. \&lt;exists&gt;g. (\&lt;forall&gt;x\&lt;in&gt;i. norm (f x - g x) \&lt;le&gt; e) \&lt;and&gt; g integrable_on i&quot;
+  obtains g where &quot;\&lt;forall&gt;x\&lt;in&gt;cbox a b. norm (f x - g x) \&lt;le&gt; e&quot; &quot;g integrable_on cbox a b&quot;</command><error></error></attempt><attempt mode="context" success="true" index="890" line="1530" source_state="889" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="891" line="1532" source_state="890" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="892" line="1532" source_state="891" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="893" line="1" source_state="892" duration_seconds="0.000"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="894" line="1" source_state="893" duration_seconds="0.001"><command>lemma integrable_continuous:
+  fixes f :: &quot;&apos;b::euclidean_space \&lt;Rightarrow&gt; &apos;a::banach&quot;
+  assumes &quot;continuous_on (cbox a b) f&quot;
+  shows &quot;f integrable_on cbox a b&quot;</command><error></error></attempt><attempt mode="target" success="true" index="895" line="4" source_state="894" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

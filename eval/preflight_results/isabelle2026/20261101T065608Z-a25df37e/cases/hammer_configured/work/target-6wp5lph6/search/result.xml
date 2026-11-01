@@ -1,0 +1,33 @@
+<dsp_result schema="dsp_native_result_v1" request_id="da801c2eaf1342cd857ab2a817e2c5fe" input_sha256="e588d6491fbc4f6f4b147ceae3229e366dd5cb0ed72b9c81b207f4a6e64f7db5" action="search" success="true" target_closed="true"><proof>proof -
+ show &quot;True&quot;
+ by satx
+
+qed</proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.037"><command>theory V2Control imports Main begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="1" source_state="2" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="1" source_state="3" duration_seconds="0.000"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="5" line="1" source_state="4" duration_seconds="0.001"><command>lemma v2_control: &quot;True&quot;</command><error></error></attempt><attempt mode="target" success="true" index="6" line="1" source_state="5" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="search" success="true" index="7" line="1" source_state="6" duration_seconds="0.000"><command>proof -</command><error></error></attempt><attempt mode="search" success="true" index="8" line="1" source_state="7" duration_seconds="0.000"><command>
+ </command><error></error></attempt><attempt mode="search" success="true" index="9" line="2" source_state="8" duration_seconds="0.001"><command>show &quot;True&quot;</command><error></error></attempt><attempt mode="search" success="true" index="10" line="2" source_state="9" duration_seconds="0.000"><command>
+ </command><error></error></attempt><attempt mode="hammer" success="true" index="11" line="0" source_state="10" duration_seconds="0.677"><command>native Sledgehammer</command><error></error></attempt><attempt mode="reconstruction" success="true" index="12" line="0" source_state="10" duration_seconds="0.000"><command>by satx</command><error></error></attempt><attempt mode="search" success="true" index="13" line="3" source_state="11" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="search" success="true" index="14" line="4" source_state="12" duration_seconds="0.001"><command>qed</command><error></error></attempt><attempt mode="close_scope" success="true" index="15" line="1" source_state="13" duration_seconds="0.010"><command>end</command><error></error></attempt></attempts><settings><param name="resolved_provers">cvc5 verit z3 e spass vampire zipperposition presburger fastforce linarith algebra order metis meson force blast simp satx fast auto argo</param><param name="native_parameters">{abduce = SOME 0, cache_dir = NONE, compress = NONE, debug = false, expect =
+ &quot;&quot;, fact_filter = SOME &quot;mepo&quot;, fact_thresholds = (0.45, 0.85), falsify =
+ SOME false, induction_rules = NONE, instantiate = NONE, isar_proofs =
+ SOME false, lam_trans = NONE, learn = false, max_facts = NONE,
+ max_mono_iters = NONE, max_new_mono_instances = NONE, max_proofs = 4,
+ minimize = true, overlord = false, preplay_timeout = 10.000, provers =
+ [&quot;cvc5&quot;, &quot;verit&quot;, &quot;z3&quot;, &quot;e&quot;, &quot;spass&quot;, &quot;vampire&quot;, &quot;zipperposition&quot;,
+  &quot;presburger&quot;, &quot;fastforce&quot;, &quot;linarith&quot;, &quot;algebra&quot;, &quot;order&quot;, &quot;metis&quot;,
+  &quot;meson&quot;, &quot;force&quot;, &quot;blast&quot;, &quot;simp&quot;, &quot;satx&quot;, &quot;fast&quot;, &quot;auto&quot;, &quot;argo&quot;],
+ slices = 192, smt_proofs = true, spy = false, strict = false, timeout =
+ 40.000, try0 = false, type_enc = NONE, uncurried_aliases = NONE, verbose =
+ false}</param><param name="caller_pide_enabled">true</param><param name="native_messages">satx found a proof...
+satx: Try this: by satx (0.9 ms)
+presburger found a proof...
+presburger: Try this: by presburger (1 ms)
+simp found a proof...
+simp: Try this: by simp (0.3 ms)
+argo found a proof...
+auto found a proof...
+argo: Try this: by argo (0.7 ms)
+auto: Try this: by auto (0.2 ms)
+metis found a proof...
+metis: Try this: by metis (5 ms)
+Done</param><param name="native_outcome">some</param><param name="native_message">Try this: by satx (0.9 ms)</param><param name="preplay_count">0</param><param name="preplayed_count">0</param><param name="preplay_results"></param><param name="reconstruction_source">native_tactic</param><param name="candidate_count">1</param></settings></dsp_result>

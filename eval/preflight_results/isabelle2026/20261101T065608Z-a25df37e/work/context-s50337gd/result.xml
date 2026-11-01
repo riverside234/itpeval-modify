@@ -1,0 +1,68 @@
+<dsp_result schema="dsp_native_result_v1" request_id="68d2be4a154a4e7cb4726754b105a71e" input_sha256="b2508bb7db3e2655f5d132c55f2b3917305c4ba29edda5031c50ba58c2d20d51" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.039"><command>theory limits_uniqueness
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="5" source_state="3" duration_seconds="0.061"><command>locale abs_field =
+  fixes zero    :: &quot;&apos;r&quot;
+    and one     :: &quot;&apos;r&quot;
+    and add     :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;   (infixl &quot;+R&quot; 65)
+    and mul     :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;   (infixl &quot;*R&quot; 70)
+    and opp     :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+    and absV    :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+    and le      :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;  (infix &quot;\&lt;preceq&gt;&quot; 50)
+    and lt      :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;  (infix &quot;\&lt;prec&gt;&quot; 50)
+
+    and natLe   :: &quot;&apos;n \&lt;Rightarrow&gt; &apos;n \&lt;Rightarrow&gt; bool&quot;
+    and natMax  :: &quot;&apos;n \&lt;Rightarrow&gt; &apos;n \&lt;Rightarrow&gt; &apos;n&quot;
+  assumes le_max_left    : &quot;\&lt;And&gt;x y. natLe x (natMax x y)&quot;
+    and   le_max_right   : &quot;\&lt;And&gt;x y. natLe y (natMax x y)&quot;
+    and   add_comm       : &quot;\&lt;And&gt;x y. x +R y = y +R x&quot;
+    and   add_assoc      : &quot;\&lt;And&gt;x y z. (x +R y) +R z = x +R (y +R z)&quot;
+    and   add_zero       : &quot;\&lt;And&gt;x. x +R zero = x&quot;
+    and   add_opp        : &quot;\&lt;And&gt;x. x +R opp x = zero&quot;
+    and   opp_add        : &quot;\&lt;And&gt;x y. opp (x +R y) = opp x +R opp y&quot;
+    and   le_refl        : &quot;\&lt;And&gt;x. x \&lt;preceq&gt; x&quot;
+    and   le_trans       : &quot;\&lt;And&gt;x y z. x \&lt;preceq&gt; y \&lt;Longrightarrow&gt; y \&lt;preceq&gt; z \&lt;Longrightarrow&gt; x \&lt;preceq&gt; z&quot;
+    and   add_le_add     : &quot;\&lt;And&gt;a b c d. a \&lt;preceq&gt; b \&lt;Longrightarrow&gt; c \&lt;preceq&gt; d \&lt;Longrightarrow&gt; a +R c \&lt;preceq&gt; b +R d&quot;
+    and   abs_nonneg     : &quot;\&lt;And&gt;x. zero \&lt;preceq&gt; absV x&quot;
+    and   abs_triangle   : &quot;\&lt;And&gt;x y. absV (x +R y) \&lt;preceq&gt; absV x +R absV y&quot;
+    and   abs_sub_symm   : &quot;\&lt;And&gt;x y. absV (x +R opp y) = absV (y +R opp x)&quot;
+    and   sub_decomp     : &quot;\&lt;And&gt;x y z. x +R opp z = (x +R opp y) +R (y +R opp z)&quot;
+    and   sub_eq_zero    : &quot;\&lt;And&gt;x y. x +R opp y = zero \&lt;Longrightarrow&gt; x = y&quot;
+    and   eq_of_forall_eps2 :
+            &quot;\&lt;And&gt;x. (\&lt;forall&gt;eps. zero \&lt;prec&gt; eps \&lt;longrightarrow&gt; absV x \&lt;preceq&gt; eps +R eps) \&lt;Longrightarrow&gt; x = zero&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="34" source_state="4" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="40" source_state="5" duration_seconds="0.014"><command>definition sub :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+  where &quot;sub x y \&lt;equiv&gt; x +R opp y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="41" source_state="6" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="8" line="43" source_state="7" duration_seconds="0.019"><command>definition limit :: &quot;(&apos;n \&lt;Rightarrow&gt; &apos;r) \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;
+  where &quot;limit u l \&lt;equiv&gt;
+    \&lt;forall&gt;eps. zero \&lt;prec&gt; eps \&lt;longrightarrow&gt;
+      (\&lt;exists&gt;N. \&lt;forall&gt;n. natLe N n \&lt;longrightarrow&gt; absV (sub (u n) l) \&lt;preceq&gt; eps)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="9" line="46" source_state="8" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="10" line="52" source_state="9" duration_seconds="0.006"><command>lemma sub_self_zero: &quot;sub x x = zero&quot;</command><error></error></attempt><attempt mode="context" success="true" index="11" line="52" source_state="10" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="12" line="53" source_state="11" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="13" line="53" source_state="12" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="14" line="54" source_state="13" duration_seconds="0.002"><command>lemma sub_decomp_lem: &quot;sub x z = (sub x y) +R (sub y z)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="15" line="54" source_state="14" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="16" line="55" source_state="15" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="17" line="55" source_state="16" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="56" source_state="17" duration_seconds="0.003"><command>lemma abs_sub_triangle:
+  &quot;absV (sub x z) \&lt;preceq&gt; absV (sub x y) +R absV (sub y z)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="57" source_state="18" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="20" line="58" source_state="19" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="21" line="58" source_state="20" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="59" source_state="21" duration_seconds="0.002"><command>lemma abs_sub_symm_lem: &quot;absV (sub x y) = absV (sub y x)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="23" line="59" source_state="22" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="24" line="60" source_state="23" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="25" line="60" source_state="24" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="26" line="1" source_state="25" duration_seconds="0.001"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="27" line="1" source_state="26" duration_seconds="0.003"><command>theorem limit_unique:
+  assumes Hl: &quot;limit u l&quot; and Hm: &quot;limit u m&quot;
+  shows &quot;l = m&quot;</command><error></error></attempt><attempt mode="target" success="true" index="28" line="3" source_state="27" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

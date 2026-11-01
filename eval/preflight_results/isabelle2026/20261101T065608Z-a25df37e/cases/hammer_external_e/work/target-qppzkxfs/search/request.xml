@@ -1,0 +1,5 @@
+<dsp_request schema="dsp_native_request_v1" request_id="09cccfa669874af78d96430daa3d6236" input_sha256="714d58c6a06e2d5e032eb6ade0c80f1f333b16b064768847a7588f6e4f34ed7d" action="search"><prefix>theory V2Control imports Main begin
+</prefix><statement>lemma v2_control: "True"</statement><proof_prefix /><sketch>proof -
+ show "True"
+ sledgehammer
+qed</sketch><depth>1</depth><target_name>v2_control</target_name><forbidden_names><item>v2_control</item></forbidden_names><heuristics /><provers><item>e</item></provers><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.999054291984</remaining_s></dsp_request>

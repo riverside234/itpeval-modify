@@ -1,0 +1,44 @@
+{
+  "name": "context_hundred-theorems_098_bertrand_s_postulate_bertrand",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 3.097,
+  "details": "details/065-context_hundred-theorems_098_bertrand_s_postulate_bertrand.json",
+  "failure_category": "worker_failure",
+  "expected_failure": null,
+  "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-c3mdntwc/build.log\n*** Bad imports session \"Pratt_Certificate\" for \"DSP_Job_8e8c341b785e4839b631e6cc350556d6\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-c3mdntwc/ROOT\")",
+  "payload": {
+    "ok": false,
+    "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-c3mdntwc/build.log\n*** Bad imports session \"Pratt_Certificate\" for \"DSP_Job_8e8c341b785e4839b631e6cc350556d6\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-c3mdntwc/ROOT\")",
+    "failure_category": "worker_failure",
+    "build_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-c3mdntwc/build.log",
+    "build_returncode": 2,
+    "build_log_excerpt": "*** Bad imports session \"Pratt_Certificate\" for \"DSP_Job_8e8c341b785e4839b631e6cc350556d6\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-c3mdntwc/ROOT\")",
+    "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-c3mdntwc",
+    "import_resolution": {
+      "original_imports": [
+        "Complex_Main",
+        "HOL-Number_Theory.Number_Theory",
+        "HOL-Library.Discrete_Functions",
+        "HOL-Decision_Procs.Approximation_Bounds",
+        "HOL-Library.Code_Target_Numeral",
+        "Pratt_Certificate.Pratt_Certificate"
+      ],
+      "resolved_imports": [
+        "Complex_Main",
+        "HOL-Number_Theory.Number_Theory",
+        "HOL-Library.Discrete_Functions",
+        "HOL-Decision_Procs.Approximation_Bounds",
+        "HOL-Library.Code_Target_Numeral",
+        "Pratt_Certificate.Pratt_Certificate"
+      ],
+      "session_dependencies": [
+        "HOL-Number_Theory",
+        "HOL-Library",
+        "HOL-Decision_Procs",
+        "Pratt_Certificate"
+      ]
+    },
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-c3mdntwc"
+  }
+}

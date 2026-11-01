@@ -1,0 +1,148 @@
+<dsp_result schema="dsp_native_result_v1" request_id="b8534b41d7704a6f847026bd2256111f" input_sha256="f81f0160e67fbf8d86a700a12d36eaa1ea3de6f7eeb7139dffa7cb0e1c252fb2" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.039"><command>theory integral_comp_neg_Iic
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="5" source_state="3" duration_seconds="0.101"><command>locale integrals_setup =
+  fixes zero one  :: &quot;&apos;r&quot;
+    and add       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;   (infixl &quot;+R&quot; 65)
+    and opp       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+    and mul       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;   (infixl &quot;*R&quot; 70)
+    and leR       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;  (infix &quot;\&lt;le&gt;R&quot; 50)
+    and ltR       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;  (infix &quot;&lt;R&quot; 50)
+    and absR      :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+    and sigma     :: &quot;(&apos;r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; (&apos;r \&lt;Rightarrow&gt; &apos;r) \&lt;Rightarrow&gt; &apos;r&quot;
+
+  assumes
+    add_comm      : &quot;\&lt;And&gt;x y.   x +R y = y +R x&quot;
+    and add_assoc : &quot;\&lt;And&gt;x y z. (x +R y) +R z = x +R (y +R z)&quot;
+    and add_zero  : &quot;\&lt;And&gt;x.     x +R zero = x&quot;
+    and add_opp   : &quot;\&lt;And&gt;x.     opp x +R x = zero&quot;
+    and add_right_cancel : &quot;\&lt;And&gt;x y z. x +R z = y +R z \&lt;Longrightarrow&gt; x = y&quot;
+    and mul_comm  : &quot;\&lt;And&gt;x y.   x *R y = y *R x&quot;
+    and mul_assoc : &quot;\&lt;And&gt;x y z. (x *R y) *R z = x *R (y *R z)&quot;
+    and mul_one   : &quot;\&lt;And&gt;x.     x *R one = x&quot;
+    and dist_l    : &quot;\&lt;And&gt;x y z. x *R (y +R z) = (x *R y) +R (x *R z)&quot;
+    and opp_inv   : &quot;\&lt;And&gt;x.     opp (opp x) = x&quot;
+    and add_le_compat : &quot;\&lt;And&gt;x y z. x \&lt;le&gt;R y \&lt;Longrightarrow&gt; (x +R z) \&lt;le&gt;R (y +R z)&quot;
+    and le_opp    : &quot;\&lt;And&gt;x y.   x \&lt;le&gt;R y \&lt;Longrightarrow&gt; opp y \&lt;le&gt;R opp x&quot;
+    and le_antisymm : &quot;\&lt;And&gt;x y. x \&lt;le&gt;R y \&lt;Longrightarrow&gt; y \&lt;le&gt;R x \&lt;Longrightarrow&gt; x = y&quot;
+    and lt_opp    : &quot;\&lt;And&gt;x y.   x &lt;R y \&lt;Longrightarrow&gt; opp y &lt;R opp x&quot;
+    and le_refl   : &quot;\&lt;And&gt;x.     x \&lt;le&gt;R x&quot;
+    and le_trans  : &quot;\&lt;And&gt;x y z. x \&lt;le&gt;R y \&lt;Longrightarrow&gt; y \&lt;le&gt;R z \&lt;Longrightarrow&gt; x \&lt;le&gt;R z&quot;
+    and le_total  : &quot;\&lt;And&gt;x y.   x \&lt;le&gt;R y \&lt;or&gt; y \&lt;le&gt;R x&quot;
+    and lt_def    : &quot;\&lt;And&gt;x y.   (x &lt;R y) \&lt;longleftrightarrow&gt; (x \&lt;le&gt;R y \&lt;and&gt; x \&lt;noteq&gt; y)&quot;
+    and abs_pos   : &quot;\&lt;And&gt;x.     zero \&lt;le&gt;R x \&lt;Longrightarrow&gt; absR x = x&quot;
+    and abs_neg   : &quot;\&lt;And&gt;x.     x \&lt;le&gt;R zero \&lt;Longrightarrow&gt; absR x = opp x&quot;
+    and abs_nonneg : &quot;\&lt;And&gt;x.    zero \&lt;le&gt;R absR x&quot;
+    and abs_opp   : &quot;\&lt;And&gt;x.     absR (opp x) = absR x&quot;
+    and abs_triangle : &quot;\&lt;And&gt;x y. absR (x +R y) \&lt;le&gt;R (absR x +R absR y)&quot;
+
+    and sigma_mul_const : &quot;\&lt;And&gt;D f c. sigma D (\&lt;lambda&gt;x. c *R f x) = c *R sigma D f&quot;
+    and sigma_congr : &quot;\&lt;And&gt;D f g. (\&lt;forall&gt;x. D x \&lt;longrightarrow&gt; f x = g x) \&lt;Longrightarrow&gt; sigma D f = sigma D g&quot;
+    and sigma_zero  : &quot;\&lt;And&gt;D.     sigma D (\&lt;lambda&gt;_. zero) = zero&quot;
+    and sigma_add   : &quot;\&lt;And&gt;D f g. sigma D (\&lt;lambda&gt;x. f x +R g x) = sigma D f +R sigma D g&quot;
+    and sigma_union_disjoint :
+          &quot;\&lt;And&gt;D E f. (\&lt;forall&gt;x. D x \&lt;longrightarrow&gt; E x \&lt;longrightarrow&gt; False) \&lt;Longrightarrow&gt;
+            sigma (\&lt;lambda&gt;x. D x \&lt;or&gt; E x) f = sigma D f +R sigma E f&quot;
+    and sigma_le    : &quot;\&lt;And&gt;D f g. (\&lt;forall&gt;x. D x \&lt;longrightarrow&gt; f x \&lt;le&gt;R g x) \&lt;Longrightarrow&gt; sigma D f \&lt;le&gt;R sigma D g&quot;
+    and sigma_dom_congr :
+          &quot;\&lt;And&gt;D E f. (\&lt;forall&gt;x. D x \&lt;longleftrightarrow&gt; E x) \&lt;Longrightarrow&gt; sigma D f = sigma E f&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="50" source_state="4" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="56" source_state="5" duration_seconds="0.010"><command>definition Iic :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot; where &quot;Iic c x \&lt;equiv&gt; x \&lt;le&gt;R c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="56" source_state="6" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="8" line="57" source_state="7" duration_seconds="0.010"><command>definition Ioi :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot; where &quot;Ioi c x \&lt;equiv&gt; c &lt;R x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="9" line="57" source_state="8" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="10" line="58" source_state="9" duration_seconds="0.009"><command>definition Iio :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot; where &quot;Iio c x \&lt;equiv&gt; x &lt;R c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="11" line="58" source_state="10" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="12" line="60" source_state="11" duration_seconds="0.009"><command>definition preimage :: &quot;(&apos;r \&lt;Rightarrow&gt; &apos;r) \&lt;Rightarrow&gt; (&apos;r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;
+  where &quot;preimage g D x \&lt;equiv&gt; D (g x)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="13" line="61" source_state="12" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="14" line="67" source_state="13" duration_seconds="0.004"><command>lemma add_opp_r: &quot;x +R opp x = zero&quot;</command><error></error></attempt><attempt mode="context" success="true" index="15" line="67" source_state="14" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="16" line="68" source_state="15" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="17" line="68" source_state="16" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="73" source_state="17" duration_seconds="0.001"><command>lemma lt_irrefl: &quot;\&lt;not&gt; (x &lt;R x)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="73" source_state="18" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="20" line="74" source_state="19" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="21" line="74" source_state="20" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="75" source_state="21" duration_seconds="0.001"><command>lemma lt_trans_strict: &quot;x &lt;R y \&lt;Longrightarrow&gt; y &lt;R z \&lt;Longrightarrow&gt; x &lt;R z&quot;</command><error></error></attempt><attempt mode="context" success="true" index="23" line="75" source_state="22" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="24" line="76" source_state="23" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="25" line="76" source_state="24" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="26" line="81" source_state="25" duration_seconds="0.002"><command>lemma preimage_union:
+  &quot;preimage g (\&lt;lambda&gt;x. D x \&lt;or&gt; E x) x \&lt;longleftrightarrow&gt; preimage g D x \&lt;or&gt; preimage g E x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="27" line="82" source_state="26" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="28" line="83" source_state="27" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="29" line="83" source_state="28" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="30" line="84" source_state="29" duration_seconds="0.002"><command>lemma preimage_inter:
+  &quot;preimage g (\&lt;lambda&gt;x. D x \&lt;and&gt; E x) x \&lt;longleftrightarrow&gt; preimage g D x \&lt;and&gt; preimage g E x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="31" line="85" source_state="30" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="32" line="86" source_state="31" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="33" line="86" source_state="32" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="34" line="87" source_state="33" duration_seconds="0.002"><command>lemma preimage_neg_Ioi: &quot;preimage opp (Ioi c) x \&lt;longleftrightarrow&gt; x &lt;R opp c&quot;</command><error></error></attempt><attempt mode="context" success="true" index="35" line="87" source_state="34" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="36" line="88" source_state="35" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="37" line="88" source_state="36" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="38" line="89" source_state="37" duration_seconds="0.002"><command>lemma preimage_neg_Iic: &quot;preimage opp (Iic c) x \&lt;longleftrightarrow&gt; opp c \&lt;le&gt;R x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="39" line="89" source_state="38" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="40" line="90" source_state="39" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="41" line="90" source_state="40" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="42" line="91" source_state="41" duration_seconds="0.002"><command>lemma preimage_comp:
+  &quot;preimage g (preimage h D) x \&lt;longleftrightarrow&gt; preimage (\&lt;lambda&gt;x. h (g x)) D x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="43" line="92" source_state="42" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="44" line="93" source_state="43" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="45" line="93" source_state="44" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="46" line="98" source_state="45" duration_seconds="0.002"><command>lemma integral_neg: &quot;sigma D (\&lt;lambda&gt;x. opp (f x)) = opp (sigma D f)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="47" line="98" source_state="46" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="48" line="99" source_state="47" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="49" line="99" source_state="48" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="50" line="100" source_state="49" duration_seconds="0.003"><command>lemma integral_sub:
+  &quot;sigma D (\&lt;lambda&gt;x. f x +R opp (g x)) = sigma D f +R opp (sigma D g)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="51" line="101" source_state="50" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="52" line="102" source_state="51" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="53" line="102" source_state="52" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="54" line="107" source_state="53" duration_seconds="0.001"><command>lemma sigma_empty: &quot;sigma (\&lt;lambda&gt;_. False) f = zero&quot;</command><error></error></attempt><attempt mode="context" success="true" index="55" line="107" source_state="54" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="56" line="108" source_state="55" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="57" line="108" source_state="56" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="58" line="113" source_state="57" duration_seconds="0.002"><command>lemma sigma_bilinear:
+  &quot;sigma D (\&lt;lambda&gt;x. (c *R f x) +R (d *R g x)) =
+   (c *R sigma D f) +R (d *R sigma D g)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="59" line="115" source_state="58" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="60" line="116" source_state="59" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="61" line="116" source_state="60" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="62" line="121" source_state="61" duration_seconds="0.002"><command>lemma sigma_le_monotone:
+  &quot;(\&lt;forall&gt;x. D x \&lt;longrightarrow&gt; f x \&lt;le&gt;R g x) \&lt;Longrightarrow&gt; sigma D f \&lt;le&gt;R sigma D g&quot;</command><error></error></attempt><attempt mode="context" success="true" index="63" line="122" source_state="62" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="64" line="123" source_state="63" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="65" line="123" source_state="64" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="66" line="124" source_state="65" duration_seconds="0.001"><command>lemma sigma_nonneg:
+  &quot;(\&lt;forall&gt;x. D x \&lt;longrightarrow&gt; zero \&lt;le&gt;R f x) \&lt;Longrightarrow&gt; zero \&lt;le&gt;R sigma D f&quot;</command><error></error></attempt><attempt mode="context" success="true" index="67" line="125" source_state="66" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="68" line="126" source_state="67" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="69" line="126" source_state="68" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="70" line="131" source_state="69" duration_seconds="0.002"><command>lemma sigma_split:
+  &quot;sigma D f =
+   sigma (\&lt;lambda&gt;x. D x \&lt;and&gt; P x) f +R sigma (\&lt;lambda&gt;x. D x \&lt;and&gt; \&lt;not&gt; P x) f&quot;</command><error></error></attempt><attempt mode="context" success="true" index="71" line="133" source_state="70" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="72" line="134" source_state="71" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="73" line="134" source_state="72" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="74" line="139" source_state="73" duration_seconds="0.002"><command>lemma sigma_preimage_neg_Ioi:
+  &quot;sigma (preimage opp (Ioi c)) f = sigma (Iio (opp c)) f&quot;</command><error></error></attempt><attempt mode="context" success="true" index="75" line="140" source_state="74" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="76" line="141" source_state="75" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="77" line="141" source_state="76" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="78" line="1" source_state="77" duration_seconds="0.001"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="79" line="1" source_state="78" duration_seconds="0.002"><command>lemma sigma_abs_bound:
+  &quot;absR (sigma D f) \&lt;le&gt;R sigma D (\&lt;lambda&gt;x. absR (f x))&quot;</command><error></error></attempt><attempt mode="target" success="true" index="80" line="2" source_state="79" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

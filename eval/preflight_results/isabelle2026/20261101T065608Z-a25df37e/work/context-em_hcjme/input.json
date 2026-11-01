@@ -1,0 +1,25 @@
+{
+  "request_id": "ac83afe6c42e4bafaf88ed225fc20309",
+  "action": "context",
+  "prefix": "theory circle_average\n  imports Main\nbegin\n\nlocale circle_average_setup =\n  fixes zero     :: \"'r\"\n    and add      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"     (infixl \"+C\" 65)\n    and integral :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> 'r\"\n  assumes add_zero      : \"\\<And>x. x +C zero = x\"\n    and   add_comm      : \"\\<And>x y. x +C y = y +C x\"\n    and   add_assoc     : \"\\<And>x y z. (x +C y) +C z = x +C (y +C z)\"\n    and   integral_ext  : \"\\<And>g h. (\\<forall>\\<theta>. g \\<theta> = h \\<theta>) \\<Longrightarrow> integral g = integral h\"\n    and   integral_const: \"\\<And>c. integral (\\<lambda>_. c) = c\"\n    and   integral_add  : \"\\<And>f g. integral (\\<lambda>\\<theta>. f \\<theta> +C g \\<theta>) = integral f +C integral g\"\n    and   integral_shift: \"\\<And>f c. integral (\\<lambda>\\<theta>. f (\\<theta> +C c)) = integral f\"\nbegin\n\n\n\n\n\ndefinition circleMap :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"circleMap c \\<theta> \\<equiv> \\<theta> +C c\"\n\ndefinition circleAverage :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"circleAverage f c \\<equiv> integral (\\<lambda>\\<theta>. f (circleMap c \\<theta>))\"\n\n\n\n\n\nlemma circleMap_zero: \"circleMap zero \\<theta> = \\<theta>\"\n  sorry\nlemma circleAverage_zero: \"circleAverage f zero = integral f\"\n  sorry\nlemma circleAverage_add:\n  \"circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage f c +C circleAverage g c\"\n  sorry\nlemma circleAverage_fun_add:\n  \"circleAverage (\\<lambda>z. f (z +C c)) zero = circleAverage f c\"\n  sorry\nlemma circleMap_add:\n  \"circleMap (c +C d) \\<theta> = circleMap c (circleMap d \\<theta>)\"\n  sorry\nlemma circleAverage_shift:\n  \"circleAverage f (c +C d) = circleAverage (\\<lambda>z. f (z +C d)) c\"\n  sorry\nlemma circleAverage_const:\n  \"circleAverage (\\<lambda>_. k) c = k\"\n  sorry\nlemma circleAverage_add_const:\n  \"circleAverage (\\<lambda>z. f z +C k) c = circleAverage f c +C k\"\n  sorry\nlemma circleAverage_comm_add:\n  \"circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage (\\<lambda>z. g z +C f z) c\"\n  sorry\nlemma circleAverage_add_assoc:\n  \"circleAverage (\\<lambda>z. (f z +C g z) +C h z) c =\n   circleAverage f c +C (circleAverage g c +C circleAverage h c)\"\n  sorry\nlemma circleAverage_center_comm:\n  \"circleAverage f (c +C d) = circleAverage f (d +C c)\"\n  sorry\n",
+  "statement": "lemma circleAverage_center_independent:\n  \"circleAverage f c = integral f\"",
+  "proof_prefix": "",
+  "sketch": "",
+  "depth": "2",
+  "target_name": "circleAverage_center_independent",
+  "forbidden_names": [
+    "circleAverage_center_independent",
+    "circleAverage_center_eq",
+    "circleAverage_idempotent",
+    "circleAverage_of_zero_integral",
+    "circleAverage_linear",
+    "circleAverage_shift_commute"
+  ],
+  "heuristics": [],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9983352919808",
+  "input_sha256": "eb7379c0e81de7c4b2e37f403479d7096580f3144c6be7f993e4679962d86ef0"
+}

@@ -1,0 +1,286 @@
+<dsp_request schema="dsp_native_request_v1" request_id="cce263f8e2204d0eb5413ee8833c2e1f" input_sha256="d265a0d2e7a48182db0221e34e85bef3e2ef29566a09300bc948ff6cbfe69f21" action="context"><prefix>(* Author: Lukas Bulwahn &lt;lukas.bulwahn-at-gmail.com&gt; *)
+
+section \&lt;open&gt;Ptolemy's Theorem\&lt;close&gt;
+
+theory Ptolemys_Theorem
+imports
+  "HOL-Analysis.Multivariate_Analysis"
+begin
+
+subsection \&lt;open&gt;Preliminaries\&lt;close&gt;
+
+subsubsection \&lt;open&gt;Additions to Rat theory\&lt;close&gt;
+
+hide_const (open) normalize
+
+subsubsection \&lt;open&gt;Additions to Transcendental theory\&lt;close&gt;
+
+text \&lt;open&gt;
+Lemmas about @{const arcsin} and @{const arccos} commonly involve to show that their argument is
+in the domain of those partial functions, i.e., the argument @{term y} is between @{term "-1::real"}
+and @{term "1::real"}.
+As the argumentation for @{term "(-1::real) \&lt;le&gt; y"} and @{term "y \&lt;le&gt; (1::real)"} is often very similar,
+we prefer to prove @{term "\&lt;bar&gt;y\&lt;bar&gt; \&lt;le&gt; (1::real)"} to the two goals above.
+
+The lemma for rewriting the term @{term "cos (arccos y)"} is already provided in the Isabelle
+distribution with name @{thm [source] cos_arccos_abs}. Here, we further provide the analogue on
+@{term "arcsin"} for rewriting @{term "sin (arcsin y)"}.
+\&lt;close&gt;
+
+lemma sin_arcsin_abs: "\&lt;bar&gt;y\&lt;bar&gt; \&lt;le&gt; 1 \&lt;Longrightarrow&gt; sin (arcsin y) = y"
+  
+  sorry
+
+
+text \&lt;open&gt;
+The further lemmas are the required variants from existing lemmas @{thm [source] arccos_lbound}
+and @{thm [source] arccos_ubound}.
+\&lt;close&gt;
+
+lemma arccos_lbound_abs [simp]:
+  "\&lt;bar&gt;y\&lt;bar&gt; \&lt;le&gt; 1 \&lt;Longrightarrow&gt; 0 \&lt;le&gt; arccos y"
+  
+  sorry
+
+
+lemma arccos_ubound_abs [simp]:
+  "\&lt;bar&gt;y\&lt;bar&gt; \&lt;le&gt; 1 \&lt;Longrightarrow&gt; arccos y \&lt;le&gt; pi"
+  
+  sorry
+
+
+text \&lt;open&gt;
+As we choose angles to be between @{term "0::real"} between @{term "2 * pi"},
+we need some lemmas to reason about the sign of @{term "sin x"}
+for angles @{term "x"}.
+\&lt;close&gt;
+
+lemma sin_ge_zero_iff:
+  assumes "0 \&lt;le&gt; x" "x &lt; 2 * pi"
+  shows "0 \&lt;le&gt; sin x \&lt;longleftrightarrow&gt; x \&lt;le&gt; pi"
+  
+  sorry
+
+
+lemma sin_less_zero_iff:
+  assumes "0 \&lt;le&gt; x" "x &lt; 2 * pi"
+  shows "sin x &lt; 0 \&lt;longleftrightarrow&gt; pi &lt; x"
+  
+  sorry
+
+
+subsubsection \&lt;open&gt;Addition to Finite-Cartesian-Product theory\&lt;close&gt;
+
+text \&lt;open&gt;
+Here follow generally useful additions and specialised equations
+for two-dimensional real-valued vectors.
+\&lt;close&gt;
+
+lemma axis_nth_eq_0 [simp]:
+  assumes "i \&lt;noteq&gt; j"
+  shows "axis i x $ j = 0"
+  
+  sorry
+
+
+lemma norm_axis:
+  fixes x :: real
+  shows "norm (axis i x) = abs x"
+  
+  sorry
+
+
+lemma norm_eq_on_real_2_vec:
+  fixes x :: "real ^ 2"
+  shows "norm x = sqrt ((x $ 1) ^ 2 + (x $ 2) ^ 2)"
+  
+  sorry
+
+
+lemma dist_eq_on_real_2_vec:
+  fixes a b :: "real ^ 2"
+  shows "dist a b = sqrt ((a $ 1 - b $ 1) ^ 2 + (a $ 2 - b $ 2) ^ 2)"
+  
+  sorry
+
+
+subsection \&lt;open&gt;Polar Form of Two-Dimensional Real-Valued Vectors\&lt;close&gt;
+
+subsubsection \&lt;open&gt;Definitions to Transfer to Polar Form and Back\&lt;close&gt;
+
+definition of_radiant :: "real \&lt;Rightarrow&gt; real ^ 2"
+where
+  "of_radiant \&lt;omega&gt; = axis 1 (cos \&lt;omega&gt;) + axis 2 (sin \&lt;omega&gt;)"
+
+definition normalize :: "real ^ 2 \&lt;Rightarrow&gt; real ^ 2"
+where
+  "normalize p = (if p = 0 then axis 1 1 else (1 / norm p) *\&lt;^sub&gt;R p)"
+
+definition radiant_of :: "real ^ 2 \&lt;Rightarrow&gt; real"
+where
+  "radiant_of p = (THE \&lt;omega&gt;. 0 \&lt;le&gt; \&lt;omega&gt; \&lt;and&gt; \&lt;omega&gt; &lt; 2 * pi \&lt;and&gt; of_radiant \&lt;omega&gt; = normalize p)"
+
+text \&lt;open&gt;
+The vector @{term "of_radiant \&lt;omega&gt;"} is the vector with length @{term "1::real"} and angle @{term "\&lt;omega&gt;"}
+to the first axis.
+We normalize vectors to length @{term "1::real"} keeping their orientation with the normalize function.
+Conversely, @{term "radiant_of p"} is the angle of vector @{term p} to the first axis, where we
+choose @{term "radiant_of"} to return angles between @{term "0::real"} and @{term "2 * pi"},
+following the usual high-school convention.
+With these definitions, we can express the main result
+@{term "norm p *\&lt;^sub&gt;R of_radiant (radiant_of p) = p"}.
+Note that the main result holds for any definition of @{term "radiant_of 0"}.
+So, we choose to define @{term "normalize 0"} and @{term "radiant_of 0"}, such that
+@{term "radiant_of 0 = 0"}.
+\&lt;close&gt;
+
+subsubsection \&lt;open&gt;Lemmas on @{const of_radiant}\&lt;close&gt;
+
+lemma nth_of_radiant_1 [simp]:
+  "of_radiant \&lt;omega&gt; $ 1 = cos \&lt;omega&gt;"
+  
+  sorry
+
+
+lemma nth_of_radiant_2 [simp]:
+  "of_radiant \&lt;omega&gt; $ 2 = sin \&lt;omega&gt;"
+  
+  sorry
+
+
+lemma norm_of_radiant:
+  "norm (of_radiant \&lt;omega&gt;) = 1"
+  
+  sorry
+
+
+lemma of_radiant_plus_2pi:
+  "of_radiant (\&lt;omega&gt; + 2 * pi) = of_radiant \&lt;omega&gt;"
+  
+  sorry
+
+
+lemma of_radiant_minus_2pi:
+  "of_radiant (\&lt;omega&gt; - 2 * pi) = of_radiant \&lt;omega&gt;"
+  
+  sorry
+
+
+subsubsection \&lt;open&gt;Lemmas on @{const normalize}\&lt;close&gt;
+
+lemma normalize_eq:
+  "norm p *\&lt;^sub&gt;R normalize p = p"
+  
+  sorry
+
+
+lemma norm_normalize:
+  "norm (normalize p) = 1"
+  
+  sorry
+
+
+lemma nth_normalize [simp]:
+  "\&lt;bar&gt;normalize p $ i\&lt;bar&gt; \&lt;le&gt; 1"
+  
+  sorry
+
+
+lemma normalize_square:
+  "(normalize p $ 1)\&lt;^sup&gt;2 + (normalize p $ 2)\&lt;^sup&gt;2 = 1"
+  
+  sorry
+
+
+lemma nth_normalize_ge_zero_iff:
+  "0 \&lt;le&gt; normalize p $ i \&lt;longleftrightarrow&gt; 0 \&lt;le&gt; p $ i"
+  
+  sorry
+
+
+lemma nth_normalize_less_zero_iff:
+  "normalize p $ i &lt; 0 \&lt;longleftrightarrow&gt; p $ i &lt; 0"
+  
+  sorry
+
+
+lemma normalize_boundary_iff:
+  "\&lt;bar&gt;normalize p $ 1\&lt;bar&gt; = 1 \&lt;longleftrightarrow&gt; p $ 2 = 0"
+  
+  sorry
+
+
+lemma between_normalize_if_distant_from_0:
+  assumes "norm p \&lt;ge&gt; 1"
+  shows "between (0, p) (normalize p)"
+  
+  sorry
+
+
+lemma between_normalize_if_near_0:
+  assumes "norm p \&lt;le&gt; 1"
+  shows "between (0, normalize p) p"
+  
+  sorry
+
+
+subsubsection \&lt;open&gt;Lemmas on @{const radiant_of}\&lt;close&gt;
+
+lemma radiant_of:
+  "0 \&lt;le&gt; radiant_of p \&lt;and&gt; radiant_of p &lt; 2 * pi \&lt;and&gt; of_radiant (radiant_of p) = normalize p"
+  
+  sorry
+
+
+lemma radiant_of_bounds [simp]:
+  "0 \&lt;le&gt; radiant_of p" "radiant_of p &lt; 2 * pi"
+  
+  sorry
+
+
+lemma radiant_of_weak_ubound [simp]:
+  "radiant_of p \&lt;le&gt; 2 * pi"
+  
+  sorry
+
+
+subsubsection \&lt;open&gt;Main Equations for Transforming to Polar Form\&lt;close&gt;
+
+lemma polar_form_eq:
+  "norm p *\&lt;^sub&gt;R of_radiant (radiant_of p) = p"
+  
+  sorry
+
+
+lemma relative_polar_form_eq:
+  "Q + dist P Q *\&lt;^sub&gt;R of_radiant (radiant_of (P - Q)) = P"
+  
+  sorry
+
+
+subsection \&lt;open&gt;Ptolemy's Theorem\&lt;close&gt;
+
+lemma dist_circle_segment:
+  assumes "0 \&lt;le&gt; radius" "0 \&lt;le&gt; \&lt;alpha&gt;" "\&lt;alpha&gt; \&lt;le&gt; \&lt;beta&gt;" "\&lt;beta&gt; \&lt;le&gt; 2 * pi"
+  shows "dist (center + radius *\&lt;^sub&gt;R of_radiant \&lt;alpha&gt;) (center + radius *\&lt;^sub&gt;R of_radiant \&lt;beta&gt;) = 2 * radius * sin ((\&lt;beta&gt; - \&lt;alpha&gt;) / 2)"
+    (is "?lhs = ?rhs")
+  
+  sorry
+
+
+theorem ptolemy_trigonometric:
+  fixes \&lt;omega&gt;\&lt;^sub&gt;1 \&lt;omega&gt;\&lt;^sub&gt;2 \&lt;omega&gt;\&lt;^sub&gt;3 :: real
+  shows "sin (\&lt;omega&gt;\&lt;^sub&gt;1 + \&lt;omega&gt;\&lt;^sub&gt;2) * sin (\&lt;omega&gt;\&lt;^sub&gt;2 + \&lt;omega&gt;\&lt;^sub&gt;3) = sin \&lt;omega&gt;\&lt;^sub&gt;1 * sin \&lt;omega&gt;\&lt;^sub&gt;3 + sin \&lt;omega&gt;\&lt;^sub&gt;2 * sin (\&lt;omega&gt;\&lt;^sub&gt;1 + \&lt;omega&gt;\&lt;^sub&gt;2 + \&lt;omega&gt;\&lt;^sub&gt;3)"
+  
+  sorry
+
+
+</prefix><statement>theorem ptolemy:
+  fixes A B C D center :: "real ^ 2"
+  assumes "dist center A = radius" and "dist center B = radius"
+  assumes "dist center C = radius" and "dist center D = radius"
+  assumes ordering_of_points:
+    "radiant_of (A - center) \&lt;le&gt; radiant_of (B - center)"
+    "radiant_of (B - center) \&lt;le&gt; radiant_of (C - center)"
+    "radiant_of (C - center) \&lt;le&gt; radiant_of (D - center)"
+  shows "dist A C * dist B D = dist A B * dist C D + dist A D * dist B C"</statement><proof_prefix /><sketch /><depth>1</depth><target_name>ptolemy</target_name><forbidden_names><item>ptolemy</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9967888609972</remaining_s></dsp_request>

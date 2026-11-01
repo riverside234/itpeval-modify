@@ -1,0 +1,17 @@
+[
+  "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/bin/isabelle",
+  "build",
+  "-j",
+  "1",
+  "-o",
+  "document=false",
+  "-o",
+  "parallel_proofs=0",
+  "-o",
+  "timeout_scale=1.0",
+  "-o",
+  "threads=4",
+  "-d",
+  "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/cases/hammer_native_tactic/work/target-_6k5pbf5/replay",
+  "DSP_Replay_7e4db1f884a54d7393879ff4f7bd9095"
+]

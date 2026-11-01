@@ -1,0 +1,359 @@
+<dsp_request schema="dsp_native_request_v1" request_id="0a49d92abdab46c6b199f902f622cbfd" input_sha256="69f47c85b5f84255d1f3b954f34888003bc3090c1813897092d7d3e666627414" action="context"><prefix>(*  Title:      HOL/Analysis/Inner_Product.thy
+    Author:     Brian Huffman
+*)
+
+section \&lt;open&gt;Inner Product Spaces and Gradient Derivative\&lt;close&gt;
+
+theory Inner_Product
+imports Complex_Main
+begin
+
+subsection \&lt;open&gt;Real inner product spaces\&lt;close&gt;
+
+text \&lt;open&gt;
+  Temporarily relax type constraints for \&lt;^term&gt;\&lt;open&gt;open\&lt;close&gt;, \&lt;^term&gt;\&lt;open&gt;uniformity\&lt;close&gt;,
+  \&lt;^term&gt;\&lt;open&gt;dist\&lt;close&gt;, and \&lt;^term&gt;\&lt;open&gt;norm\&lt;close&gt;.
+\&lt;close&gt;
+
+setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;open\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;'a::open set \&lt;Rightarrow&gt; bool\&lt;close&gt;)\&lt;close&gt;
+
+setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;dist\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;'a::dist \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; real\&lt;close&gt;)\&lt;close&gt;
+
+setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;uniformity\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;('a::uniformity \&lt;times&gt; 'a) filter\&lt;close&gt;)\&lt;close&gt;
+
+setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;norm\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;'a::norm \&lt;Rightarrow&gt; real\&lt;close&gt;)\&lt;close&gt;
+
+class real_inner = real_vector + sgn_div_norm + dist_norm + uniformity_dist + open_uniformity +
+  fixes inner :: "'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; real"
+  assumes inner_commute: "inner x y = inner y x"
+  and inner_add_left: "inner (x + y) z = inner x z + inner y z"
+  and inner_scaleR_left [simp]: "inner (scaleR r x) y = r * (inner x y)"
+  and inner_ge_zero [simp]: "0 \&lt;le&gt; inner x x"
+  and inner_eq_zero_iff [simp]: "inner x x = 0 \&lt;longleftrightarrow&gt; x = 0"
+  and norm_eq_sqrt_inner: "norm x = sqrt (inner x x)"
+begin
+
+lemma inner_zero_left [simp]: "inner 0 x = 0"
+  
+  sorry
+
+
+lemma inner_minus_left [simp]: "inner (- x) y = - inner x y"
+  
+  sorry
+
+
+lemma inner_diff_left: "inner (x - y) z = inner x z - inner y z"
+  
+  sorry
+
+
+lemma inner_sum_left: "inner (\&lt;Sum&gt;x\&lt;in&gt;A. f x) y = (\&lt;Sum&gt;x\&lt;in&gt;A. inner (f x) y)"
+  
+  sorry
+
+
+lemma all_zero_iff [simp]: "(\&lt;forall&gt;u. inner x u = 0) \&lt;longleftrightarrow&gt; (x = 0)"
+  
+  sorry
+
+
+text \&lt;open&gt;Transfer distributivity rules to right argument.\&lt;close&gt;
+
+lemma inner_add_right: "inner x (y + z) = inner x y + inner x z"
+  
+  sorry
+
+
+lemma inner_scaleR_right [simp]: "inner x (scaleR r y) = r * (inner x y)"
+  
+  sorry
+
+
+lemma inner_zero_right [simp]: "inner x 0 = 0"
+  
+  sorry
+
+
+lemma inner_minus_right [simp]: "inner x (- y) = - inner x y"
+  
+  sorry
+
+
+lemma inner_diff_right: "inner x (y - z) = inner x y - inner x z"
+  
+  sorry
+
+
+lemma inner_sum_right: "inner x (\&lt;Sum&gt;y\&lt;in&gt;A. f y) = (\&lt;Sum&gt;y\&lt;in&gt;A. inner x (f y))"
+  
+  sorry
+
+
+lemmas inner_add [algebra_simps] = inner_add_left inner_add_right
+lemmas inner_diff [algebra_simps]  = inner_diff_left inner_diff_right
+lemmas inner_scaleR = inner_scaleR_left inner_scaleR_right
+
+text \&lt;open&gt;Legacy theorem names\&lt;close&gt;
+lemmas inner_left_distrib = inner_add_left
+lemmas inner_right_distrib = inner_add_right
+lemmas inner_distrib = inner_left_distrib inner_right_distrib
+
+lemma inner_gt_zero_iff [simp]: "0 &lt; inner x x \&lt;longleftrightarrow&gt; x \&lt;noteq&gt; 0"
+  
+  sorry
+
+
+lemma power2_norm_eq_inner: "(norm x)\&lt;^sup&gt;2 = inner x x"
+  
+  sorry
+
+
+lemma dot_square_norm: "inner x x = (norm x)\&lt;^sup&gt;2"
+  
+  sorry
+
+
+text \&lt;open&gt;Identities involving real multiplication and division.\&lt;close&gt;
+
+lemma inner_mult_left: "inner (of_real m * a) b = m * (inner a b)"
+  
+  sorry
+
+
+lemma inner_mult_right: "inner a (of_real m * b) = m * (inner a b)"
+  
+  sorry
+
+
+lemma inner_mult_left': "inner (a * of_real m) b = m * (inner a b)"
+  
+  sorry
+
+
+lemma inner_mult_right': "inner a (b * of_real m) = (inner a b) * m"
+  
+  sorry
+
+
+lemma Cauchy_Schwarz_ineq:
+  "(inner x y)\&lt;^sup&gt;2 \&lt;le&gt; inner x x * inner y y"
+  
+  sorry
+
+
+lemma Cauchy_Schwarz_ineq2:
+  "\&lt;bar&gt;inner x y\&lt;bar&gt; \&lt;le&gt; norm x * norm y"
+  
+  sorry
+
+
+lemma norm_cauchy_schwarz: "inner x y \&lt;le&gt; norm x * norm y"
+  
+  sorry
+
+
+subclass real_normed_vector
+
+  sorry
+
+
+end
+
+lemma square_bound_lemma:
+  fixes x :: real
+  shows "x &lt; (1 + x) * (1 + x)"
+  
+  sorry
+
+
+lemma square_continuous:
+  fixes e :: real
+  shows "e &gt; 0 \&lt;Longrightarrow&gt; \&lt;exists&gt;d. 0 &lt; d \&lt;and&gt; (\&lt;forall&gt;y. \&lt;bar&gt;y - x\&lt;bar&gt; &lt; d \&lt;longrightarrow&gt; \&lt;bar&gt;y * y - x * x\&lt;bar&gt; &lt; e)"
+  
+  sorry
+
+
+lemma norm_le: "norm x \&lt;le&gt; norm y \&lt;longleftrightarrow&gt; inner x x \&lt;le&gt; inner y y"
+  
+  sorry
+
+
+lemma norm_lt: "norm x &lt; norm y \&lt;longleftrightarrow&gt; inner x x &lt; inner y y"
+  
+  sorry
+
+
+lemma norm_eq: "norm x = norm y \&lt;longleftrightarrow&gt; inner x x = inner y y"
+  
+  sorry
+
+
+lemma norm_eq_1: "norm x = 1 \&lt;longleftrightarrow&gt; inner x x = 1"
+  
+  sorry
+
+
+lemma inner_divide_left:
+  fixes a :: "'a :: {real_inner,real_div_algebra}"
+  shows "inner (a / of_real m) b = (inner a b) / m"
+  
+  sorry
+
+
+lemma inner_divide_right:
+  fixes a :: "'a :: {real_inner,real_div_algebra}"
+  shows "inner a (b / of_real m) = (inner a b) / m"
+  
+  sorry
+
+
+text \&lt;open&gt;
+  Re-enable constraints for \&lt;^term&gt;\&lt;open&gt;open\&lt;close&gt;, \&lt;^term&gt;\&lt;open&gt;uniformity\&lt;close&gt;,
+  \&lt;^term&gt;\&lt;open&gt;dist\&lt;close&gt;, and \&lt;^term&gt;\&lt;open&gt;norm\&lt;close&gt;.
+\&lt;close&gt;
+
+setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;open\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;'a::topological_space set \&lt;Rightarrow&gt; bool\&lt;close&gt;)\&lt;close&gt;
+
+setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;uniformity\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;('a::uniform_space \&lt;times&gt; 'a) filter\&lt;close&gt;)\&lt;close&gt;
+
+setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;dist\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;'a::metric_space \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; real\&lt;close&gt;)\&lt;close&gt;
+
+setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;norm\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;'a::real_normed_vector \&lt;Rightarrow&gt; real\&lt;close&gt;)\&lt;close&gt;
+
+lemma bounded_bilinear_inner:
+  "bounded_bilinear (inner::'a::real_inner \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; real)"
+  
+  sorry
+
+
+lemmas tendsto_inner [tendsto_intros] =
+  bounded_bilinear.tendsto [OF bounded_bilinear_inner]
+
+lemmas isCont_inner [simp] =
+  bounded_bilinear.isCont [OF bounded_bilinear_inner]
+
+lemmas has_derivative_inner [derivative_intros] =
+  bounded_bilinear.FDERIV [OF bounded_bilinear_inner]
+
+lemmas bounded_linear_inner_left =
+  bounded_bilinear.bounded_linear_left [OF bounded_bilinear_inner]
+
+lemmas bounded_linear_inner_right =
+  bounded_bilinear.bounded_linear_right [OF bounded_bilinear_inner]
+
+lemmas bounded_linear_inner_left_comp = bounded_linear_inner_left[THEN bounded_linear_compose]
+
+lemmas bounded_linear_inner_right_comp = bounded_linear_inner_right[THEN bounded_linear_compose]
+
+lemmas has_derivative_inner_right [derivative_intros] =
+  bounded_linear.has_derivative [OF bounded_linear_inner_right]
+
+lemmas has_derivative_inner_left [derivative_intros] =
+  bounded_linear.has_derivative [OF bounded_linear_inner_left]
+
+lemma differentiable_inner [simp]:
+  "f differentiable (at x within s) \&lt;Longrightarrow&gt; g differentiable at x within s \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. inner (f x) (g x)) differentiable at x within s"
+  
+  sorry
+
+
+
+subsection \&lt;open&gt;Class instances\&lt;close&gt;
+
+instantiation real :: real_inner
+begin
+
+definition inner_real_def [simp]: "inner = (*)"
+
+instance
+
+  sorry
+
+
+end
+
+lemma
+  shows real_inner_1_left[simp]: "inner 1 x = x"
+    and real_inner_1_right[simp]: "inner x 1 = x"
+  
+  sorry
+
+
+instantiation complex :: real_inner
+begin
+
+definition inner_complex_def:
+  "inner x y = Re x * Re y + Im x * Im y"
+
+instance
+
+  sorry
+
+
+end
+
+lemma complex_inner_1 [simp]: "inner 1 x = Re x"
+  
+  sorry
+
+
+lemma complex_inner_1_right [simp]: "inner x 1 = Re x"
+  
+  sorry
+
+
+lemma complex_inner_i_left [simp]: "inner \&lt;i&gt; x = Im x"
+  
+  sorry
+
+
+lemma complex_inner_i_right [simp]: "inner x \&lt;i&gt; = Im x"
+  
+  sorry
+
+
+lemma dot_square_norm: "inner x x = (norm x)\&lt;^sup&gt;2"
+  
+  sorry
+
+
+lemma norm_eq_square: "norm x = a \&lt;longleftrightarrow&gt; 0 \&lt;le&gt; a \&lt;and&gt; inner x x = a\&lt;^sup&gt;2"
+  
+  sorry
+
+
+lemma norm_le_square: "norm x \&lt;le&gt; a \&lt;longleftrightarrow&gt; 0 \&lt;le&gt; a \&lt;and&gt; inner x x \&lt;le&gt; a\&lt;^sup&gt;2"
+  
+  sorry
+
+
+lemma norm_ge_square: "norm x \&lt;ge&gt; a \&lt;longleftrightarrow&gt; a \&lt;le&gt; 0 \&lt;or&gt; inner x x \&lt;ge&gt; a\&lt;^sup&gt;2"
+  
+  sorry
+
+
+lemma norm_lt_square: "norm x &lt; a \&lt;longleftrightarrow&gt; 0 &lt; a \&lt;and&gt; inner x x &lt; a\&lt;^sup&gt;2"
+  
+  sorry
+
+
+lemma norm_gt_square: "norm x &gt; a \&lt;longleftrightarrow&gt; a &lt; 0 \&lt;or&gt; inner x x &gt; a\&lt;^sup&gt;2"
+  
+  sorry
+
+
+text\&lt;open&gt;Dot product in terms of the norm rather than conversely.\&lt;close&gt;
+
+lemmas inner_simps = inner_add_left inner_add_right inner_diff_right inner_diff_left
+  inner_scaleR_left inner_scaleR_right
+
+</prefix><statement>lemma dot_norm: "inner x y = ((norm (x + y))\&lt;^sup&gt;2 - (norm x)\&lt;^sup&gt;2 - (norm y)\&lt;^sup&gt;2) / 2"</statement><proof_prefix /><sketch /><depth>1</depth><target_name>dot_norm</target_name><forbidden_names><item>dot_norm</item><item>dot_norm_neg</item><item>of_real_inner_1</item><item>summable_of_real_iff</item><item>gderiv_deriv</item><item>GDERIV_DERIV_compose</item><item>has_derivative_subst</item><item>GDERIV_subst</item><item>GDERIV_const</item><item>GDERIV_add</item><item>GDERIV_minus</item><item>GDERIV_diff</item><item>GDERIV_scaleR</item><item>GDERIV_mult</item><item>GDERIV_inverse</item><item>GDERIV_norm</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9959589310456</remaining_s></dsp_request>

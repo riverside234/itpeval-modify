@@ -1,0 +1,29 @@
+{
+  "name": "context_hundred-theorems_027_sum_of_the_angles_of_a_triangle_Pythagoras",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 4.725,
+  "details": "details/054-context_hundred-theorems_027_sum_of_the_angles_of_a_triangle_Pythagoras.json",
+  "failure_category": "import_error",
+  "expected_failure": null,
+  "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/build.log\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/Angles.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_2f6e86f9b6324528ae1d0ccf5b271173.Angles\"\n*** (required by \"DSP_Job_2f6e86f9b6324528ae1d0ccf5b271173.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/Angles.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/Angles.thy\"\n*** The error(s) above occurred in session \"DSP_Job_2f6e86f9b6324528ae1d0ccf5b271173\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/ROOT\")",
+  "payload": {
+    "ok": false,
+    "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/build.log\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/Angles.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_2f6e86f9b6324528ae1d0ccf5b271173.Angles\"\n*** (required by \"DSP_Job_2f6e86f9b6324528ae1d0ccf5b271173.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/Angles.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/Angles.thy\"\n*** The error(s) above occurred in session \"DSP_Job_2f6e86f9b6324528ae1d0ccf5b271173\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/ROOT\")",
+    "failure_category": "import_error",
+    "build_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/build.log",
+    "build_returncode": 2,
+    "build_log_excerpt": "*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/Angles.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_2f6e86f9b6324528ae1d0ccf5b271173.Angles\"\n*** (required by \"DSP_Job_2f6e86f9b6324528ae1d0ccf5b271173.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/Angles.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/Angles.thy\"\n*** The error(s) above occurred in session \"DSP_Job_2f6e86f9b6324528ae1d0ccf5b271173\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp/ROOT\")",
+    "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp",
+    "import_resolution": {
+      "original_imports": [
+        "Angles"
+      ],
+      "resolved_imports": [
+        "Angles"
+      ],
+      "session_dependencies": []
+    },
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ficcvewp"
+  }
+}

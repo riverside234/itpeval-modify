@@ -1,0 +1,32 @@
+{
+  "request_id": "de889ec3dc7847b4a1cbf4c9a280effe",
+  "action": "search",
+  "prefix": "theory V2Control imports Main begin\n",
+  "statement": "lemma v2_control: \"True\"",
+  "proof_prefix": "",
+  "sketch": "by simp",
+  "depth": "1",
+  "target_name": "v2_control",
+  "forbidden_names": [
+    "v2_control"
+  ],
+  "heuristics": [
+    "by auto",
+    "by simp",
+    "by blast",
+    "by fastforce",
+    "by force",
+    "by eval",
+    "by presburger",
+    "by sos",
+    "by arith",
+    "by linarith",
+    "by (auto simp: field_simps)"
+  ],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9983822740614",
+  "input_sha256": "54cfaf0288f849e662d4091a3e7b4928710f25b2820eaf53af10c83e009b2ea1"
+}

@@ -1,0 +1,11 @@
+{
+  "original_imports": [
+    "Lattices",
+    "Boolean_Algebras"
+  ],
+  "resolved_imports": [
+    "Lattices",
+    "Boolean_Algebras"
+  ],
+  "session_dependencies": []
+}

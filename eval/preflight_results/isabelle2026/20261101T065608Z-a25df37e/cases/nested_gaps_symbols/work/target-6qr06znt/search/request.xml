@@ -1,0 +1,14 @@
+<dsp_request schema="dsp_native_request_v1" request_id="53544399c8034c48a4604eb77fab8b0f" input_sha256="bf0ddd8ab614b14bbce2e512461a8a47882edc6c07c196cf002326772a7adb4b" action="search"><prefix>theory V2Control imports Main begin
+</prefix><statement>lemma v2_control: "True"</statement><proof_prefix /><sketch>proof -
+ have first: True
+ sledgehammer
+ have both: \&lt;open&gt;True \&lt;and&gt; True\&lt;close&gt;
+ proof
+  show True using first
+  sledgehammer
+  show True using first
+  sledgehammer
+ qed
+ show True using both
+ sledgehammer
+qed</sketch><depth>1</depth><target_name>v2_control</target_name><forbidden_names><item>v2_control</item></forbidden_names><heuristics><item>by auto</item><item>by simp</item><item>by blast</item><item>by fastforce</item><item>by force</item><item>by eval</item><item>by presburger</item><item>by sos</item><item>by arith</item><item>by linarith</item><item>by (auto simp: field_simps)</item></heuristics><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9992917659692</remaining_s></dsp_request>

@@ -1,0 +1,22 @@
+{
+  "request_id": "2b88a248111343dcb40eb18c37861d83",
+  "action": "search",
+  "prefix": "theory V2Control imports Main begin\n",
+  "statement": "lemma v2_control: \"True\"",
+  "proof_prefix": "",
+  "sketch": "proof -\n have both: \"True \\<and> True\"\n apply (rule conjI)\n sledgehammer\n from both show \"True\" by simp\nqed",
+  "depth": "1",
+  "target_name": "v2_control",
+  "forbidden_names": [
+    "v2_control"
+  ],
+  "heuristics": [],
+  "provers": [
+    "simp"
+  ],
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9989697099663",
+  "input_sha256": "54c742e96e268528d263b093927a45d8932a749987fc3c34425f412d0195ed62"
+}

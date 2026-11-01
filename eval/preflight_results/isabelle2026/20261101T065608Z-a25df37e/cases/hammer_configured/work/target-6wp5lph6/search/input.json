@@ -1,0 +1,20 @@
+{
+  "request_id": "da801c2eaf1342cd857ab2a817e2c5fe",
+  "action": "search",
+  "prefix": "theory V2Control imports Main begin\n",
+  "statement": "lemma v2_control: \"True\"",
+  "proof_prefix": "",
+  "sketch": "proof -\n show \"True\"\n sledgehammer\nqed",
+  "depth": "1",
+  "target_name": "v2_control",
+  "forbidden_names": [
+    "v2_control"
+  ],
+  "heuristics": [],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.998403109028",
+  "input_sha256": "e588d6491fbc4f6f4b147ceae3229e366dd5cb0ed72b9c81b207f4a6e64f7db5"
+}

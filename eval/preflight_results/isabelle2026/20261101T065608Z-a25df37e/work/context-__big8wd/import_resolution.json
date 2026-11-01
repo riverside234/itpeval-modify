@@ -1,0 +1,17 @@
+{
+  "original_imports": [
+    "Complex_Main",
+    "HOL-Library.More_List",
+    "HOL-Library.Infinite_Set",
+    "Primes"
+  ],
+  "resolved_imports": [
+    "Complex_Main",
+    "HOL-Library.More_List",
+    "HOL-Library.Infinite_Set",
+    "Primes"
+  ],
+  "session_dependencies": [
+    "HOL-Library"
+  ]
+}

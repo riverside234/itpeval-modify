@@ -1,0 +1,7 @@
+<dsp_request schema="dsp_native_request_v1" request_id="c285bb6bcf924272be79e0ddd837d77f" input_sha256="1ddbd67a5874e4b7ddacf754185ce06de8e34e624f15179c97cb7cdd7f7c3cc5" action="search"><prefix>theory V2Control imports Main begin
+</prefix><statement>lemma v2_control: "True"</statement><proof_prefix /><sketch>proof -
+ define t where "t = True"
+ have ht: t unfolding t_def by simp
+ consider t using ht by blast
+ then show True by cases simp
+qed</sketch><depth>1</depth><target_name>v2_control</target_name><forbidden_names><item>v2_control</item></forbidden_names><heuristics><item>by auto</item><item>by simp</item><item>by blast</item><item>by fastforce</item><item>by force</item><item>by eval</item><item>by presburger</item><item>by sos</item><item>by arith</item><item>by linarith</item><item>by (auto simp: field_simps)</item></heuristics><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9987589049852</remaining_s></dsp_request>

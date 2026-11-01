@@ -1,0 +1,13 @@
+{
+  "original_imports": [
+    "Complex_Main",
+    "HOL-Combinatorics.Permutations"
+  ],
+  "resolved_imports": [
+    "Complex_Main",
+    "HOL-Combinatorics.Permutations"
+  ],
+  "session_dependencies": [
+    "HOL-Combinatorics"
+  ]
+}

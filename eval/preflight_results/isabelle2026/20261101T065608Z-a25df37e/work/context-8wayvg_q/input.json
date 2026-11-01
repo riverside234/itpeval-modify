@@ -1,0 +1,20 @@
+{
+  "request_id": "58248b54a2d44ce98ae7a8ccc97fa367",
+  "action": "context",
+  "prefix": "theory ideals\n  imports Main\nbegin\n\nlocale cring =\n  fixes zero :: \"'r\"\n    and one  :: \"'r\"\n    and add  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"+R\" 65)\n    and mul  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"*R\" 70)\n    and opp  :: \"'r \\<Rightarrow> 'r\"\n  assumes add_comm  : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero  : \"\\<And>x. x +R zero = x\"\n    and   add_opp   : \"\\<And>x. x +R opp x = zero\"\n    and   mul_comm  : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_one   : \"\\<And>x. x *R one = x\"\n    and   dist_l    : \"\\<And>a x y. a *R (x +R y) = (a *R x) +R (a *R y)\"\n    and   opp_add   : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\nbegin\n\n\nlemma add_left_comm: \"x +R (y +R z) = y +R (x +R z)\"\n  sorry\nlemma zero_add: \"zero +R x = x\"\n  sorry\n\n\n\n\ndefinition IsIdeal :: \"('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"IsIdeal I \\<equiv>\n    I zero \\<and>\n    (\\<forall>x y. I x \\<longrightarrow> I y \\<longrightarrow> I (x +R y)) \\<and>\n    (\\<forall>x.   I x \\<longrightarrow> I (opp x)) \\<and>\n    (\\<forall>a x. I x \\<longrightarrow> I (a *R x))\"\n\n\n\n\n\ndefinition Inter :: \"('i \\<Rightarrow> 'r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"Inter F \\<equiv> \\<lambda>x. \\<forall>i. F i x\"\n\nlemma inter_isIdeal:\n  assumes h: \"\\<forall>i. IsIdeal (F i)\"\n  shows \"IsIdeal (Inter F)\"\n  sorry\n\n\n\n\ndefinition isum :: \"('r \\<Rightarrow> bool) \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"isum I J \\<equiv> \\<lambda>x. \\<exists>a b. I a \\<and> J b \\<and> x = a +R b\"\n\n",
+  "statement": "lemma sum_isIdeal:\n  assumes hI: \"IsIdeal I\" and hJ: \"IsIdeal J\"\n  shows \"IsIdeal (isum I J)\"",
+  "proof_prefix": "",
+  "sketch": "",
+  "depth": "2",
+  "target_name": "sum_isIdeal",
+  "forbidden_names": [
+    "sum_isIdeal"
+  ],
+  "heuristics": [],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9989745330531",
+  "input_sha256": "1601274737d829ebce7ac292adf1a70f2981ca291f0d1fa5332f312650f9f462"
+}

@@ -1,0 +1,8 @@
+<dsp_request schema="dsp_native_request_v1" request_id="d605797f237749bd935a3c3418af78b7" input_sha256="62f289f57ff5d4684abd514547218e03f0d39a6285ccda9f85a70ed6274a51ac" action="search"><prefix>theory V2Control imports Main begin
+</prefix><statement>lemma v2_control: "True"</statement><proof_prefix /><sketch>proof -
+ have h: "True" by simp
+ show "True"
+ sledgehammer
+qed</sketch><depth>1</depth><target_name>v2_control</target_name><forbidden_names><item>v2_control</item></forbidden_names><heuristics><item>using h (* separator *)
+ by metis
+</item></heuristics><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9989482350647</remaining_s></dsp_request>

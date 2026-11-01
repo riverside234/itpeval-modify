@@ -1,0 +1,19 @@
+[
+  "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/bin/isabelle",
+  "build",
+  "-j",
+  "1",
+  "-o",
+  "document=false",
+  "-o",
+  "parallel_proofs=0",
+  "-o",
+  "timeout_scale=1.0",
+  "-o",
+  "threads=4",
+  "-d",
+  "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2026-native/infrastructure/61aa968004dae873",
+  "-d",
+  "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/cases/inherited_theory_replay/work/target-n68pt16d/context",
+  "DSP_Job_1bf6d73f8af4490d948a1375c2959faa"
+]

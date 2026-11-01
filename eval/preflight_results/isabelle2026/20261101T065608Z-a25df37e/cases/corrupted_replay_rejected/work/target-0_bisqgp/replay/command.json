@@ -1,0 +1,17 @@
+[
+  "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/bin/isabelle",
+  "build",
+  "-j",
+  "1",
+  "-o",
+  "document=false",
+  "-o",
+  "parallel_proofs=0",
+  "-o",
+  "timeout_scale=1.0",
+  "-o",
+  "threads=4",
+  "-d",
+  "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/cases/corrupted_replay_rejected/work/target-0_bisqgp/replay",
+  "DSP_Replay_c888f42fe63f4c24977b51b2122c9298"
+]

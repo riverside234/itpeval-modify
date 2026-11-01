@@ -1,0 +1,3 @@
+<dsp_request schema="dsp_native_request_v1" request_id="73626d2f239e4ac490f11c437e6fa41b" input_sha256="885bab748c3007715ef74e48bd8889ebff27a7fe04a4b0e900040d8d29eeac1b" action="context"><prefix>theory V2Control imports Main begin
+declare [[smt_oracle = true]]
+</prefix><statement>lemma v2_control: "True"</statement><proof_prefix /><sketch /><depth>1</depth><target_name>v2_control</target_name><forbidden_names><item>v2_control</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.999268803047</remaining_s></dsp_request>

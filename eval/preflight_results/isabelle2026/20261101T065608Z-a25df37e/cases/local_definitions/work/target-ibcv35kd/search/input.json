@@ -1,0 +1,32 @@
+{
+  "request_id": "c285bb6bcf924272be79e0ddd837d77f",
+  "action": "search",
+  "prefix": "theory V2Control imports Main begin\n",
+  "statement": "lemma v2_control: \"True\"",
+  "proof_prefix": "",
+  "sketch": "proof -\n define t where \"t = True\"\n have ht: t unfolding t_def by simp\n consider t using ht by blast\n then show True by cases simp\nqed",
+  "depth": "1",
+  "target_name": "v2_control",
+  "forbidden_names": [
+    "v2_control"
+  ],
+  "heuristics": [
+    "by auto",
+    "by simp",
+    "by blast",
+    "by fastforce",
+    "by force",
+    "by eval",
+    "by presburger",
+    "by sos",
+    "by arith",
+    "by linarith",
+    "by (auto simp: field_simps)"
+  ],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9987589049852",
+  "input_sha256": "1ddbd67a5874e4b7ddacf754185ce06de8e34e624f15179c97cb7cdd7f7c3cc5"
+}

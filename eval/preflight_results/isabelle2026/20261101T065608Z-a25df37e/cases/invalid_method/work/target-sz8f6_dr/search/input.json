@@ -1,0 +1,32 @@
+{
+  "request_id": "ecb77658c414490da7a8b593f5514c7b",
+  "action": "search",
+  "prefix": "theory V2Control imports Main begin\n",
+  "statement": "lemma v2_control: \"True\"",
+  "proof_prefix": "",
+  "sketch": "by (v2_missing_negative_control_method)",
+  "depth": "1",
+  "target_name": "v2_control",
+  "forbidden_names": [
+    "v2_control"
+  ],
+  "heuristics": [
+    "by auto",
+    "by simp",
+    "by blast",
+    "by fastforce",
+    "by force",
+    "by eval",
+    "by presburger",
+    "by sos",
+    "by arith",
+    "by linarith",
+    "by (auto simp: field_simps)"
+  ],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9991318659158",
+  "input_sha256": "46bfcf019c011ce73df8de64062d41ab2f44d52a1b13c78254c1a6520ff51eb3"
+}

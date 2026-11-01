@@ -1,0 +1,143 @@
+<dsp_request schema="dsp_native_request_v1" request_id="44fca1b4a1aa47f8b8f1897b7bb198c4" input_sha256="2a53c8601216d70d335db5cd38fb244f3fab300c5ec874c77d550c0064a2d0fb" action="context"><prefix>theory supinf
+  imports Main
+begin
+
+locale complete_ordered_field =
+  fixes zero_nat  :: "'n"
+    and succ      :: "'n \&lt;Rightarrow&gt; 'n"
+    and nat_le    :: "'n \&lt;Rightarrow&gt; 'n \&lt;Rightarrow&gt; bool"
+    and zero one  :: "'r"
+    and add       :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"   (infixl "+R" 65)
+    and mul       :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"   (infixl "*R" 70)
+    and opp inv   :: "'r \&lt;Rightarrow&gt; 'r"
+    and rle       :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; bool"  (infix "\&lt;le&gt;R" 50)
+    and rlt       :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; bool"  (infix "&lt;R" 50)
+    and rabs      :: "'r \&lt;Rightarrow&gt; 'r"
+    and inr       :: "'n \&lt;Rightarrow&gt; 'r"
+  assumes nat_le_refl   : "\&lt;And&gt;n. nat_le n n"
+    and   le_succ_of_le : "\&lt;And&gt;n m. nat_le n m \&lt;Longrightarrow&gt; nat_le n (succ m)"
+    and   le_succ       : "\&lt;And&gt;n. nat_le n (succ n)"
+    and   add_comm      : "\&lt;And&gt;x y. x +R y = y +R x"
+    and   add_assoc     : "\&lt;And&gt;x y z. (x +R y) +R z = x +R (y +R z)"
+    and   add_zero      : "\&lt;And&gt;x. x +R zero = x"
+    and   add_opp       : "\&lt;And&gt;x. opp x +R x = zero"
+    and   mul_comm      : "\&lt;And&gt;x y. x *R y = y *R x"
+    and   mul_assoc     : "\&lt;And&gt;x y z. (x *R y) *R z = x *R (y *R z)"
+    and   mul_one       : "\&lt;And&gt;x. x *R one = x"
+    and   dist_l        : "\&lt;And&gt;x y z. x *R (y +R z) = (x *R y) +R (x *R z)"
+    and   sub_zero      : "\&lt;And&gt;x. x +R opp zero = x"
+    and   rle_refl      : "\&lt;And&gt;x. x \&lt;le&gt;R x"
+    and   rle_trans     : "\&lt;And&gt;x y z. x \&lt;le&gt;R y \&lt;Longrightarrow&gt; y \&lt;le&gt;R z \&lt;Longrightarrow&gt; x \&lt;le&gt;R z"
+    and   rle_antisym   : "\&lt;And&gt;x y. x \&lt;le&gt;R y \&lt;Longrightarrow&gt; y \&lt;le&gt;R x \&lt;Longrightarrow&gt; x = y"
+    and   rlt_def       : "\&lt;And&gt;x y. (x &lt;R y) \&lt;longleftrightarrow&gt; (x \&lt;le&gt;R y \&lt;and&gt; x \&lt;noteq&gt; y)"
+    and   rle_abs       : "\&lt;And&gt;x. x +R opp zero \&lt;le&gt;R rabs x"
+    and   rinv_pos      : "\&lt;And&gt;x. zero &lt;R x \&lt;Longrightarrow&gt; zero &lt;R inv x"
+    and   rplus_le_compat_l : "\&lt;And&gt;x y z. y \&lt;le&gt;R z \&lt;Longrightarrow&gt; x +R y \&lt;le&gt;R x +R z"
+    and   rinv_involutive    : "\&lt;And&gt;x. zero &lt;R x \&lt;Longrightarrow&gt; inv (inv x) = x"
+    and   inr_pos       : "\&lt;And&gt;n. zero &lt;R inr (succ n)"
+    and   inr_le        : "\&lt;And&gt;m n. nat_le m n \&lt;Longrightarrow&gt; inr m \&lt;le&gt;R inr n"
+    and   inr_zero      : "inr zero_nat = zero"
+    and   inr_succ      : "\&lt;And&gt;n. inr (succ n) = inr n +R one"
+    and   rtotal_order  : "\&lt;And&gt;x y. (x &lt;R y) \&lt;or&gt; x = y \&lt;or&gt; (y &lt;R x)"
+    and   rle_inv_contravar :
+            "\&lt;And&gt;a b. zero &lt;R a \&lt;Longrightarrow&gt; zero &lt;R b \&lt;Longrightarrow&gt; a \&lt;le&gt;R b \&lt;Longrightarrow&gt; inv b \&lt;le&gt;R inv a"
+    and   eps_between   :
+            "\&lt;And&gt;x y. x &lt;R y \&lt;Longrightarrow&gt; \&lt;exists&gt;eps. zero &lt;R eps \&lt;and&gt; x +R eps &lt;R y"
+    and   archimedean   : "\&lt;And&gt;x. \&lt;exists&gt;n. x \&lt;le&gt;R inr n"
+    and   completeness  :
+            "\&lt;And&gt;A. (\&lt;exists&gt;ub. \&lt;forall&gt;a. A a \&lt;longrightarrow&gt; ub \&lt;le&gt;R a) \&lt;Longrightarrow&gt;
+              \&lt;exists&gt;sup. (\&lt;forall&gt;a. A a \&lt;longrightarrow&gt; a \&lt;le&gt;R sup) \&lt;and&gt;
+                    (\&lt;forall&gt;y. (\&lt;forall&gt;a. A a \&lt;longrightarrow&gt; a \&lt;le&gt;R y) \&lt;longrightarrow&gt; sup \&lt;le&gt;R y)"
+begin
+
+
+
+
+
+lemma add_opp_r: "x +R opp x = zero"
+  sorry
+lemma rlt_le: "x &lt;R y \&lt;Longrightarrow&gt; x \&lt;le&gt;R y"
+  sorry
+lemma rlt_ne: "x &lt;R y \&lt;Longrightarrow&gt; x \&lt;noteq&gt; y"
+  sorry
+lemma rlt_intro: "x \&lt;le&gt;R y \&lt;Longrightarrow&gt; x \&lt;noteq&gt; y \&lt;Longrightarrow&gt; x &lt;R y"
+  sorry
+
+
+
+
+definition up_bounds :: "('r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; bool"
+  where "up_bounds A x \&lt;equiv&gt; \&lt;forall&gt;a. A a \&lt;longrightarrow&gt; a \&lt;le&gt;R x"
+
+definition is_maximum :: "'r \&lt;Rightarrow&gt; ('r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; bool"
+  where "is_maximum a A \&lt;equiv&gt; A a \&lt;and&gt; up_bounds A a"
+
+definition low_bounds :: "('r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; bool"
+  where "low_bounds A x \&lt;equiv&gt; \&lt;forall&gt;a. A a \&lt;longrightarrow&gt; x \&lt;le&gt;R a"
+
+definition is_inf :: "'r \&lt;Rightarrow&gt; ('r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; bool"
+  where "is_inf x A \&lt;equiv&gt; is_maximum x (low_bounds A)"
+
+definition limit :: "('n \&lt;Rightarrow&gt; 'r) \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; bool"
+  where "limit u l \&lt;equiv&gt;
+    \&lt;forall&gt;eps. zero &lt;R eps \&lt;longrightarrow&gt;
+      (\&lt;exists&gt;N. \&lt;forall&gt;n. nat_le N n \&lt;longrightarrow&gt; rabs (u n +R opp l) \&lt;le&gt;R eps)"
+
+
+
+
+
+lemma add_sub_cancel_r: "a +R (b +R opp a) = b"
+  sorry
+
+
+
+
+lemma rabs_pos: "t \&lt;le&gt;R rabs t"
+  sorry
+
+
+
+
+lemma unique_max:
+  assumes "is_maximum x A" "is_maximum y A"
+  shows "x = y"
+  sorry
+
+
+
+
+lemma inf_lt:
+  assumes hinf: "is_inf x A" and hlt: "x &lt;R y"
+  shows "\&lt;exists&gt;a. A a \&lt;and&gt; a &lt;R y"
+  sorry
+
+
+
+
+lemma le_of_le_add_eps:
+  assumes H: "\&lt;forall&gt;eps. zero &lt;R eps \&lt;longrightarrow&gt; y \&lt;le&gt;R x +R eps"
+  shows "y \&lt;le&gt;R x"
+  sorry
+
+
+
+
+lemma le_lim:
+  assumes hlim : "limit u x"
+      and hle  : "\&lt;forall&gt;n. y \&lt;le&gt;R u n"
+  shows "y \&lt;le&gt;R x"
+  sorry
+
+
+
+
+lemma inv_succ_pos: "zero &lt;R inv (inr (succ n))"
+  sorry
+
+
+
+
+</prefix><statement>lemma limit_inv_succ:
+  assumes heps: "zero &lt;R eps"
+  shows "\&lt;exists&gt;N. \&lt;forall&gt;n. nat_le N n \&lt;longrightarrow&gt; inv (inr (succ n)) \&lt;le&gt;R eps"</statement><proof_prefix /><sketch /><depth>2</depth><target_name>limit_inv_succ</target_name><forbidden_names><item>limit_inv_succ</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9976145599503</remaining_s></dsp_request>

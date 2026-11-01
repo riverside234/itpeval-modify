@@ -1,0 +1,46 @@
+<dsp_request schema="dsp_native_request_v1" request_id="d578e85d3c7b47099be52c725e74a6b9" input_sha256="946763936d9ae4477535540cd0f949cba79b0b5fb688143f3310212acf2ad6b2" action="context"><prefix>theory zero_le_one_elem
+  imports Main
+begin
+
+locale zero_le_one_setup =
+  fixes decEq      :: "'m \&lt;Rightarrow&gt; 'm \&lt;Rightarrow&gt; bool"
+    and zero       :: "'a"
+    and one        :: "'a"
+    and le         :: "'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool"   (infix "\&lt;preceq&gt;" 50)
+    and le_antisym :: "'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool"
+  assumes le_refl      : "\&lt;And&gt;x. x \&lt;preceq&gt; x"
+    and   le_trans     : "\&lt;And&gt;x y z. x \&lt;preceq&gt; y \&lt;Longrightarrow&gt; y \&lt;preceq&gt; z \&lt;Longrightarrow&gt; x \&lt;preceq&gt; z"
+    and   zero_le_one  : "zero \&lt;preceq&gt; one"
+    and   zero_le_zero : "zero \&lt;preceq&gt; zero"
+    and   le_antisym   : "\&lt;And&gt;x y. x \&lt;preceq&gt; y \&lt;Longrightarrow&gt; y \&lt;preceq&gt; x \&lt;Longrightarrow&gt; x = y"
+begin
+
+definition One_matrix :: "'m \&lt;Rightarrow&gt; 'm \&lt;Rightarrow&gt; 'a"
+  where "One_matrix i j \&lt;equiv&gt; if decEq i j then one else zero"
+
+definition Zero_matrix :: "'m \&lt;Rightarrow&gt; 'm \&lt;Rightarrow&gt; 'a"
+  where "Zero_matrix \&lt;equiv&gt; \&lt;lambda&gt;_ _. zero"
+
+definition matrix_le :: "('m \&lt;Rightarrow&gt; 'm \&lt;Rightarrow&gt; 'a) \&lt;Rightarrow&gt; ('m \&lt;Rightarrow&gt; 'm \&lt;Rightarrow&gt; 'a) \&lt;Rightarrow&gt; bool"
+  where "matrix_le A B \&lt;equiv&gt; \&lt;forall&gt;i j. A i j \&lt;preceq&gt; B i j"
+
+definition matrix_eq :: "('m \&lt;Rightarrow&gt; 'm \&lt;Rightarrow&gt; 'a) \&lt;Rightarrow&gt; ('m \&lt;Rightarrow&gt; 'm \&lt;Rightarrow&gt; 'a) \&lt;Rightarrow&gt; bool"
+  where "matrix_eq A B \&lt;equiv&gt; \&lt;forall&gt;i j. A i j = B i j"
+
+lemma zero_le_one_elem: "zero \&lt;preceq&gt; One_matrix i j"
+  sorry
+lemma Zero_le_One_matrix: "matrix_le Zero_matrix One_matrix"
+  sorry
+lemma matrix_le_refl: "matrix_le A A"
+  sorry
+lemma matrix_le_trans: "matrix_le A B \&lt;Longrightarrow&gt; matrix_le B C \&lt;Longrightarrow&gt; matrix_le A C"
+  sorry
+lemma matrix_eq_refl: "matrix_eq A A"
+  sorry
+lemma matrix_eq_sym: "matrix_eq A B \&lt;Longrightarrow&gt; matrix_eq B A"
+  sorry
+lemma matrix_eq_trans: "matrix_eq A B \&lt;Longrightarrow&gt; matrix_eq B C \&lt;Longrightarrow&gt; matrix_eq A C"
+  sorry
+lemma matrix_eq_le: "matrix_eq A B \&lt;Longrightarrow&gt; matrix_le A B \&lt;and&gt; matrix_le B A"
+  sorry
+</prefix><statement>lemma matrix_le_antisymm: "matrix_le A B \&lt;Longrightarrow&gt; matrix_le B A \&lt;Longrightarrow&gt; matrix_eq A B"</statement><proof_prefix /><sketch /><depth>2</depth><target_name>matrix_le_antisymm</target_name><forbidden_names><item>matrix_le_antisymm</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9993396449136</remaining_s></dsp_request>

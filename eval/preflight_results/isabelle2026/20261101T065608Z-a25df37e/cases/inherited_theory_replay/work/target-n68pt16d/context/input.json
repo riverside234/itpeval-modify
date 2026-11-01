@@ -1,0 +1,20 @@
+{
+  "request_id": "1bf6d73f8af4490d948a1375c2959faa",
+  "action": "context",
+  "prefix": "theory Set imports Main begin\n",
+  "statement": "lemma v2_control: \"True\"",
+  "proof_prefix": "",
+  "sketch": "",
+  "depth": "1",
+  "target_name": "v2_control",
+  "forbidden_names": [
+    "v2_control"
+  ],
+  "heuristics": [],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9992633269867",
+  "input_sha256": "b923951c71cdd87475b3b2ac380001925d5f275691fdb9c0bf0c64fb38222bb7"
+}

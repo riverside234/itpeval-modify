@@ -1,0 +1,29 @@
+{
+  "name": "context_hundred-theorems_065_isosceles_triangle_theorem_isosceles_triangle_converse",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 4.473,
+  "details": "details/059-context_hundred-theorems_065_isosceles_triangle_theorem_isosceles_triangle_converse.json",
+  "failure_category": "import_error",
+  "expected_failure": null,
+  "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/build.log\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/Angles.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_7d7cf359b7394c7d9a6fdca7cc1b5119.Angles\"\n*** (required by \"DSP_Job_7d7cf359b7394c7d9a6fdca7cc1b5119.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/Angles.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/Angles.thy\"\n*** The error(s) above occurred in session \"DSP_Job_7d7cf359b7394c7d9a6fdca7cc1b5119\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/ROOT\")",
+  "payload": {
+    "ok": false,
+    "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/build.log\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/Angles.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_7d7cf359b7394c7d9a6fdca7cc1b5119.Angles\"\n*** (required by \"DSP_Job_7d7cf359b7394c7d9a6fdca7cc1b5119.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/Angles.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/Angles.thy\"\n*** The error(s) above occurred in session \"DSP_Job_7d7cf359b7394c7d9a6fdca7cc1b5119\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/ROOT\")",
+    "failure_category": "import_error",
+    "build_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/build.log",
+    "build_returncode": 2,
+    "build_log_excerpt": "*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/Angles.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_7d7cf359b7394c7d9a6fdca7cc1b5119.Angles\"\n*** (required by \"DSP_Job_7d7cf359b7394c7d9a6fdca7cc1b5119.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/Angles.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/Angles.thy\"\n*** The error(s) above occurred in session \"DSP_Job_7d7cf359b7394c7d9a6fdca7cc1b5119\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic/ROOT\")",
+    "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic",
+    "import_resolution": {
+      "original_imports": [
+        "Angles"
+      ],
+      "resolved_imports": [
+        "Angles"
+      ],
+      "session_dependencies": []
+    },
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-b0hbe2ic"
+  }
+}

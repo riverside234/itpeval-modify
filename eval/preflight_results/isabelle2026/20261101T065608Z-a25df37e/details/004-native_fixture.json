@@ -1,0 +1,17 @@
+{
+  "name": "native_fixture",
+  "domain": "backend",
+  "status": "fail",
+  "duration_seconds": 12.488,
+  "details": "details/004-native_fixture.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "error": "native acceptance fixture failed (exit status 1); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/fixture/build.log\nRunning DSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139 ...\nDSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139 FAILED (see also \"isabelle build_log -H Error DSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139\")\n*** ML error (line 81 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/fixture/DSP_Reconstruction_Test.thy\"):\n*** Value or constructor (sleep) has not been declared in structure OS.Process\n*** \n*** At command \"ML\" (line 7 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/fixture/DSP_Reconstruction_Test.thy\")\nUnfinished session(s): DSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139\n0:00:10 elapsed time",
+  "payload": {
+    "ok": false,
+    "build_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/fixture/build.log",
+    "build_returncode": 1,
+    "build_log_excerpt": "Running DSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139 ...\nDSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139 FAILED (see also \"isabelle build_log -H Error DSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139\")\n*** ML error (line 81 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/fixture/DSP_Reconstruction_Test.thy\"):\n*** Value or constructor (sleep) has not been declared in structure OS.Process\n*** \n*** At command \"ML\" (line 7 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/fixture/DSP_Reconstruction_Test.thy\")\nUnfinished session(s): DSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139\n0:00:10 elapsed time",
+    "error": "native acceptance fixture failed (exit status 1); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/fixture/build.log\nRunning DSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139 ...\nDSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139 FAILED (see also \"isabelle build_log -H Error DSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139\")\n*** ML error (line 81 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/fixture/DSP_Reconstruction_Test.thy\"):\n*** Value or constructor (sleep) has not been declared in structure OS.Process\n*** \n*** At command \"ML\" (line 7 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/fixture/DSP_Reconstruction_Test.thy\")\nUnfinished session(s): DSP_Acceptance_97b3eaabfb28470c8d5927acc6c66139\n0:00:10 elapsed time"
+  }
+}

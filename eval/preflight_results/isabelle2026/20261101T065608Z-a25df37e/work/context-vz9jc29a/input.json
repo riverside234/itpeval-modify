@@ -1,0 +1,20 @@
+{
+  "request_id": "b6c86f82996e4975bcd9c1d9a3788d97",
+  "action": "context",
+  "prefix": "theory linear_map\n  imports Main\nbegin\n\n\n\n\n\nlocale linear_map_setup =\n  fixes zeroV :: \"'v\"\n    and addV  :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'v\"         (infixl \"+V\" 65)\n    and smul  :: \"'r \\<Rightarrow> 'v \\<Rightarrow> 'v\"           (infixr \"\\<cdot>V\" 70)\n    and zeroW :: \"'w\"\n    and addW  :: \"'w \\<Rightarrow> 'w \\<Rightarrow> 'w\"         (infixl \"+W\" 65)\n    and smulW :: \"'r \\<Rightarrow> 'w \\<Rightarrow> 'w\"           (infixr \"\\<cdot>W\" 70)\n    and toFun :: \"'v \\<Rightarrow> 'w\"\n\n  assumes addV_comm  : \"\\<And>u v. u +V v = v +V u\"\n    and   addV_assoc : \"\\<And>u v w. (u +V v) +V w = u +V (v +V w)\"\n    and   addV_zero  : \"\\<And>u. u +V zeroV = u\"\n    and   smul_zeroV : \"\\<And>a. a \\<cdot>V zeroV = zeroV\"\n\n    and   addW_comm  : \"\\<And>u v. u +W v = v +W u\"\n    and   addW_assoc : \"\\<And>u v w. (u +W v) +W w = u +W (v +W w)\"\n    and   addW_zero  : \"\\<And>u. u +W zeroW = u\"\n    and   smulW_zero : \"\\<And>a. a \\<cdot>W zeroW = zeroW\"\n\n    and   map_add    : \"\\<And>u v. toFun (u +V v) = toFun u +W toFun v\"\n    and   map_smul   : \"\\<And>a u. toFun (a \\<cdot>V u) = a \\<cdot>W toFun u\"\nbegin\n\n\n\n\n\ndefinition ker :: \"'v \\<Rightarrow> bool\"\n  where \"ker x \\<equiv> toFun x = zeroW\"\n\ndefinition im :: \"'w \\<Rightarrow> bool\"\n  where \"im y \\<equiv> \\<exists>x. toFun x = y\"\n\n\n\n\n\nlemma ker_add:\n  assumes \"ker x\" \"ker y\" shows \"ker (x +V y)\"\n  sorry\nlemma ker_smul:\n  assumes \"ker x\" shows \"ker (a \\<cdot>V x)\"\n  sorry\n\n\n\n\nlemma im_add:\n  assumes \"im y\" \"im z\" shows \"im (y +W z)\"\n  sorry\n",
+  "statement": "lemma im_smul:\n  assumes \"im y\" shows \"im (a \\<cdot>W y)\"",
+  "proof_prefix": "",
+  "sketch": "",
+  "depth": "2",
+  "target_name": "im_smul",
+  "forbidden_names": [
+    "im_smul"
+  ],
+  "heuristics": [],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.999461497995",
+  "input_sha256": "6657483043eb7d2d20242b5401745674a02d7eeae8cddfe51f5f0a9edbd77d0f"
+}

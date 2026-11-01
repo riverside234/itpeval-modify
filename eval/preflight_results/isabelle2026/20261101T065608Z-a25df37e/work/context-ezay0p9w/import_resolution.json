@@ -1,0 +1,13 @@
+{
+  "original_imports": [
+    "Square_Matrix",
+    "HOL-Computational_Algebra.Polynomial"
+  ],
+  "resolved_imports": [
+    "Square_Matrix",
+    "HOL-Computational_Algebra.Polynomial"
+  ],
+  "session_dependencies": [
+    "HOL-Computational_Algebra"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "original_imports": [
+    "Complex_Main",
+    "HOL-Library.FuncSet"
+  ],
+  "resolved_imports": [
+    "Complex_Main",
+    "HOL-Library.FuncSet"
+  ],
+  "session_dependencies": [
+    "HOL-Library"
+  ]
+}

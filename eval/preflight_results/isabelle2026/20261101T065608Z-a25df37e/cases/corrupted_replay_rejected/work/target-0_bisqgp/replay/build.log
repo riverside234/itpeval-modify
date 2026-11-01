@@ -1,0 +1,6 @@
+Running DSP_Replay_c888f42fe63f4c24977b51b2122c9298 ...
+DSP_Replay_c888f42fe63f4c24977b51b2122c9298 FAILED (see also "isabelle build_log -H Error DSP_Replay_c888f42fe63f4c24977b51b2122c9298")
+*** Undefined method: "dsp_invalid_replay_method" (line 7 of "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/cases/corrupted_replay_rejected/work/target-0_bisqgp/replay/V2Control.thy")
+*** At command "by" (line 7 of "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/cases/corrupted_replay_rejected/work/target-0_bisqgp/replay/V2Control.thy")
+Unfinished session(s): DSP_Replay_c888f42fe63f4c24977b51b2122c9298
+0:00:12 elapsed time

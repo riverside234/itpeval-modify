@@ -1,0 +1,16 @@
+{
+  "original_imports": [
+    "Lebesgue_Measure",
+    "Tagged_Division",
+    "HOL-Real_Asymp.Real_Asymp"
+  ],
+  "resolved_imports": [
+    "HOL-Analysis.Lebesgue_Measure",
+    "HOL-Analysis.Tagged_Division",
+    "HOL-Real_Asymp.Real_Asymp"
+  ],
+  "session_dependencies": [
+    "HOL-Analysis",
+    "HOL-Real_Asymp"
+  ]
+}

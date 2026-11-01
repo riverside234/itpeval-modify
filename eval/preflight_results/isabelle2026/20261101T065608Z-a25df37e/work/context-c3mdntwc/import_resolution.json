@@ -1,0 +1,24 @@
+{
+  "original_imports": [
+    "Complex_Main",
+    "HOL-Number_Theory.Number_Theory",
+    "HOL-Library.Discrete_Functions",
+    "HOL-Decision_Procs.Approximation_Bounds",
+    "HOL-Library.Code_Target_Numeral",
+    "Pratt_Certificate.Pratt_Certificate"
+  ],
+  "resolved_imports": [
+    "Complex_Main",
+    "HOL-Number_Theory.Number_Theory",
+    "HOL-Library.Discrete_Functions",
+    "HOL-Decision_Procs.Approximation_Bounds",
+    "HOL-Library.Code_Target_Numeral",
+    "Pratt_Certificate.Pratt_Certificate"
+  ],
+  "session_dependencies": [
+    "HOL-Number_Theory",
+    "HOL-Library",
+    "HOL-Decision_Procs",
+    "Pratt_Certificate"
+  ]
+}

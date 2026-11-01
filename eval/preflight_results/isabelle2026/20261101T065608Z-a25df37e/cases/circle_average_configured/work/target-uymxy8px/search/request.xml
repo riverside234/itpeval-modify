@@ -1,0 +1,70 @@
+<dsp_request schema="dsp_native_request_v1" request_id="2ee08bdc5c7747fc950a19aa41bea73a" input_sha256="0ab0f387673895b46d1bf78f2104043b067036b7f6a2de19fada4e79c8b87ee7" action="search"><prefix>theory circle_average
+  imports Main
+begin
+
+locale circle_average_setup =
+  fixes zero     :: "'r"
+    and add      :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"     (infixl "+C" 65)
+    and integral :: "('r \&lt;Rightarrow&gt; 'r) \&lt;Rightarrow&gt; 'r"
+  assumes add_zero      : "\&lt;And&gt;x. x +C zero = x"
+    and   add_comm      : "\&lt;And&gt;x y. x +C y = y +C x"
+    and   add_assoc     : "\&lt;And&gt;x y z. (x +C y) +C z = x +C (y +C z)"
+    and   integral_ext  : "\&lt;And&gt;g h. (\&lt;forall&gt;\&lt;theta&gt;. g \&lt;theta&gt; = h \&lt;theta&gt;) \&lt;Longrightarrow&gt; integral g = integral h"
+    and   integral_const: "\&lt;And&gt;c. integral (\&lt;lambda&gt;_. c) = c"
+    and   integral_add  : "\&lt;And&gt;f g. integral (\&lt;lambda&gt;\&lt;theta&gt;. f \&lt;theta&gt; +C g \&lt;theta&gt;) = integral f +C integral g"
+    and   integral_shift: "\&lt;And&gt;f c. integral (\&lt;lambda&gt;\&lt;theta&gt;. f (\&lt;theta&gt; +C c)) = integral f"
+begin
+
+
+
+
+
+definition circleMap :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"
+  where "circleMap c \&lt;theta&gt; \&lt;equiv&gt; \&lt;theta&gt; +C c"
+
+definition circleAverage :: "('r \&lt;Rightarrow&gt; 'r) \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"
+  where "circleAverage f c \&lt;equiv&gt; integral (\&lt;lambda&gt;\&lt;theta&gt;. f (circleMap c \&lt;theta&gt;))"
+
+
+
+
+
+lemma circleMap_zero: "circleMap zero \&lt;theta&gt; = \&lt;theta&gt;"
+  sorry
+lemma circleAverage_zero: "circleAverage f zero = integral f"
+  sorry
+lemma circleAverage_add:
+  "circleAverage (\&lt;lambda&gt;z. f z +C g z) c =
+   circleAverage f c +C circleAverage g c"
+  sorry
+lemma circleAverage_fun_add:
+  "circleAverage (\&lt;lambda&gt;z. f (z +C c)) zero = circleAverage f c"
+  sorry
+lemma circleMap_add:
+  "circleMap (c +C d) \&lt;theta&gt; = circleMap c (circleMap d \&lt;theta&gt;)"
+  sorry
+lemma circleAverage_shift:
+  "circleAverage f (c +C d) = circleAverage (\&lt;lambda&gt;z. f (z +C d)) c"
+  sorry
+lemma circleAverage_const:
+  "circleAverage (\&lt;lambda&gt;_. k) c = k"
+  sorry
+lemma circleAverage_add_const:
+  "circleAverage (\&lt;lambda&gt;z. f z +C k) c = circleAverage f c +C k"
+  sorry
+lemma circleAverage_comm_add:
+  "circleAverage (\&lt;lambda&gt;z. f z +C g z) c =
+   circleAverage (\&lt;lambda&gt;z. g z +C f z) c"
+  sorry
+lemma circleAverage_add_assoc:
+  "circleAverage (\&lt;lambda&gt;z. (f z +C g z) +C h z) c =
+   circleAverage f c +C (circleAverage g c +C circleAverage h c)"
+  sorry
+lemma circleAverage_center_comm:
+  "circleAverage f (c +C d) = circleAverage f (d +C c)"
+  sorry
+</prefix><statement>lemma circleAverage_center_independent:
+  "circleAverage f c = integral f"</statement><proof_prefix /><sketch>proof -
+ show ?thesis unfolding circleAverage_def circleMap_def
+ sledgehammer
+qed</sketch><depth>2</depth><target_name>circleAverage_center_independent</target_name><forbidden_names><item>circleAverage_center_independent</item><item>circleAverage_center_eq</item><item>circleAverage_idempotent</item><item>circleAverage_of_zero_integral</item><item>circleAverage_linear</item><item>circleAverage_shift_commute</item></forbidden_names><heuristics><item>by auto</item><item>by simp</item><item>by blast</item><item>by fastforce</item><item>by force</item><item>by eval</item><item>by presburger</item><item>by sos</item><item>by arith</item><item>by linarith</item><item>by (auto simp: field_simps)</item></heuristics><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9983027620474</remaining_s></dsp_request>

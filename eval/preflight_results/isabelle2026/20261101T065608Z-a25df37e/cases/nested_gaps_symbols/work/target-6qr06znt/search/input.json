@@ -1,0 +1,32 @@
+{
+  "request_id": "53544399c8034c48a4604eb77fab8b0f",
+  "action": "search",
+  "prefix": "theory V2Control imports Main begin\n",
+  "statement": "lemma v2_control: \"True\"",
+  "proof_prefix": "",
+  "sketch": "proof -\n have first: True\n sledgehammer\n have both: \\<open>True \\<and> True\\<close>\n proof\n  show True using first\n  sledgehammer\n  show True using first\n  sledgehammer\n qed\n show True using both\n sledgehammer\nqed",
+  "depth": "1",
+  "target_name": "v2_control",
+  "forbidden_names": [
+    "v2_control"
+  ],
+  "heuristics": [
+    "by auto",
+    "by simp",
+    "by blast",
+    "by fastforce",
+    "by force",
+    "by eval",
+    "by presburger",
+    "by sos",
+    "by arith",
+    "by linarith",
+    "by (auto simp: field_simps)"
+  ],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9992917659692",
+  "input_sha256": "bf0ddd8ab614b14bbce2e512461a8a47882edc6c07c196cf002326772a7adb4b"
+}

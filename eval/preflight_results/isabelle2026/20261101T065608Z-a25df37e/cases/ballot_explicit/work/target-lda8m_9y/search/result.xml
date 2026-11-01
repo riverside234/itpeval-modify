@@ -1,0 +1,97 @@
+<dsp_result schema="dsp_native_result_v1" request_id="9df5b00adafa464f8b9dfc120b7dfd53" input_sha256="39fab9f48db43bb8ce08cfd3503420ddc316f4edd1b22c0c4568ba073206e72c" action="search" success="true" target_closed="true"><proof>by (simp add: all_countings_set n_subsets)</proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.000"><command>(*   Title: HOL/ex/Ballot.thy
+     Author: Lukas Bulwahn &lt;lukas.bulwahn-at-gmail.com&gt;
+     Author: Johannes Hölzl &lt;hoelzl@in.tum.de&gt;
+*)
+
+</command><error></error></attempt><attempt mode="context" success="true" index="2" line="6" source_state="1" duration_seconds="0.000"><command>section \&lt;open&gt;Bertrand&apos;s Ballot Theorem\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="3" line="6" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="8" source_state="3" duration_seconds="0.348"><command>theory Ballot
+imports
+  Complex_Main
+  &quot;HOL-Library.FuncSet&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="1" source_state="4" duration_seconds="0.000"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="6" line="12" source_state="5" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="7" line="14" source_state="6" duration_seconds="0.000"><command>subsection \&lt;open&gt;Preliminaries\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="8" line="14" source_state="7" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="9" line="16" source_state="8" duration_seconds="0.003"><command>lemma card_bij&apos;:
+  assumes &quot;f \&lt;in&gt; A \&lt;rightarrow&gt; B&quot; &quot;\&lt;And&gt;x. x \&lt;in&gt; A \&lt;Longrightarrow&gt; g (f x) = x&quot;
+    and &quot;g \&lt;in&gt; B \&lt;rightarrow&gt; A&quot; &quot;\&lt;And&gt;x. x \&lt;in&gt; B \&lt;Longrightarrow&gt; f (g x) = x&quot;
+  shows &quot;card A = card B&quot;</command><error></error></attempt><attempt mode="context" success="true" index="10" line="19" source_state="9" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="11" line="21" source_state="10" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="12" line="21" source_state="11" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="13" line="24" source_state="12" duration_seconds="0.000"><command>subsection \&lt;open&gt;Formalization of Problem Statement\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="14" line="24" source_state="13" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="15" line="26" source_state="14" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Basic Definitions\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="16" line="26" source_state="15" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="17" line="28" source_state="16" duration_seconds="0.177"><command>datatype vote = A | B</command><error></error></attempt><attempt mode="context" success="true" index="18" line="28" source_state="17" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="19" line="30" source_state="18" duration_seconds="0.007"><command>definition
+  &quot;all_countings a b = card {f \&lt;in&gt; {1 .. a + b} \&lt;rightarrow&gt;\&lt;^sub&gt;E {A, B}.
+      card {x \&lt;in&gt; {1 .. a + b}. f x = A} = a \&lt;and&gt; card {x \&lt;in&gt; {1 .. a + b}. f x = B} = b}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="20" line="32" source_state="19" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="21" line="34" source_state="20" duration_seconds="0.130"><command>definition
+  &quot;valid_countings a b =
+    card {f\&lt;in&gt;{1..a+b} \&lt;rightarrow&gt;\&lt;^sub&gt;E {A, B}.
+      card {x\&lt;in&gt;{1..a+b}. f x = A} = a \&lt;and&gt; card {x\&lt;in&gt;{1..a+b}. f x = B} = b \&lt;and&gt;
+      (\&lt;forall&gt;m\&lt;in&gt;{1..a+b}. card {x\&lt;in&gt;{1..m}. f x = A} &gt; card {x\&lt;in&gt;{1..m}. f x = B})}&quot;</command><error></error></attempt><attempt mode="context" success="true" index="22" line="38" source_state="21" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="23" line="40" source_state="22" duration_seconds="0.000"><command>subsubsection \&lt;open&gt;Equivalence with Set Cardinality\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="24" line="40" source_state="23" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="25" line="42" source_state="24" duration_seconds="0.055"><command>lemma Collect_on_transfer:
+  assumes &quot;rel_set R X Y&quot;
+  shows &quot;rel_fun (rel_fun R (=)) (rel_set R) (\&lt;lambda&gt;P. {x\&lt;in&gt;X. P x}) (\&lt;lambda&gt;P. {y\&lt;in&gt;Y. P y})&quot;</command><error></error></attempt><attempt mode="context" success="true" index="26" line="44" source_state="25" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="27" line="46" source_state="26" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="28" line="46" source_state="27" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="29" line="49" source_state="28" duration_seconds="0.004"><command>lemma rel_fun_trans:
+  &quot;rel_fun P Q g g&apos; \&lt;Longrightarrow&gt; rel_fun R P f f&apos; \&lt;Longrightarrow&gt; rel_fun R Q (\&lt;lambda&gt;x. g (f x)) (\&lt;lambda&gt;y. g&apos; (f&apos; y))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="30" line="50" source_state="29" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="31" line="52" source_state="30" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="32" line="52" source_state="31" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="33" line="55" source_state="32" duration_seconds="0.005"><command>lemma rel_fun_trans2:
+  &quot;rel_fun P1 (rel_fun P2 Q) g g&apos; \&lt;Longrightarrow&gt; rel_fun R P1 f1 f1&apos; \&lt;Longrightarrow&gt; rel_fun R P2 f2 f2&apos; \&lt;Longrightarrow&gt;
+    rel_fun R Q (\&lt;lambda&gt;x. g (f1 x) (f2 x)) (\&lt;lambda&gt;y. g&apos; (f1&apos; y) (f2&apos; y))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="34" line="57" source_state="33" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="35" line="59" source_state="34" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="36" line="59" source_state="35" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="37" line="62" source_state="36" duration_seconds="0.004"><command>lemma rel_fun_trans2&apos;:
+  &quot;rel_fun R (=) f1 f1&apos; \&lt;Longrightarrow&gt; rel_fun R (=) f2 f2&apos; \&lt;Longrightarrow&gt;
+    rel_fun R (=) (\&lt;lambda&gt;x. g (f1 x) (f2 x)) (\&lt;lambda&gt;y. g (f1&apos; y) (f2&apos; y))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="38" line="64" source_state="37" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="39" line="66" source_state="38" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="40" line="66" source_state="39" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="41" line="69" source_state="40" duration_seconds="0.001"><command>lemma rel_fun_const: &quot;rel_fun R (=) (\&lt;lambda&gt;x. a) (\&lt;lambda&gt;y. a)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="42" line="69" source_state="41" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="43" line="71" source_state="42" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="44" line="71" source_state="43" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="45" line="74" source_state="44" duration_seconds="0.003"><command>lemma rel_fun_conj:
+  &quot;rel_fun R (=) f f&apos; \&lt;Longrightarrow&gt; rel_fun R (=) g g&apos; \&lt;Longrightarrow&gt; rel_fun R (=) (\&lt;lambda&gt;x. f x \&lt;and&gt; g x) (\&lt;lambda&gt;y. f&apos; y \&lt;and&gt; g&apos; y)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="46" line="75" source_state="45" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="47" line="77" source_state="46" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="48" line="77" source_state="47" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="49" line="80" source_state="48" duration_seconds="0.003"><command>lemma rel_fun_ball:
+  &quot;(\&lt;And&gt;i. i \&lt;in&gt; I \&lt;Longrightarrow&gt; rel_fun R (=) (f i) (f&apos; i)) \&lt;Longrightarrow&gt; rel_fun R (=) (\&lt;lambda&gt;x. \&lt;forall&gt;i\&lt;in&gt;I. f i x) (\&lt;lambda&gt;y. \&lt;forall&gt;i\&lt;in&gt;I. f&apos; i y)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="50" line="81" source_state="49" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="51" line="83" source_state="50" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="52" line="83" source_state="51" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="53" line="86" source_state="52" duration_seconds="0.006"><command>lemma
+  shows all_countings_set: &quot;all_countings a b = card {V\&lt;in&gt;Pow {0..&lt;a+b}. card V = a}&quot;
+      (is &quot;_ = card ?A&quot;)
+    and valid_countings_set: &quot;valid_countings a b =
+      card {V\&lt;in&gt;Pow {0..&lt;a+b}. card V = a \&lt;and&gt; (\&lt;forall&gt;m\&lt;in&gt;{1..a+b}. card ({0..&lt;m} \&lt;inter&gt; V) &gt; m - card ({0..&lt;m} \&lt;inter&gt; V))}&quot;
+      (is &quot;_ = card ?V&quot;)</command><error></error></attempt><attempt mode="context" success="true" index="54" line="91" source_state="53" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="55" line="93" source_state="54" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="56" line="93" source_state="55" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="57" line="1" source_state="56" duration_seconds="0.000"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="58" line="1" source_state="57" duration_seconds="0.001"><command>lemma all_countings [code]: &quot;all_countings a b = (a + b) choose a&quot;</command><error></error></attempt><attempt mode="target" success="true" index="59" line="1" source_state="58" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="search" success="true" index="60" line="1" source_state="59" duration_seconds="0.006"><command>by (simp add: all_countings_set n_subsets)</command><error></error></attempt><attempt mode="close_scope" success="true" index="61" line="1" source_state="60" duration_seconds="0.016"><command>end</command><error></error></attempt></attempts><settings/></dsp_result>

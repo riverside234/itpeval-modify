@@ -1,0 +1,37 @@
+{
+  "name": "context_hundred-theorems_089_the_factor_and_remainder_theorems_poly_squarefree_decomp",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 9.508,
+  "details": "details/063-context_hundred-theorems_089_the_factor_and_remainder_theorems_poly_squarefree_decomp.json",
+  "failure_category": "import_error",
+  "expected_failure": null,
+  "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/build.log\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/Primes.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_bcb4d101b99c490c8e8026fee6d9c987.Primes\"\n*** (required by \"DSP_Job_bcb4d101b99c490c8e8026fee6d9c987.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/Primes.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/Primes.thy\"\n*** The error(s) above occurred in session \"DSP_Job_bcb4d101b99c490c8e8026fee6d9c987\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/ROOT\")",
+  "payload": {
+    "ok": false,
+    "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/build.log\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/Primes.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_bcb4d101b99c490c8e8026fee6d9c987.Primes\"\n*** (required by \"DSP_Job_bcb4d101b99c490c8e8026fee6d9c987.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/Primes.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/Primes.thy\"\n*** The error(s) above occurred in session \"DSP_Job_bcb4d101b99c490c8e8026fee6d9c987\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/ROOT\")",
+    "failure_category": "import_error",
+    "build_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/build.log",
+    "build_returncode": 2,
+    "build_log_excerpt": "*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/Primes.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_bcb4d101b99c490c8e8026fee6d9c987.Primes\"\n*** (required by \"DSP_Job_bcb4d101b99c490c8e8026fee6d9c987.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/Primes.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/Primes.thy\"\n*** The error(s) above occurred in session \"DSP_Job_bcb4d101b99c490c8e8026fee6d9c987\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd/ROOT\")",
+    "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd",
+    "import_resolution": {
+      "original_imports": [
+        "Complex_Main",
+        "HOL-Library.More_List",
+        "HOL-Library.Infinite_Set",
+        "Primes"
+      ],
+      "resolved_imports": [
+        "Complex_Main",
+        "HOL-Library.More_List",
+        "HOL-Library.Infinite_Set",
+        "Primes"
+      ],
+      "session_dependencies": [
+        "HOL-Library"
+      ]
+    },
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-__big8wd"
+  }
+}

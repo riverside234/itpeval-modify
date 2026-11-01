@@ -1,0 +1,211 @@
+<dsp_result schema="dsp_native_result_v1" request_id="7aaa8925d59043c08cc9a152bc96e287" input_sha256="20e0e1d2cc7ddd6d5fa1e43332d04b4dc26fb70f01857a0d4cb7e87d840d219a" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.038"><command>theory probability
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="5" source_state="3" duration_seconds="0.600"><command>datatype &apos;a mylist = NilL | ConsL &apos;a &quot;&apos;a mylist&quot;</command><error></error></attempt><attempt mode="context" success="true" index="5" line="5" source_state="4" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="7" source_state="5" duration_seconds="0.009"><command>primrec mapL :: &quot;(&apos;a \&lt;Rightarrow&gt; &apos;b) \&lt;Rightarrow&gt; &apos;a mylist \&lt;Rightarrow&gt; &apos;b mylist&quot; where
+  &quot;mapL f NilL        = NilL&quot;
+| &quot;mapL f (ConsL x xs) = ConsL (f x) (mapL f xs)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="9" source_state="6" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="8" line="11" source_state="7" duration_seconds="0.009"><command>primrec fold_addL :: &quot;(&apos;a \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; &apos;a) \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; &apos;a mylist \&lt;Rightarrow&gt; &apos;a&quot; where
+  &quot;fold_addL add z NilL        = z&quot;
+| &quot;fold_addL add z (ConsL x xs) = add x (fold_addL add z xs)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="9" line="13" source_state="8" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="10" line="15" source_state="9" duration_seconds="0.019"><command>inductive InL :: &quot;&apos;a \&lt;Rightarrow&gt; &apos;a mylist \&lt;Rightarrow&gt; bool&quot; where
+  In_head : &quot;InL x (ConsL x xs)&quot;
+| In_tail : &quot;InL x xs \&lt;Longrightarrow&gt; InL x (ConsL y xs)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="11" line="17" source_state="10" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="12" line="19" source_state="11" duration_seconds="0.016"><command>inductive NoDupL :: &quot;&apos;a mylist \&lt;Rightarrow&gt; bool&quot; where
+  ND_nil  : &quot;NoDupL NilL&quot;
+| ND_cons : &quot;\&lt;lbrakk&gt;\&lt;not&gt; InL x xs; NoDupL xs\&lt;rbrakk&gt; \&lt;Longrightarrow&gt; NoDupL (ConsL x xs)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="13" line="21" source_state="12" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="14" line="23" source_state="13" duration_seconds="0.001"><command>type_synonym &apos;a event = &quot;&apos;a \&lt;Rightarrow&gt; bool&quot;</command><error></error></attempt><attempt mode="context" success="true" index="15" line="23" source_state="14" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="16" line="25" source_state="15" duration_seconds="0.004"><command>definition ev_false :: &quot;&apos;a event&quot; where &quot;ev_false \&lt;equiv&gt; \&lt;lambda&gt;_. False&quot;</command><error></error></attempt><attempt mode="context" success="true" index="17" line="25" source_state="16" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="26" source_state="17" duration_seconds="0.004"><command>definition ev_true  :: &quot;&apos;a event&quot; where &quot;ev_true  \&lt;equiv&gt; \&lt;lambda&gt;_. True&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="26" source_state="18" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="20" line="27" source_state="19" duration_seconds="0.005"><command>definition ev_inter :: &quot;&apos;a event \&lt;Rightarrow&gt; &apos;a event \&lt;Rightarrow&gt; &apos;a event&quot;
+  where &quot;ev_inter A B \&lt;equiv&gt; \&lt;lambda&gt;\&lt;omega&gt;. A \&lt;omega&gt; \&lt;and&gt; B \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="21" line="28" source_state="20" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="29" source_state="21" duration_seconds="0.005"><command>definition ev_union :: &quot;&apos;a event \&lt;Rightarrow&gt; &apos;a event \&lt;Rightarrow&gt; &apos;a event&quot;
+  where &quot;ev_union A B \&lt;equiv&gt; \&lt;lambda&gt;\&lt;omega&gt;. A \&lt;omega&gt; \&lt;or&gt; B \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="23" line="30" source_state="22" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="24" line="31" source_state="23" duration_seconds="0.005"><command>definition ev_compl :: &quot;&apos;a event \&lt;Rightarrow&gt; &apos;a event&quot;
+  where &quot;ev_compl A \&lt;equiv&gt; \&lt;lambda&gt;\&lt;omega&gt;. \&lt;not&gt; A \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="25" line="32" source_state="24" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="26" line="33" source_state="25" duration_seconds="0.005"><command>definition ev_diff  :: &quot;&apos;a event \&lt;Rightarrow&gt; &apos;a event \&lt;Rightarrow&gt; &apos;a event&quot;
+  where &quot;ev_diff A B \&lt;equiv&gt; \&lt;lambda&gt;\&lt;omega&gt;. A \&lt;omega&gt; \&lt;and&gt; \&lt;not&gt; B \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="27" line="34" source_state="26" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="28" line="36" source_state="27" duration_seconds="0.005"><command>definition disjoint :: &quot;&apos;a event \&lt;Rightarrow&gt; &apos;a event \&lt;Rightarrow&gt; bool&quot;
+  where &quot;disjoint A B \&lt;equiv&gt; \&lt;forall&gt;\&lt;omega&gt;. \&lt;not&gt; (A \&lt;omega&gt; \&lt;and&gt; B \&lt;omega&gt;)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="29" line="37" source_state="28" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="30" line="39" source_state="29" duration_seconds="0.070"><command>fun pairwise_disjoint :: &quot;(&apos;a event) mylist \&lt;Rightarrow&gt; bool&quot; where
+  &quot;pairwise_disjoint NilL = True&quot;
+| &quot;pairwise_disjoint (ConsL _ NilL) = True&quot;
+| &quot;pairwise_disjoint (ConsL A (ConsL B xs)) =
+     (disjoint A B \&lt;and&gt;
+      (\&lt;forall&gt;C. InL C (ConsL B xs) \&lt;longrightarrow&gt; disjoint A C) \&lt;and&gt;
+      pairwise_disjoint (ConsL B xs))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="31" line="45" source_state="30" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="32" line="47" source_state="31" duration_seconds="0.008"><command>primrec bigUnion :: &quot;(&apos;a event) mylist \&lt;Rightarrow&gt; &apos;a event&quot; where
+  &quot;bigUnion NilL         = ev_false&quot;
+| &quot;bigUnion (ConsL A xs) = ev_union A (bigUnion xs)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="33" line="49" source_state="32" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="34" line="53" source_state="33" duration_seconds="0.001"><command>lemma ev_inter_comm:
+  &quot;\&lt;forall&gt;\&lt;omega&gt;. ev_inter A B \&lt;omega&gt; \&lt;longleftrightarrow&gt; ev_inter B A \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="35" line="54" source_state="34" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="36" line="55" source_state="35" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="37" line="55" source_state="36" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="38" line="56" source_state="37" duration_seconds="0.001"><command>lemma ev_union_comm:
+  &quot;\&lt;forall&gt;\&lt;omega&gt;. ev_union A B \&lt;omega&gt; \&lt;longleftrightarrow&gt; ev_union B A \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="39" line="57" source_state="38" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="40" line="58" source_state="39" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="41" line="58" source_state="40" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="42" line="59" source_state="41" duration_seconds="0.002"><command>lemma ev_inter_assoc:
+  &quot;\&lt;forall&gt;\&lt;omega&gt;. ev_inter (ev_inter A B) C \&lt;omega&gt; \&lt;longleftrightarrow&gt; ev_inter A (ev_inter B C) \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="43" line="60" source_state="42" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="44" line="61" source_state="43" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="45" line="61" source_state="44" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="46" line="62" source_state="45" duration_seconds="0.002"><command>lemma ev_union_assoc:
+  &quot;\&lt;forall&gt;\&lt;omega&gt;. ev_union (ev_union A B) C \&lt;omega&gt; \&lt;longleftrightarrow&gt; ev_union A (ev_union B C) \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="47" line="63" source_state="46" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="48" line="64" source_state="47" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="49" line="64" source_state="48" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="50" line="65" source_state="49" duration_seconds="0.002"><command>lemma ev_inter_distrib_left:
+  &quot;\&lt;forall&gt;\&lt;omega&gt;. ev_inter A (ev_union B C) \&lt;omega&gt; \&lt;longleftrightarrow&gt; ev_union (ev_inter A B) (ev_inter A C) \&lt;omega&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="51" line="66" source_state="50" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="52" line="67" source_state="51" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="53" line="67" source_state="52" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="54" line="69" source_state="53" duration_seconds="0.002"><command>lemma disjoint_bigUnion:
+  &quot;(\&lt;forall&gt;C. InL C xs \&lt;longrightarrow&gt; disjoint A C) \&lt;Longrightarrow&gt; disjoint A (bigUnion xs)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="55" line="70" source_state="54" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="56" line="71" source_state="55" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="57" line="71" source_state="56" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="58" line="73" source_state="57" duration_seconds="0.053"><command>locale probability_setup =
+  fixes zero one :: &quot;&apos;r&quot;
+    and add       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;   (infixl &quot;+R&quot; 65)
+    and opp       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+    and mul       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;   (infixl &quot;*R&quot; 70)
+    and prob      :: &quot;(&apos;a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; &apos;r&quot;
+    and cprob     :: &quot;(&apos;a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; (&apos;a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; &apos;r&quot;
+
+  assumes
+    add_comm      : &quot;\&lt;And&gt;x y.   x +R y = y +R x&quot;
+    and add_assoc : &quot;\&lt;And&gt;x y z. (x +R y) +R z = x +R (y +R z)&quot;
+    and add_zero  : &quot;\&lt;And&gt;x.     x +R zero = x&quot;
+    and add_opp   : &quot;\&lt;And&gt;x.     x +R opp x = zero&quot;
+    and mul_comm  : &quot;\&lt;And&gt;x y.   x *R y = y *R x&quot;
+    and mul_assoc : &quot;\&lt;And&gt;x y z. (x *R y) *R z = x *R (y *R z)&quot;
+    and mul_one   : &quot;\&lt;And&gt;x.     x *R one = x&quot;
+    and dist_l    : &quot;\&lt;And&gt;x y z. x *R (y +R z) = (x *R y) +R (x *R z)&quot;
+    and mul_zero  : &quot;\&lt;And&gt;x.     x *R zero = zero&quot;
+    and opp_zero  : &quot;opp zero = zero&quot;
+    and opp_opp   : &quot;\&lt;And&gt;x.     opp (opp x) = x&quot;
+    and opp_mul_right : &quot;\&lt;And&gt;x y. x *R opp y = opp (x *R y)&quot;
+    and opp_mul_left  : &quot;\&lt;And&gt;x y. opp x *R y = opp (x *R y)&quot;
+
+    and prob_ext  : &quot;\&lt;And&gt;A B. (\&lt;forall&gt;\&lt;omega&gt;. A \&lt;omega&gt; \&lt;longleftrightarrow&gt; B \&lt;omega&gt;) \&lt;Longrightarrow&gt; prob A = prob B&quot;
+    and prob_false_ax : &quot;prob ev_false = zero&quot;
+    and prob_true_ax  : &quot;prob ev_true  = one&quot;
+    and prob_union_ax :
+          &quot;\&lt;And&gt;A B. prob (ev_union A B) =
+           prob A +R (prob B +R opp (prob (ev_inter A B)))&quot;
+    and prob_compl_ax : &quot;\&lt;And&gt;A. prob (ev_compl A) = one +R opp (prob A)&quot;
+    and cprob_mul     : &quot;\&lt;And&gt;A B. prob (ev_inter A B) = cprob A B *R prob B&quot;
+    and prob_union_disjoint :
+          &quot;\&lt;And&gt;A B. disjoint A B \&lt;Longrightarrow&gt;
+           prob (ev_union A B) = prob A +R prob B&quot;
+    and disjoint_head_tail :
+          &quot;\&lt;And&gt;A xs. pairwise_disjoint (ConsL A xs) \&lt;Longrightarrow&gt;
+           disjoint A (bigUnion xs)&quot;
+    and indep_compl_both_ax :
+          &quot;\&lt;And&gt;A B. prob (ev_inter A B) = prob A *R prob B \&lt;Longrightarrow&gt;
+           prob (ev_inter (ev_compl A) (ev_compl B)) =
+           prob (ev_compl A) *R prob (ev_compl B)&quot;
+    and inclusion_exclusion_three :
+          &quot;\&lt;And&gt;A B C.
+           prob (ev_union (ev_union A B) C) =
+           prob A +R (prob B +R (prob C +R
+             opp (prob (ev_inter A B) +R
+                  (prob (ev_inter A C) +R
+                   (prob (ev_inter B C) +R
+                    opp (prob (ev_inter (ev_inter A B) C)))))))&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="59" line="122" source_state="58" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="60" line="128" source_state="59" duration_seconds="0.002"><command>lemma zero_add: &quot;zero +R x = x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="61" line="128" source_state="60" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="62" line="129" source_state="61" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="63" line="129" source_state="62" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="64" line="130" source_state="63" duration_seconds="0.001"><command>lemma add_opp_comm: &quot;opp x +R x = zero&quot;</command><error></error></attempt><attempt mode="context" success="true" index="65" line="130" source_state="64" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="66" line="131" source_state="65" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="67" line="131" source_state="66" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="68" line="133" source_state="67" duration_seconds="0.001"><command>lemma sub_of_eq: &quot;a = b +R c \&lt;Longrightarrow&gt; c = a +R opp b&quot;</command><error></error></attempt><attempt mode="context" success="true" index="69" line="133" source_state="68" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="70" line="134" source_state="69" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="71" line="134" source_state="70" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="72" line="139" source_state="71" duration_seconds="0.007"><command>definition indep :: &quot;(&apos;a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; (&apos;a \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; bool&quot;
+  where &quot;indep A B \&lt;equiv&gt; prob (ev_inter A B) = prob A *R prob B&quot;</command><error></error></attempt><attempt mode="context" success="true" index="73" line="140" source_state="72" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="74" line="146" source_state="73" duration_seconds="0.003"><command>lemma prob_union_comm:
+  &quot;prob (ev_union A B) = prob (ev_union B A)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="75" line="147" source_state="74" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="76" line="148" source_state="75" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="77" line="148" source_state="76" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="78" line="149" source_state="77" duration_seconds="0.001"><command>lemma prob_union_idem:
+  &quot;prob (ev_union A A) = prob A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="79" line="150" source_state="78" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="80" line="151" source_state="79" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="81" line="151" source_state="80" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="82" line="156" source_state="81" duration_seconds="0.002"><command>lemma prob_diff:
+  &quot;prob (ev_diff A B) = prob A +R opp (prob (ev_inter A B))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="83" line="157" source_state="82" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="84" line="158" source_state="83" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="85" line="158" source_state="84" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="86" line="163" source_state="85" duration_seconds="0.001"><command>lemma bayes_symm:
+  &quot;cprob A B *R prob B = cprob B A *R prob A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="87" line="164" source_state="86" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="88" line="165" source_state="87" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="89" line="165" source_state="88" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="90" line="170" source_state="89" duration_seconds="0.002"><command>lemma law_total_prob:
+  &quot;prob A =
+   cprob A B *R prob B +R cprob A (ev_compl B) *R prob (ev_compl B)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="91" line="172" source_state="90" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="92" line="173" source_state="91" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="93" line="173" source_state="92" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="94" line="178" source_state="93" duration_seconds="0.002"><command>lemma prob_union_indep:
+  &quot;indep A B \&lt;Longrightarrow&gt;
+   prob (ev_union A B) =
+   prob A +R (prob B +R opp (prob A *R prob B))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="95" line="181" source_state="94" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="96" line="182" source_state="95" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="97" line="182" source_state="96" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="98" line="187" source_state="97" duration_seconds="0.001"><command>lemma indep_symm: &quot;indep A B \&lt;Longrightarrow&gt; indep B A&quot;</command><error></error></attempt><attempt mode="context" success="true" index="99" line="187" source_state="98" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="100" line="188" source_state="99" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="101" line="188" source_state="100" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="102" line="189" source_state="101" duration_seconds="0.001"><command>lemma indep_compl_right: &quot;indep A B \&lt;Longrightarrow&gt; indep A (ev_compl B)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="103" line="189" source_state="102" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="104" line="190" source_state="103" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="105" line="190" source_state="104" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="106" line="191" source_state="105" duration_seconds="0.001"><command>lemma indep_compl_left: &quot;indep A B \&lt;Longrightarrow&gt; indep (ev_compl A) B&quot;</command><error></error></attempt><attempt mode="context" success="true" index="107" line="191" source_state="106" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="108" line="192" source_state="107" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="109" line="192" source_state="108" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="110" line="193" source_state="109" duration_seconds="0.001"><command>lemma indep_compl_both: &quot;indep A B \&lt;Longrightarrow&gt; indep (ev_compl A) (ev_compl B)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="111" line="193" source_state="110" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="112" line="194" source_state="111" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="113" line="194" source_state="112" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="114" line="199" source_state="113" duration_seconds="0.002"><command>lemma prob_bigUnion_disjoint:
+  &quot;pairwise_disjoint xs \&lt;Longrightarrow&gt;
+   prob (bigUnion xs) = fold_addL (+R) zero (mapL prob xs)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="115" line="201" source_state="114" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="116" line="202" source_state="115" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="117" line="202" source_state="116" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="118" line="1" source_state="117" duration_seconds="0.001"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="119" line="1" source_state="118" duration_seconds="0.002"><command>lemma prob_bigUnion_disjoint_zero:
+  &quot;pairwise_disjoint xs \&lt;Longrightarrow&gt;
+   (\&lt;forall&gt;A. InL A xs \&lt;longrightarrow&gt; prob A = zero) \&lt;Longrightarrow&gt;
+   prob (bigUnion xs) = zero&quot;</command><error></error></attempt><attempt mode="target" success="true" index="120" line="4" source_state="119" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

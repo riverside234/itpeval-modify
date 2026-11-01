@@ -1,0 +1,60 @@
+<dsp_request schema="dsp_native_request_v1" request_id="b6c86f82996e4975bcd9c1d9a3788d97" input_sha256="6657483043eb7d2d20242b5401745674a02d7eeae8cddfe51f5f0a9edbd77d0f" action="context"><prefix>theory linear_map
+  imports Main
+begin
+
+
+
+
+
+locale linear_map_setup =
+  fixes zeroV :: "'v"
+    and addV  :: "'v \&lt;Rightarrow&gt; 'v \&lt;Rightarrow&gt; 'v"         (infixl "+V" 65)
+    and smul  :: "'r \&lt;Rightarrow&gt; 'v \&lt;Rightarrow&gt; 'v"           (infixr "\&lt;cdot&gt;V" 70)
+    and zeroW :: "'w"
+    and addW  :: "'w \&lt;Rightarrow&gt; 'w \&lt;Rightarrow&gt; 'w"         (infixl "+W" 65)
+    and smulW :: "'r \&lt;Rightarrow&gt; 'w \&lt;Rightarrow&gt; 'w"           (infixr "\&lt;cdot&gt;W" 70)
+    and toFun :: "'v \&lt;Rightarrow&gt; 'w"
+
+  assumes addV_comm  : "\&lt;And&gt;u v. u +V v = v +V u"
+    and   addV_assoc : "\&lt;And&gt;u v w. (u +V v) +V w = u +V (v +V w)"
+    and   addV_zero  : "\&lt;And&gt;u. u +V zeroV = u"
+    and   smul_zeroV : "\&lt;And&gt;a. a \&lt;cdot&gt;V zeroV = zeroV"
+
+    and   addW_comm  : "\&lt;And&gt;u v. u +W v = v +W u"
+    and   addW_assoc : "\&lt;And&gt;u v w. (u +W v) +W w = u +W (v +W w)"
+    and   addW_zero  : "\&lt;And&gt;u. u +W zeroW = u"
+    and   smulW_zero : "\&lt;And&gt;a. a \&lt;cdot&gt;W zeroW = zeroW"
+
+    and   map_add    : "\&lt;And&gt;u v. toFun (u +V v) = toFun u +W toFun v"
+    and   map_smul   : "\&lt;And&gt;a u. toFun (a \&lt;cdot&gt;V u) = a \&lt;cdot&gt;W toFun u"
+begin
+
+
+
+
+
+definition ker :: "'v \&lt;Rightarrow&gt; bool"
+  where "ker x \&lt;equiv&gt; toFun x = zeroW"
+
+definition im :: "'w \&lt;Rightarrow&gt; bool"
+  where "im y \&lt;equiv&gt; \&lt;exists&gt;x. toFun x = y"
+
+
+
+
+
+lemma ker_add:
+  assumes "ker x" "ker y" shows "ker (x +V y)"
+  sorry
+lemma ker_smul:
+  assumes "ker x" shows "ker (a \&lt;cdot&gt;V x)"
+  sorry
+
+
+
+
+lemma im_add:
+  assumes "im y" "im z" shows "im (y +W z)"
+  sorry
+</prefix><statement>lemma im_smul:
+  assumes "im y" shows "im (a \&lt;cdot&gt;W y)"</statement><proof_prefix /><sketch /><depth>2</depth><target_name>im_smul</target_name><forbidden_names><item>im_smul</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.999461497995</remaining_s></dsp_request>

@@ -1,0 +1,92 @@
+<dsp_result schema="dsp_native_result_v1" request_id="1bbe7f3df5ff4298b215e3eab35e9b66" input_sha256="35967619c1119b946494e8c65b0b7430a6bd9a732ac14c7aa40309e303213ddd" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.038"><command>theory inner_product
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="5" source_state="3" duration_seconds="0.070"><command>locale inner_product =
+  fixes zero_R one_R :: &quot;&apos;r&quot;
+    and add_R :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;  (infixl &quot;+R&quot; 65)
+    and mul_R :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;  (infixl &quot;*R&quot; 70)
+    and opp_R :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+    and zeroV :: &quot;&apos;v&quot;
+    and addV  :: &quot;&apos;v \&lt;Rightarrow&gt; &apos;v \&lt;Rightarrow&gt; &apos;v&quot;  (infixl &quot;+V&quot; 65)
+    and oppV  :: &quot;&apos;v \&lt;Rightarrow&gt; &apos;v&quot;
+    and smul  :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;v \&lt;Rightarrow&gt; &apos;v&quot;
+    and ip    :: &quot;&apos;v \&lt;Rightarrow&gt; &apos;v \&lt;Rightarrow&gt; &apos;r&quot;
+
+  assumes add_R_comm    : &quot;\&lt;And&gt;x y. x +R y = y +R x&quot;
+    and   add_R_assoc   : &quot;\&lt;And&gt;x y z. (x +R y) +R z = x +R (y +R z)&quot;
+    and   add_R_zero    : &quot;\&lt;And&gt;x. x +R zero_R = x&quot;
+    and   zero_R_add    : &quot;\&lt;And&gt;x. zero_R +R x = x&quot;
+    and   add_R_opp     : &quot;\&lt;And&gt;x. x +R opp_R x = zero_R&quot;
+    and   mul_R_comm    : &quot;\&lt;And&gt;x y. x *R y = y *R x&quot;
+    and   mul_R_assoc   : &quot;\&lt;And&gt;x y z. (x *R y) *R z = x *R (y *R z)&quot;
+    and   mul_R_one     : &quot;\&lt;And&gt;x. x *R one_R = x&quot;
+    and   mul_opp_one   : &quot;\&lt;And&gt;x. opp_R one_R *R x = opp_R x&quot;
+    and   opp_R_opp     : &quot;\&lt;And&gt;x. opp_R (opp_R x) = x&quot;
+
+    and   addV_comm     : &quot;\&lt;And&gt;u v. u +V v = v +V u&quot;
+    and   addV_assoc    : &quot;\&lt;And&gt;u v w. (u +V v) +V w = u +V (v +V w)&quot;
+    and   addV_zero     : &quot;\&lt;And&gt;u. u +V zeroV = u&quot;
+    and   smul_addV     : &quot;\&lt;And&gt;a u v. smul a (u +V v) = smul a u +V smul a v&quot;
+    and   one_smul      : &quot;\&lt;And&gt;u. smul one_R u = u&quot;
+    and   opp_smul_one  : &quot;\&lt;And&gt;u. oppV u = smul (opp_R one_R) u&quot;
+
+    and   lin_left_add  : &quot;\&lt;And&gt;u v w. ip (u +V v) w = ip u w +R ip v w&quot;
+    and   lin_left_smul : &quot;\&lt;And&gt;a u v. ip (smul a u) v = a *R ip u v&quot;
+    and   lin_right_add : &quot;\&lt;And&gt;u v w. ip u (v +V w) = ip u v +R ip u w&quot;
+    and   lin_right_smul: &quot;\&lt;And&gt;a u v. ip u (smul a v) = a *R ip u v&quot;
+    and   ip_symm       : &quot;\&lt;And&gt;u v. ip u v = ip v u&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="39" source_state="4" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="45" source_state="5" duration_seconds="0.019"><command>definition subV :: &quot;&apos;v \&lt;Rightarrow&gt; &apos;v \&lt;Rightarrow&gt; &apos;v&quot;  (infixl &quot;-V&quot; 65)
+  where &quot;u -V v \&lt;equiv&gt; u +V oppV v&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="46" source_state="6" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="8" line="48" source_state="7" duration_seconds="0.006"><command>lemma add_R_left_comm: &quot;x +R (y +R z) = y +R (x +R z)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="9" line="48" source_state="8" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="10" line="49" source_state="9" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="11" line="49" source_state="10" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="12" line="54" source_state="11" duration_seconds="0.002"><command>lemma ip_neg_left: &quot;ip (oppV u) v = opp_R (ip u v)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="13" line="54" source_state="12" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="14" line="55" source_state="13" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="15" line="55" source_state="14" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="16" line="56" source_state="15" duration_seconds="0.002"><command>lemma ip_neg_right: &quot;ip u (oppV v) = opp_R (ip u v)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="17" line="56" source_state="16" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="18" line="57" source_state="17" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="19" line="57" source_state="18" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="20" line="62" source_state="19" duration_seconds="0.003"><command>lemma ip_add_add:
+  &quot;ip (u +V v) (u +V v) =
+    (ip u u +R ip v u) +R (ip u v +R ip v v)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="21" line="64" source_state="20" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="22" line="65" source_state="21" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="23" line="65" source_state="22" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="24" line="70" source_state="23" duration_seconds="0.002"><command>lemma ip_neg_neg: &quot;ip (oppV v) (oppV v) = ip v v&quot;</command><error></error></attempt><attempt mode="context" success="true" index="25" line="70" source_state="24" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="26" line="71" source_state="25" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="27" line="71" source_state="26" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="28" line="72" source_state="27" duration_seconds="0.004"><command>lemma ip_sub_sub:
+  &quot;ip (u -V v) (u -V v) =
+    (ip u u +R opp_R (ip v u)) +R (opp_R (ip u v) +R ip v v)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="29" line="74" source_state="28" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="30" line="75" source_state="29" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="31" line="75" source_state="30" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="32" line="80" source_state="31" duration_seconds="0.003"><command>lemma pythagoras:
+  assumes h: &quot;ip u v = zero_R&quot;
+  shows &quot;ip (u +V v) (u +V v) = ip u u +R ip v v&quot;</command><error></error></attempt><attempt mode="context" success="true" index="33" line="82" source_state="32" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="34" line="83" source_state="33" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="35" line="83" source_state="34" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="36" line="1" source_state="35" duration_seconds="0.001"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="37" line="1" source_state="36" duration_seconds="0.006"><command>lemma parallelogram:
+  &quot;ip (u +V v) (u +V v) +R ip (u -V v) (u -V v) =
+    ((ip u u +R ip v u) +R (ip u v +R ip v v)) +R
+    ((ip u u +R opp_R (ip v u)) +R (opp_R (ip u v) +R ip v v))&quot;</command><error></error></attempt><attempt mode="target" success="true" index="38" line="4" source_state="37" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

@@ -1,0 +1,20 @@
+{
+  "request_id": "68d2be4a154a4e7cb4726754b105a71e",
+  "action": "context",
+  "prefix": "theory limits_uniqueness\n  imports Main\nbegin\n\nlocale abs_field =\n  fixes zero    :: \"'r\"\n    and one     :: \"'r\"\n    and add     :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"+R\" 65)\n    and mul     :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"*R\" 70)\n    and opp     :: \"'r \\<Rightarrow> 'r\"\n    and absV    :: \"'r \\<Rightarrow> 'r\"\n    and le      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<preceq>\" 50)\n    and lt      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<prec>\" 50)\n\n    and natLe   :: \"'n \\<Rightarrow> 'n \\<Rightarrow> bool\"\n    and natMax  :: \"'n \\<Rightarrow> 'n \\<Rightarrow> 'n\"\n  assumes le_max_left    : \"\\<And>x y. natLe x (natMax x y)\"\n    and   le_max_right   : \"\\<And>x y. natLe y (natMax x y)\"\n    and   add_comm       : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc      : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero       : \"\\<And>x. x +R zero = x\"\n    and   add_opp        : \"\\<And>x. x +R opp x = zero\"\n    and   opp_add        : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\n    and   le_refl        : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans       : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   add_le_add     : \"\\<And>a b c d. a \\<preceq> b \\<Longrightarrow> c \\<preceq> d \\<Longrightarrow> a +R c \\<preceq> b +R d\"\n    and   abs_nonneg     : \"\\<And>x. zero \\<preceq> absV x\"\n    and   abs_triangle   : \"\\<And>x y. absV (x +R y) \\<preceq> absV x +R absV y\"\n    and   abs_sub_symm   : \"\\<And>x y. absV (x +R opp y) = absV (y +R opp x)\"\n    and   sub_decomp     : \"\\<And>x y z. x +R opp z = (x +R opp y) +R (y +R opp z)\"\n    and   sub_eq_zero    : \"\\<And>x y. x +R opp y = zero \\<Longrightarrow> x = y\"\n    and   eq_of_forall_eps2 :\n            \"\\<And>x. (\\<forall>eps. zero \\<prec> eps \\<longrightarrow> absV x \\<preceq> eps +R eps) \\<Longrightarrow> x = zero\"\nbegin\n\n\n\n\n\ndefinition sub :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"sub x y \\<equiv> x +R opp y\"\n\ndefinition limit :: \"('n \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"limit u l \\<equiv>\n    \\<forall>eps. zero \\<prec> eps \\<longrightarrow>\n      (\\<exists>N. \\<forall>n. natLe N n \\<longrightarrow> absV (sub (u n) l) \\<preceq> eps)\"\n\n\n\n\n\nlemma sub_self_zero: \"sub x x = zero\"\n  sorry\nlemma sub_decomp_lem: \"sub x z = (sub x y) +R (sub y z)\"\n  sorry\nlemma abs_sub_triangle:\n  \"absV (sub x z) \\<preceq> absV (sub x y) +R absV (sub y z)\"\n  sorry\nlemma abs_sub_symm_lem: \"absV (sub x y) = absV (sub y x)\"\n  sorry\n\n\n\n\n",
+  "statement": "theorem limit_unique:\n  assumes Hl: \"limit u l\" and Hm: \"limit u m\"\n  shows \"l = m\"",
+  "proof_prefix": "",
+  "sketch": "",
+  "depth": "2",
+  "target_name": "limit_unique",
+  "forbidden_names": [
+    "limit_unique"
+  ],
+  "heuristics": [],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9985818070127",
+  "input_sha256": "b2508bb7db3e2655f5d132c55f2b3917305c4ba29edda5031c50ba58c2d20d51"
+}

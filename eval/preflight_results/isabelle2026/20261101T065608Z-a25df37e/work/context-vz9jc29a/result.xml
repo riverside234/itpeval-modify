@@ -1,0 +1,61 @@
+<dsp_result schema="dsp_native_result_v1" request_id="b6c86f82996e4975bcd9c1d9a3788d97" input_sha256="6657483043eb7d2d20242b5401745674a02d7eeae8cddfe51f5f0a9edbd77d0f" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.039"><command>theory linear_map
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="9" source_state="3" duration_seconds="0.041"><command>locale linear_map_setup =
+  fixes zeroV :: &quot;&apos;v&quot;
+    and addV  :: &quot;&apos;v \&lt;Rightarrow&gt; &apos;v \&lt;Rightarrow&gt; &apos;v&quot;         (infixl &quot;+V&quot; 65)
+    and smul  :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;v \&lt;Rightarrow&gt; &apos;v&quot;           (infixr &quot;\&lt;cdot&gt;V&quot; 70)
+    and zeroW :: &quot;&apos;w&quot;
+    and addW  :: &quot;&apos;w \&lt;Rightarrow&gt; &apos;w \&lt;Rightarrow&gt; &apos;w&quot;         (infixl &quot;+W&quot; 65)
+    and smulW :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;w \&lt;Rightarrow&gt; &apos;w&quot;           (infixr &quot;\&lt;cdot&gt;W&quot; 70)
+    and toFun :: &quot;&apos;v \&lt;Rightarrow&gt; &apos;w&quot;
+
+  assumes addV_comm  : &quot;\&lt;And&gt;u v. u +V v = v +V u&quot;
+    and   addV_assoc : &quot;\&lt;And&gt;u v w. (u +V v) +V w = u +V (v +V w)&quot;
+    and   addV_zero  : &quot;\&lt;And&gt;u. u +V zeroV = u&quot;
+    and   smul_zeroV : &quot;\&lt;And&gt;a. a \&lt;cdot&gt;V zeroV = zeroV&quot;
+
+    and   addW_comm  : &quot;\&lt;And&gt;u v. u +W v = v +W u&quot;
+    and   addW_assoc : &quot;\&lt;And&gt;u v w. (u +W v) +W w = u +W (v +W w)&quot;
+    and   addW_zero  : &quot;\&lt;And&gt;u. u +W zeroW = u&quot;
+    and   smulW_zero : &quot;\&lt;And&gt;a. a \&lt;cdot&gt;W zeroW = zeroW&quot;
+
+    and   map_add    : &quot;\&lt;And&gt;u v. toFun (u +V v) = toFun u +W toFun v&quot;
+    and   map_smul   : &quot;\&lt;And&gt;a u. toFun (a \&lt;cdot&gt;V u) = a \&lt;cdot&gt;W toFun u&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="30" source_state="4" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="36" source_state="5" duration_seconds="0.014"><command>definition ker :: &quot;&apos;v \&lt;Rightarrow&gt; bool&quot;
+  where &quot;ker x \&lt;equiv&gt; toFun x = zeroW&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="37" source_state="6" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="8" line="39" source_state="7" duration_seconds="0.014"><command>definition im :: &quot;&apos;w \&lt;Rightarrow&gt; bool&quot;
+  where &quot;im y \&lt;equiv&gt; \&lt;exists&gt;x. toFun x = y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="9" line="40" source_state="8" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="10" line="46" source_state="9" duration_seconds="0.007"><command>lemma ker_add:
+  assumes &quot;ker x&quot; &quot;ker y&quot; shows &quot;ker (x +V y)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="11" line="47" source_state="10" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="12" line="48" source_state="11" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="13" line="48" source_state="12" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="14" line="49" source_state="13" duration_seconds="0.002"><command>lemma ker_smul:
+  assumes &quot;ker x&quot; shows &quot;ker (a \&lt;cdot&gt;V x)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="15" line="50" source_state="14" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="16" line="51" source_state="15" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="17" line="51" source_state="16" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="56" source_state="17" duration_seconds="0.002"><command>lemma im_add:
+  assumes &quot;im y&quot; &quot;im z&quot; shows &quot;im (y +W z)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="57" source_state="18" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="20" line="58" source_state="19" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="21" line="58" source_state="20" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="1" source_state="21" duration_seconds="0.001"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="23" line="1" source_state="22" duration_seconds="0.002"><command>lemma im_smul:
+  assumes &quot;im y&quot; shows &quot;im (a \&lt;cdot&gt;W y)&quot;</command><error></error></attempt><attempt mode="target" success="true" index="24" line="2" source_state="23" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

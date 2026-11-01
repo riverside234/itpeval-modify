@@ -1,0 +1,14 @@
+{
+  "name": "infrastructure",
+  "domain": "setup",
+  "status": "pass",
+  "duration_seconds": 18.201,
+  "details": "details/003-infrastructure.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "payload": {
+    "ok": true,
+    "session": "DSP_Native_61aa968004dae873",
+    "snapshot": "infrastructure"
+  }
+}

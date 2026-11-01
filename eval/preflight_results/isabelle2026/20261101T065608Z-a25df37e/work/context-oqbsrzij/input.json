@@ -1,0 +1,20 @@
+{
+  "request_id": "d578e85d3c7b47099be52c725e74a6b9",
+  "action": "context",
+  "prefix": "theory zero_le_one_elem\n  imports Main\nbegin\n\nlocale zero_le_one_setup =\n  fixes decEq      :: \"'m \\<Rightarrow> 'm \\<Rightarrow> bool\"\n    and zero       :: \"'a\"\n    and one        :: \"'a\"\n    and le         :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"   (infix \"\\<preceq>\" 50)\n    and le_antisym :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  assumes le_refl      : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans     : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   zero_le_one  : \"zero \\<preceq> one\"\n    and   zero_le_zero : \"zero \\<preceq> zero\"\n    and   le_antisym   : \"\\<And>x y. x \\<preceq> y \\<Longrightarrow> y \\<preceq> x \\<Longrightarrow> x = y\"\nbegin\n\ndefinition One_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"One_matrix i j \\<equiv> if decEq i j then one else zero\"\n\ndefinition Zero_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"Zero_matrix \\<equiv> \\<lambda>_ _. zero\"\n\ndefinition matrix_le :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_le A B \\<equiv> \\<forall>i j. A i j \\<preceq> B i j\"\n\ndefinition matrix_eq :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_eq A B \\<equiv> \\<forall>i j. A i j = B i j\"\n\nlemma zero_le_one_elem: \"zero \\<preceq> One_matrix i j\"\n  sorry\nlemma Zero_le_One_matrix: \"matrix_le Zero_matrix One_matrix\"\n  sorry\nlemma matrix_le_refl: \"matrix_le A A\"\n  sorry\nlemma matrix_le_trans: \"matrix_le A B \\<Longrightarrow> matrix_le B C \\<Longrightarrow> matrix_le A C\"\n  sorry\nlemma matrix_eq_refl: \"matrix_eq A A\"\n  sorry\nlemma matrix_eq_sym: \"matrix_eq A B \\<Longrightarrow> matrix_eq B A\"\n  sorry\nlemma matrix_eq_trans: \"matrix_eq A B \\<Longrightarrow> matrix_eq B C \\<Longrightarrow> matrix_eq A C\"\n  sorry\nlemma matrix_eq_le: \"matrix_eq A B \\<Longrightarrow> matrix_le A B \\<and> matrix_le B A\"\n  sorry\n",
+  "statement": "lemma matrix_le_antisymm: \"matrix_le A B \\<Longrightarrow> matrix_le B A \\<Longrightarrow> matrix_eq A B\"",
+  "proof_prefix": "",
+  "sketch": "",
+  "depth": "2",
+  "target_name": "matrix_le_antisymm",
+  "forbidden_names": [
+    "matrix_le_antisymm"
+  ],
+  "heuristics": [],
+  "provers": null,
+  "step_timeout_s": "10",
+  "hammer_timeout_s": "40",
+  "preplay_timeout_s": "10",
+  "remaining_s": "1199.9993396449136",
+  "input_sha256": "946763936d9ae4477535540cd0f949cba79b0b5fb688143f3310212acf2ad6b2"
+}

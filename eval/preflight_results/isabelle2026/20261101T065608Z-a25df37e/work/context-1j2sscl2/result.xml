@@ -1,0 +1,254 @@
+<dsp_result schema="dsp_native_result_v1" request_id="8a56c687c9bd4345b8d75b89d096560d" input_sha256="26a37c3e6865915367ddd07c157c46767d1a09faa9ca96de0d0bbcd21b1f9d46" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.000"><command>(*  
+  File:       Bernoulli.thy
+  Author:     Lukas Bulwahn &lt;lukas.bulwahn-at-gmail.com&gt; 
+  Author:     Manuel Eberl &lt;manuel@pruvisto.org&gt; 
+*)
+</command><error></error></attempt><attempt mode="context" success="true" index="2" line="6" source_state="1" duration_seconds="0.000"><command>section \&lt;open&gt;Bernoulli numbers\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="3" line="6" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="8" source_state="3" duration_seconds="0.199"><command>theory Bernoulli
+imports Complex_Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="1" source_state="4" duration_seconds="0.000"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="6" line="10" source_state="5" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="7" line="12" source_state="6" duration_seconds="0.000"><command>subsection \&lt;open&gt;Preliminaries\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="8" line="12" source_state="7" duration_seconds="0.000"><command>
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="9" line="14" source_state="8" duration_seconds="0.001"><command>lemma power_numeral_reduce: &quot;a ^ numeral n = a * a ^ pred_numeral n&quot;</command><error></error></attempt><attempt mode="context" success="true" index="10" line="14" source_state="9" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="11" line="16" source_state="10" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="12" line="16" source_state="11" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="13" line="19" source_state="12" duration_seconds="0.001"><command>lemma fact_diff_Suc: &quot;n &lt; Suc m \&lt;Longrightarrow&gt; fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="14" line="19" source_state="13" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="15" line="21" source_state="14" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="16" line="21" source_state="15" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="17" line="24" source_state="16" duration_seconds="0.002"><command>lemma of_nat_binomial_Suc:
+  assumes &quot;k \&lt;le&gt; n&quot;
+  shows   &quot;(of_nat (Suc n choose k) :: &apos;a :: field_char_0) = 
+             of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="18" line="27" source_state="17" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="19" line="29" source_state="18" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="20" line="29" source_state="19" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="21" line="32" source_state="20" duration_seconds="0.002"><command>lemma integrals_eq:
+  assumes &quot;f 0 = g 0&quot;
+  assumes &quot;\&lt;And&gt; x. ((\&lt;lambda&gt;x. f x - g x) has_real_derivative 0) (at x)&quot;
+  shows &quot;f x = g x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="22" line="35" source_state="21" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="23" line="37" source_state="22" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="24" line="37" source_state="23" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="25" line="40" source_state="24" duration_seconds="0.001"><command>lemma sum_diff: &quot;((\&lt;Sum&gt;i\&lt;le&gt;n::nat. f (i + 1) - f i)::&apos;a::field) = f (n + 1) - f 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="26" line="40" source_state="25" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="27" line="42" source_state="26" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="28" line="42" source_state="27" duration_seconds="0.000"><command>
+
+    
+</command><error></error></attempt><attempt mode="context" success="true" index="29" line="45" source_state="28" duration_seconds="0.001"><command>lemma Rats_sum: &quot;(\&lt;And&gt;x. x \&lt;in&gt; A \&lt;Longrightarrow&gt; f x \&lt;in&gt; \&lt;rat&gt;) \&lt;Longrightarrow&gt; sum f A \&lt;in&gt; \&lt;rat&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="30" line="45" source_state="29" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="31" line="47" source_state="30" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="32" line="47" source_state="31" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="33" line="51" source_state="32" duration_seconds="0.000"><command>subsection \&lt;open&gt;Bernoulli Numbers and Bernoulli Polynomials\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="34" line="51" source_state="33" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="35" line="53" source_state="34" duration_seconds="0.000"><command>declare sum.cong [fundef_cong]</command><error></error></attempt><attempt mode="context" success="true" index="36" line="53" source_state="35" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="37" line="55" source_state="36" duration_seconds="0.053"><command>fun bernoulli :: &quot;nat \&lt;Rightarrow&gt; &apos;a :: field_char_0&quot;
+where
+  &quot;bernoulli 0 = 1&quot;
+| &quot;bernoulli (Suc n) =  (-1 / (of_nat n + 2)) * (\&lt;Sum&gt;k \&lt;le&gt; n. (of_nat (n + 2 choose k) * bernoulli k))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="38" line="58" source_state="37" duration_seconds="0.000"><command>
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="39" line="60" source_state="38" duration_seconds="0.001"><command>declare bernoulli.simps[simp del]</command><error></error></attempt><attempt mode="context" success="true" index="40" line="60" source_state="39" duration_seconds="0.000"><command>
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="41" line="62" source_state="40" duration_seconds="0.001"><command>lemmas bernoulli_0 [simp] = bernoulli.simps(1)</command><error></error></attempt><attempt mode="context" success="true" index="42" line="62" source_state="41" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="43" line="63" source_state="42" duration_seconds="0.001"><command>lemmas bernoulli_Suc = bernoulli.simps(2)</command><error></error></attempt><attempt mode="context" success="true" index="44" line="63" source_state="43" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="45" line="64" source_state="44" duration_seconds="0.001"><command>lemma bernoulli_1 [simp]: &quot;bernoulli 1 = -1/2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="46" line="64" source_state="45" duration_seconds="0.000"><command> 
+  </command><error></error></attempt><attempt mode="context" success="true" index="47" line="65" source_state="46" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="48" line="65" source_state="47" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="49" line="67" source_state="48" duration_seconds="0.001"><command>lemma bernoulli_Suc_0 [simp]: &quot;bernoulli (Suc 0) = -1/2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="50" line="67" source_state="49" duration_seconds="0.000"><command> 
+  </command><error></error></attempt><attempt mode="context" success="true" index="51" line="68" source_state="50" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="52" line="68" source_state="51" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="53" line="71" source_state="52" duration_seconds="0.001"><command>lemma of_rat_bernoulli: &quot;of_rat (bernoulli n) = bernoulli n&quot;</command><error></error></attempt><attempt mode="context" success="true" index="54" line="71" source_state="53" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="55" line="73" source_state="54" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="56" line="73" source_state="55" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="57" line="75" source_state="56" duration_seconds="0.001"><command>lemma of_real_of_rat: &quot;of_real (of_rat x) = (of_rat x :: &apos;a :: real_field)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="58" line="75" source_state="57" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="59" line="77" source_state="58" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="60" line="77" source_state="59" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="61" line="80" source_state="60" duration_seconds="0.001"><command>lemma of_real_bernoulli: &quot;of_real (bernoulli n) = (bernoulli n :: &apos;a :: real_field)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="62" line="80" source_state="61" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="63" line="82" source_state="62" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="64" line="82" source_state="63" duration_seconds="0.000"><command>
+
+
+    
+</command><error></error></attempt><attempt mode="context" success="true" index="65" line="86" source_state="64" duration_seconds="0.000"><command>text \&lt;open&gt;
+  The ``normal&apos;&apos; Bernoulli numbers are the negative Bernoulli numbers $B_n^{-}$ we just defined
+  (so called because $B_1^{-} = -\frac{1}{2}$). There is also another convention, the 
+  positive Bernoulli numbers $B_n^{+}$, which differ from the negative ones only in that 
+  $B_1^{+} = \frac{1}{2}$. Both conventions have their justification, since a number of theorems 
+  are easier to state with one than the other.
+\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="66" line="92" source_state="65" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="67" line="93" source_state="66" duration_seconds="0.005"><command>definition bernoulli&apos; :: &quot;nat \&lt;Rightarrow&gt; &apos;a :: field_char_0&quot; where
+  &quot;bernoulli&apos; n = (if n = 1 then 1/2 else bernoulli n)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="68" line="94" source_state="67" duration_seconds="0.000"><command>
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="69" line="96" source_state="68" duration_seconds="0.001"><command>lemma bernoulli&apos;_0 [simp]: &quot;bernoulli&apos; 0 = 1&quot;</command><error></error></attempt><attempt mode="context" success="true" index="70" line="96" source_state="69" duration_seconds="0.000"><command> 
+  </command><error></error></attempt><attempt mode="context" success="true" index="71" line="97" source_state="70" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="72" line="97" source_state="71" duration_seconds="0.000"><command>
+
+    
+</command><error></error></attempt><attempt mode="context" success="true" index="73" line="100" source_state="72" duration_seconds="0.001"><command>lemma bernoulli&apos;_1 [simp]: &quot;bernoulli&apos; (Suc 0) = 1/2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="74" line="100" source_state="73" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="75" line="102" source_state="74" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="76" line="102" source_state="75" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="77" line="105" source_state="76" duration_seconds="0.001"><command>lemma bernoulli_conv_bernoulli&apos;: &quot;n \&lt;noteq&gt; 1 \&lt;Longrightarrow&gt; bernoulli n = bernoulli&apos; n&quot;</command><error></error></attempt><attempt mode="context" success="true" index="78" line="105" source_state="77" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="79" line="107" source_state="78" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="80" line="107" source_state="79" duration_seconds="0.000"><command>
+
+    
+</command><error></error></attempt><attempt mode="context" success="true" index="81" line="110" source_state="80" duration_seconds="0.001"><command>lemma bernoulli&apos;_conv_bernoulli: &quot;n \&lt;noteq&gt; 1 \&lt;Longrightarrow&gt; bernoulli&apos; n = bernoulli n&quot;</command><error></error></attempt><attempt mode="context" success="true" index="82" line="110" source_state="81" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="83" line="112" source_state="82" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="84" line="112" source_state="83" duration_seconds="0.000"><command>
+
+    
+</command><error></error></attempt><attempt mode="context" success="true" index="85" line="115" source_state="84" duration_seconds="0.002"><command>lemma bernoulli_conv_bernoulli&apos;_if: 
+    &quot;n \&lt;noteq&gt; 1 \&lt;Longrightarrow&gt; bernoulli n = (if n = 1 then -1/2 else bernoulli&apos; n)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="86" line="116" source_state="85" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="87" line="118" source_state="86" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="88" line="118" source_state="87" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="89" line="121" source_state="88" duration_seconds="0.001"><command>lemma of_rat_bernoulli&apos;: &quot;of_rat (bernoulli&apos; n) = bernoulli&apos; n&quot;</command><error></error></attempt><attempt mode="context" success="true" index="90" line="121" source_state="89" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="91" line="123" source_state="90" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="92" line="123" source_state="91" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="93" line="126" source_state="92" duration_seconds="0.001"><command>lemma of_real_bernoulli&apos;: &quot;of_real (bernoulli&apos; n) = (bernoulli&apos; n :: &apos;a :: real_field)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="94" line="126" source_state="93" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="95" line="128" source_state="94" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="96" line="128" source_state="95" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="97" line="131" source_state="96" duration_seconds="0.001"><command>lemma bernoulli_in_Rats: &quot;bernoulli n \&lt;in&gt; \&lt;rat&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="98" line="131" source_state="97" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="99" line="133" source_state="98" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="100" line="133" source_state="99" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="101" line="136" source_state="100" duration_seconds="0.001"><command>lemma bernoulli&apos;_in_Rats: &quot;bernoulli&apos; n \&lt;in&gt; \&lt;rat&gt;&quot;</command><error></error></attempt><attempt mode="context" success="true" index="102" line="136" source_state="101" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="103" line="138" source_state="102" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="104" line="138" source_state="103" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="105" line="141" source_state="104" duration_seconds="0.007"><command>definition bernpoly :: &quot;nat \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; &apos;a :: real_algebra_1&quot; where
+  &quot;bernpoly n = (\&lt;lambda&gt;x. \&lt;Sum&gt;k \&lt;le&gt; n. of_nat (n choose k) * of_real (bernoulli k) * x ^ (n - k))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="106" line="142" source_state="105" duration_seconds="0.000"><command>
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="107" line="144" source_state="106" duration_seconds="0.002"><command>lemma bernpoly_altdef:
+  &quot;bernpoly n = (\&lt;lambda&gt;x. \&lt;Sum&gt;k\&lt;le&gt;n. of_nat (n choose k) * of_real (bernoulli (n - k)) * x ^ k)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="108" line="145" source_state="107" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="109" line="147" source_state="108" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="110" line="147" source_state="109" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="111" line="150" source_state="110" duration_seconds="0.003"><command>lemma bernoulli_Suc&apos;: 
+  &quot;bernoulli (Suc n) = -1/(of_nat n + 2) * (\&lt;Sum&gt;k\&lt;le&gt;n. of_nat (n + 2 choose (k + 2)) * bernoulli (n - k))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="112" line="151" source_state="111" duration_seconds="0.000"><command> 
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="113" line="153" source_state="112" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="114" line="153" source_state="113" duration_seconds="0.000"><command>
+
+  
+
+</command><error></error></attempt><attempt mode="context" success="true" index="115" line="157" source_state="114" duration_seconds="0.000"><command>subsection \&lt;open&gt;Basic Observations on Bernoulli Polynomials\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="116" line="157" source_state="115" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="117" line="159" source_state="116" duration_seconds="0.001"><command>lemma bernpoly_0 [simp]: &quot;bernpoly n 0 = of_real (bernoulli n)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="118" line="159" source_state="117" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="119" line="161" source_state="118" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="120" line="161" source_state="119" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="121" line="164" source_state="120" duration_seconds="0.001"><command>lemma continuous_on_bernpoly [continuous_intros]: 
+  &quot;continuous_on A (bernpoly n :: &apos;a \&lt;Rightarrow&gt; &apos;a :: real_normed_algebra_1)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="122" line="165" source_state="121" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="123" line="167" source_state="122" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="124" line="167" source_state="123" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="125" line="170" source_state="124" duration_seconds="0.001"><command>lemma isCont_bernpoly [continuous_intros]: 
+  &quot;isCont (bernpoly n :: &apos;a \&lt;Rightarrow&gt; &apos;a :: real_normed_algebra_1) x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="126" line="171" source_state="125" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="127" line="173" source_state="126" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="128" line="173" source_state="127" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="129" line="176" source_state="128" duration_seconds="0.002"><command>lemma has_field_derivative_bernpoly:
+  &quot;(bernpoly (Suc n) has_field_derivative 
+     (of_nat (n + 1) * bernpoly n x :: &apos;a :: real_normed_field)) (at x)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="130" line="178" source_state="129" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="131" line="180" source_state="130" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="132" line="180" source_state="131" duration_seconds="0.000"><command>
+
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="133" line="183" source_state="132" duration_seconds="0.001"><command>lemmas has_field_derivative_bernpoly&apos; [derivative_intros] =
+  DERIV_chain&apos;[OF _ has_field_derivative_bernpoly]</command><error></error></attempt><attempt mode="context" success="true" index="134" line="184" source_state="133" duration_seconds="0.000"><command>    
+
+</command><error></error></attempt><attempt mode="context" success="true" index="135" line="186" source_state="134" duration_seconds="0.002"><command>lemma sum_binomial_times_bernoulli:
+  &quot;(\&lt;Sum&gt;k\&lt;le&gt;n. of_nat ((Suc n) choose k) * bernoulli k) = (if n = 0 then 1 else 0)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="136" line="187" source_state="135" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="137" line="189" source_state="136" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="138" line="189" source_state="137" duration_seconds="0.000"><command>
+
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="139" line="192" source_state="138" duration_seconds="0.002"><command>lemma sum_binomial_times_bernoulli&apos;:
+  &quot;(\&lt;Sum&gt;k&lt;n. of_nat (n choose k) * bernoulli k :: &apos;a :: field_char_0) = (if n = 1 then 1 else 0)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="140" line="193" source_state="139" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="141" line="195" source_state="140" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="142" line="195" source_state="141" duration_seconds="0.000"><command>
+
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="143" line="198" source_state="142" duration_seconds="0.002"><command>lemma binomial_unroll:
+  &quot;n &gt; 0 \&lt;Longrightarrow&gt; (n choose k) = (if k = 0 then 1 else ((n - 1) choose (k - 1)) + ((n - 1) choose k))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="144" line="199" source_state="143" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="145" line="201" source_state="144" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="146" line="201" source_state="145" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="147" line="204" source_state="146" duration_seconds="0.002"><command>lemma sum_unroll:
+  &quot;(\&lt;Sum&gt;k\&lt;le&gt;n::nat. f k) = (if n = 0 then f 0 else f n + (\&lt;Sum&gt;k\&lt;le&gt;n - 1. f k))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="148" line="205" source_state="147" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="149" line="207" source_state="148" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="150" line="207" source_state="149" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="151" line="210" source_state="150" duration_seconds="0.003"><command>lemma bernoulli_unroll:
+  &quot;n &gt; 0 \&lt;Longrightarrow&gt; bernoulli n = - 1 / (of_nat n + 1) * (\&lt;Sum&gt;k\&lt;le&gt;n - 1. of_nat (n + 1 choose k) * bernoulli k)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="152" line="211" source_state="151" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="153" line="213" source_state="152" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="154" line="213" source_state="153" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="155" line="216" source_state="154" duration_seconds="0.003"><command>lemmas bernoulli_unroll_all = binomial_unroll bernoulli_unroll sum_unroll bernpoly_def</command><error></error></attempt><attempt mode="context" success="true" index="156" line="216" source_state="155" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="157" line="218" source_state="156" duration_seconds="0.001"><command>lemma bernpoly_1_1: &quot;bernpoly 1 1 = of_real (1/2)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="158" line="218" source_state="157" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="159" line="220" source_state="158" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="160" line="220" source_state="159" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="161" line="224" source_state="160" duration_seconds="0.000"><command>subsection \&lt;open&gt;Sum of Powers with Bernoulli Polynomials\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="162" line="224" source_state="161" duration_seconds="0.000"><command>
+
+(* TODO: Generalisation not possible here because mean-value theorem 
+   is only available for reals *)
+</command><error></error></attempt><attempt mode="context" success="true" index="163" line="228" source_state="162" duration_seconds="0.002"><command>lemma diff_bernpoly:
+  fixes x :: real
+  shows &quot;bernpoly n (x + 1) - bernpoly n x = of_nat n * x ^ (n - 1)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="164" line="230" source_state="163" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="165" line="232" source_state="164" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="166" line="232" source_state="165" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="167" line="235" source_state="166" duration_seconds="0.001"><command>lemma bernpoly_of_real: &quot;bernpoly n (of_real x) = of_real (bernpoly n x)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="168" line="235" source_state="167" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="169" line="237" source_state="168" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="170" line="237" source_state="169" duration_seconds="0.000"><command>
+
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="171" line="240" source_state="170" duration_seconds="0.001"><command>lemma bernpoly_1:
+  assumes &quot;n \&lt;noteq&gt; 1&quot;
+  shows   &quot;bernpoly n 1 = of_real (bernoulli n)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="172" line="242" source_state="171" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="173" line="244" source_state="172" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="174" line="244" source_state="173" duration_seconds="0.000"><command>
+
+  
+</command><error></error></attempt><attempt mode="context" success="true" index="175" line="247" source_state="174" duration_seconds="0.001"><command>lemma bernpoly_1&apos;: &quot;bernpoly n 1 = of_real (bernoulli&apos; n)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="176" line="247" source_state="175" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="177" line="249" source_state="176" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="178" line="249" source_state="177" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="179" line="1" source_state="178" duration_seconds="0.000"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="180" line="1" source_state="179" duration_seconds="0.005"><command>theorem sum_of_powers: 
+  &quot;(\&lt;Sum&gt;k\&lt;le&gt;n::nat. (real k) ^ m) = (bernpoly (Suc m) (n + 1) - bernpoly (Suc m) 0) / (m + 1)&quot;</command><error></error></attempt><attempt mode="target" success="true" index="181" line="2" source_state="180" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

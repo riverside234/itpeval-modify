@@ -1,0 +1,360 @@
+<dsp_result schema="dsp_native_result_v1" request_id="0a49d92abdab46c6b199f902f622cbfd" input_sha256="69f47c85b5f84255d1f3b954f34888003bc3090c1813897092d7d3e666627414" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.000"><command>(*  Title:      HOL/Analysis/Inner_Product.thy
+    Author:     Brian Huffman
+*)
+
+</command><error></error></attempt><attempt mode="context" success="true" index="2" line="5" source_state="1" duration_seconds="0.000"><command>section \&lt;open&gt;Inner Product Spaces and Gradient Derivative\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="3" line="5" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="7" source_state="3" duration_seconds="0.353"><command>theory Inner_Product
+imports Complex_Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="1" source_state="4" duration_seconds="0.000"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="6" line="9" source_state="5" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="7" line="11" source_state="6" duration_seconds="0.000"><command>subsection \&lt;open&gt;Real inner product spaces\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="8" line="11" source_state="7" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="9" line="13" source_state="8" duration_seconds="0.001"><command>text \&lt;open&gt;
+  Temporarily relax type constraints for \&lt;^term&gt;\&lt;open&gt;open\&lt;close&gt;, \&lt;^term&gt;\&lt;open&gt;uniformity\&lt;close&gt;,
+  \&lt;^term&gt;\&lt;open&gt;dist\&lt;close&gt;, and \&lt;^term&gt;\&lt;open&gt;norm\&lt;close&gt;.
+\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="10" line="16" source_state="9" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="11" line="18" source_state="10" duration_seconds="0.002"><command>setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;open\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;&apos;a::open set \&lt;Rightarrow&gt; bool\&lt;close&gt;)\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="12" line="19" source_state="11" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="13" line="21" source_state="12" duration_seconds="0.002"><command>setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;dist\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;&apos;a::dist \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; real\&lt;close&gt;)\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="14" line="22" source_state="13" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="15" line="24" source_state="14" duration_seconds="0.002"><command>setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;uniformity\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;(&apos;a::uniformity \&lt;times&gt; &apos;a) filter\&lt;close&gt;)\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="16" line="25" source_state="15" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="17" line="27" source_state="16" duration_seconds="0.001"><command>setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;norm\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;&apos;a::norm \&lt;Rightarrow&gt; real\&lt;close&gt;)\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="18" line="28" source_state="17" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="19" line="30" source_state="18" duration_seconds="0.421"><command>class real_inner = real_vector + sgn_div_norm + dist_norm + uniformity_dist + open_uniformity +
+  fixes inner :: &quot;&apos;a \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; real&quot;
+  assumes inner_commute: &quot;inner x y = inner y x&quot;
+  and inner_add_left: &quot;inner (x + y) z = inner x z + inner y z&quot;
+  and inner_scaleR_left [simp]: &quot;inner (scaleR r x) y = r * (inner x y)&quot;
+  and inner_ge_zero [simp]: &quot;0 \&lt;le&gt; inner x x&quot;
+  and inner_eq_zero_iff [simp]: &quot;inner x x = 0 \&lt;longleftrightarrow&gt; x = 0&quot;
+  and norm_eq_sqrt_inner: &quot;norm x = sqrt (inner x x)&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="20" line="38" source_state="19" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="21" line="40" source_state="20" duration_seconds="0.001"><command>lemma inner_zero_left [simp]: &quot;inner 0 x = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="22" line="40" source_state="21" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="23" line="42" source_state="22" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="24" line="42" source_state="23" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="25" line="45" source_state="24" duration_seconds="0.001"><command>lemma inner_minus_left [simp]: &quot;inner (- x) y = - inner x y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="26" line="45" source_state="25" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="27" line="47" source_state="26" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="28" line="47" source_state="27" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="29" line="50" source_state="28" duration_seconds="0.001"><command>lemma inner_diff_left: &quot;inner (x - y) z = inner x z - inner y z&quot;</command><error></error></attempt><attempt mode="context" success="true" index="30" line="50" source_state="29" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="31" line="52" source_state="30" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="32" line="52" source_state="31" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="33" line="55" source_state="32" duration_seconds="0.002"><command>lemma inner_sum_left: &quot;inner (\&lt;Sum&gt;x\&lt;in&gt;A. f x) y = (\&lt;Sum&gt;x\&lt;in&gt;A. inner (f x) y)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="34" line="55" source_state="33" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="35" line="57" source_state="34" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="36" line="57" source_state="35" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="37" line="60" source_state="36" duration_seconds="0.001"><command>lemma all_zero_iff [simp]: &quot;(\&lt;forall&gt;u. inner x u = 0) \&lt;longleftrightarrow&gt; (x = 0)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="38" line="60" source_state="37" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="39" line="62" source_state="38" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="40" line="62" source_state="39" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="41" line="65" source_state="40" duration_seconds="0.000"><command>text \&lt;open&gt;Transfer distributivity rules to right argument.\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="42" line="65" source_state="41" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="43" line="67" source_state="42" duration_seconds="0.001"><command>lemma inner_add_right: &quot;inner x (y + z) = inner x y + inner x z&quot;</command><error></error></attempt><attempt mode="context" success="true" index="44" line="67" source_state="43" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="45" line="69" source_state="44" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="46" line="69" source_state="45" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="47" line="72" source_state="46" duration_seconds="0.001"><command>lemma inner_scaleR_right [simp]: &quot;inner x (scaleR r y) = r * (inner x y)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="48" line="72" source_state="47" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="49" line="74" source_state="48" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="50" line="74" source_state="49" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="51" line="77" source_state="50" duration_seconds="0.001"><command>lemma inner_zero_right [simp]: &quot;inner x 0 = 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="52" line="77" source_state="51" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="53" line="79" source_state="52" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="54" line="79" source_state="53" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="55" line="82" source_state="54" duration_seconds="0.001"><command>lemma inner_minus_right [simp]: &quot;inner x (- y) = - inner x y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="56" line="82" source_state="55" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="57" line="84" source_state="56" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="58" line="84" source_state="57" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="59" line="87" source_state="58" duration_seconds="0.001"><command>lemma inner_diff_right: &quot;inner x (y - z) = inner x y - inner x z&quot;</command><error></error></attempt><attempt mode="context" success="true" index="60" line="87" source_state="59" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="61" line="89" source_state="60" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="62" line="89" source_state="61" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="63" line="92" source_state="62" duration_seconds="0.002"><command>lemma inner_sum_right: &quot;inner x (\&lt;Sum&gt;y\&lt;in&gt;A. f y) = (\&lt;Sum&gt;y\&lt;in&gt;A. inner x (f y))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="64" line="92" source_state="63" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="65" line="94" source_state="64" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="66" line="94" source_state="65" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="67" line="97" source_state="66" duration_seconds="0.003"><command>lemmas inner_add [algebra_simps] = inner_add_left inner_add_right</command><error></error></attempt><attempt mode="context" success="true" index="68" line="97" source_state="67" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="69" line="98" source_state="68" duration_seconds="0.003"><command>lemmas inner_diff [algebra_simps]  = inner_diff_left inner_diff_right</command><error></error></attempt><attempt mode="context" success="true" index="70" line="98" source_state="69" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="71" line="99" source_state="70" duration_seconds="0.002"><command>lemmas inner_scaleR = inner_scaleR_left inner_scaleR_right</command><error></error></attempt><attempt mode="context" success="true" index="72" line="99" source_state="71" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="73" line="101" source_state="72" duration_seconds="0.000"><command>text \&lt;open&gt;Legacy theorem names\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="74" line="101" source_state="73" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="75" line="102" source_state="74" duration_seconds="0.002"><command>lemmas inner_left_distrib = inner_add_left</command><error></error></attempt><attempt mode="context" success="true" index="76" line="102" source_state="75" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="77" line="103" source_state="76" duration_seconds="0.002"><command>lemmas inner_right_distrib = inner_add_right</command><error></error></attempt><attempt mode="context" success="true" index="78" line="103" source_state="77" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="79" line="104" source_state="78" duration_seconds="0.002"><command>lemmas inner_distrib = inner_left_distrib inner_right_distrib</command><error></error></attempt><attempt mode="context" success="true" index="80" line="104" source_state="79" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="81" line="106" source_state="80" duration_seconds="0.001"><command>lemma inner_gt_zero_iff [simp]: &quot;0 &lt; inner x x \&lt;longleftrightarrow&gt; x \&lt;noteq&gt; 0&quot;</command><error></error></attempt><attempt mode="context" success="true" index="82" line="106" source_state="81" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="83" line="108" source_state="82" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="84" line="108" source_state="83" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="85" line="111" source_state="84" duration_seconds="0.001"><command>lemma power2_norm_eq_inner: &quot;(norm x)\&lt;^sup&gt;2 = inner x x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="86" line="111" source_state="85" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="87" line="113" source_state="86" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="88" line="113" source_state="87" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="89" line="116" source_state="88" duration_seconds="0.001"><command>lemma dot_square_norm: &quot;inner x x = (norm x)\&lt;^sup&gt;2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="90" line="116" source_state="89" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="91" line="118" source_state="90" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="92" line="118" source_state="91" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="93" line="121" source_state="92" duration_seconds="0.000"><command>text \&lt;open&gt;Identities involving real multiplication and division.\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="94" line="121" source_state="93" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="95" line="123" source_state="94" duration_seconds="0.001"><command>lemma inner_mult_left: &quot;inner (of_real m * a) b = m * (inner a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="96" line="123" source_state="95" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="97" line="125" source_state="96" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="98" line="125" source_state="97" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="99" line="128" source_state="98" duration_seconds="0.001"><command>lemma inner_mult_right: &quot;inner a (of_real m * b) = m * (inner a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="100" line="128" source_state="99" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="101" line="130" source_state="100" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="102" line="130" source_state="101" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="103" line="133" source_state="102" duration_seconds="0.001"><command>lemma inner_mult_left&apos;: &quot;inner (a * of_real m) b = m * (inner a b)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="104" line="133" source_state="103" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="105" line="135" source_state="104" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="106" line="135" source_state="105" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="107" line="138" source_state="106" duration_seconds="0.001"><command>lemma inner_mult_right&apos;: &quot;inner a (b * of_real m) = (inner a b) * m&quot;</command><error></error></attempt><attempt mode="context" success="true" index="108" line="138" source_state="107" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="109" line="140" source_state="108" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="110" line="140" source_state="109" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="111" line="143" source_state="110" duration_seconds="0.001"><command>lemma Cauchy_Schwarz_ineq:
+  &quot;(inner x y)\&lt;^sup&gt;2 \&lt;le&gt; inner x x * inner y y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="112" line="144" source_state="111" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="113" line="146" source_state="112" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="114" line="146" source_state="113" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="115" line="149" source_state="114" duration_seconds="0.001"><command>lemma Cauchy_Schwarz_ineq2:
+  &quot;\&lt;bar&gt;inner x y\&lt;bar&gt; \&lt;le&gt; norm x * norm y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="116" line="150" source_state="115" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="117" line="152" source_state="116" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="118" line="152" source_state="117" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="119" line="155" source_state="118" duration_seconds="0.001"><command>lemma norm_cauchy_schwarz: &quot;inner x y \&lt;le&gt; norm x * norm y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="120" line="155" source_state="119" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="121" line="157" source_state="120" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="122" line="157" source_state="121" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="123" line="160" source_state="122" duration_seconds="0.023"><command>subclass real_normed_vector</command><error></error></attempt><attempt mode="context" success="true" index="124" line="160" source_state="123" duration_seconds="0.000"><command>
+
+  </command><error></error></attempt><attempt mode="context" success="true" index="125" line="162" source_state="124" duration_seconds="0.106"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="126" line="162" source_state="125" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="127" line="165" source_state="126" duration_seconds="0.000"><command>end</command><error></error></attempt><attempt mode="context" success="true" index="128" line="165" source_state="127" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="129" line="167" source_state="128" duration_seconds="0.001"><command>lemma square_bound_lemma:
+  fixes x :: real
+  shows &quot;x &lt; (1 + x) * (1 + x)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="130" line="169" source_state="129" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="131" line="171" source_state="130" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="132" line="171" source_state="131" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="133" line="174" source_state="132" duration_seconds="0.001"><command>lemma square_continuous:
+  fixes e :: real
+  shows &quot;e &gt; 0 \&lt;Longrightarrow&gt; \&lt;exists&gt;d. 0 &lt; d \&lt;and&gt; (\&lt;forall&gt;y. \&lt;bar&gt;y - x\&lt;bar&gt; &lt; d \&lt;longrightarrow&gt; \&lt;bar&gt;y * y - x * x\&lt;bar&gt; &lt; e)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="134" line="176" source_state="133" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="135" line="178" source_state="134" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="136" line="178" source_state="135" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="137" line="181" source_state="136" duration_seconds="0.001"><command>lemma norm_le: &quot;norm x \&lt;le&gt; norm y \&lt;longleftrightarrow&gt; inner x x \&lt;le&gt; inner y y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="138" line="181" source_state="137" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="139" line="183" source_state="138" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="140" line="183" source_state="139" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="141" line="186" source_state="140" duration_seconds="0.001"><command>lemma norm_lt: &quot;norm x &lt; norm y \&lt;longleftrightarrow&gt; inner x x &lt; inner y y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="142" line="186" source_state="141" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="143" line="188" source_state="142" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="144" line="188" source_state="143" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="145" line="191" source_state="144" duration_seconds="0.001"><command>lemma norm_eq: &quot;norm x = norm y \&lt;longleftrightarrow&gt; inner x x = inner y y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="146" line="191" source_state="145" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="147" line="193" source_state="146" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="148" line="193" source_state="147" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="149" line="196" source_state="148" duration_seconds="0.001"><command>lemma norm_eq_1: &quot;norm x = 1 \&lt;longleftrightarrow&gt; inner x x = 1&quot;</command><error></error></attempt><attempt mode="context" success="true" index="150" line="196" source_state="149" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="151" line="198" source_state="150" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="152" line="198" source_state="151" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="153" line="201" source_state="152" duration_seconds="0.001"><command>lemma inner_divide_left:
+  fixes a :: &quot;&apos;a :: {real_inner,real_div_algebra}&quot;
+  shows &quot;inner (a / of_real m) b = (inner a b) / m&quot;</command><error></error></attempt><attempt mode="context" success="true" index="154" line="203" source_state="153" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="155" line="205" source_state="154" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="156" line="205" source_state="155" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="157" line="208" source_state="156" duration_seconds="0.001"><command>lemma inner_divide_right:
+  fixes a :: &quot;&apos;a :: {real_inner,real_div_algebra}&quot;
+  shows &quot;inner a (b / of_real m) = (inner a b) / m&quot;</command><error></error></attempt><attempt mode="context" success="true" index="158" line="210" source_state="157" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="159" line="212" source_state="158" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="160" line="212" source_state="159" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="161" line="215" source_state="160" duration_seconds="0.001"><command>text \&lt;open&gt;
+  Re-enable constraints for \&lt;^term&gt;\&lt;open&gt;open\&lt;close&gt;, \&lt;^term&gt;\&lt;open&gt;uniformity\&lt;close&gt;,
+  \&lt;^term&gt;\&lt;open&gt;dist\&lt;close&gt;, and \&lt;^term&gt;\&lt;open&gt;norm\&lt;close&gt;.
+\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="162" line="218" source_state="161" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="163" line="220" source_state="162" duration_seconds="0.002"><command>setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;open\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;&apos;a::topological_space set \&lt;Rightarrow&gt; bool\&lt;close&gt;)\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="164" line="221" source_state="163" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="165" line="223" source_state="164" duration_seconds="0.002"><command>setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;uniformity\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;(&apos;a::uniform_space \&lt;times&gt; &apos;a) filter\&lt;close&gt;)\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="166" line="224" source_state="165" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="167" line="226" source_state="166" duration_seconds="0.001"><command>setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;dist\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;&apos;a::metric_space \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; real\&lt;close&gt;)\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="168" line="227" source_state="167" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="169" line="229" source_state="168" duration_seconds="0.001"><command>setup \&lt;open&gt;Sign.add_const_constraint
+  (\&lt;^const_name&gt;\&lt;open&gt;norm\&lt;close&gt;, SOME \&lt;^typ&gt;\&lt;open&gt;&apos;a::real_normed_vector \&lt;Rightarrow&gt; real\&lt;close&gt;)\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="170" line="230" source_state="169" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="171" line="232" source_state="170" duration_seconds="0.000"><command>lemma bounded_bilinear_inner:
+  &quot;bounded_bilinear (inner::&apos;a::real_inner \&lt;Rightarrow&gt; &apos;a \&lt;Rightarrow&gt; real)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="172" line="233" source_state="171" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="173" line="235" source_state="172" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="174" line="235" source_state="173" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="175" line="238" source_state="174" duration_seconds="0.001"><command>lemmas tendsto_inner [tendsto_intros] =
+  bounded_bilinear.tendsto [OF bounded_bilinear_inner]</command><error></error></attempt><attempt mode="context" success="true" index="176" line="239" source_state="175" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="177" line="241" source_state="176" duration_seconds="0.001"><command>lemmas isCont_inner [simp] =
+  bounded_bilinear.isCont [OF bounded_bilinear_inner]</command><error></error></attempt><attempt mode="context" success="true" index="178" line="242" source_state="177" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="179" line="244" source_state="178" duration_seconds="0.001"><command>lemmas has_derivative_inner [derivative_intros] =
+  bounded_bilinear.FDERIV [OF bounded_bilinear_inner]</command><error></error></attempt><attempt mode="context" success="true" index="180" line="245" source_state="179" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="181" line="247" source_state="180" duration_seconds="0.000"><command>lemmas bounded_linear_inner_left =
+  bounded_bilinear.bounded_linear_left [OF bounded_bilinear_inner]</command><error></error></attempt><attempt mode="context" success="true" index="182" line="248" source_state="181" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="183" line="250" source_state="182" duration_seconds="0.000"><command>lemmas bounded_linear_inner_right =
+  bounded_bilinear.bounded_linear_right [OF bounded_bilinear_inner]</command><error></error></attempt><attempt mode="context" success="true" index="184" line="251" source_state="183" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="185" line="253" source_state="184" duration_seconds="0.001"><command>lemmas bounded_linear_inner_left_comp = bounded_linear_inner_left[THEN bounded_linear_compose]</command><error></error></attempt><attempt mode="context" success="true" index="186" line="253" source_state="185" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="187" line="255" source_state="186" duration_seconds="0.000"><command>lemmas bounded_linear_inner_right_comp = bounded_linear_inner_right[THEN bounded_linear_compose]</command><error></error></attempt><attempt mode="context" success="true" index="188" line="255" source_state="187" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="189" line="257" source_state="188" duration_seconds="0.001"><command>lemmas has_derivative_inner_right [derivative_intros] =
+  bounded_linear.has_derivative [OF bounded_linear_inner_right]</command><error></error></attempt><attempt mode="context" success="true" index="190" line="258" source_state="189" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="191" line="260" source_state="190" duration_seconds="0.001"><command>lemmas has_derivative_inner_left [derivative_intros] =
+  bounded_linear.has_derivative [OF bounded_linear_inner_left]</command><error></error></attempt><attempt mode="context" success="true" index="192" line="261" source_state="191" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="193" line="263" source_state="192" duration_seconds="0.001"><command>lemma differentiable_inner [simp]:
+  &quot;f differentiable (at x within s) \&lt;Longrightarrow&gt; g differentiable at x within s \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. inner (f x) (g x)) differentiable at x within s&quot;</command><error></error></attempt><attempt mode="context" success="true" index="194" line="264" source_state="193" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="195" line="266" source_state="194" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="196" line="266" source_state="195" duration_seconds="0.000"><command>
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="197" line="270" source_state="196" duration_seconds="0.000"><command>subsection \&lt;open&gt;Class instances\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="198" line="270" source_state="197" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="199" line="272" source_state="198" duration_seconds="0.000"><command>instantiation real :: real_inner
+begin</command><error></error></attempt><attempt mode="context" success="true" index="200" line="273" source_state="199" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="201" line="275" source_state="200" duration_seconds="0.005"><command>definition inner_real_def [simp]: &quot;inner = (*)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="202" line="275" source_state="201" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="203" line="277" source_state="202" duration_seconds="0.000"><command>instance</command><error></error></attempt><attempt mode="context" success="true" index="204" line="277" source_state="203" duration_seconds="0.000"><command>
+
+  </command><error></error></attempt><attempt mode="context" success="true" index="205" line="279" source_state="204" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="206" line="279" source_state="205" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="207" line="282" source_state="206" duration_seconds="0.000"><command>end</command><error></error></attempt><attempt mode="context" success="true" index="208" line="282" source_state="207" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="209" line="284" source_state="208" duration_seconds="0.001"><command>lemma
+  shows real_inner_1_left[simp]: &quot;inner 1 x = x&quot;
+    and real_inner_1_right[simp]: &quot;inner x 1 = x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="210" line="286" source_state="209" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="211" line="288" source_state="210" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="212" line="288" source_state="211" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="213" line="291" source_state="212" duration_seconds="0.000"><command>instantiation complex :: real_inner
+begin</command><error></error></attempt><attempt mode="context" success="true" index="214" line="292" source_state="213" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="215" line="294" source_state="214" duration_seconds="0.005"><command>definition inner_complex_def:
+  &quot;inner x y = Re x * Re y + Im x * Im y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="216" line="295" source_state="215" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="217" line="297" source_state="216" duration_seconds="0.000"><command>instance</command><error></error></attempt><attempt mode="context" success="true" index="218" line="297" source_state="217" duration_seconds="0.000"><command>
+
+  </command><error></error></attempt><attempt mode="context" success="true" index="219" line="299" source_state="218" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="220" line="299" source_state="219" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="221" line="302" source_state="220" duration_seconds="0.000"><command>end</command><error></error></attempt><attempt mode="context" success="true" index="222" line="302" source_state="221" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="223" line="304" source_state="222" duration_seconds="0.000"><command>lemma complex_inner_1 [simp]: &quot;inner 1 x = Re x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="224" line="304" source_state="223" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="225" line="306" source_state="224" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="226" line="306" source_state="225" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="227" line="309" source_state="226" duration_seconds="0.000"><command>lemma complex_inner_1_right [simp]: &quot;inner x 1 = Re x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="228" line="309" source_state="227" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="229" line="311" source_state="228" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="230" line="311" source_state="229" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="231" line="314" source_state="230" duration_seconds="0.000"><command>lemma complex_inner_i_left [simp]: &quot;inner \&lt;i&gt; x = Im x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="232" line="314" source_state="231" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="233" line="316" source_state="232" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="234" line="316" source_state="233" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="235" line="319" source_state="234" duration_seconds="0.000"><command>lemma complex_inner_i_right [simp]: &quot;inner x \&lt;i&gt; = Im x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="236" line="319" source_state="235" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="237" line="321" source_state="236" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="238" line="321" source_state="237" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="239" line="324" source_state="238" duration_seconds="0.001"><command>lemma dot_square_norm: &quot;inner x x = (norm x)\&lt;^sup&gt;2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="240" line="324" source_state="239" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="241" line="326" source_state="240" duration_seconds="0.000"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="242" line="326" source_state="241" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="243" line="329" source_state="242" duration_seconds="0.001"><command>lemma norm_eq_square: &quot;norm x = a \&lt;longleftrightarrow&gt; 0 \&lt;le&gt; a \&lt;and&gt; inner x x = a\&lt;^sup&gt;2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="244" line="329" source_state="243" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="245" line="331" source_state="244" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="246" line="331" source_state="245" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="247" line="334" source_state="246" duration_seconds="0.001"><command>lemma norm_le_square: &quot;norm x \&lt;le&gt; a \&lt;longleftrightarrow&gt; 0 \&lt;le&gt; a \&lt;and&gt; inner x x \&lt;le&gt; a\&lt;^sup&gt;2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="248" line="334" source_state="247" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="249" line="336" source_state="248" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="250" line="336" source_state="249" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="251" line="339" source_state="250" duration_seconds="0.001"><command>lemma norm_ge_square: &quot;norm x \&lt;ge&gt; a \&lt;longleftrightarrow&gt; a \&lt;le&gt; 0 \&lt;or&gt; inner x x \&lt;ge&gt; a\&lt;^sup&gt;2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="252" line="339" source_state="251" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="253" line="341" source_state="252" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="254" line="341" source_state="253" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="255" line="344" source_state="254" duration_seconds="0.001"><command>lemma norm_lt_square: &quot;norm x &lt; a \&lt;longleftrightarrow&gt; 0 &lt; a \&lt;and&gt; inner x x &lt; a\&lt;^sup&gt;2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="256" line="344" source_state="255" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="257" line="346" source_state="256" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="258" line="346" source_state="257" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="259" line="349" source_state="258" duration_seconds="0.001"><command>lemma norm_gt_square: &quot;norm x &gt; a \&lt;longleftrightarrow&gt; a &lt; 0 \&lt;or&gt; inner x x &gt; a\&lt;^sup&gt;2&quot;</command><error></error></attempt><attempt mode="context" success="true" index="260" line="349" source_state="259" duration_seconds="0.000"><command>
+  
+  </command><error></error></attempt><attempt mode="context" success="true" index="261" line="351" source_state="260" duration_seconds="0.001"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="262" line="351" source_state="261" duration_seconds="0.000"><command>
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="263" line="354" source_state="262" duration_seconds="0.000"><command>text\&lt;open&gt;Dot product in terms of the norm rather than conversely.\&lt;close&gt;</command><error></error></attempt><attempt mode="context" success="true" index="264" line="354" source_state="263" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="265" line="356" source_state="264" duration_seconds="0.002"><command>lemmas inner_simps = inner_add_left inner_add_right inner_diff_right inner_diff_left
+  inner_scaleR_left inner_scaleR_right</command><error></error></attempt><attempt mode="context" success="true" index="266" line="357" source_state="265" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="267" line="1" source_state="266" duration_seconds="0.000"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="268" line="1" source_state="267" duration_seconds="0.001"><command>lemma dot_norm: &quot;inner x y = ((norm (x + y))\&lt;^sup&gt;2 - (norm x)\&lt;^sup&gt;2 - (norm y)\&lt;^sup&gt;2) / 2&quot;</command><error></error></attempt><attempt mode="target" success="true" index="269" line="1" source_state="268" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

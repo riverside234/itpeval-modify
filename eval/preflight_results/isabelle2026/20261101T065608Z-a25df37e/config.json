@@ -1,0 +1,20 @@
+{
+  "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026",
+  "expected_isabelle_version": "Isabelle2026",
+  "backend": "isabelle-native",
+  "base_session": "HOL",
+  "session_roots": [],
+  "session_dependencies": [],
+  "theory_imports": {
+    "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+    "Tagged_Division": "HOL-Analysis.Tagged_Division"
+  },
+  "threads": 4,
+  "provers": null,
+  "startup_timeout_s": 600,
+  "step_timeout_s": 10,
+  "hammer_timeout_s": 40,
+  "preplay_timeout_s": 10,
+  "target_timeout_s": 1200,
+  "replay_timeout_s": 1200
+}

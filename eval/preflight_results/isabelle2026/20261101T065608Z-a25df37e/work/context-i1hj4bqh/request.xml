@@ -1,0 +1,449 @@
+<dsp_request schema="dsp_native_request_v1" request_id="eb23f6457a7b481eb114b0c331b32728" input_sha256="13267bfbd1384e294574e6fb1530d7a3896d27c684e338569976f56767855dbd" action="context"><prefix>(*  Title:      HOL/Computational_Algebra/Primes.thy
+    Author:     Christophe Tabacznyj
+    Author:     Lawrence C. Paulson
+    Author:     Amine Chaieb
+    Author:     Thomas M. Rasmussen
+    Author:     Jeremy Avigad
+    Author:     Tobias Nipkow
+    Author:     Manuel Eberl
+
+This theory deals with properties of primes. Definitions and lemmas are
+proved uniformly for the natural numbers and integers.
+
+This file combines and revises a number of prior developments.
+
+The original theories "GCD" and "Primes" were by Christophe Tabacznyj
+and Lawrence C. Paulson, based on @{cite davenport92}. They introduced
+gcd, lcm, and prime for the natural numbers.
+
+The original theory "IntPrimes" was by Thomas M. Rasmussen, and
+extended gcd, lcm, primes to the integers. Amine Chaieb provided
+another extension of the notions to the integers, and added a number
+of results to "Primes" and "GCD". IntPrimes also defined and developed
+the congruence relations on the integers. The notion was extended to
+the natural numbers by Chaieb.
+
+Jeremy Avigad combined all of these, made everything uniform for the
+natural numbers and the integers, and added a number of new theorems.
+
+Tobias Nipkow cleaned up a lot.
+
+Florian Haftmann and Manuel Eberl put primality and prime factorisation
+onto an algebraic foundation and thus generalised these concepts to 
+other rings, such as polynomials. (see also the Factorial_Ring theory).
+
+There were also previous formalisations of unique factorisation by 
+Thomas Marthedal Rasmussen, Jeremy Avigad, and David Gray.
+*)
+
+section \&lt;open&gt;Primes\&lt;close&gt;
+
+theory Primes
+imports Euclidean_Algorithm
+begin
+
+subsection \&lt;open&gt;Primes on \&lt;^typ&gt;\&lt;open&gt;nat\&lt;close&gt; and \&lt;^typ&gt;\&lt;open&gt;int\&lt;close&gt;\&lt;close&gt;
+
+lemma Suc_0_not_prime_nat [simp]: "\&lt;not&gt; prime (Suc 0)"
+  
+  sorry
+
+
+lemma prime_ge_2_nat:
+  "p \&lt;ge&gt; 2" if "prime p" for p :: nat
+  
+  sorry
+
+
+lemma prime_ge_2_int:
+  "p \&lt;ge&gt; 2" if "prime p" for p :: int
+  
+  sorry
+
+
+lemma prime_ge_0_int: "prime p \&lt;Longrightarrow&gt; p \&lt;ge&gt; (0::int)"
+  
+  sorry
+
+
+lemma prime_gt_0_nat: "prime p \&lt;Longrightarrow&gt; p &gt; (0::nat)"
+  
+  sorry
+
+
+lemma prime_gt_0_int: "prime p \&lt;Longrightarrow&gt; p &gt; (0::int)"
+  
+  sorry
+
+
+lemma prime_ge_1_nat: "prime p \&lt;Longrightarrow&gt; p \&lt;ge&gt; (1::nat)"
+  
+  sorry
+
+
+lemma prime_ge_Suc_0_nat: "prime p \&lt;Longrightarrow&gt; p \&lt;ge&gt; Suc 0"
+  
+  sorry
+
+
+lemma prime_ge_1_int: "prime p \&lt;Longrightarrow&gt; p \&lt;ge&gt; (1::int)"
+  
+  sorry
+
+
+lemma prime_gt_1_nat: "prime p \&lt;Longrightarrow&gt; p &gt; (1::nat)"
+  
+  sorry
+
+
+lemma prime_gt_Suc_0_nat: "prime p \&lt;Longrightarrow&gt; p &gt; Suc 0"
+  
+  sorry
+
+
+lemma prime_gt_1_int: "prime p \&lt;Longrightarrow&gt; p &gt; (1::int)"
+  
+  sorry
+
+
+lemma prime_natI:
+  "prime p" if "p \&lt;ge&gt; 2" and "\&lt;And&gt;m n. p dvd m * n \&lt;Longrightarrow&gt; p dvd m \&lt;or&gt; p dvd n" for p :: nat
+  
+  sorry
+
+
+lemma prime_intI:
+  "prime p" if "p \&lt;ge&gt; 2" and "\&lt;And&gt;m n. p dvd m * n \&lt;Longrightarrow&gt; p dvd m \&lt;or&gt; p dvd n" for p :: int
+  
+  sorry
+
+
+lemma prime_elem_nat_iff [simp]:
+  "prime_elem n \&lt;longleftrightarrow&gt; prime n" for n :: nat
+  
+  sorry
+
+
+lemma prime_elem_iff_prime_abs [simp]:
+  "prime_elem k \&lt;longleftrightarrow&gt; prime \&lt;bar&gt;k\&lt;bar&gt;" for k :: int
+  
+  sorry
+
+
+lemma prime_nat_int_transfer [simp]:
+  "prime (int n) \&lt;longleftrightarrow&gt; prime n" (is "?P \&lt;longleftrightarrow&gt; ?Q")
+  
+  sorry
+
+
+lemma prime_nat_iff_prime [simp]:
+  "prime (nat k) \&lt;longleftrightarrow&gt; prime k"
+  
+  sorry
+
+
+lemma prime_int_nat_transfer:
+  "prime k \&lt;longleftrightarrow&gt; k \&lt;ge&gt; 0 \&lt;and&gt; prime (nat k)"
+  
+  sorry
+
+
+lemma prime_nat_naiveI:
+  "prime p" if "p \&lt;ge&gt; 2" and dvd: "\&lt;And&gt;n. n dvd p \&lt;Longrightarrow&gt; n = 1 \&lt;or&gt; n = p" for p :: nat
+  
+  sorry
+
+
+lemma prime_int_naiveI:
+  "prime p" if "p \&lt;ge&gt; 2" and dvd: "\&lt;And&gt;k. k dvd p \&lt;Longrightarrow&gt; \&lt;bar&gt;k\&lt;bar&gt; = 1 \&lt;or&gt; \&lt;bar&gt;k\&lt;bar&gt; = p" for p :: int
+  
+  sorry
+
+
+lemma prime_nat_iff:
+  "prime (n :: nat) \&lt;longleftrightarrow&gt; (1 &lt; n \&lt;and&gt; (\&lt;forall&gt;m. m dvd n \&lt;longrightarrow&gt; m = 1 \&lt;or&gt; m = n))"
+  
+  sorry
+
+
+lemma prime_nat_iff':
+  "prime (p :: nat) \&lt;longleftrightarrow&gt; p &gt; 1 \&lt;and&gt; (\&lt;forall&gt;n \&lt;in&gt; {2..&lt;p}. \&lt;not&gt; n dvd p)"
+  
+  sorry
+
+
+lemma prime_int_iff:
+  "prime (n::int) \&lt;longleftrightarrow&gt; (1 &lt; n \&lt;and&gt; (\&lt;forall&gt;m. m \&lt;ge&gt; 0 \&lt;and&gt; m dvd n \&lt;longrightarrow&gt; m = 1 \&lt;or&gt; m = n))"
+  
+  sorry
+
+
+lemma prime_int_iff':
+  "prime (p :: int) \&lt;longleftrightarrow&gt; p &gt; 1 \&lt;and&gt; (\&lt;forall&gt;n \&lt;in&gt; {2..&lt;p}. \&lt;not&gt; n dvd p)" (is "?P \&lt;longleftrightarrow&gt; ?Q")
+  
+  sorry
+
+
+lemma prime_nat_not_dvd:
+  assumes "prime p" "p &gt; n" "n \&lt;noteq&gt; (1::nat)"
+  shows   "\&lt;not&gt;n dvd p"
+  
+  sorry
+
+
+lemma prime_int_not_dvd:
+  assumes "prime p" "p &gt; n" "n &gt; (1::int)"
+  shows   "\&lt;not&gt;n dvd p"
+  
+  sorry
+
+
+lemma prime_odd_nat: "prime p \&lt;Longrightarrow&gt; p &gt; (2::nat) \&lt;Longrightarrow&gt; odd p"
+  
+  sorry
+
+
+lemma prime_odd_int: "prime p \&lt;Longrightarrow&gt; p &gt; (2::int) \&lt;Longrightarrow&gt; odd p"
+  
+  sorry
+
+
+lemma prime_int_altdef:
+  "prime p = (1 &lt; p \&lt;and&gt; (\&lt;forall&gt;m::int. m \&lt;ge&gt; 0 \&lt;longrightarrow&gt; m dvd p \&lt;longrightarrow&gt;
+    m = 1 \&lt;or&gt; m = p))"
+  
+  sorry
+
+
+lemma not_prime_eq_prod_nat:
+  assumes "m &gt; 1" "\&lt;not&gt; prime (m::nat)"
+  shows   "\&lt;exists&gt;n k. n = m * k \&lt;and&gt; 1 &lt; m \&lt;and&gt; m &lt; n \&lt;and&gt; 1 &lt; k \&lt;and&gt; k &lt; n"
+  
+  sorry
+
+
+
+subsection \&lt;open&gt;Make prime naively executable\&lt;close&gt;
+
+lemma prime_int_numeral_eq [simp]:
+  "prime (numeral m :: int) \&lt;longleftrightarrow&gt; prime (numeral m :: nat)"
+  
+  sorry
+
+
+class check_prime_by_range = normalization_semidom + discrete_linordered_semidom +
+  assumes prime_iff: \&lt;open&gt;prime a \&lt;longleftrightarrow&gt; 1 &lt; a \&lt;and&gt; (\&lt;forall&gt;d\&lt;in&gt;{2..a div 2}. \&lt;not&gt; d dvd a)\&lt;close&gt;
+begin
+
+lemma two_is_prime [simp]:
+  \&lt;open&gt;prime 2\&lt;close&gt;
+  
+  sorry
+
+
+end
+
+lemma divisor_less_eq_half_nat:
+  \&lt;open&gt;m \&lt;le&gt; n div 2\&lt;close&gt; if \&lt;open&gt;m dvd n\&lt;close&gt; \&lt;open&gt;m &lt; n\&lt;close&gt; for m n :: nat
+  
+  sorry
+
+
+instance nat :: check_prime_by_range
+  
+  sorry
+
+
+lemma two_is_prime_nat [simp]:
+  \&lt;open&gt;prime (2::nat)\&lt;close&gt;
+  
+  sorry
+
+
+lemma divisor_less_eq_half_int:
+  \&lt;open&gt;k \&lt;le&gt; l div 2\&lt;close&gt; if \&lt;open&gt;k dvd l\&lt;close&gt; \&lt;open&gt;k &lt; l\&lt;close&gt; \&lt;open&gt;l \&lt;ge&gt; 0\&lt;close&gt; \&lt;open&gt;k \&lt;ge&gt; 0\&lt;close&gt; for k l :: int
+  
+  sorry
+
+
+instance int :: check_prime_by_range
+  
+  sorry
+
+
+lemma prime_nat_numeral_eq [simp]: \&lt;comment&gt; \&lt;open&gt;TODO Sieve Of Erathosthenes might speed this up\&lt;close&gt;
+  "prime (numeral m :: nat) \&lt;longleftrightarrow&gt;
+    (1::nat) &lt; numeral m \&lt;and&gt;
+    (\&lt;forall&gt;n::nat \&lt;in&gt; set [2..&lt;Suc (numeral m div 2)]. \&lt;not&gt; n dvd numeral m)"
+  
+  sorry
+
+
+context check_prime_by_range
+begin
+
+definition check_divisors :: \&lt;open&gt;'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; 'a \&lt;Rightarrow&gt; bool\&lt;close&gt;
+  where \&lt;open&gt;check_divisors l u a \&lt;longleftrightarrow&gt; (\&lt;forall&gt;d\&lt;in&gt;{l..u}. \&lt;not&gt; d dvd a)\&lt;close&gt;
+
+lemma check_divisors_rec [code]:
+  \&lt;open&gt;check_divisors l u a \&lt;longleftrightarrow&gt; u &lt; l \&lt;or&gt; (\&lt;not&gt; l dvd a \&lt;and&gt; check_divisors (l + 1) u a)\&lt;close&gt;
+  
+  sorry
+
+
+lemma prime_eq_check_divisors [code]:
+  \&lt;open&gt;prime a \&lt;longleftrightarrow&gt; a &gt; 1 \&lt;and&gt; check_divisors 2 (a div 2) a\&lt;close&gt;
+  
+  sorry
+
+
+end
+
+
+subsection \&lt;open&gt;Largest exponent of a prime factor\&lt;close&gt;
+
+lemma prime_factor_nat:
+  "n \&lt;noteq&gt; (1::nat) \&lt;Longrightarrow&gt; \&lt;exists&gt;p. prime p \&lt;and&gt; p dvd n"
+  
+  sorry
+
+
+lemma prime_factor_int:
+  fixes k :: int
+  assumes "\&lt;bar&gt;k\&lt;bar&gt; \&lt;noteq&gt; 1"
+  obtains p where "prime p" "p dvd k"
+  
+  sorry
+
+
+text\&lt;open&gt;Possibly duplicates other material, but avoid the complexities of multisets.\&lt;close&gt;
+  
+lemma prime_power_cancel_less:
+  assumes "prime p" and eq: "m * (p ^ k) = m' * (p ^ k')" and less: "k &lt; k'" and "\&lt;not&gt; p dvd m"
+  shows False
+  
+  sorry
+
+
+lemma prime_power_cancel:
+  assumes "prime p" and eq: "m * (p ^ k) = m' * (p ^ k')" and "\&lt;not&gt; p dvd m" "\&lt;not&gt; p dvd m'"
+  shows "k = k'"
+  
+  sorry
+
+
+lemma prime_power_cancel2:
+  assumes "prime p" "m * (p ^ k) = m' * (p ^ k')" "\&lt;not&gt; p dvd m" "\&lt;not&gt; p dvd m'"
+  obtains "m = m'" "k = k'"
+  
+  sorry
+
+
+lemma prime_power_canonical:
+  fixes m :: nat
+  assumes "prime p" "m &gt; 0"
+  shows "\&lt;exists&gt;k n. \&lt;not&gt; p dvd n \&lt;and&gt; m = n * p ^ k"
+  
+  sorry
+
+
+
+subsection \&lt;open&gt;Infinitely many primes\&lt;close&gt;
+
+lemma next_prime_bound: "\&lt;exists&gt;p::nat. prime p \&lt;and&gt; n &lt; p \&lt;and&gt; p \&lt;le&gt; fact n + 1"
+  
+  sorry
+
+
+lemma bigger_prime: "\&lt;exists&gt;p. prime p \&lt;and&gt; p &gt; (n::nat)"
+  
+  sorry
+
+
+lemma primes_infinite: "\&lt;not&gt; (finite {(p::nat). prime p})"
+  
+  sorry
+
+
+subsection \&lt;open&gt;Powers of Primes\&lt;close&gt;
+
+text\&lt;open&gt;Versions for type nat only\&lt;close&gt;
+
+lemma prime_product:
+  fixes p::nat
+  assumes "prime (p * q)"
+  shows "p = 1 \&lt;or&gt; q = 1"
+  
+  sorry
+
+lemma prime_power_mult_nat:
+  fixes p :: nat
+  assumes p: "prime p" and xy: "x * y = p ^ k"
+  shows "\&lt;exists&gt;i j. x = p ^ i \&lt;and&gt; y = p^ j"
+  
+  sorry
+
+
+lemma prime_power_exp_nat:
+  fixes p::nat
+  assumes p: "prime p" and n: "n \&lt;noteq&gt; 0"
+    and xn: "x^n = p^k" shows "\&lt;exists&gt;i. x = p^i"
+  
+  sorry
+
+
+lemma divides_primepow_nat:
+  fixes p :: nat
+  assumes p: "prime p"
+  shows "d dvd p ^ k \&lt;longleftrightarrow&gt; (\&lt;exists&gt;i\&lt;le&gt;k. d = p ^ i)"
+  
+  sorry
+
+
+lemma gcd_prime_int:
+  assumes "prime (p :: int)"
+  shows   "gcd p k = (if p dvd k then p else 1)"
+  
+  sorry
+
+
+
+subsection \&lt;open&gt;Chinese Remainder Theorem Variants\&lt;close&gt;
+
+lemma bezout_gcd_nat:
+  fixes a::nat shows "\&lt;exists&gt;x y. a * x - b * y = gcd a b \&lt;or&gt; b * x - a * y = gcd a b"
+  
+  sorry
+
+
+lemma gcd_bezout_sum_nat:
+  fixes a::nat
+  assumes "a * x + b * y = d"
+  shows "gcd a b dvd d"
+  
+  sorry
+
+
+
+text \&lt;open&gt;A binary form of the Chinese Remainder Theorem.\&lt;close&gt;
+
+(* TODO: Generalise? *)
+lemma chinese_remainder:
+  fixes a::nat  assumes ab: "coprime a b" and a: "a \&lt;noteq&gt; 0" and b: "b \&lt;noteq&gt; 0"
+  shows "\&lt;exists&gt;x q1 q2. x = u + q1 * a \&lt;and&gt; x = v + q2 * b"
+  
+  sorry
+
+
+text \&lt;open&gt;Primality\&lt;close&gt;
+
+lemma coprime_bezout_strong:
+  fixes a::nat assumes "coprime a b"  "b \&lt;noteq&gt; 1"
+  shows "\&lt;exists&gt;x y. a * x = b * y + 1"
+  
+  sorry
+
+
+</prefix><statement>lemma bezout_prime:
+  assumes p: "prime p" and pa: "\&lt;not&gt; p dvd a"
+  shows "\&lt;exists&gt;x y. a*x = Suc (p*y)"</statement><proof_prefix /><sketch /><depth>1</depth><target_name>bezout_prime</target_name><forbidden_names><item>bezout_prime</item><item>prime_factors_gt_0_nat</item><item>prime_factors_gt_0_int</item><item>prime_factors_ge_0_int</item><item>prod_mset_prime_factorization_int</item><item>prime_factorization_exists_nat</item><item>prod_mset_prime_factorization_nat</item><item>prime_factorization_nat</item><item>prime_factorization_int</item><item>prime_factorization_unique_nat</item><item>prime_factorization_unique_int</item><item>prime_factors_characterization_nat</item><item>prime_factors_characterization'_nat</item><item>prime_factors_characterization_int</item><item>abs_prod</item><item>primes_characterization'_int</item><item>multiplicity_characterization_nat</item><item>multiplicity_characterization'_nat</item><item>multiplicity_characterization_int</item><item>multiplicity_characterization'_int</item><item>multiplicity_one_nat</item><item>multiplicity_eq_nat</item><item>multiplicity_eq_int</item><item>multiplicity_prod_prime_powers</item><item>prime_factorization_prod_mset</item><item>prime_factors_prod</item><item>prime_factors_fact</item><item>prime_dvd_fact_iff</item><item>dvd_choose_prime</item><item>minus_power_prime_CHAR</item><item>CHAR_pos</item><item>CHAR_nonzero</item><item>CHAR_prime</item><item>semiring_prime_charI</item><item>idom_prime_charI</item><item>field_prime_charI</item><item>field_prime_charI'</item><item>finite_fieldI</item><item>finite_field_power_card_eq_same</item><item>finite_field_power_card_power_eq_same</item><item>inj_on_enum_finite_field</item><item>freshmans_dream</item><item>freshmans_dream'</item><item>freshmans_dream_sum</item><item>freshmans_dream_sum'</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9945957349846</remaining_s></dsp_request>

@@ -1,0 +1,7 @@
+<dsp_request schema="dsp_native_request_v1" request_id="00ca00acaf37477596bc475fa57bbf39" input_sha256="9ca8db9062328d88481be83ac019ae11e59550c09792ff61c83d3eb06e70e88f" action="search"><prefix>theory V2Control imports Main begin
+</prefix><statement>lemma v2_control: "True"</statement><proof_prefix /><sketch>proof -
+ have impossible: "True \&lt;and&gt; False"
+ apply (rule conjI)
+ sledgehammer
+ then show "True" by simp
+qed</sketch><depth>1</depth><target_name>v2_control</target_name><forbidden_names><item>v2_control</item></forbidden_names><heuristics /><provers><item>simp</item></provers><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9989072199678</remaining_s></dsp_request>

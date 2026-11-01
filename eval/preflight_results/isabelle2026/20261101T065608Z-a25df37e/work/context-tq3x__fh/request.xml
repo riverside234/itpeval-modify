@@ -1,0 +1,48 @@
+<dsp_request schema="dsp_native_request_v1" request_id="d7a6a09c942e4d3f81a120bc7dc95cf1" input_sha256="694f028db5c7fbacb21c148c3aacef9ed2fb67e7af25d4577092292a81d9ed9b" action="context"><prefix>(* Author: Lukas Bulwahn &lt;lukas.bulwahn-at-gmail.com&gt; *)
+
+section \&lt;open&gt;Derangements\&lt;close&gt;
+
+theory Derangements
+imports
+  Complex_Main
+  "HOL-Combinatorics.Permutations"
+begin
+
+subsection \&lt;open&gt;Preliminaries\&lt;close&gt;
+
+subsubsection \&lt;open&gt;Additions to @{theory HOL.Finite_Set} Theory\&lt;close&gt;
+
+lemma card_product_dependent:
+  assumes "finite S" "\&lt;forall&gt;x \&lt;in&gt; S. finite (T x)"
+  shows "card {(x, y). x \&lt;in&gt; S \&lt;and&gt; y \&lt;in&gt; T x} = (\&lt;Sum&gt;x \&lt;in&gt; S. card (T x))"
+  
+  sorry
+
+
+
+subsubsection \&lt;open&gt;Additions to @{theory "HOL-Combinatorics.Permutations"} Theory\&lt;close&gt;
+
+lemma permutes_imp_bij':
+  assumes "p permutes S"
+  shows "bij p"
+  
+  sorry
+
+
+lemma permutesE:
+  assumes "p permutes S"
+  obtains "bij p" "\&lt;forall&gt;x. x \&lt;notin&gt; S \&lt;longrightarrow&gt; p x = x"
+  
+  sorry
+
+
+lemma bij_imp_permutes':
+  assumes "bij p" "\&lt;forall&gt;x. x \&lt;notin&gt; A \&lt;longrightarrow&gt; p x = x"
+  shows  "p permutes A"
+  
+  sorry
+
+
+</prefix><statement>lemma permutes_swap:
+  assumes "p permutes S"
+  shows "Fun.swap x y p permutes (insert x (insert y S))"</statement><proof_prefix /><sketch /><depth>1</depth><target_name>permutes_swap</target_name><forbidden_names><item>permutes_swap</item><item>bij_extends</item><item>permutes_add_one</item><item>permutations_skip_one</item><item>permutes_drop_cycle_size_two</item><item>derangementsI</item><item>derangementsE</item><item>derangements_inv</item><item>derangements_in_image</item><item>derangements_in_image_strong</item><item>derangements_inverse_in_image</item><item>derangements_fixpoint</item><item>derangements_no_fixpoint</item><item>finite_derangements</item><item>derangements_empty</item><item>derangements_singleton</item><item>derangements_swap</item><item>derangements_skip_one</item><item>derangements_add_one</item><item>derangements_drop_minimal_cycle</item><item>card_derangements</item><item>count_derangements</item><item>two_power_fact_le_fact</item><item>exp1_approx</item><item>exp1_bounds</item><item>count_derangements_approximation</item><item>derangements_formula</item><item>derangements_formula'</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.999341230956</remaining_s></dsp_request>

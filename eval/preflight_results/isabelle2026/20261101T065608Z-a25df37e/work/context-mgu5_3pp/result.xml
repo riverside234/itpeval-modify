@@ -1,0 +1,144 @@
+<dsp_result schema="dsp_native_result_v1" request_id="44fca1b4a1aa47f8b8f1897b7bb198c4" input_sha256="2a53c8601216d70d335db5cd38fb244f3fab300c5ec874c77d550c0064a2d0fb" action="context" success="true" target_closed="false"><proof></proof><category></category><error></error><attempts><attempt mode="context" success="true" index="1" line="1" source_state="0" duration_seconds="0.038"><command>theory supinf
+  imports Main
+begin</command><error></error></attempt><attempt mode="context" success="true" index="2" line="1" source_state="1" duration_seconds="0.001"><command>declare [[quick_and_dirty = true]]</command><error></error></attempt><attempt mode="context" success="true" index="3" line="3" source_state="2" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="4" line="5" source_state="3" duration_seconds="0.099"><command>locale complete_ordered_field =
+  fixes zero_nat  :: &quot;&apos;n&quot;
+    and succ      :: &quot;&apos;n \&lt;Rightarrow&gt; &apos;n&quot;
+    and nat_le    :: &quot;&apos;n \&lt;Rightarrow&gt; &apos;n \&lt;Rightarrow&gt; bool&quot;
+    and zero one  :: &quot;&apos;r&quot;
+    and add       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;   (infixl &quot;+R&quot; 65)
+    and mul       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; &apos;r&quot;   (infixl &quot;*R&quot; 70)
+    and opp inv   :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+    and rle       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;  (infix &quot;\&lt;le&gt;R&quot; 50)
+    and rlt       :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;  (infix &quot;&lt;R&quot; 50)
+    and rabs      :: &quot;&apos;r \&lt;Rightarrow&gt; &apos;r&quot;
+    and inr       :: &quot;&apos;n \&lt;Rightarrow&gt; &apos;r&quot;
+  assumes nat_le_refl   : &quot;\&lt;And&gt;n. nat_le n n&quot;
+    and   le_succ_of_le : &quot;\&lt;And&gt;n m. nat_le n m \&lt;Longrightarrow&gt; nat_le n (succ m)&quot;
+    and   le_succ       : &quot;\&lt;And&gt;n. nat_le n (succ n)&quot;
+    and   add_comm      : &quot;\&lt;And&gt;x y. x +R y = y +R x&quot;
+    and   add_assoc     : &quot;\&lt;And&gt;x y z. (x +R y) +R z = x +R (y +R z)&quot;
+    and   add_zero      : &quot;\&lt;And&gt;x. x +R zero = x&quot;
+    and   add_opp       : &quot;\&lt;And&gt;x. opp x +R x = zero&quot;
+    and   mul_comm      : &quot;\&lt;And&gt;x y. x *R y = y *R x&quot;
+    and   mul_assoc     : &quot;\&lt;And&gt;x y z. (x *R y) *R z = x *R (y *R z)&quot;
+    and   mul_one       : &quot;\&lt;And&gt;x. x *R one = x&quot;
+    and   dist_l        : &quot;\&lt;And&gt;x y z. x *R (y +R z) = (x *R y) +R (x *R z)&quot;
+    and   sub_zero      : &quot;\&lt;And&gt;x. x +R opp zero = x&quot;
+    and   rle_refl      : &quot;\&lt;And&gt;x. x \&lt;le&gt;R x&quot;
+    and   rle_trans     : &quot;\&lt;And&gt;x y z. x \&lt;le&gt;R y \&lt;Longrightarrow&gt; y \&lt;le&gt;R z \&lt;Longrightarrow&gt; x \&lt;le&gt;R z&quot;
+    and   rle_antisym   : &quot;\&lt;And&gt;x y. x \&lt;le&gt;R y \&lt;Longrightarrow&gt; y \&lt;le&gt;R x \&lt;Longrightarrow&gt; x = y&quot;
+    and   rlt_def       : &quot;\&lt;And&gt;x y. (x &lt;R y) \&lt;longleftrightarrow&gt; (x \&lt;le&gt;R y \&lt;and&gt; x \&lt;noteq&gt; y)&quot;
+    and   rle_abs       : &quot;\&lt;And&gt;x. x +R opp zero \&lt;le&gt;R rabs x&quot;
+    and   rinv_pos      : &quot;\&lt;And&gt;x. zero &lt;R x \&lt;Longrightarrow&gt; zero &lt;R inv x&quot;
+    and   rplus_le_compat_l : &quot;\&lt;And&gt;x y z. y \&lt;le&gt;R z \&lt;Longrightarrow&gt; x +R y \&lt;le&gt;R x +R z&quot;
+    and   rinv_involutive    : &quot;\&lt;And&gt;x. zero &lt;R x \&lt;Longrightarrow&gt; inv (inv x) = x&quot;
+    and   inr_pos       : &quot;\&lt;And&gt;n. zero &lt;R inr (succ n)&quot;
+    and   inr_le        : &quot;\&lt;And&gt;m n. nat_le m n \&lt;Longrightarrow&gt; inr m \&lt;le&gt;R inr n&quot;
+    and   inr_zero      : &quot;inr zero_nat = zero&quot;
+    and   inr_succ      : &quot;\&lt;And&gt;n. inr (succ n) = inr n +R one&quot;
+    and   rtotal_order  : &quot;\&lt;And&gt;x y. (x &lt;R y) \&lt;or&gt; x = y \&lt;or&gt; (y &lt;R x)&quot;
+    and   rle_inv_contravar :
+            &quot;\&lt;And&gt;a b. zero &lt;R a \&lt;Longrightarrow&gt; zero &lt;R b \&lt;Longrightarrow&gt; a \&lt;le&gt;R b \&lt;Longrightarrow&gt; inv b \&lt;le&gt;R inv a&quot;
+    and   eps_between   :
+            &quot;\&lt;And&gt;x y. x &lt;R y \&lt;Longrightarrow&gt; \&lt;exists&gt;eps. zero &lt;R eps \&lt;and&gt; x +R eps &lt;R y&quot;
+    and   archimedean   : &quot;\&lt;And&gt;x. \&lt;exists&gt;n. x \&lt;le&gt;R inr n&quot;
+    and   completeness  :
+            &quot;\&lt;And&gt;A. (\&lt;exists&gt;ub. \&lt;forall&gt;a. A a \&lt;longrightarrow&gt; ub \&lt;le&gt;R a) \&lt;Longrightarrow&gt;
+              \&lt;exists&gt;sup. (\&lt;forall&gt;a. A a \&lt;longrightarrow&gt; a \&lt;le&gt;R sup) \&lt;and&gt;
+                    (\&lt;forall&gt;y. (\&lt;forall&gt;a. A a \&lt;longrightarrow&gt; a \&lt;le&gt;R y) \&lt;longrightarrow&gt; sup \&lt;le&gt;R y)&quot;
+begin</command><error></error></attempt><attempt mode="context" success="true" index="5" line="51" source_state="4" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="6" line="57" source_state="5" duration_seconds="0.006"><command>lemma add_opp_r: &quot;x +R opp x = zero&quot;</command><error></error></attempt><attempt mode="context" success="true" index="7" line="57" source_state="6" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="8" line="58" source_state="7" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="9" line="58" source_state="8" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="10" line="59" source_state="9" duration_seconds="0.001"><command>lemma rlt_le: &quot;x &lt;R y \&lt;Longrightarrow&gt; x \&lt;le&gt;R y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="11" line="59" source_state="10" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="12" line="60" source_state="11" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="13" line="60" source_state="12" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="14" line="61" source_state="13" duration_seconds="0.001"><command>lemma rlt_ne: &quot;x &lt;R y \&lt;Longrightarrow&gt; x \&lt;noteq&gt; y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="15" line="61" source_state="14" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="16" line="62" source_state="15" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="17" line="62" source_state="16" duration_seconds="0.000"><command>
+</command><error></error></attempt><attempt mode="context" success="true" index="18" line="63" source_state="17" duration_seconds="0.002"><command>lemma rlt_intro: &quot;x \&lt;le&gt;R y \&lt;Longrightarrow&gt; x \&lt;noteq&gt; y \&lt;Longrightarrow&gt; x &lt;R y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="19" line="63" source_state="18" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="20" line="64" source_state="19" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="21" line="64" source_state="20" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="22" line="69" source_state="21" duration_seconds="0.011"><command>definition up_bounds :: &quot;(&apos;r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;
+  where &quot;up_bounds A x \&lt;equiv&gt; \&lt;forall&gt;a. A a \&lt;longrightarrow&gt; a \&lt;le&gt;R x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="23" line="70" source_state="22" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="24" line="72" source_state="23" duration_seconds="0.015"><command>definition is_maximum :: &quot;&apos;r \&lt;Rightarrow&gt; (&apos;r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; bool&quot;
+  where &quot;is_maximum a A \&lt;equiv&gt; A a \&lt;and&gt; up_bounds A a&quot;</command><error></error></attempt><attempt mode="context" success="true" index="25" line="73" source_state="24" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="26" line="75" source_state="25" duration_seconds="0.015"><command>definition low_bounds :: &quot;(&apos;r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;
+  where &quot;low_bounds A x \&lt;equiv&gt; \&lt;forall&gt;a. A a \&lt;longrightarrow&gt; x \&lt;le&gt;R a&quot;</command><error></error></attempt><attempt mode="context" success="true" index="27" line="76" source_state="26" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="28" line="78" source_state="27" duration_seconds="0.015"><command>definition is_inf :: &quot;&apos;r \&lt;Rightarrow&gt; (&apos;r \&lt;Rightarrow&gt; bool) \&lt;Rightarrow&gt; bool&quot;
+  where &quot;is_inf x A \&lt;equiv&gt; is_maximum x (low_bounds A)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="29" line="79" source_state="28" duration_seconds="0.000"><command>
+
+</command><error></error></attempt><attempt mode="context" success="true" index="30" line="81" source_state="29" duration_seconds="0.019"><command>definition limit :: &quot;(&apos;n \&lt;Rightarrow&gt; &apos;r) \&lt;Rightarrow&gt; &apos;r \&lt;Rightarrow&gt; bool&quot;
+  where &quot;limit u l \&lt;equiv&gt;
+    \&lt;forall&gt;eps. zero &lt;R eps \&lt;longrightarrow&gt;
+      (\&lt;exists&gt;N. \&lt;forall&gt;n. nat_le N n \&lt;longrightarrow&gt; rabs (u n +R opp l) \&lt;le&gt;R eps)&quot;</command><error></error></attempt><attempt mode="context" success="true" index="31" line="84" source_state="30" duration_seconds="0.000"><command>
+
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="32" line="90" source_state="31" duration_seconds="0.006"><command>lemma add_sub_cancel_r: &quot;a +R (b +R opp a) = b&quot;</command><error></error></attempt><attempt mode="context" success="true" index="33" line="90" source_state="32" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="34" line="91" source_state="33" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="35" line="91" source_state="34" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="36" line="96" source_state="35" duration_seconds="0.001"><command>lemma rabs_pos: &quot;t \&lt;le&gt;R rabs t&quot;</command><error></error></attempt><attempt mode="context" success="true" index="37" line="96" source_state="36" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="38" line="97" source_state="37" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="39" line="97" source_state="38" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="40" line="102" source_state="39" duration_seconds="0.002"><command>lemma unique_max:
+  assumes &quot;is_maximum x A&quot; &quot;is_maximum y A&quot;
+  shows &quot;x = y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="41" line="104" source_state="40" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="42" line="105" source_state="41" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="43" line="105" source_state="42" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="44" line="110" source_state="43" duration_seconds="0.002"><command>lemma inf_lt:
+  assumes hinf: &quot;is_inf x A&quot; and hlt: &quot;x &lt;R y&quot;
+  shows &quot;\&lt;exists&gt;a. A a \&lt;and&gt; a &lt;R y&quot;</command><error></error></attempt><attempt mode="context" success="true" index="45" line="112" source_state="44" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="46" line="113" source_state="45" duration_seconds="0.003"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="47" line="113" source_state="46" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="48" line="118" source_state="47" duration_seconds="0.002"><command>lemma le_of_le_add_eps:
+  assumes H: &quot;\&lt;forall&gt;eps. zero &lt;R eps \&lt;longrightarrow&gt; y \&lt;le&gt;R x +R eps&quot;
+  shows &quot;y \&lt;le&gt;R x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="49" line="120" source_state="48" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="50" line="121" source_state="49" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="51" line="121" source_state="50" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="52" line="126" source_state="51" duration_seconds="0.003"><command>lemma le_lim:
+  assumes hlim : &quot;limit u x&quot;
+      and hle  : &quot;\&lt;forall&gt;n. y \&lt;le&gt;R u n&quot;
+  shows &quot;y \&lt;le&gt;R x&quot;</command><error></error></attempt><attempt mode="context" success="true" index="53" line="129" source_state="52" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="54" line="130" source_state="53" duration_seconds="0.003"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="55" line="130" source_state="54" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="56" line="135" source_state="55" duration_seconds="0.002"><command>lemma inv_succ_pos: &quot;zero &lt;R inv (inr (succ n))&quot;</command><error></error></attempt><attempt mode="context" success="true" index="57" line="135" source_state="56" duration_seconds="0.000"><command>
+  </command><error></error></attempt><attempt mode="context" success="true" index="58" line="136" source_state="57" duration_seconds="0.002"><command>sorry</command><error></error></attempt><attempt mode="context" success="true" index="59" line="136" source_state="58" duration_seconds="0.000"><command>
+
+
+
+
+</command><error></error></attempt><attempt mode="context" success="true" index="60" line="1" source_state="59" duration_seconds="0.001"><command>declare [[quick_and_dirty = false, smt_oracle = false]]</command><error></error></attempt><attempt mode="target" success="true" index="61" line="1" source_state="60" duration_seconds="0.003"><command>lemma limit_inv_succ:
+  assumes heps: &quot;zero &lt;R eps&quot;
+  shows &quot;\&lt;exists&gt;N. \&lt;forall&gt;n. nat_le N n \&lt;longrightarrow&gt; inv (inr (succ n)) \&lt;le&gt;R eps&quot;</command><error></error></attempt><attempt mode="target" success="true" index="62" line="3" source_state="61" duration_seconds="0.000"><command>
+</command><error></error></attempt></attempts><settings/></dsp_result>

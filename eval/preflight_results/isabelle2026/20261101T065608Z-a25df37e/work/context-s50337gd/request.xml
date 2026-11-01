@@ -1,0 +1,67 @@
+<dsp_request schema="dsp_native_request_v1" request_id="68d2be4a154a4e7cb4726754b105a71e" input_sha256="b2508bb7db3e2655f5d132c55f2b3917305c4ba29edda5031c50ba58c2d20d51" action="context"><prefix>theory limits_uniqueness
+  imports Main
+begin
+
+locale abs_field =
+  fixes zero    :: "'r"
+    and one     :: "'r"
+    and add     :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"   (infixl "+R" 65)
+    and mul     :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"   (infixl "*R" 70)
+    and opp     :: "'r \&lt;Rightarrow&gt; 'r"
+    and absV    :: "'r \&lt;Rightarrow&gt; 'r"
+    and le      :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; bool"  (infix "\&lt;preceq&gt;" 50)
+    and lt      :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; bool"  (infix "\&lt;prec&gt;" 50)
+
+    and natLe   :: "'n \&lt;Rightarrow&gt; 'n \&lt;Rightarrow&gt; bool"
+    and natMax  :: "'n \&lt;Rightarrow&gt; 'n \&lt;Rightarrow&gt; 'n"
+  assumes le_max_left    : "\&lt;And&gt;x y. natLe x (natMax x y)"
+    and   le_max_right   : "\&lt;And&gt;x y. natLe y (natMax x y)"
+    and   add_comm       : "\&lt;And&gt;x y. x +R y = y +R x"
+    and   add_assoc      : "\&lt;And&gt;x y z. (x +R y) +R z = x +R (y +R z)"
+    and   add_zero       : "\&lt;And&gt;x. x +R zero = x"
+    and   add_opp        : "\&lt;And&gt;x. x +R opp x = zero"
+    and   opp_add        : "\&lt;And&gt;x y. opp (x +R y) = opp x +R opp y"
+    and   le_refl        : "\&lt;And&gt;x. x \&lt;preceq&gt; x"
+    and   le_trans       : "\&lt;And&gt;x y z. x \&lt;preceq&gt; y \&lt;Longrightarrow&gt; y \&lt;preceq&gt; z \&lt;Longrightarrow&gt; x \&lt;preceq&gt; z"
+    and   add_le_add     : "\&lt;And&gt;a b c d. a \&lt;preceq&gt; b \&lt;Longrightarrow&gt; c \&lt;preceq&gt; d \&lt;Longrightarrow&gt; a +R c \&lt;preceq&gt; b +R d"
+    and   abs_nonneg     : "\&lt;And&gt;x. zero \&lt;preceq&gt; absV x"
+    and   abs_triangle   : "\&lt;And&gt;x y. absV (x +R y) \&lt;preceq&gt; absV x +R absV y"
+    and   abs_sub_symm   : "\&lt;And&gt;x y. absV (x +R opp y) = absV (y +R opp x)"
+    and   sub_decomp     : "\&lt;And&gt;x y z. x +R opp z = (x +R opp y) +R (y +R opp z)"
+    and   sub_eq_zero    : "\&lt;And&gt;x y. x +R opp y = zero \&lt;Longrightarrow&gt; x = y"
+    and   eq_of_forall_eps2 :
+            "\&lt;And&gt;x. (\&lt;forall&gt;eps. zero \&lt;prec&gt; eps \&lt;longrightarrow&gt; absV x \&lt;preceq&gt; eps +R eps) \&lt;Longrightarrow&gt; x = zero"
+begin
+
+
+
+
+
+definition sub :: "'r \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; 'r"
+  where "sub x y \&lt;equiv&gt; x +R opp y"
+
+definition limit :: "('n \&lt;Rightarrow&gt; 'r) \&lt;Rightarrow&gt; 'r \&lt;Rightarrow&gt; bool"
+  where "limit u l \&lt;equiv&gt;
+    \&lt;forall&gt;eps. zero \&lt;prec&gt; eps \&lt;longrightarrow&gt;
+      (\&lt;exists&gt;N. \&lt;forall&gt;n. natLe N n \&lt;longrightarrow&gt; absV (sub (u n) l) \&lt;preceq&gt; eps)"
+
+
+
+
+
+lemma sub_self_zero: "sub x x = zero"
+  sorry
+lemma sub_decomp_lem: "sub x z = (sub x y) +R (sub y z)"
+  sorry
+lemma abs_sub_triangle:
+  "absV (sub x z) \&lt;preceq&gt; absV (sub x y) +R absV (sub y z)"
+  sorry
+lemma abs_sub_symm_lem: "absV (sub x y) = absV (sub y x)"
+  sorry
+
+
+
+
+</prefix><statement>theorem limit_unique:
+  assumes Hl: "limit u l" and Hm: "limit u m"
+  shows "l = m"</statement><proof_prefix /><sketch /><depth>2</depth><target_name>limit_unique</target_name><forbidden_names><item>limit_unique</item></forbidden_names><heuristics /><provers /><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1199.9985818070127</remaining_s></dsp_request>

@@ -1,0 +1,33 @@
+{
+  "name": "context_hundred-theorems_049_the_cayley-hamilton_theorem_Cayley_Hamilton",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 4.608,
+  "details": "details/057-context_hundred-theorems_049_the_cayley-hamilton_theorem_Cayley_Hamilton.json",
+  "failure_category": "import_error",
+  "expected_failure": null,
+  "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/build.log\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/Square_Matrix.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_cac47d224bd04037a58800a088d56253.Square_Matrix\"\n*** (required by \"DSP_Job_cac47d224bd04037a58800a088d56253.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/Square_Matrix.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/Square_Matrix.thy\"\n*** The error(s) above occurred in session \"DSP_Job_cac47d224bd04037a58800a088d56253\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/ROOT\")",
+  "payload": {
+    "ok": false,
+    "error": "NativeFailure: native worker produced no structured result (exit status 2); /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/build.log\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/Square_Matrix.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_cac47d224bd04037a58800a088d56253.Square_Matrix\"\n*** (required by \"DSP_Job_cac47d224bd04037a58800a088d56253.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/Square_Matrix.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/Square_Matrix.thy\"\n*** The error(s) above occurred in session \"DSP_Job_cac47d224bd04037a58800a088d56253\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/ROOT\")",
+    "failure_category": "import_error",
+    "build_log_path": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/build.log",
+    "build_returncode": 2,
+    "build_log_excerpt": "*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/Square_Matrix.thy\"\n*** The error(s) above occurred for theory \"DSP_Job_cac47d224bd04037a58800a088d56253.Square_Matrix\"\n*** (required by \"DSP_Job_cac47d224bd04037a58800a088d56253.DSP_Driver\") (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/DSP_Driver.thy\")\n*** Cannot load theory file \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/Square_Matrix.thy\"\n*** No such file: \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/Square_Matrix.thy\"\n*** The error(s) above occurred in session \"DSP_Job_cac47d224bd04037a58800a088d56253\" (line 1 of \"/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w/ROOT\")",
+    "search_directory": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w",
+    "import_resolution": {
+      "original_imports": [
+        "Square_Matrix",
+        "HOL-Computational_Algebra.Polynomial"
+      ],
+      "resolved_imports": [
+        "Square_Matrix",
+        "HOL-Computational_Algebra.Polynomial"
+      ],
+      "session_dependencies": [
+        "HOL-Computational_Algebra"
+      ]
+    },
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/work/context-ezay0p9w"
+  }
+}
