@@ -92,6 +92,7 @@ term thm typ print_statement find_theorems text text_raw txt section
 subsection subsubsection chapter paragraph subparagraph
 termination partial_function global_interpretation declare_file external_file
 nonterminal syntax_declaration oracle
+setup_lifting lifting_forget lifting_update syntax_consts quickcheck_generator
 """.split())
 PROOF_COMMANDS = {"by", "proof", "apply", "sorry", "using", "unfolding"}
 

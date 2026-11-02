@@ -1,6 +1,7 @@
 """Full-session native jobs, strict XML protocol and checked target completion."""
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import shutil
@@ -24,6 +25,77 @@ class NativeFailure(RuntimeError):
         super().__init__(message)
         self.category = category
         self.details = details or {}
+
+
+# Companion code from the pinned AFP-2026 release. Only the helper ML file is
+# copied: importing Bertrand.thy would expose the very theorem being evaluated.
+AUXILIARY_SOURCES = {
+    ("Bertrand", "bertrand.ML"): (
+        "Bertrands_Postulate/bertrand.ML",
+        "423110be6c919dec5add93272fe461371562ea66fec40bd3832bcbb3a6627bf0"),
+}
+
+
+def forbidden_fact_names(context) -> list[str]:
+    """Keep target checks strict; a later basename can name a valid earlier helper.
+
+    The executable prefix excludes every later declaration. An ancestor check also
+    rejects importing the original theory. Basenames duplicated across scopes cannot
+    identify a leaked *later* fact, so do not reject the earlier scoped fact for it.
+    """
+    prior = set(context.prior_names)
+    return list(dict.fromkeys(d.name for d in inventory_isabelle_declarations(context.template)
+        if d.char_start >= len(context.prefix)
+        and (d.char_start == len(context.prefix) or d.name not in prior)))
+
+
+def stage_auxiliary_files(prefix: str, theory_name: str, config: DspConfig, directory: Path) -> list[dict]:
+    """Resolve only audited trusted context files from configured AFP roots."""
+    items = tokens(prefix)
+    words = {t.text for t in items if t.kind == "word"}
+    if theory_name == "Polynomial" and "lift_definition" in words and "setup_lifting" not in words:
+        raise NativeFailure("input_error", "Saved Polynomial context lacks setup_lifting. "
+            "Re-extract Hundred Theorems records with the current masker (repair_p2); "
+            "old records/drafts/sketches contain a stale context and must be regenerated.")
+    staged = {}
+    for index, item in enumerate(items):
+        if item.kind != "word" or item.text not in {"ML_file", "SML_file", "external_file"}:
+            continue
+        arg = items[index + 1] if index + 1 < len(items) else None
+        if arg is None or arg.kind not in {"string", "cartouche"}:
+            raise NativeFailure("import_error", "Unsupported auxiliary-file command: " + item.text)
+        name = arg.text[1:-1] if arg.kind == "string" or arg.text.startswith(chr(0x2039)) else arg.text[7:-8]
+        spec = AUXILIARY_SOURCES.get((theory_name, name))
+        if spec is None:
+            raise NativeFailure("import_error", "No audited auxiliary source for " + theory_name + "/" + name)
+        if name in staged:
+            continue
+        relative, expected = spec
+        found = None
+        for configured in config.session_roots:
+            root = repo_path(configured)
+            source = repo_path(root / (Path(relative).name if root.name == Path(relative).parent.name else relative))
+            if not source.is_relative_to(root):
+                raise NativeFailure("import_error", "Auxiliary source escapes its configured session root")
+            if source.is_file():
+                content = source.read_bytes()
+                actual = hashlib.sha256(content).hexdigest()
+                if actual != expected:
+                    raise NativeFailure("import_error", "Auxiliary source hash mismatch: " + str(source))
+                found = (source, content, actual)
+                break
+        if found is None:
+            raise NativeFailure("import_error", "Missing " + relative + ". Run v2_dsp.prepare_afp "
+                "and include the pinned AFP-2026 thys directory in session_roots.")
+        source, content, actual = found
+        destination = repo_path(directory / name)
+        if destination.parent != directory.resolve():
+            raise NativeFailure("import_error", "Auxiliary destination must be inside the native job")
+        if destination.exists() and destination.read_bytes() != content:
+            raise NativeFailure("import_error", "Refusing to replace a different auxiliary file: " + str(destination))
+        destination.write_bytes(content)
+        staged[name] = {"file": name, "source": str(source), "sha256": actual}
+    return list(staged.values())
 
 
 def import_tokens(prefix: str) -> list:
@@ -239,14 +311,17 @@ class NativeSearch:
                 details={"import_resolution": resolution, "required_afp_sessions": external_sessions})
         directory.mkdir(parents=True, exist_ok=True)
         (directory / "import_resolution.json").write_text(json.dumps(resolution, indent=2) + "\n", encoding="utf-8")
+        auxiliary = stage_auxiliary_files(prefix, context.theory_name, self.config, directory)
+        (directory / "auxiliary_sources.json").write_text(json.dumps(auxiliary, indent=2) + "\n", encoding="utf-8")
         parent_dir, parent_session = self.infrastructure(deadline=deadline)
-        forbidden = [d.name for d in inventory_isabelle_declarations(context.template)
-                     if d.char_start >= len(context.prefix)]
+        forbidden = forbidden_fact_names(context)
         request = {"request_id": uuid.uuid4().hex, "action": action,
                    "prefix": prefix, "statement": context.statement,
                    "proof_prefix": context.proof_prefix, "sketch": sketch, "depth": str(context.depth),
                    "target_name": record["isabelle_target_name"], "forbidden_names": forbidden,
                    "heuristics": list(heuristics), "provers": self.config.provers,
+                   "auxiliary_sources": [f"{item['file']}:{item['sha256']}" for item in auxiliary],
+                   "context_step_timeout_s": str(self.config.context_step_timeout_s),
                    "step_timeout_s": str(self.config.step_timeout_s),
                    "hammer_timeout_s": str(self.config.hammer_timeout_s),
                    "preplay_timeout_s": str(self.config.preplay_timeout_s),
@@ -292,4 +367,5 @@ class NativeSearch:
             raise
         result["search_directory"] = str(directory)
         result["import_resolution"] = resolution
+        result["auxiliary_sources"] = auxiliary
         return result

@@ -236,3 +236,11 @@ outputs. Neither DSP backend performs separate replay verification. See the
 `--dataset both --all-targets --expected-contexts 262` lab command. Matching AFP
 sources are required for 31 Hundred candidates; the 24 inherited core Set targets
 are reported separately as unavailable context in preflight.
+
+The November 2 context fixes preserve lifting registration commands during proof
+masking (`hundred_theorems_repair_p2`). Re-extract older factor/remainder Polynomial
+records before experiments and regenerate their dependent Draft/Sketch artifacts.
+The shared full preflight extracts fresh contexts when `--input` is omitted.
+Bertrand contexts require the pinned AFP companion `bertrand.ML`; the native loader
+stages it automatically from `session_roots` without importing the target theory.
+See the [native review](../babel_formal_pipeline/v2_dsp/PROVER_REVIEW.md).

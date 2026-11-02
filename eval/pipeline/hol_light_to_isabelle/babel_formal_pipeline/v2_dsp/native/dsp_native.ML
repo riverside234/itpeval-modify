@@ -74,6 +74,21 @@ fun number nodes name =
 fun integer nodes name =
   (case Int.fromString (value nodes name) of SOME n => n | NONE => fail "protocol_error" ("bad " ^ name));
 
+(* A fresh theory must use its job's source directory. Theory.begin_theory
+   alone inherits the first parent's master directory (the infrastructure heap),
+   which makes relative ML_file loads fail even when their files are staged. *)
+fun begin_context_theory driver_theory prefix =
+  let
+    val header = Thy_Header.read Position.none prefix;
+    val (name, pos) = #name header;
+    val directory = Resources.master_directory driver_theory;
+    val source: Resources.thy =
+      {name = {node = Path.implode (directory + Path.basic (name ^ ".thy")),
+               master_dir = directory, theory = name},
+       pos = pos, imports = [], options = [], keywords = #keywords header,
+       condition_bad = (false, ""), errors = [], initiators = []};
+  in Resources.begin_theory source (Theory.parents_of driver_theory) end;
+
 fun run driver_theory request_file result_file =
   let
     val (attrs, nodes) =
@@ -96,17 +111,15 @@ fun run driver_theory request_file result_file =
     val timer = Timer.startRealTimer ();
     val whole_budget = number nodes "remaining_s";
     val step_budget = number nodes "step_timeout_s";
+    val context_budget = number nodes "context_step_timeout_s";
+    val last_error = Unsynchronized.ref "";
     fun bounded seconds f arg =
       let val budget = Real.min (seconds, whole_budget - Time.toReal (Timer.checkRealTimer timer))
       in if budget <= 0.0 then fail "timeout" "whole-target deadline exceeded"
          else checked_timeout budget f arg end;
     fun init () =
-      let
-        val header = Thy_Header.read Position.none (value nodes "prefix");
-        (* Use completed imported parents, never the currently executing driver theory. *)
-        val theory = Theory.begin_theory (#name header) (Theory.parents_of driver_theory)
-          |> Thy_Header.add_keywords (#keywords header);
-      in {skip_theory = false, theory = theory} end;
+      {skip_theory = false,
+       theory = begin_context_theory driver_theory (value nodes "prefix")};
     fun spans state source =
       let
         val thy = if Toplevel.is_toplevel state then driver_theory else Toplevel.theory_of state;
@@ -124,6 +137,7 @@ fun run driver_theory request_file result_file =
         val _ = serial := !serial + 1;
         val success = (case result of Exn.Res _ => true | _ => false);
         val error_message = (case result of Exn.Exn exn => Runtime.exn_message exn | _ => "");
+        val _ = last_error := error_message;
         val row = elem "attempt"
           [("mode", mode), ("success", Bool.toString success), ("index", string_of_int (!serial)),
            ("line", string_of_int line), ("source_state", string_of_int (!state_serial)),
@@ -146,9 +160,10 @@ fun run driver_theory request_file result_file =
         val line = the_default 1 (Position.line_of (Toplevel.pos_of tr));
       in
         (case attempt mode command line
-          (fn () => bounded step_budget (Toplevel.command_exception tr) state) of
+          (fn () => bounded (if mode = "context" then context_budget else step_budget)
+            (Toplevel.command_exception tr) state) of
           SOME next => (state_serial := !state_serial + 1; next)
-        | NONE => fail (!stage) ("failed command: " ^ command))
+        | NONE => fail (!stage) ("failed command: " ^ command ^ "\n" ^ !last_error))
       end;
     fun execute_text mode state source = fold (fn span => fn st => execute mode st span) (spans state source) state;
     fun ensure_real state =
@@ -252,7 +267,9 @@ fun run driver_theory request_file result_file =
              else next end;
         val context = fold prepare prefix_spans (Toplevel.make_state NONE);
         val _ = if Toplevel.is_proof context then fail "context_error" "prefix leaves an open proof" else ();
-        (* Detect target/later facts already present in inherited sessions or prefix. *)
+        (* Detect the target and unambiguous later names already present in context.
+           The request excludes later basenames also used by earlier scoped helpers;
+           no later source is executed, and the ancestor guard above still applies. *)
         val ctxt = Toplevel.context_of context;
         val _ = List.app (fn name =>
           let val qualified = distinct (op =) [original_name ^ "." ^ name,

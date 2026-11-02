@@ -62,6 +62,7 @@ class DspConfig:
     threads: int = 4
     provers: tuple[str, ...] | None = None
     startup_timeout_s: float = 600
+    context_step_timeout_s: float = 120
     step_timeout_s: float = 10
     hammer_timeout_s: float = 40
     preplay_timeout_s: float = 10
@@ -72,13 +73,13 @@ class DspConfig:
             raise ValueError("v2_dsp uses Isabelle2026; use v2_dsp_pisa for DSP/PISA/Isabelle2021")
         if isinstance(self.threads, bool) or not isinstance(self.threads, int) or self.threads < 1:
             raise ValueError("threads must be a positive integer")
-        for name in ("startup_timeout_s", "step_timeout_s", "hammer_timeout_s", "preplay_timeout_s",
+        for name in ("startup_timeout_s", "context_step_timeout_s", "step_timeout_s", "hammer_timeout_s", "preplay_timeout_s",
                      "target_timeout_s"):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, (float, int)) or not math.isfinite(value) or value <= 0:
                 raise ValueError(name + " must be finite and positive")
             # Timeout.apply deliberately ignores values below one millisecond.
-            if name in {"step_timeout_s", "hammer_timeout_s", "preplay_timeout_s"} and value < 0.001:
+            if name in {"context_step_timeout_s", "step_timeout_s", "hammer_timeout_s", "preplay_timeout_s"} and value < 0.001:
                 raise ValueError(name + " must be at least 0.001 seconds (Isabelle timeout resolution)")
         for name in ("session_roots", "session_dependencies"):
             value = getattr(self, name)

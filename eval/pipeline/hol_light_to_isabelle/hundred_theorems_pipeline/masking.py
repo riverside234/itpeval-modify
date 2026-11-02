@@ -7,6 +7,9 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.isabelle_syntax i
 )
 
 
+MASKING_VERSION = "hundred_theorems_repair_p2"
+
+
 def mask_isabelle_reference(content: str) -> str:
     items = tokens(content)
     replacements = []

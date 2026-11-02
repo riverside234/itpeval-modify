@@ -45,6 +45,11 @@ local
           (Sledgehammer.SH_Some (tactic, [(Simp_Method, (Play_Timed_Out Time.zeroTime, []))])));
       val _ = expect "native failure yields no reconstruction" ([], "none")
         (DSP_Sledgehammer.reconstructions 1 Sledgehammer.SH_None);
+      val fresh = DSP_Native.begin_context_theory \<^theory>
+        "theory DSP_Context_Resource_Test imports Main begin";
+      val _ = expect "context master directory is the current job, not its parent heap"
+        (Path.implode (Resources.master_directory \<^theory>))
+        (Path.implode (Resources.master_directory fresh));
       val keywords = Thy_Header.get_keywords \<^theory>;
       fun transitions source = Outer_Syntax.parse_text \<^theory>
         (fn () => {skip_theory = false, theory = \<^theory>}) Position.start source;

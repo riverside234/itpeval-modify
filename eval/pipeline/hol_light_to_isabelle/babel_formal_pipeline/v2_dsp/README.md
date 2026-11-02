@@ -152,6 +152,25 @@ git add eval/preflight_results/isabelle2026/<run-id>
 # Commit and push using your normal workflow.
 ```
 
+## Context repairs after the November 2 preflight
+
+The report committed in `fabeacf1` had 41 context failures in three topics; all
+backend controls passed. See [the diagnosis and fixes](PROVER_REVIEW.md).
+The native checker now stages the pinned AFP `bertrand.ML` companion in each job,
+uses that job's master directory, and allows legitimate earlier scoped helpers
+whose basenames recur later. The selected target and inherited-theory guards remain.
+
+`context_step_timeout_s` defaults to 120 seconds for trusted context initialization,
+including the Bertrand ML calculation. Generated proof steps retain the separate
+10-second `step_timeout_s`. Both are bounded by `target_timeout_s`.
+
+Hundred extraction now uses `hundred_theorems_repair_p2`, preserving `setup_lifting`
+after masked typedef proofs. Run the full preflight command above **without
+`--input`** to use freshly extracted contexts. For experiments reading old Polynomial
+JSONL, re-extract those records and regenerate their dependent Draft/Sketch files;
+old contexts receive an explicit re-extraction error. Other unchanged contexts
+can retain their saved artifacts. No old preflight outcome has been relabeled.
+
 ## Running experiments
 
 Use each dataset's `v2_dsp.run` / `run_babel` / `run_hundred` entry point and the

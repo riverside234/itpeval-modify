@@ -191,6 +191,20 @@ class NativeIntegrationTests(unittest.TestCase):
         self.assertTrue(result["baseline_ok"], result)
         self.assertIn("HOL-Analysis", result["native_result"]["import_resolution"]["session_dependencies"])
 
+    def test_preflight_context_regressions_in_real_isabelle(self):
+        from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.extract_hol_light import extract_records as hundred
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import PreparedNative
+        parent = NativeSearch(self.config).infrastructure(deadline=time.monotonic() + self.config.target_timeout_s)
+        checker = Checker(self.config, native_factory=lambda cfg: PreparedNative(cfg, parent))
+        for topic, name in (
+            ('078_the_cauchy-schwarz_inequality', 'norm_cauchy_schwarz'),
+            ('089_the_factor_and_remainder_theorems', 'poly_zero'),
+            ('098_bertrand_s_postulate', 'bertrand'),
+        ):
+            with self.subTest(topic=topic):
+                record = hundred(topic=topic, target_key=name)[0]
+                self.assertTrue(checker.check_context(record, backend_metadata=self.backend)['baseline_ok'])
+
     def test_external_e_prover_reconstruction_and_target_completion(self):
         # The default True control may be solved by an integrated tactic. This
         # explicitly tests the bundled external ATP + preplay + reconstruction.

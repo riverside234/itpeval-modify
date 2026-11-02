@@ -13,6 +13,7 @@ from .common import LAB_REPO_ROOT, RESULTS_DIR, SOURCE, repo_path, sha256, valid
 from .hol_syntax import inventory_hol_declarations
 from .inventory import inventory_topic
 from .manifest import MANIFEST, Target, targets_for_topic
+from .masking import MASKING_VERSION
 
 DEFAULT_OUTPUT = RESULTS_DIR + "/hundred_theorems_v2_records.jsonl"
 
@@ -25,7 +26,7 @@ def build_record(topic, target: Target, *, proofs=None, masked=None) -> dict:
     record["metadata"].update({
         "raw_hol_light_stmt_sha256":sha256(source["content"]),
         "raw_isabelle_stmt_sha256":sha256(target_input["content"]),
-        "proof_masking_version":"hundred_theorems_repair_p1",
+        "proof_masking_version": MASKING_VERSION,
         "input_source":"eval/data/proofs.json:hol-light + eval/data/stmts.json:hol-light,isabelle",
     })
     validate_context(record)

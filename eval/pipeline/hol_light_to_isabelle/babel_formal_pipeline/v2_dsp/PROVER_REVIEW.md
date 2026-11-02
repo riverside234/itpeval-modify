@@ -1,3 +1,73 @@
+# Review of committed run fabeacf1: context repairs
+
+Date: 2026-11-02. Source: commit `fabeacf1a89563bee5c9d9cc2d1a810fc31f1e54`,
+run `20261102T054119Z-67780b09`. Historical reports remain unchanged.
+
+There were **227 passes, 41 failures, and 24 unavailable contexts** among 292
+checks. All 30 setup/backend/dataset-proof checks passed. All 163 Babel contexts
+passed; Hundred contributed 34 passes, 41 failures, and the 24 core Set contexts.
+No failure in this run was an LLM Draft/Sketch or Sledgehammer control failure.
+
+| Failed contexts | Root cause | Repair |
+| --- | --- | --- |
+| 5 Cauchy-Schwarz targets | `dot_square_norm` appears both as an earlier class-local helper and a later global declaration. Checking later basenames in the current namespace falsely rejected the earlier helper. | Exclude ambiguous later basenames already declared in the prefix. Always retain the selected target check, checks for unambiguous later names, exclusion of later source, and the original-theory ancestor guard. |
+| 15 factor/remainder targets | The masking command boundary list lacked `setup_lifting`, so masking the preceding typedef proof also deleted `setup_lifting type_definition_poly`. `lift_definition zero_poly` then had no quotient registration. | Preserve lifting setup/update/forget commands and bump the masking version to `hundred_theorems_repair_p2`. Original mathematical statements stay unchanged. |
+| 21 Bertrand targets | Relative `ML_file` used the infrastructure theory's master directory, and the companion `bertrand.ML` had never been staged. | Copy only the SHA-256-pinned companion from configured AFP sources into the job. Initialize the copied context with the official `Resources.begin_theory` API and the driver job's directory. Do not import the completed Bertrand target theory. |
+
+Additional fixes:
+
+- Trusted context commands use `context_step_timeout_s=120`; generated proof
+  commands still use `step_timeout_s=10`. The original Bertrand source says its
+  calculation can take a minute. Both budgets remain bounded by the target deadline.
+- Top-level errors now include the underlying Isabelle exception, rather than
+  only `failed command`, so the compact summary retains the useful diagnosis.
+- Missing or modified companion sources fail explicitly before native execution.
+  The pinned `bertrand.ML` SHA-256 is
+  `423110be6c919dec5add93272fe461371562ea66fec40bd3832bcbb3a6627bf0`.
+- Checker **p8** and updated adapter hashes invalidate prior prover caches.
+  The new resource API is pinned against `src/Pure/Build/resources.ML` from the
+  official Isabelle2026 source archive, in addition to the existing nine pins.
+
+API/source verification: the official
+[Isabelle2026 source archive](https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2026.tar.gz),
+[`Resources.begin_theory`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Build/resources.ML),
+and the installed pinned AFP-2026 `Bertrands_Postulate/bertrand.ML`.
+
+## Rerun on the lab
+
+The full preflight below extracts current contexts itself; it does not reuse the
+old broken masked records or call an LLM. AFP already installed by `prepare_afp`
+can be reused. Keep the 24 core Set targets unavailable and in the 262 denominator.
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.lab_preflight \
+  --expected-root "$PWD" \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
+  --dataset both --all-targets --expected-contexts 262
+```
+
+For experiments that read saved JSONL, re-extract the affected Polynomial records
+and regenerate their dependent Draft/Sketch artifacts. The native checker rejects
+old contexts missing lifting registration with a re-extraction instruction. Do
+not splice the new template into a saved artifact with stale hashes/proof spans.
+Unchanged contexts can retain their existing saved artifacts.
+
+Validation: **302 tests collected, 285 passed, 17 native integration tests skipped**.
+All 262 contexts passed offline preparation with the actual pinned AFP helper:
+241 required no auxiliary file, and 21 staged `bertrand.ML`. Candidate selection
+still reports 262 with no extraction issues and 24 unavailable core Set contexts.
+Python 3.10 syntax and patch whitespace checks passed.
+
+Offline regression coverage checks the exact 5/15/21 failure groups, all 262
+candidates, preservation of lifting commands, missing/modified auxiliary sources,
+source staging and request identity, and separate context/proof timeout settings.
+The lab fixture now checks the context's master directory, and opt-in integration
+tests check all three affected theories. Actual Isabelle compilation and the full
+lab rerun are still required; offline checks are not proof of native success.
+
+---
+
 # AFP setup and unavailable-context reporting update
 
 Date: 2026-11-01. This update supersedes the core Set failure accounting below.

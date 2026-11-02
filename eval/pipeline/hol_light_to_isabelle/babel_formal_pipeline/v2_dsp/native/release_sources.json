@@ -10,6 +10,7 @@
     "src/Pure/Isar/toplevel.ML": "b67baeec68a4cc37638d3309ff31dfaa8092ea19949be0be163ceae5fcabf738",
     "src/Pure/Isar/proof.ML": "5d43e84bde93218df688b8af85e8055c0bf570d9daf7a0fbd12119a6699a3e2a",
     "src/Pure/Isar/token.ML": "c19a538c6a2811907f70636e33f296ce62242971d266950d557d9cc8545ba132",
-    "src/Pure/Thy/thy_header.ML": "888fc9665b849b21e09dadc3e1b203faaf9a5d59fa3908d8c75ef7830f23895b"
+    "src/Pure/Thy/thy_header.ML": "888fc9665b849b21e09dadc3e1b203faaf9a5d59fa3908d8c75ef7830f23895b",
+    "src/Pure/Build/resources.ML": "b8aea19be57b70390c0fb1395e004b9417063e8a4526dc8b909a20bcceb5d318"
   }
 }

@@ -104,6 +104,30 @@ class DataTests(unittest.TestCase):
             self.assertEqual("sorry", masked[slice(*target.proof_span)])
         self.assertEqual(masked, mask_isabelle_reference(masked))
 
+    def test_masking_preserves_lifting_registration_after_typedef_proofs(self):
+        raw = ('theory Example imports Main begin\n'
+               'typedef t = "{True}" by auto\n'
+               'setup_lifting type_definition_t\n'
+               'lift_definition value :: t is True by simp\n'
+               'lifting_update t.lifting\n'
+               'lifting_forget t.lifting\n'
+               'lemma goal: "True" by simp\nend\n')
+        masked = mask_isabelle_reference(raw)
+        for command in ('setup_lifting type_definition_t', 'lifting_update t.lifting', 'lifting_forget t.lifting'):
+            self.assertIn(command, masked)
+        self.assertEqual(3, sum(t.text == 'sorry' for t in isabelle_tokens(masked)))
+        self.assertEqual(masked, mask_isabelle_reference(masked))
+
+    def test_all_polynomial_candidates_keep_setup_and_have_new_mask_version(self):
+        rows = [r for r in self.records if r['topic'] == '089_the_factor_and_remainder_theorems']
+        self.assertEqual(15, len(rows))
+        for record in rows:
+            prefix = record['isabelle_context_before_target']
+            self.assertIn('setup_lifting type_definition_poly', prefix)
+            self.assertLess(prefix.index('setup_lifting'), prefix.index('lift_definition zero_poly'))
+            self.assertEqual('hundred_theorems_repair_p2', record['metadata']['proof_masking_version'])
+            validate_context(record)
+
     def test_local_proofs_do_not_become_exported_theorems(self):
         q = chr(96)
         source = f"let local = prove({q}P{q}, MESON_TAC[]) in install local;;\nlet TOP = prove({q}Q{q}, ALL_TAC);;"
