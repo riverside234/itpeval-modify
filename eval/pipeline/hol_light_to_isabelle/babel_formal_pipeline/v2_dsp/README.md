@@ -1,196 +1,167 @@
-# Original DSP + PISA + Isabelle2021
+# Isabelle2026 native DSP backend (default)
 
-Both datasets now use the checker copied directly from the local
-`mathLLM/draft_sketch_prove/autoformalization/checker.py`. It tries DSP's original
-eleven heuristic methods, then PISA's `normalhammer`, and accepts the original
-PISA completion result. **There is no separate replay stage.** The Isabelle2024
-baseline remains in `v2_itpeval/`.
+`v2_dsp/` is the default for both Babel Formal and Hundred Theorems. The original
+DSP/PISA/Isabelle2021 implementation is preserved separately in
+[`v2_dsp_pisa/`](../v2_dsp_pisa/README.md), including its copied upstream checker
+and recent runtime fixes. `v2_itpeval/` still uses Isabelle2024.
 
-[Copied checker](upstream/checker.py) · [Provenance and patch](upstream/ORIGIN.md) ·
-[Review of the pulled reports](PROVER_REVIEW.md)
+Both native input modes remain available: saved mathematical Draft to Sketch,
+and HOL Light proof directly to Sketch. API and Qwen/vLLM inference are unchanged.
+
+## Verification
+
+There is **no separate replay verification** in either DSP backend. Native
+Isabelle2026 executes the selected Sketch, tries DSP-style heuristics at gaps,
+then calls Sledgehammer and executes its reconstructed commands. Success requires
+complete target closure, an admissible completed proof, the matching request
+identity, and a successful native process exit. Sledgehammer's internal preplay
+is still part of proof search; it is not a second whole-proof verification stage.
+
+`verified` and `prove_success` describe this one native job;
+`verification_method` is `isabelle2026_native_completion`. There are no new
+`native_replay` or `replay_verified` fields. `prove.jsonl` and `verified.jsonl`
+store the same completed result. `--skip-prove` and `--replay-only` are removed.
+Use `--skip-sketch` to check a saved Sketch without model calls.
+
+Earlier masked helpers are admitted background. The selected theorem and its
+new intermediate claims must be proved with `quick_and_dirty` and `smt_oracle`
+disabled. Context guards reject direct self-import, inherited target theories,
+and previously available target/later facts. Removing replay does not remove
+these checks or the checked reconstruction of each Sledgehammer result.
 
 ## Lab setup
 
-Use Linux, the main **Python 3.10** environment, **Isabelle2021**, **Java 11**,
-Git, and `sbt` on `PATH`. PISA's project selects sbt 1.4.3 and Scala 2.13.
-The API and separate Python 3.12 vLLM inference options remain available.
-
-Download the Linux bundle from the official
-[Isabelle2021 installation page](https://www.isabelle.in.tum.de/website-Isabelle2021/installation.html)
-and extract it under `itpeval/_toolchains/Isabelle2021/`. Keep the archive under
-the repository too. The installed release must be `Isabelle2021`; its official
-version banner may include `: February 2021`. Metadata keeps the normalized release
-in `isabelle_version` and the full banner in `isabelle_version_raw`.
-`Isabelle2021-1` and later releases are different runtimes. For example, after
-downloading the archive:
+Use the main Python 3.10 environment on Linux. Install the released Isabelle2026
+at `itpeval/_toolchains/Isabelle2026/` under the repository. This backend does not
+require PISA, sbt or a separate Java server. Its source checks remain pinned to
+Isabelle2026, and its settings, heaps and temporary files stay under
+`itpeval/.runs/isabelle2026-native/`.
 
 ```bash
 cd /data/not_backed_up/yxu209/itpeval-modify
-mkdir -p itpeval/_toolchains
-tar -xzf itpeval/_toolchains/Isabelle2021_linux.tar.gz -C itpeval/_toolchains
-```
-
-Activate the main environment, then prepare PISA:
-
-```bash
 python -m pip install -r requirements.txt
+```
+
+`eval/configs/hol_light_to_isabelle/v2_dsp.example.json` and
+`v2_dsp_2026.example.json` select native Isabelle2026. The existing
+`v2_dsp_2026.local.json` is also supported. Old configurations automatically gain
+the verified missing import qualifications. A legacy `replay_timeout_s` field is
+ignored for compatibility; it does not enable replay.
+
+Keep `base_session` as `HOL`. Do not use `HOL-Analysis` or a complete AFP target
+session as the parent to work around missing imports: that may import the proof
+being evaluated. The configuration qualifies only original theory basenames:
+
+| Original import | Owning session and theory |
+| --- | --- |
+| Lebesgue_Measure | HOL-Analysis.Lebesgue_Measure |
+| Tagged_Division | HOL-Analysis.Tagged_Division |
+| Euclidean_Algorithm | HOL-Computational_Algebra.Euclidean_Algorithm |
+| Primes | HOL-Computational_Algebra.Primes |
+| Lattices | HOL.Lattices |
+| Boolean_Algebras | HOL.Boolean_Algebras |
+| Angles | Triangle.Angles |
+| Square_Matrix | Cayley_Hamilton.Square_Matrix |
+
+Hundred Theorems also requires the AFP sessions `Triangle`, `Cayley_Hamilton`,
+and `Pratt_Certificate` (31 extracted contexts in total). Install the **full AFP
+source archive for Isabelle2026** using the supplied Python 3.10 script:
+
+```bash
+python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.prepare_afp \
+  --expected-root "$PWD" \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
+```
+
+The installer downloads the [official dated release](https://isa-afp.org/release/afp-2026-10-26.tar.gz),
+pinned to SHA-256 `7f48e3fc3dc823a30149a90fa4a614ed53be175273971f4923debb9457fa60e4`.
+It verifies the archive checksum and `AFP_VERSION=2026`, extracts all sources to
+`external/afp-2026/`, then adds `external/afp-2026/thys` to `session_roots` in the
+requested config. Other settings and roots are preserved. The tracked local
+config already contains that portable path; run the installer on the lab before
+preflight. It does not install Isabelle or build AFP sessions.
+
+The cache is `itpeval/.downloads/afp-2026-10-26.tar.gz`; `--archive` can supply an
+already downloaded copy with the same checksum. Reruns reuse a validated install
+without duplicating roots. Existing unmanaged directories are never replaced;
+choose another `--destination` if necessary. Sources, archive and installation
+manifest remain repository-local and Git-ignored. No global Isabelle settings
+are changed. The dated release avoids silently switching to a future AFP version.
+
+The **24 core Set contexts** receive status `unavailable_context` (displayed as
+**unavailable context**) because HOL already inherits their original theory.
+Preflight lists them separately and does not launch a native job for them.
+They remain in the 262-candidate denominator and are never counted as passes.
+The 31 AFP-dependent contexts receive normal native checks after installation;
+missing AFP is still a dependency error, not a core Set unavailability marker.
+
+## One consolidated preflight: all 262 contexts
+
+After activating the main environment and preparing Isabelle/AFP:
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
 PIPE=eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp
-CFG=eval/configs/hol_light_to_isabelle/v2_dsp_2021.local.json
-cp -n eval/configs/hol_light_to_isabelle/v2_dsp_2021.example.json "$CFG"
+CFG=eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
 
-java -version  # Must be Java 11; set java_bin in CFG if needed.
-python -m "${PIPE}.prepare_pisa" \
-  --expected-root "$PWD" --config "$CFG" --build
-```
-
-This clones PISA into `external/Portal-to-ISAbelle/` if absent and pins
-`690eed41fa03fe04ec015bb375c668cd6fd94261`. An existing checkout at another
-revision or with changes to pinned sources produces an explicit error; changes
-are not overwritten. Setup fixes the upstream local JAR URL in `build.sbt`,
-regenerates Python gRPC bindings from the unchanged protocol, and builds
-`PISA-assembly-0.1.jar`. The build log is
-`external/Portal-to-ISAbelle/pisa-build.log`.
-
-Initialize the repository-local Isabelle environment and build the HOL heap.
-Original PISA uses `build = false`; this prepares its base runtime, not a
-replay of a generated proof:
-
-```bash
-eval "$(python -m "${PIPE}.prepare_pisa" --config "$CFG" --print-env)"
-"$PWD/itpeval/_toolchains/Isabelle2021/bin/isabelle" build -b HOL
-```
-
-If the config uses another installation path, use that `bin/isabelle` instead.
-Settings, heaps, temporary files and build caches are under
-`itpeval/.runs/isabelle2021-pisa/`. OS `HOME` and `CODEX_HOME` are preserved.
-Each job starts its own server on the configured port, default 9000. Do not start
-another PISA server manually; an occupied port fails rather than attaching to it.
-Run one pipeline at a time on that port.
-
-## Consolidated lab preflight
-
-Run this once after setup. It makes no LLM calls and extracts its inputs in
-memory, so saved Drafts or Sketches are not required:
-
-```bash
 python -m "${PIPE}.lab_preflight" \
-  --expected-root "$PWD" --config "$CFG" \
-  --dataset both --all-targets
+  --expected-root "$PWD" \
+  --config "$CFG" \
+  --dataset both \
+  --all-targets \
+  --expected-contexts 262
 ```
 
-With the current data it checks **all 262 target contexts** (163 Babel, 99 Hundred
-Theorems), setup, 16 proof controls, and three real-theorem proof checks. Controls
-cover explicit methods, the original heuristic order, forced `normalhammer`,
-`using` facts, comments, multiple gaps, nested proofs, local definitions, invalid
-methods, self/later references, admissions, unsafe commands, and incomplete goals.
-Forced hammer is diagnostic only; normal runs use the original search order.
+Use the actual repository-local AFP root. Omit `--afp-root` if it is already in
+`session_roots`. Without AFP, you can still run the command without that option;
+its 31 dependent contexts will report missing dependencies. A supplied nonexistent
+root is a setup error and blocks native execution.
 
-For a smaller first pass omit `--all-targets`: 32 representative/sentinel contexts
-across 29 topics, **54 total checks**. That does not establish readiness for every
-target. Add `--plan-only` to inspect coverage without executing or writing outputs.
-Filters include `--dataset hundred-theorems`, `--topic ...`, and `--target-key ...`.
-Repeat `--input <records.jsonl>` to use saved record files instead of extraction.
+The full run has **292 checks**: selection, metadata, infrastructure, the repaired
+ML fixture, 23 proof/search controls, three fixed real-theorem proofs, and all
+**163 Babel + 99 Hundred contexts**. No LLM calls are made. These checks establish
+context and backend readiness, not successful proofs of every dataset theorem.
 
-Each run creates a unique folder:
+`--expected-contexts 262` detects accidentally restricted or changed input scope.
+Add `--plan-only` to inspect the full selection without Isabelle or output writes.
+Omitting `--all-targets` selects 32 representative contexts across 29 topics.
 
-```text
-eval/preflight_results/pisa_isabelle2021/<UTC-time>-<run-id>/
-├── report.json, summary.md, events.jsonl
-├── config.json, backend.json       # when setup reaches these stages
-├── details/                       # exact result of each check
-├── transport/, cases/, work/       # input, RPC, JVM and worker logs
-└── diagnostics.zip                # portable copy of the run
-```
+Each invocation writes a new directory under
+`eval/preflight_results/isabelle2026/<UTC-timestamp>-<run-id>/`, including:
 
-The **entire directory is not Git-ignored**, including logs, JSON and ZIP files.
-Push the complete run folder after it finishes. Reports are checkpointed after
-each check. A caught Ctrl-C also saves a partial report and bundle. Exit codes:
-0 all passed, 1 failed/blocked checks, 130 interruption. A setup failure blocks
-its dependent checks once; independent proof/context failures are all collected.
+- `report.json`, `summary.md`, per-check JSON and checkpointed `events.jsonl`;
+- `config.json`, `backend.json`, `dependencies.json` and `unavailable_contexts.json`;
+- the ML fixture, native inputs/results, command/build/process logs and `diagnostics.zip`.
 
-`backend_ok` covers setup and fixed controls; `contexts_ok` covers input selection,
-real dataset proof checks, and selected contexts. Neither measures model accuracy.
-The previous 2026 report had seven dataset import/dependency failures. An older
-prover does not automatically supply those libraries; see the linked review.
-Install compatible library/AFP dependencies before counting those contexts as
-ready. Failures remain explicit and stay in the requested denominator.
-
-The focused `preflight` command still accepts `--input`, `--topic`, and
-`--target-key`, using the same config. Its report is saved under
-`eval/preflight_results/pisa_isabelle2021/single-target/`. Use `lab_preflight`
-above for comprehensive acceptance with a complete diagnostics bundle.
-
-## Experiment commands
-
-Saved mathematical Draft to Sketch to Prove:
+The whole report folder is Git-trackable. Independent failures do not stop the
+remaining checks; an infrastructure failure blocks dependent checks explicitly.
+Exit status is 0 when backend controls and available dataset checks pass, 1 for
+failures or an entirely unavailable selection, or 130 for interruption.
+`contexts_ok` covers available dataset checks. `full_context_coverage` stays false
+when any context is unavailable/blocked or unreported; a green readiness result
+never means all 262 contexts passed. `context_counts` reports selected, reported,
+passed, failed, blocked and unavailable counts separately. The full run retains
+292 report entries, with 24 marked unavailable and 238 normal context checks.
 
 ```bash
-DATA=eval/results/hol_light_to_isabelle_v2
-python -m "${PIPE}.run_babel" \
-  --expected-root "$PWD" --config "$CFG" \
-  --sketch-source draft --drafts "$DATA/babel_formal_v2_drafts.jsonl" \
-  --topic circle_average --target-key circleAverage_center_independent --samples 1
+git add eval/preflight_results/isabelle2026/<run-id>
+# Commit and push using your normal workflow.
 ```
 
-Direct completed HOL Light proof to Sketch to Prove:
+## Running experiments
 
-```bash
-python -m "${PIPE}.run_babel" \
-  --expected-root "$PWD" --config "$CFG" \
-  --sketch-source hol-light-proof --records "$DATA/babel_formal_v2_exact_name_records.jsonl" \
-  --topic circle_average --target-key circleAverage_center_independent --samples 1
-```
+Use each dataset's `v2_dsp.run` / `run_babel` / `run_hundred` entry point and the
+2026 config. `--sketch-source draft --drafts <drafts.jsonl>` consumes saved Drafts;
+`--sketch-source hol-light-proof --records <records.jsonl>` uses the direct mode.
+Normal runs check native capabilities and each context before making model calls.
+`--dry-run` previews the chosen prompt without inference or native execution.
 
-For Hundred Theorems use
-`eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.run_hundred`,
-its records/Draft file and the corresponding topic/target filters. Both frontends
-share the checker. Omit filters for a batch. `--dry-run` previews prompts;
-`--skip-sketch` consumes saved Sketches. `--sketch-llm-config` selects API or vLLM.
-Defaults remain `gpt-6.1-terra`, medium reasoning for Draft and high for Sketch.
-The runner checks the runtime and target contexts before model calls.
+Native output paths remain `v2-dsp-isabelle2026/{draft,direct}/<profile>/` under
+the dataset's result root. PISA uses `v2-dsp-pisa-isabelle2021/` and a distinct
+artifact schema. Saved 2026 Sketches can be rechecked without regenerating Drafts.
+Checker `dsp_isabelle2026_native_p7` invalidates old verification caches; historical
+reports and model outputs are not rewritten.
 
-## Results and migration
-
-New schema: `hol_light_to_isabelle_dsp_pisa_v1`. Default result directories:
-
-```text
-eval/results/hol_light_to_isabelle_v2/
-├── v2-dsp-pisa-isabelle2021/{draft,direct}/<inference-profile>/
-└── hundred-theorems/v2-dsp-pisa-isabelle2021/{draft,direct}/<inference-profile>/
-```
-
-Runs save `inputs.jsonl`, `sketches.jsonl`, `prove.jsonl`, `verified.jsonl`, and
-summaries. **`prove.jsonl` and `verified.jsonl` contain the same one-pass result**;
-the final filename is retained for existing consumers. `verified == prove_success`
-means the upstream checker completed with `done` and reward 1.0.
-`verification_method` is `dsp_pisa_completion`. There is no `replay_verified`,
-replay subprocess, or separately assembled/rebuilt proof. The original Sketch
-and `dsp_result.step_results` retain proof commands and reconstruction outputs;
-`step_results` also records attempted methods and observations.
-
-Each PISA job receives the original header, preceding definitions/masked helper
-statements, and exact selected declaration. Earlier helpers are admitted background;
-admission is disabled before the selected proof. Generated admissions/unsafe commands
-and later declarations are rejected. The copied miniF2F proof wrapper is unused;
-the job directory is named `miniF2F` only because original PISA uses that convention
-to select its HOL runtime.
-
-Reuse extracted records and saved mathematical Drafts. Regenerate DSP exports and
-Sketches with the Isabelle2021 prompts/config. Old native and earlier PISA artifacts
-are rejected rather than resumed. Historical 2026 reports/config stay available;
-use the new 2021 config. `--replay-only` and `--skip-prove` were removed. Resume
-checks include runtime/source/build identity, inputs, model, prompt, and budgets.
-Keep the same cohort, budgets, and sample counts when comparing experiment modes.
-Failed Drafts, contexts, Sketches and missing samples stay in the denominator.
-
-## Tests
-
-```bash
-python -m unittest discover -s tests/hol_light_to_isabelle -p 'test_*.py'
-```
-
-Offline tests check copied-method identity, setup, handoffs, failure accounting,
-timeouts, process ownership, and reports. Native Isabelle2021/PISA execution still
-requires the lab run. The optional integration test uses the same acceptance cases
-and is enabled by `ITPEVAL_PISA_ISABELLE2021_CONFIG="$CFG"`; normally the single
-consolidated lab preflight is sufficient without repeating that test.
+See [review and fixes](PROVER_REVIEW.md). Offline tests use explicit fake
+transports; the updated ML fixture and real dataset dependencies still require
+execution on the Linux lab installation.

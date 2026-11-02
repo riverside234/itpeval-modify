@@ -1,36 +1,41 @@
-> Historical reports: the active DSP baseline is original DSP/PISA with Isabelle2021.
-> See [current lab preflight](../pisa_isabelle2021/README.md). Existing reports are retained unchanged.
-
 # Isabelle2026 lab preflight reports
 
-This folder is intentionally **not ignored by Git**. The consolidated lab
-preflight creates one timestamped subdirectory per invocation, containing
-`report.json`, `summary.md`, individual check details, native input/output files,
-build logs, and `diagnostics.zip`. Heap images and toolchain binaries stay in the
-ignored runtime directories.
+Native Isabelle2026 is the default again. See the [setup and full-cohort guide](../../pipeline/hol_light_to_isabelle/babel_formal_pipeline/v2_dsp/README.md).
+Separate replay verification has been removed; old report directories are historical evidence.
 
-From the lab repository root, with the main Python 3.10 environment active:
+Run in the main Python 3.10 environment on the Linux lab host:
 
 ```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
 python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.lab_preflight \
+  --expected-root "$PWD" \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
+  --dataset both --all-targets --expected-contexts 262
+```
+
+Before the first lab preflight, run:
+
+```bash
+python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.prepare_afp \
   --expected-root "$PWD" \
   --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
 ```
 
-The default checks both datasets, 26 backend controls, the native ML fixture,
-three fixed real-theorem proofs, and 32 representative target contexts. Add
-`--all-targets` for all 262 target contexts. No LLM calls are made.
-See [the runner documentation](../../pipeline/hol_light_to_isabelle/babel_formal_pipeline/v2_dsp/README.md#consolidated-lab-acceptance-recommended)
-for scope flags, interpretation, and exit codes. A failed or interrupted run is
-also useful: push its complete directory so its original inputs and logs can be
-reviewed together.
+This installs the full pinned AFP release for Isabelle2026 and updates
+`session_roots`. There are 31 AFP-dependent candidates, checked normally after
+setup. The 24 core Set candidates instead receive **unavailable context**, remain
+in the cohort and are listed in `unavailable_contexts.json` and a separate summary
+table. They are neither failures nor passes. The native isolation guard remains.
+`contexts_ok`/exit 0 concern available checks; `full_context_coverage` remains false
+when contexts are unavailable. An entirely unavailable selection cannot pass.
 
-```bash
-git add eval/preflight_results/isabelle2026/
-git commit -m "Record Isabelle2026 lab preflight"
-git push
-```
+The run performs 292 checks (262 contexts, 23 backend controls, three fixed real
+proofs, and four setup/fixture/selection checks), without model calls or separate
+replay. `--plan-only` prints scope without running Isabelle. Default representative
+selection remains available by omitting `--all-targets --expected-contexts 262`.
 
-No `git add -f` is necessary. Reports with `status: running` are incomplete; a
-finished run uses `complete` or `interrupted`, while `ok` records acceptance.
-These are diagnostic controls, not proof-translation benchmark results.
+Each timestamped run saves `report.json`, `summary.md`, `dependencies.json`,
+configuration/source identity, check details, native requests/results, logs and
+`diagnostics.zip`. All files here are Git-trackable. Commit and push the entire
+new run directory, leaving historical results unchanged. Ordinary failures and
+caught interruptions preserve completed results and mark unexecuted checks.

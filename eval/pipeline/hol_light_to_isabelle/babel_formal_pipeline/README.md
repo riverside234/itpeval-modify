@@ -12,7 +12,8 @@ theorem. Draft generation is in this dataset package.
 | Pipeline | Package | Proof verification |
 |---|---|---|
 | v2-itpeval | v2_itpeval | Complete proof checked through ITPEval with Isabelle2024 |
-| v2-dsp | v2_dsp | Isar Sketch checked by original DSP/PISA with Isabelle2021 |
+| v2-dsp (default) | v2_dsp | Isar Sketch checked by native Isabelle2026 |
+| original DSP baseline | v2_dsp_pisa | Isar Sketch checked by original DSP/PISA/Isabelle2021 |
 
 This dataset's code now lives in `babel_formal_pipeline/`. Existing JSONL
 files and default output paths remain usable. Both `v2_itpeval.run` and
@@ -93,45 +94,32 @@ Use --skip-sketch to verify an existing --sketch-output without an API call.
 The generated candidate replaces only the selected target placeholder in the
 full masked template.
 
-## v2-dsp
+## v2-dsp (default: Isabelle2026)
 
-The baseline uses **original DSP + PISA + Isabelle2021**, with the checker copied
-from the local original DSP repository. Saved mathematical Drafts and direct HOL
-Light proofs are supported. There is no separate replay stage.
+The native Isabelle2026 backend is in `v2_dsp/`. Saved Drafts and direct HOL Light
+proofs are supported. Both DSP backends use one checked-completion stage, with no
+separate replay. See [native setup and all-262-context preflight](v2_dsp/README.md).
+Use the `v2_dsp_2026.example.json` or existing `v2_dsp_2026.local.json` config.
+`--dry-run` previews prompts; `--skip-sketch` checks saved Sketches without LLM calls.
 
-See [DSP/PISA setup, both modes and consolidated lab preflight](v2_dsp/README.md).
-Use `eval/configs/hol_light_to_isabelle/v2_dsp_2021.example.json` as the config
-starting point. The normal runner checks capabilities and target contexts before
-model calls; `--dry-run` previews the selected prompt without native execution or
-inference. `--skip-sketch` consumes saved Sketches.
+Original DSP/PISA/Isabelle2021 remains in [`v2_dsp_pisa/`](v2_dsp_pisa/README.md),
+with its own 2021 config and copied upstream implementation. Both datasets have
+matching frontends. The Isabelle2024 `v2_itpeval/` baseline is unchanged.
 
 ## Results and interpretation
 
-DSP outputs use schema `hol_light_to_isabelle_dsp_pisa_v1` under
-`eval/results/hol_light_to_isabelle_v2/v2-dsp-pisa-isabelle2021/`, separated by
-`draft`/`direct` and inference profile. Direct mode has no Draft fields. Draft
-mode retains the exact Draft as `informal_proof`. Both preserve the oracle and
-original preceding context. Old native artifacts are rejected; reuse records and
-Drafts, then regenerate DSP exports and Sketches with the new prompt/config.
+Native outputs use `hol_light_to_isabelle_dsp_v2` and `v2-dsp-isabelle2026/`.
+PISA uses `hol_light_to_isabelle_dsp_pisa_v1` and `v2-dsp-pisa-isabelle2021/`.
+Each is separated by input mode and inference profile. Do not mix their exports,
+Sketches or verified artifacts. Raw records and mathematical Drafts are reusable.
 
-Keep the same cohort, sample counts and budgets when comparing Draft/direct modes.
-Failed Drafts, contexts and Sketches remain in the denominator. Earlier masked
-helpers remain admitted background. Each selected target and generated intermediate
-claim must be proved. `verified` and `prove_success` both mean the original
-PISA completion result; `prove.jsonl` and `verified.jsonl` are two saved copies of
-that single result, without an additional proof replay.
+`verified` and `prove_success` require the selected backend's checked target
+completion. `prove.jsonl` and `verified.jsonl` are two saved copies of that result.
+Earlier masked helpers remain admitted background; target claims must be proved.
+All requested targets/samples and failures stay in the denominator. The native
+checker p7 invalidates older success caches while allowing saved 2026 Sketches to
+be checked again. Preflight reports and logs are Git-trackable.
 
-The Isabelle2024 ITPEval baseline retains its own verifier and output directories.
-Runtime/source/build identity, consumed context, prompt and model settings are part
-of DSP resume checks. Historical 2026 reports remain available.
-
-## Verification
-
-```bash
-python -m unittest discover -s tests/hol_light_to_isabelle -p 'test_*.py'
-```
-
-The offline suite covers all 163 Babel and 99 Hundred Theorems extracted targets,
-masked contexts, stale artifacts, failed Drafts, copied DSP behavior, process
-ownership and reports. Transport tests use explicit fakes. Run the consolidated
-PISA preflight on Linux to check actual Isabelle2021, ATP and dataset compatibility.
+Run offline regressions with `python -m unittest discover -s tests/hol_light_to_isabelle`.
+Transport tests use explicit fakes; actual ML/prover/dependency validation requires
+running the consolidated preflight on the Linux lab computer.

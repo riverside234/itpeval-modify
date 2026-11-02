@@ -1,80 +1,122 @@
-"""Individual-theorem DSP/PISA execution. Success is PISA completion, with no replay."""
+"""DSP-style native Isabelle2026 search and checked target completion.
+
+Heuristic ordering: albertqjiang/draft_sketch_prove commit 647aa65.
+Copyright Sean Welleck, Albert Q. Jiang, Jin Peng Zhou and others.
+See UPSTREAM_LICENSE.txt. No PISA runtime is used.
+"""
 from __future__ import annotations
+
 import tempfile
 import time
 from pathlib import Path
 
 from ..common import RESULTS_DIR, repo_path
-from .input_contract import clean_record, envelope, input_metadata, mode_of, normalize_sketch, validate_artifacts
-from .pisa_context import prepare_context
-from .runtime import DspConfig, PisaFailure, run_job
+from ..theory_context import validate_context
+from .input_contract import clean_record, envelope, input_metadata, mode_of, validate_artifacts, normalize_sketch, normalize_proof
+from .native_search import NativeFailure, NativeSearch
+from .runtime import DspConfig
 
-CHECKER_VERSION = "dsp_pisa_isabelle2021_p1"
-ProofFailure = PisaFailure
+ProofFailure = NativeFailure  # Preserve the old exception import for callers.
+
+CHECKER_VERSION = "dsp_isabelle2026_native_p7"
+HEURISTICS = (
+    "by auto", "by simp", "by blast", "by fastforce", "by force", "by eval",
+    "by presburger", "by sos", "by arith", "by linarith", "by (auto simp: field_simps)",
+)
 
 
-def verification_input(record, mode):
+def verification_input(record: dict, mode: str) -> dict:
+    """A new check cannot inherit diagnostics or success artifacts from an old job."""
     result = clean_record(record, mode)
-    for name in list(result):
-        if name.startswith(("native_", "replay_", "verify_")) or name in {
-            "workdir", "backend_metadata", "isabelle_proof", "dsp_result", "step_results", "prover_settings",
-            "prove_success", "verified", "failure_category"}:
-            result.pop(name, None)
+    for name in (
+        "native_search", "native_replay", "native_result", "native_context", "prover_settings", "workdir",
+        "search_directory", "build_directory", "build_session", "build_log_path",
+        "build_log_excerpt", "build_returncode", "replay_theory_path", "replay_log_path",
+        "replay_verified", "verification_method", "pisa_result", "dsp_result", "import_resolution", "verify_fingerprint", "verify_duration_seconds", "backend_metadata", "isabelle_proof",
+    ):
+        result.pop(name, None)
     return result
 
 
 class Checker:
-    def __init__(self, config: DspConfig, *, results_dir=RESULTS_DIR, job_runner=None):
-        self.config, self.results_dir = config, results_dir
-        self.job_runner = job_runner or run_job
+    def __init__(self, config: DspConfig, *, native_factory=None, results_dir: str = RESULTS_DIR):
+        self.config = config
+        self.native_factory = native_factory or NativeSearch
+        self.results_dir = results_dir
 
-    def directory(self, prefix):
-        parent = repo_path(self.results_dir) / "work"
-        parent.mkdir(parents=True, exist_ok=True)
-        return Path(tempfile.mkdtemp(prefix=prefix, dir=parent))
+    def directory(self, prefix: str) -> Path:
+        base = repo_path(self.results_dir) / "work"
+        base.mkdir(parents=True, exist_ok=True)
+        return Path(tempfile.mkdtemp(prefix=prefix, dir=base))
 
-    def check_context(self, record, *, backend_metadata=None):
-        context, preamble, imports = prepare_context(record, self.config)
+    def check_context(self, record: dict, *, backend_metadata: dict | None = None) -> dict:
+        context = validate_context(record)  # Raw extracted records need no Draft in either mode.
         backend = backend_metadata or self.config.metadata()
         directory = self.directory("context-")
-        request = {"action": "context", "formal": preamble, "theory_name": context.theory_name}
-        result = self.job_runner(self.config, directory, request)
-        if not result["success"]:
-            raise PisaFailure(result.get("failure_category") or "context_error", result.get("error") or "target goal was not opened",
-                details={"workdir": str(directory), "pisa_result": result, "import_resolution": imports})
+        diagnostics = {"workdir": str(directory), "build_log_path": str(directory / "build.log")}
+        try:
+            result = self.native_factory(self.config).request(
+                record, "", directory=directory, action="context", heuristics=(),
+                deadline=time.monotonic() + self.config.target_timeout_s)
+            if not result["success"]:
+                raise NativeFailure(result["failure_category"], result["error"],
+                                    details={"native_result": result})
+        except NativeFailure as exc:
+            for name, value in diagnostics.items():
+                exc.details.setdefault(name, value)
+            raise
+        except Exception as exc:
+            category = "timeout" if isinstance(exc, TimeoutError) else "context_error"
+            raise NativeFailure(category, f"{type(exc).__name__}: {exc}", details=diagnostics) from exc
         return {"baseline_ok": True, "workdir": str(directory), "backend_metadata": backend,
-                "pisa_result": result, "import_resolution": imports, **context.metadata}
+                **context.metadata, "native_result": result}
 
-    def check(self, record, *, backend_metadata=None, force_hammer=False):
+    def check(self, record: dict, *, backend_metadata: dict | None = None,
+              force_hammer: bool = False) -> dict:
         mode = mode_of(record)
         result = {**verification_input(record, mode), **envelope(mode), "checker_version": CHECKER_VERSION,
-                  "verified": False, "prove_success": False, "verification_method": "dsp_pisa_completion",
+                  "verification_method": "isabelle2026_native_completion",
+                  "prove_success": False, "verified": False,
                   "verify_error": "", "failure_category": None, "step_results": []}
         started = time.monotonic()
-        stage = "rejected_proof"
+        deadline = started + self.config.target_timeout_s
+        stage = "input_error"
         try:
             validate_artifacts([record], mode)
             if record.get("input_error") or record.get("sketch_error"):
-                raise PisaFailure(record.get("failure_category") or "sketch_error", record.get("input_error") or record["sketch_error"])
+                raise NativeFailure(record.get("failure_category") or "sketch_error",
+                                    record.get("input_error") or record["sketch_error"])
             result.update(input_metadata(record, mode))
+            validate_context(record)
             sketch = normalize_sketch(record.get("isabelle_sketch", ""))
-            context, preamble, imports = prepare_context(record, self.config)
             stage = "toolchain_error"
             result["backend_metadata"] = backend_metadata or self.config.metadata()
             directory = self.directory("target-")
-            result.update(workdir=str(directory), import_resolution=imports)
+            result["workdir"] = str(directory)
+            native = self.native_factory(self.config)
             stage = "worker_failure"
-            checked = self.job_runner(self.config, directory, {"action": "prove", "theory_name": context.theory_name,
-                "formal": preamble + "\n" + sketch, "force_hammer": force_hammer})
-            result.update(pisa_result=checked, dsp_result=checked.get("dsp_result"), step_results=checked.get("step_results", []))
-            if not checked["success"]:
-                raise PisaFailure(checked.get("failure_category") or "proof_failure", checked.get("error") or "PISA did not finish the theorem")
-            # The upstream success condition is done && reward == 1.0 after all steps.
+            search = native.request(record, sketch, directory=directory / "search", action="search",
+                                    heuristics=() if force_hammer else HEURISTICS, deadline=deadline)
+            result["native_search"] = search
+            result["step_results"] = search["step_results"]
+            result["prover_settings"] = search.get("prover_settings", {})
+            if not search["success"] or not search.get("target_closed"):
+                message = search.get("error") or "target is open"
+                last_step = search["step_results"][-1] if search["step_results"] else {}
+                if (not last_step.get("success") and last_step.get("error")
+                        and last_step["error"] not in message):
+                    message += f" (line {last_step.get('line', '?')}): {last_step['error']}"
+                raise NativeFailure(search.get("failure_category") or "incomplete_proof", message)
+            # The native job has already executed every command, reconstructed each
+            # gap and closed this target. There is no second proof build.
+            result["isabelle_proof"] = normalize_proof(search["isabelle_proof"])
             result["prove_success"] = result["verified"] = True
         except Exception as exc:
-            if isinstance(exc, PisaFailure):
+            if isinstance(exc, NativeFailure):
                 result.update(exc.details)
             result["verify_error"] = f"{type(exc).__name__}: {exc}"
-            result["failure_category"] = exc.category if isinstance(exc, PisaFailure) else stage
-        result["verify_duration_seconds"] = round(time.monotonic()-started, 3)
+            result["failure_category"] = (exc.category if isinstance(exc, NativeFailure) else
+                "timeout" if isinstance(exc, TimeoutError) else
+                "rejected_proof" if isinstance(exc, ValueError) and stage == "input_error" else stage)
+        result["verify_duration_seconds"] = round(time.monotonic() - started, 3)
         return result

@@ -1,3 +1,119 @@
+# AFP setup and unavailable-context reporting update
+
+Date: 2026-11-01. This update supersedes the core Set failure accounting below.
+
+The consolidated preflight now records the **24 inherited core Set targets** as
+`status=unavailable_context`, displayed as **unavailable context**. They stay in
+the original 262-candidate scope and in all 292 report entries. A separate
+`unavailable_contexts.json` and Markdown table list their identities and reasons.
+They are not passed proofs or ordinary failures; no native job is launched for
+these known unavailable contexts. The underlying prover's isolation guard remains.
+
+`contexts_ok` and readiness exit status evaluate available contexts, while
+`full_context_coverage` and `context_counts` expose missing coverage. An entirely
+unavailable selection cannot pass. Ordinary missing dependencies, proof failures,
+setup failures and interruptions retain their existing failure/blocking behavior.
+The **31 AFP-dependent contexts are separate from the 24 Set targets** and receive
+normal native checks after setup.
+
+`prepare_afp.py` installs the entire official `afp-2026-10-26.tar.gz` release with
+pinned SHA-256 and `AFP_VERSION=2026` checks. It extracts through a private staging
+directory, rejects links and escaping archive paths, preserves existing user
+checkouts, records installation provenance, and updates only `session_roots` in
+the selected native config after successful installation. It preserves other
+roots/settings and reuses its installation on subsequent runs. The local config
+now contains `external/afp-2026/thys`. The full installer was exercised locally:
+16,148 source files extracted; actual Isabelle compilation still requires the lab.
+See [setup and complete preflight commands](README.md).
+
+---
+
+# Isabelle2026 restored as default; no separate replay
+
+Date: 2026-11-01.
+
+The active `v2_dsp/` backend is again native Isabelle2026, restored from `e06e512`
+with the prior p6 safety fixes intact. Original DSP/PISA/Isabelle2021 and its
+recent diagnostics fixes are preserved separately in `v2_dsp_pisa/`. Both datasets
+expose both implementations. Runtime configs, prompts, artifact schemas, output
+paths, and tests are separate. `v2_itpeval/` is unchanged.
+
+## Report diagnosis and current fixes
+
+The report `eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/report.json`
+had **57 passing / 8 failing checks**. All 26 then-current proof/search/replay
+controls and three fixed real-theorem checks passed. The failures were the ML
+fixture and seven Hundred Theorems dependency contexts, not a universal search
+failure.
+
+| Reported issue or additional finding | Current change |
+| --- | --- |
+| Fixture uses `OS.Process.sleep`, unavailable in Isabelle/ML | Use `Time.sleep`, the Isabelle API, in the interrupted-operation regression. |
+| Bare `Euclidean_Algorithm` and `Primes` | Resolve to same-named `HOL-Computational_Algebra` theories. |
+| Bare `Angles` and `Square_Matrix` | Resolve to `Triangle.Angles` and `Cayley_Hamilton.Square_Matrix`; require matching AFP sources. |
+| Bare `Lattices` and `Boolean_Algebras` | Qualify with `HOL`; retain the ancestor guard for the copied core `Set` theory. |
+| Missing `Pratt_Certificate` session | Report the required AFP session and root setup before building when no session roots are configured. |
+| `Bad imports session` was missed by error classification | Classify the actual plural error as `import_error` and preserve the build diagnostics. |
+| Nonzero build after writing a result XML could hide its log | Keep process status and bounded build-log excerpt; it cannot count as success. |
+| Legacy local configs lacked new import mappings | Merge verified defaults into explicit mappings while retaining basename validation. |
+| Version banners can include a release date | Accept only exact `Isabelle2026` or its colon-delimited date banner; reject RC/other releases. |
+
+Import fixes modify generated import tokens and session declarations only.
+Original dataset records, proofs and statements are unchanged. Session roots are
+still required for AFP. The all-context dependency plan identifies **31 AFP-dependent
+contexts** and **24 core Set contexts already inherited by HOL**. Those 24 stay in
+the cohort as isolation failures, not successful translations or silently skipped
+records. The next lab run may reveal additional release-compatibility issues.
+
+API cross-checks: official
+[`Time.sleep`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/General/time.ML),
+[HOL session ownership](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/ROOT),
+[Triangle session](https://github.com/isabelle-prover/mirror-afp-devel/blob/master/thys/Triangle/ROOT),
+and [Cayley_Hamilton session](https://github.com/isabelle-prover/mirror-afp-devel/blob/master/thys/Cayley_Hamilton/ROOT).
+These source checks establish the API/import owners, not installed AFP release
+compatibility; use the AFP release matching the pinned Isabelle2026 distribution.
+
+## Verification and lab acceptance
+
+Separate replay has been removed from the native checker, runner, acceptance
+catalog and integration tests. `verified` requires successful execution and
+closure of the selected target in the original native job. Kernel-checked gap
+reconstruction, no-admission filtering, inherited-target guards, request identity,
+process exit checks and deadlines remain. Sledgehammer's own preplay remains.
+
+The result records `verification_method=isabelle2026_native_completion`, omits
+old replay-success fields, and clears stale diagnostics before each check.
+Checker **p7** invalidates previous verification caches. Saved 2026 Sketches can
+be rechecked with `--skip-sketch` without another model call. The new default
+example config is 2026; PISA uses its separate package and 2021 config.
+
+The consolidated preflight covers **all 262 candidate contexts** with
+`--dataset both --all-targets --expected-contexts 262`. It has 23 backend controls,
+three fixed dataset proofs and four selection/setup/fixture checks: **292 total**.
+`--afp-root` supplies an existing repository-local AFP `thys` directory.
+`dependencies.json` records exact import/session requirements and known inherited
+contexts. Reports remain Git-trackable in `eval/preflight_results/isabelle2026/`.
+The [current guide](README.md) gives the complete command and setup instructions.
+
+Validation: **277 tests collected, 261 passed, 16 native integration tests skipped**.
+Python 3.10 syntax checks passed for 187 pipeline/test files. All 12 native/PISA,
+Babel/Hundred runner/prove/preflight CLI entry points load; no replay flags remain.
+The exact all-targets command's plan selected 262 contexts across 29 topics,
+23 controls and three dataset proofs, with no selection issues.
+
+Local regression tests cover both backends, the full extracted cohort, original
+record preservation, corrected imports, dependency diagnostics, protocol failures,
+no-replay behavior, and unchanged context/timeout isolation. Actual ML compilation
+and native execution remain pending on the Linux lab host. No LLM calls or
+historical report edits were made.
+
+---
+
+# Historical reviews
+
+The sections below preserve the review history. Their replay requirements,
+checker versions, default backends and old commands are superseded above.
+
 # DSP/PISA rollback review
 
 Date: 2026-11-01. The active backend is original DSP + PISA + Isabelle2021.

@@ -1,9 +1,9 @@
 """Optional integration check using the same cases as the recorded lab preflight."""
 import os
 import unittest
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import proof_cases,run_proof_case
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.checker import Checker
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa.acceptance import proof_cases,run_proof_case
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa.runtime import DspConfig
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa.checker import Checker
 
 @unittest.skipUnless(os.environ.get("ITPEVAL_PISA_ISABELLE2021_CONFIG"),"requires the lab PISA/Isabelle2021 installation")
 class PisaIntegrationTests(unittest.TestCase):

@@ -102,7 +102,7 @@ eval/results/hol_light_to_isabelle_v2/hundred-theorems/
 ├── hundred_theorems_v2_records.jsonl.coverage.json
 ├── hundred_theorems_v2_drafts.jsonl
 ├── v2-itpeval/
-└── v2-dsp-pisa-isabelle2021/                 # draft/<profile>/ and direct/<profile>/
+└── v2-dsp-isabelle2026/                 # draft/<profile>/ and direct/<profile>/
 ```
 
 The coverage report includes every selected file group and any skipped
@@ -170,9 +170,9 @@ without an installed prover or API call.
 
 ## DSP baseline
 
-The shared backend uses **original DSP + PISA + Isabelle2021**, with saved-Draft
+The shared backend uses **native Isabelle2026**, with saved-Draft
 and direct HOL Light proof inputs. There is no separate replay stage. Set up
-the lab computer as described in [the DSP/PISA guide](../babel_formal_pipeline/v2_dsp/README.md).
+the lab computer as described in [the native Isabelle2026 guide](../babel_formal_pipeline/v2_dsp/README.md).
 The separate `v2_itpeval` baseline retains Isabelle2024.
 
 Preflight accepts raw records without requiring a Draft:
@@ -180,7 +180,7 @@ Preflight accepts raw records without requiring a Draft:
 ~~~bash
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.preflight \
   --expected-root /data/not_backed_up/yxu209/itpeval-modify \
-  --config eval/configs/hol_light_to_isabelle/v2_dsp_2021.local.json \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
   --input eval/results/hol_light_to_isabelle_v2/hundred-theorems/hundred_theorems_v2_records.jsonl \
   --topic 030_the_ballot_problem --target-key all_countings
 ~~~
@@ -190,7 +190,7 @@ Direct-mode smoke run:
 ~~~bash
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.run_hundred \
   --expected-root /data/not_backed_up/yxu209/itpeval-modify \
-  --config eval/configs/hol_light_to_isabelle/v2_dsp_2021.local.json \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
   --sketch-source hol-light-proof \
   --records eval/results/hol_light_to_isabelle_v2/hundred-theorems/hundred_theorems_v2_records.jsonl \
   --topic 030_the_ballot_problem --target-key all_countings \
@@ -200,10 +200,10 @@ python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.r
 For saved-Draft mode, use `--sketch-source draft` and replace `--records` with
 `--drafts <saved_drafts.jsonl>`. `--dry-run` previews prompts without native
 execution or inference; `--sketch-llm-config` selects API or Qwen/vLLM.
-Defaults are under `hundred-theorems/v2-dsp-pisa-isabelle2021/`, separated by mode
+Defaults are under `hundred-theorems/v2-dsp-isabelle2026/`, separated by mode
 and inference profile. Export/Sketch/prove/final flags match Babel's runner.
-`--skip-sketch` runs original DSP on saved Sketches. `--skip-prove` was removed.
-`verified` reports PISA completion; there is no second proof verification step.
+`--skip-sketch` runs the native prover on saved Sketches. `--skip-prove` was removed.
+`verified` reports native checked target completion; there is no second proof verification step.
 
 ## Batch runs and interpretation
 
@@ -219,12 +219,20 @@ developments; their imports and tool versions must be available in the
 configured runtime. A native preflight failure stays an explicit context
 failure. The adapter does not replace imports, add missing mathematical
 assumptions, or silently substitute a theorem from another library.
-Resolve dependencies for the matching Isabelle2021 release before treating a
+Resolve dependencies for the matching Isabelle2026 release before treating a
 target context as accepted. Run the shared `v2_dsp.lab_preflight --dataset both --all-targets`
 from the Babel package for a consolidated report under
-`eval/preflight_results/pisa_isabelle2021/`; see the linked guide for the full command.
+`eval/preflight_results/isabelle2026/`; see the linked guide for the full command.
 
 The local regression suite validates all 58 aligned groups, the 99 emitted
 contexts, compatibility paths, visible-only Draft generation, both handoffs,
-and the copied DSP/PISA checker using fake transports. Native Isabelle2021 and live API experiments
+and the native checker using fake transports. Native Isabelle2026 and live API experiments
 still require the lab environment.
+
+The default backend remains in `v2_dsp/`. Original DSP/PISA/Isabelle2021 is preserved
+in the separate `v2_dsp_pisa/` frontend, with `v2_dsp_2021.example.json` and isolated
+outputs. Neither DSP backend performs separate replay verification. See the
+[Babel guide](../babel_formal_pipeline/v2_dsp/README.md) for the full
+`--dataset both --all-targets --expected-contexts 262` lab command. Matching AFP
+sources are required for 31 Hundred candidates; the 24 inherited core Set targets
+are reported separately as unavailable context in preflight.

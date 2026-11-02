@@ -186,14 +186,14 @@ class StageTests(unittest.TestCase):
         self.assertTrue(all("hundred_theorems" in row["sketch_prompt_version"] for row in rows))
         self.assertTrue(all("sledgehammer" in row["isabelle_sketch"] for row in rows))
 
-    def test_dsp_pisa_uses_own_directory_with_fake_transport(self):
+    def test_dsp_native_completion_uses_own_directory_with_fake_transport(self):
         # This fixture exercises transport/control flow; it does not prove mathematics.
-        from v2_dsp.test_checker import fake_job, CONFIG, BACKEND
+        from v2_dsp.test_checker import FakeNative, CONFIG, BACKEND
         sketch = control_record("proof -\n  show True\n    sledgehammer\nqed")
         input_path = self.root/"sketches.jsonl"
         write_jsonl(input_path,[sketch])
         with patch(B+".v2_dsp.runtime.DspConfig.metadata",return_value=BACKEND), patch(
-                B+".v2_dsp.checker.run_job",fake_job):
+                B+".v2_dsp.checker.NativeSearch",FakeNative):
             results = prove_sketches(
                 config=CONFIG,input_path=input_path,output_path=self.root/"verified.jsonl",
                 prove_output=self.root/"prove.jsonl")
@@ -252,24 +252,6 @@ class StageTests(unittest.TestCase):
         self.assertEqual(99,report["record_count"])
         self.assertFalse([row for row in report["file_groups"] if row["issues"]])
 
-    def test_dsp_context_enables_admissions_after_theory_not_documentation(self):
-        from v2_dsp.test_checker import CONFIG
-        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.pisa_context import prepare_context
-        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
-        import time
-        template = ('section \\<open>Documentation first\\<close>\n'
-                    'theory HeaderTest imports Main begin\nlemma goal: "True"\n sorry\nend\n')
-        target = sanitize_target(template,"goal")
-        record = export_record(dict(
-            source=SOURCE,theorem_id=0,topic="fixture",target_key="goal",
-            isabelle_target_name="goal",draft="True holds.",sample_idx=0,
-            isabelle_theory_template=template,isabelle_statement=target.statement,
-            isabelle_context_before_target=target.context_before_target,
-            isabelle_proof_prefix=target.proof_prefix,
-            isabelle_target_proof_span=list(target.proof_span)))
-        _, source, _ = prepare_context(record, CONFIG)
-        self.assertGreater(source.index("quick_and_dirty = true"), source.index("theory HeaderTest"))
-        self.assertLess(source.index("quick_and_dirty = false"), source.index("lemma goal"))
 
     def test_all_new_entry_points_import_without_native_runtime(self):
         modules = ["inventory","manifest","extract_hol_light","generate_draft",

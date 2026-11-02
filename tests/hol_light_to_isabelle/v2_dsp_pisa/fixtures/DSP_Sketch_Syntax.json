@@ -1,0 +1,7 @@
+{
+  "origin": "Saved circleAverage_center_independent sketches in commit c8fb3cb; corrected bodies are manual diagnostics, not model results.",
+  "draft_invalid": "by\n  have avg_def:\n    \"circleAverage f c = integral (\\<lambda>\\<theta>. f (\\<theta> +C c))\"\n    unfolding circleAverage_def circleMap_def\n    by simp\n  have shift:\n    \"integral (\\<lambda>\\<theta>. f (\\<theta> +C c)) = integral f\"\n    using integral_shift[of f c] .\n  show ?thesis\n    using avg_def shift by simp\nqed",
+  "direct_invalid": "by\n  unfold circleAverage circleMap\n  rule integral_shift",
+  "draft_corrected": "proof -\n  have avg_def:\n    \"circleAverage f c = integral (\\<lambda>\\<theta>. f (\\<theta> +C c))\"\n    unfolding circleAverage_def circleMap_def\n    by simp\n  have shift:\n    \"integral (\\<lambda>\\<theta>. f (\\<theta> +C c)) = integral f\"\n    using integral_shift[of f c] .\n  show ?thesis\n    using avg_def shift by simp\nqed",
+  "direct_corrected": "proof -\n  show ?thesis\n    unfolding circleAverage_def circleMap_def\n    by (rule integral_shift)\nqed"
+}

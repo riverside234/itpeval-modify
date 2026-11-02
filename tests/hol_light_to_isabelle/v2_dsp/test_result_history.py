@@ -118,7 +118,7 @@ class ResultHistoryTests(unittest.TestCase):
         self.assertEqual([self.row["sketch_model"]], summary["llm_profiles"]["sketch"])
         self.assertEqual([self.row["draft_model"]], summary["llm_profiles"]["draft"])
         activity = summary["search_activity"]
-        self.assertEqual(2, activity["samples_with_pisa_search"])
+        self.assertEqual(2, activity["samples_with_native_search"])
         self.assertEqual(1, activity["samples_with_gap_filling"])
         self.assertEqual(1, activity["samples_with_sledgehammer"])
         self.assertEqual(1, activity["sledgehammer_calls"])

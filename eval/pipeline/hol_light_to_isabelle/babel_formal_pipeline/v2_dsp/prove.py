@@ -1,4 +1,4 @@
-"""Fill DSP sketches with the original PISA checker; no replay stage."""
+"""Fill DSP sketches and check completion in one native Isabelle2026 job."""
 
 from __future__ import annotations
 
@@ -12,12 +12,12 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import (
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.checker import CHECKER_VERSION, Checker, verification_input
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.generate_sketch import DEFAULT_OUTPUT as DEFAULT_INPUT
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig
-from .input_contract import (MODES, align_samples, envelope, load_inputs, output_path as pisa_output_path,
+from .input_contract import (MODES, align_samples, envelope, load_inputs, output_path as native_output_path,
                              validate_artifacts, save_results)
 
 
-DEFAULT_OUTPUT = pisa_output_path(None, results_dir=RESULTS_DIR, filename="verified.jsonl", mode="draft")
-DEFAULT_PROVE_OUTPUT = pisa_output_path(None, results_dir=RESULTS_DIR, filename="prove.jsonl", mode="draft")
+DEFAULT_OUTPUT = native_output_path(None, results_dir=RESULTS_DIR, filename="verified.jsonl", mode="draft")
+DEFAULT_PROVE_OUTPUT = native_output_path(None, results_dir=RESULTS_DIR, filename="prove.jsonl", mode="draft")
 _DEFAULT_PROVE = object()
 
 
@@ -33,10 +33,10 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
     if not records:
         raise ValueError("no matching DSP Sketch records")
     require_source(records, expected_source)
-    output_path = pisa_output_path(output_path, results_dir=results_dir, filename="verified.jsonl",
+    output_path = native_output_path(output_path, results_dir=results_dir, filename="verified.jsonl",
                                      mode=sketch_source, records=records)
     if prove_output is _DEFAULT_PROVE:
-        prove_output = pisa_output_path(None, results_dir=results_dir, filename="prove.jsonl",
+        prove_output = native_output_path(None, results_dir=results_dir, filename="prove.jsonl",
                                           mode=sketch_source, records=records)
     if repo_path(input_path) == repo_path(output_path) or prove_output and repo_path(input_path) == repo_path(prove_output):
         raise ValueError("Sketch/Prove input and verification outputs must be distinct")
@@ -64,7 +64,7 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
         if result is None:
             if backend_error is not None and not record.get("sketch_error"):
                 result = {**verification_input(record, sketch_source), **envelope(sketch_source), "verified": False,
-                          "prove_success": False, "verification_method": "dsp_pisa_completion",
+                          "prove_success": False, "verification_method": "isabelle2026_native_completion",
                           "checker_version": CHECKER_VERSION, "step_results": [],
                           "failure_category": "toolchain_error",
                           "verify_error": f"{type(backend_error).__name__}: {backend_error}"}

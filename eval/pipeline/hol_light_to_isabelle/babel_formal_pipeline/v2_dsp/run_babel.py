@@ -1,4 +1,4 @@
-"""Run saved-Draft or direct HOL Light Sketch with original DSP/PISA Isabelle2021."""
+"""Run saved-Draft or direct HOL Light Sketch with DSP-style native Isabelle2026."""
 from __future__ import annotations
 
 import argparse
@@ -96,7 +96,7 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
                         "error": json.dumps(check),
                     }
                     if check.get("baseline_ok"):
-                        capability_error = "PISA capability controls failed: " + json.dumps(check)
+                        capability_error = "native capability controls failed: " + json.dumps(check)
                         break
                     if args.fail_fast:
                         raise RuntimeError("target context preflight failed: " + json.dumps(check))
@@ -108,7 +108,7 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
             if args.fail_fast:
                 raise
             blocked = {key(row): {"failure_category": "toolchain_error",
-                                  "error": "PISA preflight failed before inference: " + str(exc)} for row in exported}
+                                  "error": "native preflight failed before inference: " + str(exc)} for row in exported}
         generate_sketches(input_path=args.dsp_output, output_path=args.sketch_output, **filters,
             samples=args.samples, resume=not args.no_resume, continue_on_error=not args.fail_fast,
             blocked_targets=blocked, llm_config=llm, sketch_source=mode, expected_source=expected_source,

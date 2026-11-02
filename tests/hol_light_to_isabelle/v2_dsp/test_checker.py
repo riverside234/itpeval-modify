@@ -1,114 +1,183 @@
-"""Transport/orchestration tests; fake jobs never claim native mathematical validation."""
-import json
+"""Orchestration tests use a fake adapter, not a mathematical proof checker."""
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import RESULTS_DIR, repo_path, write_jsonl
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.checker import Checker, CHECKER_VERSION
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.preflight import control_record
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.prove import prove_sketches
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig, PisaFailure
+from eval.pipeline.hol_light_to_isabelle.common import RESULTS_DIR, read_jsonl, repo_path, write_jsonl
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.checker import CHECKER_VERSION, Checker, HEURISTICS
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.preflight import control_record
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.prove import prove_sketches
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime import DspConfig
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.native_search import NativeFailure
 
 CONFIG = DspConfig()
-BACKEND = {"backend": "dsp-pisa", "isabelle_version": "Isabelle2021", "backend_fingerprint": "fixture"}
+BACKEND = {"backend": "isabelle-native", "isabelle_version": "Isabelle2026", "native_adapter_sha256": "a"}
+SKETCH = "proof -\n show True\n sledgehammer\nqed"
 MODULE = "eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp."
 
 
-def fake_job(config, directory, request):
-    return {"success": True, "dsp_result": {"success": True, "num_steps": 3},
-            "step_results": [{"mode": "search", "success": True}], "error": ""}
+class FakeNative:
+    """Controlled job fixture; it does not interpret Isabelle."""
+    def __init__(self, config):
+        self.calls = []
+        self.success = self.closed = self.replay_ok = True
+        self.error = None
+        self.proof = "by simp"
+
+    def request(self, record, sketch, **options):
+        self.calls.append(("request", sketch, options))
+        if self.error:
+            raise self.error
+        return {"success": self.success, "target_closed": self.closed, "isabelle_proof": self.proof,
+                "failure_category": "missing_reconstruction", "error": "fixture failure",
+                "step_results": [{"mode": "hammer", "success": self.success}],
+                "prover_settings": {"resolved_provers": "e"}}
+
+    def replay(self, record, proof, **options):
+        self.calls.append(("replay", proof, options))
+        path = options["directory"] / "V2Control.thy"
+        path.parent.mkdir(parents=True)
+        path.write_text("fixture replay artifact", encoding="utf-8")
+        return {"success": self.replay_ok, "replay_theory_path": str(path)}
 
 
 class CheckerTests(unittest.TestCase):
     def setUp(self):
         base = repo_path(RESULTS_DIR)
         base.mkdir(parents=True, exist_ok=True)
-        self.temp = tempfile.TemporaryDirectory(prefix="pisa-checker-", dir=base)
+        self.temp = tempfile.TemporaryDirectory(prefix="native-checker-", dir=base)
         self.addCleanup(self.temp.cleanup)
         self.path = Path(self.temp.name)
-        self.job = Mock(side_effect=fake_job)
-        self.checker = Checker(CONFIG, results_dir=str(self.path), job_runner=self.job)
+        self.fake = FakeNative(CONFIG)
+        self.checker = Checker(CONFIG, native_factory=lambda config: self.fake, results_dir=str(self.path))
 
-    def test_one_upstream_job_is_the_complete_verification_no_replay(self):
-        result = self.checker.check(control_record("by simp"), backend_metadata=BACKEND)
-        self.assertTrue(result["verified"], result)
+    def check(self, proof=SKETCH, **options):
+        return self.checker.check(control_record(proof), backend_metadata=BACKEND, **options)
+
+    def test_single_search_and_preserved_sketch(self):
+        result = self.check()
+        self.assertTrue(result["verified"], result["verify_error"])
+        self.assertEqual(SKETCH, result["isabelle_sketch"])
+        self.assertEqual("by simp", result["isabelle_proof"])
+        self.assertEqual(["request"], [x[0] for x in self.fake.calls])
+        self.assertEqual(HEURISTICS, self.fake.calls[0][2]["heuristics"])
+
+    def test_forced_hammer_gate_bypasses_heuristics(self):
+        self.assertTrue(self.check(force_hammer=True)["verified"])
+        self.assertEqual((), self.fake.calls[0][2]["heuristics"])
+
+    def test_reconstruction_and_target_closure_are_required(self):
+        for changed in ({"closed": False}, {"success": False}, {"proof": ""}, {"proof": "by sledgehammer"}):
+            self.fake = FakeNative(CONFIG)
+            for name, value in changed.items():
+                setattr(self.fake, name, value)
+            result = self.check()
+            self.assertFalse(result["verified"], changed)
+            self.assertFalse(any(call[0] == "replay" for call in self.fake.calls))
+
+    def test_no_replay_success_fields_or_second_job(self):
+        result = self.check()
+        self.assertTrue(result["verified"])
         self.assertTrue(result["prove_success"])
-        self.assertEqual("dsp_pisa_completion", result["verification_method"])
-        self.job.assert_called_once()
-        request = self.job.call_args.args[2]
-        self.assertTrue(request["formal"].rstrip().endswith("by simp"))
-        self.assertNotIn("Symmetric_Polynomials", request["formal"])
-        self.assertEqual("prove", request["action"])
+        self.assertEqual("isabelle2026_native_completion", result["verification_method"])
+        self.assertEqual(["request"], [call[0] for call in self.fake.calls])
+        self.assertNotIn("native_replay", result)
         self.assertNotIn("replay_verified", result)
-        self.assertNotIn("isabelle_proof", result)
 
-    def test_incomplete_or_failed_pisa_result_is_a_failure(self):
-        self.job.side_effect = None
-        self.job.return_value = {"success": False, "failure_category": "proof_failure", "error": "open goal"}
-        result = self.checker.check(control_record("by simp"), backend_metadata=BACKEND)
+    def test_timeout_does_not_continue_or_replay(self):
+        self.fake.error = TimeoutError("fixture timeout")
+        result = self.check()
+        self.assertEqual("timeout", result["failure_category"])
+        self.assertEqual(1, len(self.fake.calls))
+
+    def test_admissions_ml_and_malformed_placeholders_are_rejected_before_native(self):
+        for proof in ("proof -\n sorry\nqed", "by sledgehammer", "proof -\n sledgehammer [timeout=1]\nqed",
+                      "proof -\n ML \\<open>fail ()\\<close>\nqed", "by (tactic \\<open>all_tac\\<close>)"):
+            with self.subTest(proof=proof):
+                result = self.check(proof)
+                self.assertFalse(result["verified"])
+                self.assertEqual("rejected_proof", result["failure_category"])
+        self.assertEqual([], self.fake.calls)
+
+    def test_malformed_by_block_is_rejected_before_starting_isabelle(self):
+        result = self.check('by\n have "True" by simp\n show ?thesis by simp\nqed')
+        self.assertEqual("rejected_proof", result["failure_category"])
+        self.assertIn("proof - ... qed", result["verify_error"])
+        self.assertEqual([], self.fake.calls)
+        self.assertNotIn("workdir", result)
+
+    def test_native_error_details_are_exposed_in_top_level_failure(self):
+        search = {"success": False, "target_closed": False,
+                  "failure_category": "sketch_step_failure", "error": "failed command: by",
+                  "step_results": [{"mode": "search", "success": False, "line": "7",
+                                    "error": "Undefined method: fixture_missing"}]}
+        with patch.object(self.fake, "request", return_value=search):
+            result = self.check()
         self.assertFalse(result["verified"])
-        self.assertEqual("proof_failure", result["failure_category"])
-        self.job.assert_called_once()
+        self.assertIn("Undefined method: fixture_missing", result["verify_error"])
+        self.assertIn("line 7", result["verify_error"])
+        self.assertNotIn("native_replay", result)
 
-    def test_context_gate_checks_open_target_with_no_source_proof(self):
-        result = self.checker.check_context(control_record("by simp"), backend_metadata=BACKEND)
+    def test_earlier_failed_heuristic_does_not_obscure_a_later_failure(self):
+        search = {"success": False, "target_closed": False,
+                  "failure_category": "incomplete_proof", "error": "target is still open",
+                  "step_results": [
+                      {"mode": "heuristic", "success": False, "error": "old failed candidate"},
+                      {"mode": "search", "success": True, "error": ""}]}
+        with patch.object(self.fake, "request", return_value=search):
+            result = self.check()
+        self.assertIn("target is still open", result["verify_error"])
+        self.assertNotIn("old failed candidate", result["verify_error"])
+
+    def test_context_preflight_does_not_require_a_draft(self):
+        row = control_record("by simp")
+        del row["draft"]
+        result = self.checker.check_context(row, backend_metadata=BACKEND)
         self.assertTrue(result["baseline_ok"])
-        request = self.job.call_args.args[2]
-        self.assertEqual("context", request["action"])
-        self.assertTrue(request["formal"].rstrip().endswith('lemma v2_control: "True"'))
-        self.assertNotIn("by simp", request["formal"])
+        self.assertEqual("context", self.fake.calls[0][2]["action"])
 
-    def test_context_failure_preserves_work_directory(self):
-        self.job.side_effect = None
-        self.job.return_value = {"success": False, "failure_category": "context_error", "error": "bad imports"}
-        with self.assertRaises(PisaFailure) as raised:
-            self.checker.check_context(control_record("by simp"), backend_metadata=BACKEND)
-        self.assertEqual("context_error", raised.exception.category)
-        self.assertTrue(Path(raised.exception.details["workdir"]).is_dir())
-
-    def test_admission_and_unsafe_settings_are_rejected_before_worker(self):
-        for body in ('proof -\n sorry\nqed', 'by ("tactic" \\<open>all_tac\\<close>)',
-                     'proof - supply [[smt_oracle = true]] show True by simp qed'):
-            result = self.checker.check(control_record(body), backend_metadata=BACKEND)
-            self.assertFalse(result["verified"])
-            self.assertEqual("rejected_proof", result["failure_category"])
-        self.job.assert_not_called()
-
-    def test_old_native_results_are_rejected_and_cannot_supply_success(self):
-        row = {**control_record("by simp"), "expected_isabelle_version": "Isabelle2026",
-               "native_search": {"success": True}, "replay_verified": True}
+    def test_saved_proof_cannot_bypass_checking_the_current_sketch(self):
+        row = {**control_record(r"by (tactic \<open>all_tac\<close>)"), "isabelle_proof": "by simp"}
         result = self.checker.check(row, backend_metadata=BACKEND)
         self.assertFalse(result["verified"])
-        self.assertNotIn("native_search", result)
-        self.assertNotIn("replay_verified", result)
-        self.job.assert_not_called()
+        self.assertEqual("rejected_proof", result["failure_category"])
+        self.assertFalse(self.fake.calls)
 
-    def test_prove_resume_depends_on_current_backend(self):
-        source, output = self.path/"sketches.jsonl", self.path/"result.jsonl"
-        write_jsonl(source, [control_record("by simp")])
-        options = dict(config=CONFIG, input_path=source, output_path=output, prove_output=None, results_dir=str(self.path))
-        with patch(MODULE+"runtime.DspConfig.metadata", return_value=BACKEND), patch(MODULE+"checker.run_job", side_effect=fake_job) as job:
-            first = prove_sketches(**options)
-            second = prove_sketches(**options)
-            self.assertTrue(first[0]["verified"])
-            self.assertEqual(first, second)
-            job.assert_called_once()
-        with patch(MODULE+"runtime.DspConfig.metadata", return_value={**BACKEND, "backend_fingerprint": "changed"}), patch(MODULE+"checker.run_job", side_effect=fake_job) as job:
-            prove_sketches(**options)
-            job.assert_called_once()
+    def test_resume_depends_on_native_adapter_and_budgets(self):
+        source, output = self.path / "sketches.jsonl", self.path / "verified.jsonl"
+        row = control_record(SKETCH)
+        write_jsonl(source, [row])
+        result = {**row, "checker_version": CHECKER_VERSION, "prove_success": True,
+                  "verified": True}
+        with patch.object(DspConfig, "metadata", return_value=BACKEND) as metadata, patch(
+                MODULE + "prove.Checker.check", return_value=result) as check:
+            opts = dict(config=CONFIG, input_path=source, output_path=output, prove_output=None,
+                        expected=[row], expected_samples=1)
+            prove_sketches(**opts)
+            prove_sketches(**opts)
+            self.assertEqual(1, check.call_count)
+            metadata.return_value = {**BACKEND, "native_adapter_sha256": "changed"}
+            prove_sketches(**opts)
+            self.assertEqual(2, check.call_count)
+            from dataclasses import replace
+            prove_sketches(**{**opts, "config": replace(CONFIG, hammer_timeout_s=7)})
+            self.assertEqual(3, check.call_count)
 
-    def test_missing_samples_are_still_failed_denominator_entries(self):
-        row = control_record("by simp")
-        source = self.path/"sketches.jsonl"
-        write_jsonl(source,[row])
-        with patch(MODULE+"runtime.DspConfig.metadata", return_value=BACKEND), patch(MODULE+"checker.run_job", side_effect=fake_job):
-            result = prove_sketches(config=CONFIG,input_path=source,output_path=self.path/"result.jsonl",prove_output=None,
-                                   expected=[row],expected_samples=2,results_dir=str(self.path))
-        self.assertEqual(2,len(result))
-        self.assertEqual(1,sum(r["verified"] for r in result))
-        self.assertEqual("missing_sketch",result[1]["failure_category"])
+    def test_missing_and_failed_sketches_stay_in_cohort(self):
+        source, output = self.path / "empty.jsonl", self.path / "verified.jsonl"
+        write_jsonl(source, [])
+        targets = [control_record(SKETCH), {**control_record(SKETCH), "target_key": "other"}]
+        with patch.object(DspConfig, "metadata", return_value=BACKEND):
+            rows = prove_sketches(config=CONFIG, input_path=source, output_path=output, prove_output=None,
+                                  expected=targets, expected_samples=2)
+        self.assertEqual(4, len(rows))
+        self.assertTrue(all(row["failure_category"] == "missing_sketch" for row in rows))
+        import json
+        summary = json.loads(output.with_suffix(".summary.json").read_text())
+        self.assertEqual(2, summary["targets"])
+        self.assertEqual(0, summary["verified_samples"])
+        self.assertEqual(4, summary["missing_samples"])
 
 
 if __name__ == "__main__":

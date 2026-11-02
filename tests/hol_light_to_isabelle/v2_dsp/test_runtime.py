@@ -8,7 +8,7 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from eval.pipeline.hol_light_to_isabelle.common import RESULTS_DIR, repo_path
-from eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime import DspConfig, OwnedProcess
+from eval.pipeline.hol_light_to_isabelle.v2_dsp.runtime import DspConfig, NATIVE_DIR, OwnedProcess
 
 MODULE = "eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime."
 
@@ -26,31 +26,16 @@ class RuntimeTests(unittest.TestCase):
         path.write_text(json.dumps(data), encoding="utf-8")
         return DspConfig.load(str(path))
 
-    def test_pisa_config_defaults_and_root_confinement(self):
+    def test_native_config_defaults_and_root_confinement(self):
         config = self.load({"isabelle_home": str(self.path)})
-        self.assertEqual("Isabelle2021", config.expected_isabelle_version)
-        self.assertEqual("dsp-pisa", config.backend)
+        self.assertEqual("Isabelle2026", config.expected_isabelle_version)
+        self.assertEqual("isabelle-native", config.backend)
         with self.assertRaises(ValueError):
             self.load({"isabelle_home": str(self.path.parent.parent.parent.parent.parent.parent)})
 
-    def test_official_isabelle2021_banner_normalizes_to_release_identity(self):
-        config = DspConfig()
-        for banner in ("Isabelle2021", "Isabelle2021: February 2021",
-                       "  Isabelle2021: February 2021\n"):
-            with self.subTest(banner=banner):
-                self.assertEqual("Isabelle2021", config.normalize_isabelle_version(banner))
-
-    def test_other_isabelle_releases_and_malformed_banners_are_rejected(self):
-        config = DspConfig()
-        for banner in ("Isabelle2021-1: December 2021", "Isabelle2024: May 2024",
-                       "Isabelle2026", "Isabelle20210", "prefix Isabelle2021", ""):
-            with self.subTest(banner=banner), self.assertRaises(ValueError) as error:
-                config.normalize_isabelle_version(banner)
-            self.assertIn(repr(banner), str(error.exception))
-
-    def test_native_configuration_has_explicit_migration_error(self):
-        for data in ({"replay_timeout_s": 1}, {"backend": "isabelle-native"}, {"expected_isabelle_version": "Isabelle2026"}):
-            with self.subTest(data=data), self.assertRaises(ValueError):
+    def test_old_pisa_configuration_has_explicit_migration_error(self):
+        for data in ({"pisa_jar": "old.jar"}, {"backend": "dsp-pisa"}, {"expected_isabelle_version": "Isabelle2021"}):
+            with self.subTest(data=data), self.assertRaisesRegex(ValueError, "PISA"):
                 self.load(data)
 
     def test_invalid_limits_provers_and_unknown_fields(self):
@@ -67,11 +52,34 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(os.environ.get("HOME"), env.get("HOME"))
         self.assertEqual(os.environ.get("CODEX_HOME"), env.get("CODEX_HOME"))
         self.assertTrue(Path(env["USER_HOME"]).is_relative_to(self.path))
-        self.assertEqual("Isabelle2021", env["ISABELLE_IDENTIFIER"])
+        self.assertEqual("Isabelle2026", env["ISABELLE_IDENTIFIER"])
         self.assertTrue(Path(env["TMPDIR"]).is_dir())
-        settings = Path(env["USER_HOME"]) / ".isabelle/Isabelle2021/etc/settings"
+        settings = Path(env["USER_HOME"]) / ".isabelle/Isabelle2026/etc/settings"
         self.assertIn("ISABELLE_HEAPS=", settings.read_text())
         self.assertNotIn("ISABELLE_SETTINGS_PRESENT", env)
+
+    def test_metadata_checks_release_and_resolved_paths(self):
+        (self.path / "bin").mkdir()
+        (self.path / "bin/isabelle").write_text("fixture")
+        config = DspConfig(isabelle_home=str(self.path))
+        hashes = json.loads((NATIVE_DIR / "release_sources.json").read_text())["sha256"]
+        def run(command, **kwargs):
+            if command[-1] == "version":
+                return SimpleNamespace(stdout="Isabelle2026\n")
+            return SimpleNamespace(stdout=str(self.path / command[-1]) + "\n")
+        def digest(path):
+            relative = str(path.relative_to(self.path)).replace("\\", "/") if path.is_relative_to(self.path) else ""
+            return hashes.get(relative, "a" * 64)
+        fake_os = SimpleNamespace(name="posix", environ=os.environ, access=os.access, X_OK=os.X_OK)
+        with patch(MODULE + "os", fake_os), patch(MODULE + "subprocess.run", side_effect=run), patch(
+                MODULE + "hash_file", side_effect=digest), patch(MODULE + "RUNTIME_DIR", str(self.path / "runtime")):
+            metadata = config.metadata()
+            self.assertEqual("isabelle-native", metadata["backend"])
+            self.assertEqual(hashes, metadata["release_sources"])
+            self.assertEqual(64, len(metadata["backend_fingerprint"]))
+        with patch(MODULE + "os", fake_os), patch(MODULE + "hash_file", return_value="wrong"):
+            with self.assertRaisesRegex(ValueError, "source mismatch"):
+                config.metadata()
 
     def test_cleanup_uses_only_owned_process_group(self):
         process = OwnedProcess([], directory=self.path, env={}, log_path=self.path / "log",

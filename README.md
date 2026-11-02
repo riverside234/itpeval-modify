@@ -23,7 +23,7 @@ prover integrations come from upstream ITPEval.
   from the generation inputs.
 - **Two Isabelle reconstruction paths.** Reuse identical saved drafts for complete
   proof generation with Isabelle2024/ITPEval, or structured Isar sketches followed
-  by the original DSP checker through PISA and Isabelle2021.
+  by native Isabelle2026 (default), or the separate original DSP/PISA/Isabelle2021 backend.
 - **A source-proof ablation.** A separate Isabelle-to-Lean draft experiment supplies
   only the source statement and masked reference context, allowing comparison
   with drafts informed by the original proof.
@@ -43,7 +43,8 @@ research problem.
 |---|---|---|---|
 | V1 | Isabelle/HOL → Lean 4 | Babel Formal | Mathematical drafts and JSONL export for an external DSP+ Sketch pipeline |
 | V2, ITPEval baseline | HOL Light → Isabelle/HOL | Babel Formal; Hundred Theorems | Complete candidate proofs checked with Isabelle2024 through ITPEval |
-| V2, DSP baseline | HOL Light → Isabelle/HOL | Babel Formal; Hundred Theorems | Isar sketches checked by original DSP/PISA with Isabelle2021 |
+| V2, DSP default | HOL Light → Isabelle/HOL | Babel Formal; Hundred Theorems | Isar sketches checked by native Isabelle2026 |
+| V2, original DSP baseline | HOL Light → Isabelle/HOL | Babel Formal; Hundred Theorems | Isar sketches checked by DSP/PISA/Isabelle2021 in `v2_dsp_pisa` |
 
 The current V2 extraction yields **163 candidate pairs across 16 Babel Formal
 topics** and **99 candidate pairs across 13 Hundred Theorems file groups**. These
@@ -61,6 +62,7 @@ flowchart TD
     D --> C[Complete Isabelle proof]
     C --> V[Isabelle2024 / ITPEval verification]
     D --> K[Isar proof sketch]
+    K --> N[Native Isabelle2026 completion — default]
     K --> P[Original DSP / PISA / Isabelle2021 completion]
 ```
 
@@ -75,7 +77,8 @@ Use **Python 3.10** for the main pipeline environment and **Python 3.12** for
 the separate vLLM server environment. The main environment covers data
 collection/extraction, API generation, and Isabelle/DSP compilation and
 verification orchestration. Formal prover installations are separate from pip
-dependencies; the DSP backend uses original PISA with Isabelle2021 and Java 11.
+dependencies; native DSP defaults to Isabelle2026. The separate PISA option uses
+Isabelle2021 and Java 11.
 
 ```bash
 git clone https://github.com/riverside234/itpeval-modify.git
@@ -187,7 +190,7 @@ and verifier settings.
 Verification establishes the selected theorem **relative to the supplied
 background**. Earlier masked helper lemmas remain admitted background facts;
 the selected target and generated intermediate claims must be proved. In the
-DSP path, `verified` reports the original PISA completion result. There is no
+DSP paths, `verified` reports the chosen backend's checked target completion. There is no
 separate replay stage. See [DSP setup and consolidated lab preflight](eval/pipeline/hol_light_to_isabelle/babel_formal_pipeline/v2_dsp/README.md).
 
 Run the regression suite without API credentials, a GPU, or native provers:
@@ -197,7 +200,7 @@ python -m unittest discover -s tests/hol_light_to_isabelle -p 'test_*.py'
 ```
 
 The suite covers extraction, masking, context preservation, cache invalidation,
-failure accounting, model-output handling, and the copied DSP/PISA checker.
+failure accounting, model-output handling, native Isabelle2026 and the copied DSP/PISA checker.
 Model and DSP transport tests use explicit fakes. Native Isabelle/PISA
 compatibility, GPU deployment, and proof success rates require separate lab
 runs; software regression results do not measure proof-transfer performance.
@@ -211,7 +214,8 @@ eval/pipeline/
 ├── hol_light_to_isabelle/
 │   ├── babel_formal_pipeline/       # V2: Babel extraction, prompts, and runners
 │   │   ├── v2_itpeval/             # Complete-proof generation and verification
-│   │   └── v2_dsp/                 # Original DSP/PISA checker and lab preflight
+│   │   ├── v2_dsp/                 # Default native Isabelle2026 checker and preflight
+│   │   └── v2_dsp_pisa/            # Original DSP/PISA/Isabelle2021 alternative
 │   └── hundred_theorems_pipeline/  # V2: dataset frontend using shared engines
 └── inference/                      # Shared API/vLLM configuration and client
 
@@ -223,9 +227,9 @@ vllm/                               # Isolated model-serving setup and diagnosti
 ## Attribution and license
 
 This fork builds on [ITPEval](https://github.com/lean-dojo/ITPEval) and uses its
-aligned benchmark material. The Isabelle DSP integration directly copies the original checker
+aligned benchmark material. The Isabelle2021 DSP/PISA integration directly copies the original checker
 from [Draft, Sketch, and Prove](https://github.com/albertqjiang/draft_sketch_prove);
-its upstream [license and notices](eval/pipeline/hol_light_to_isabelle/babel_formal_pipeline/v2_dsp/UPSTREAM_LICENSE.txt)
+its upstream [license and notices](eval/pipeline/hol_light_to_isabelle/babel_formal_pipeline/v2_dsp_pisa/UPSTREAM_LICENSE.txt)
 are retained. These upstream contributions are credited separately from this
 fork's extraction, prompting, orchestration, and inference extensions.
 

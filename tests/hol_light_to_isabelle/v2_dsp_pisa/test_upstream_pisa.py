@@ -9,9 +9,9 @@ import unittest
 from unittest.mock import Mock, patch
 
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import RESULTS_DIR, repo_path
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.upstream import checker as original
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.pisa_worker import ObservedChecker, BoundedStub
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig, PACKAGE, PisaFailure, run_job
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa.upstream import checker as original
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa.pisa_worker import ObservedChecker, BoundedStub
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa.runtime import DspConfig, PACKAGE, PisaFailure, run_job
 
 
 class UpstreamTests(unittest.TestCase):
@@ -91,7 +91,7 @@ class UpstreamTests(unittest.TestCase):
             checker._initialize()
 
     def test_protocol_delimiters_fail_before_starting_worker(self):
-        with patch("eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime.OwnedProcess") as process:
+        with patch("eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa.runtime.OwnedProcess") as process:
             for marker in ("<SEP>", "<apply to top level state>"):
                 with self.assertRaisesRegex(PisaFailure, "reserved PISA"):
                     run_job(DspConfig(), Path("unused"), {"formal": marker, "action": "prove"})
@@ -105,7 +105,7 @@ class UpstreamTests(unittest.TestCase):
             def run():
                 (directory/"result.json").write_text(json.dumps({"success":True,"request_id":"old","input_sha256":"old"}))
                 return 0
-            with patch("eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime.OwnedProcess") as process, patch.object(DspConfig,"environment",return_value={}):
+            with patch("eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa.runtime.OwnedProcess") as process, patch.object(DspConfig,"environment",return_value={}):
                 process.return_value.run.side_effect=run
                 with self.assertRaisesRegex(PisaFailure,"mismatched"):
                     run_job(DspConfig(),directory,{"formal":"proof","action":"prove","theory_name":"Test"})

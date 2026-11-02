@@ -7,8 +7,8 @@ import unittest
 from unittest.mock import patch
 
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import RESULTS_DIR, repo_path
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp import prepare_pisa as setup
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig, PISA_COMMIT, source_hash
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa import prepare_pisa as setup
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa.runtime import DspConfig, PISA_COMMIT, source_hash
 
 
 class PreparePisaTests(unittest.TestCase):
