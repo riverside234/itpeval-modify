@@ -125,6 +125,13 @@ class DspConfig:
         env["PYTHONPATH"] = os.pathsep.join([str(repo_path(".")), str(self.generated), str(self.root / "src/main/python")])
         return env
 
+    def normalize_isabelle_version(self, banner: str) -> str:
+        """Accept the official release banner while rejecting other releases."""
+        version = banner.split(":", 1)[0].strip()
+        if version != self.expected_isabelle_version:
+            raise ValueError(f"expected {self.expected_isabelle_version}, found {banner!r}")
+        return version
+
     def metadata(self):
         if os.name == "nt":
             raise RuntimeError("Run DSP/PISA/Isabelle2021 on the Linux lab host; offline tests work locally")
@@ -152,9 +159,8 @@ class DspConfig:
         def command(args):
             run = subprocess.run(args, capture_output=True, text=True, check=True, timeout=self.startup_timeout_s, env=env)
             return (run.stdout or run.stderr).strip()
-        version = command([str(self.executable), "version"])
-        if version != self.expected_isabelle_version:
-            raise ValueError(f"expected Isabelle2021, found {version!r}")
+        version_banner = command([str(self.executable), "version"])
+        version = self.normalize_isabelle_version(version_banner)
         java = command([self.java_bin, "-version"])
         if not re.search(r'version "11(?:[.\"]|$)', java):
             raise ValueError("original PISA needs Java 11: " + java)
@@ -163,7 +169,8 @@ class DspConfig:
                     for name in ("ISABELLE_HOME_USER", "ISABELLE_HEAPS", "ISABELLE_TMP_PREFIX")}
         for value in settings.values():
             repo_path(value)
-        result = {"backend": "dsp-pisa", "isabelle_version": version, "pisa_commit": actual,
+        result = {"backend": "dsp-pisa", "isabelle_version": version,
+            "isabelle_version_raw": version_banner, "pisa_commit": actual,
             "dsp_commit": DSP_COMMIT, "itpeval_commit": repository_commit(), "config": asdict(self),
             "java_version": java, "settings": settings, "pisa_jar_sha256": stamp["jar_sha256"],
             "generated_client_sha256": client_hashes, "dsp_checker_sha256": source_hash(PACKAGE / "upstream/checker.py"),

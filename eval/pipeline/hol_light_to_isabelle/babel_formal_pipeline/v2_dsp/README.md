@@ -18,7 +18,9 @@ The API and separate Python 3.12 vLLM inference options remain available.
 Download the Linux bundle from the official
 [Isabelle2021 installation page](https://www.isabelle.in.tum.de/website-Isabelle2021/installation.html)
 and extract it under `itpeval/_toolchains/Isabelle2021/`. Keep the archive under
-the repository too. The installed version must print exactly `Isabelle2021`;
+the repository too. The installed release must be `Isabelle2021`; its official
+version banner may include `: February 2021`. Metadata keeps the normalized release
+in `isabelle_version` and the full banner in `isabelle_version_raw`.
 `Isabelle2021-1` and later releases are different runtimes. For example, after
 downloading the archive:
 

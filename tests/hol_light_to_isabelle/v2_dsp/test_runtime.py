@@ -33,6 +33,21 @@ class RuntimeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.load({"isabelle_home": str(self.path.parent.parent.parent.parent.parent.parent)})
 
+    def test_official_isabelle2021_banner_normalizes_to_release_identity(self):
+        config = DspConfig()
+        for banner in ("Isabelle2021", "Isabelle2021: February 2021",
+                       "  Isabelle2021: February 2021\n"):
+            with self.subTest(banner=banner):
+                self.assertEqual("Isabelle2021", config.normalize_isabelle_version(banner))
+
+    def test_other_isabelle_releases_and_malformed_banners_are_rejected(self):
+        config = DspConfig()
+        for banner in ("Isabelle2021-1: December 2021", "Isabelle2024: May 2024",
+                       "Isabelle2026", "Isabelle20210", "prefix Isabelle2021", ""):
+            with self.subTest(banner=banner), self.assertRaises(ValueError) as error:
+                config.normalize_isabelle_version(banner)
+            self.assertIn(repr(banner), str(error.exception))
+
     def test_native_configuration_has_explicit_migration_error(self):
         for data in ({"replay_timeout_s": 1}, {"backend": "isabelle-native"}, {"expected_isabelle_version": "Isabelle2026"}):
             with self.subTest(data=data), self.assertRaises(ValueError):
