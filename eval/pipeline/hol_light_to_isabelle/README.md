@@ -1,7 +1,7 @@
 # HOL Light to Isabelle pipelines
 
 Both stages now support selectable inference backends. Existing commands use
-the GPT-5.6 Terra API defaults. Add `--llm-config
+the gpt-6.1-terra API defaults. Add `--llm-config
 eval/configs/inference/qwen_vllm.example.json` to a standalone generator,
 or `--sketch-llm-config` to a saved-Draft runner, for local Qwen inference.
 Start the server after `conda activate vllm` (Python 3.12); it keeps artifacts under
@@ -19,7 +19,7 @@ hol_light_to_isabelle/
 │   ├── prompt.py, generate_draft.py, sanitize_isabelle.py, theory_context.py
 │   ├── manifests/babel_targets.json
 │   ├── v2_itpeval/     # complete proof generation and Isabelle2024 checking
-│   └── v2_dsp/         # Draft/direct Sketch, native Isabelle2026 search and fresh replay
+│   └── v2_dsp/         # Draft/direct Sketch and original DSP/PISA Isabelle2021
 └── hundred_theorems_pipeline/
     ├── aligned_data.py, inventory.py, manifest.py, extract_hol_light.py
     ├── hol_syntax.py, masking.py
@@ -33,20 +33,20 @@ hol_light_to_isabelle/
 - [Hundred Theorems instructions](hundred_theorems_pipeline/README.md)
 
 Both use the same oracle/context, model-content, sampling, resume,
-verification, and DSP replay contracts. Hundred Theorems frontends reuse the
+verification, and DSP/PISA completion contracts. Hundred Theorems frontends reuse the
 execution engines in the Babel package with explicit dataset parameters.
 Changing a dataset does not require copying the prover implementation.
 
 Babel's existing output paths remain under
 `eval/results/hol_light_to_isabelle_v2/`. Hundred Theorems defaults to
 `eval/results/hol_light_to_isabelle_v2/hundred-theorems/`, with separate
-`v2-itpeval/` and `v2-dsp-isabelle2026/` results and work directories. Source checks prevent
+`v2-itpeval/` and `v2-dsp-pisa-isabelle2021/` results and work directories. Source checks prevent
 one dataset's records from entering the other's stage entry points.
 
 The small Python modules at the original package paths are compatibility
 aliases to `babel_formal_pipeline`. Existing scripts and saved Babel
-records/Drafts remain usable. Old PISA configurations/results require new
-native configuration and separate outputs. New scripts should use the dataset package:
+records/Drafts remain usable. Old native/PISA configurations and results require the new
+Isabelle2021 configuration and separate outputs. New scripts should use the dataset package:
 
 ```text
 eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.<stage>
@@ -54,8 +54,8 @@ eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.<stage>
 ```
 
 Each dataset's `v2_itpeval.run` and `v2_dsp.run` entry points accept saved
-Drafts. Native DSP also accepts `--sketch-source hol-light-proof --records ...`
-for direct Sketch generation. See [native DSP lab commands](babel_formal_pipeline/v2_dsp/README.md).
+Drafts. DSP also accepts `--sketch-source hol-light-proof --records ...`
+for direct Sketch generation. See [DSP/PISA lab commands](babel_formal_pipeline/v2_dsp/README.md).
 The previous Babel `run_babel` command remains available.
 
 The current aligned data yields 163 Babel candidates and 99 Hundred Theorems

@@ -3,11 +3,11 @@ from __future__ import annotations
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import Prompt, _required
 
 
-SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p5"
+SKETCH_PROMPT_VERSION = "babel_formal_dsp_pisa_isabelle2021_draft_p5"
 
 # Both input modes use the same target, background, and gap contract.
 ISABELLE_OUTPUT_RULES = (
-    "Construct one Isabelle2026/HOL Isar proof body for the exact oracle declaration "
+    "Construct one Isabelle2021/HOL Isar proof body for the exact oracle declaration "
     "in its supplied theory and locale context. Use standalone sledgehammer commands "
     "for unresolved proof obligations; a later prover will replace each with a "
     "checked proof that closes that obligation. A complete proof with no "

@@ -186,14 +186,14 @@ class StageTests(unittest.TestCase):
         self.assertTrue(all("hundred_theorems" in row["sketch_prompt_version"] for row in rows))
         self.assertTrue(all("sledgehammer" in row["isabelle_sketch"] for row in rows))
 
-    def test_dsp_search_replay_uses_own_directory_with_fake_transport(self):
+    def test_dsp_pisa_uses_own_directory_with_fake_transport(self):
         # This fixture exercises transport/control flow; it does not prove mathematics.
-        from v2_dsp.test_checker import FakeNative, CONFIG, BACKEND
+        from v2_dsp.test_checker import fake_job, CONFIG, BACKEND
         sketch = control_record("proof -\n  show True\n    sledgehammer\nqed")
         input_path = self.root/"sketches.jsonl"
         write_jsonl(input_path,[sketch])
         with patch(B+".v2_dsp.runtime.DspConfig.metadata",return_value=BACKEND), patch(
-                B+".v2_dsp.checker.NativeSearch",FakeNative):
+                B+".v2_dsp.checker.run_job",fake_job):
             results = prove_sketches(
                 config=CONFIG,input_path=input_path,output_path=self.root/"verified.jsonl",
                 prove_output=self.root/"prove.jsonl")
@@ -252,9 +252,9 @@ class StageTests(unittest.TestCase):
         self.assertEqual(99,report["record_count"])
         self.assertFalse([row for row in report["file_groups"] if row["issues"]])
 
-    def test_dsp_native_replay_enables_admissions_after_theory_not_documentation(self):
+    def test_dsp_context_enables_admissions_after_theory_not_documentation(self):
         from v2_dsp.test_checker import CONFIG
-        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.native_search import NativeSearch
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.pisa_context import prepare_context
         from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
         import time
         template = ('section \\<open>Documentation first\\<close>\n'
@@ -267,10 +267,7 @@ class StageTests(unittest.TestCase):
             isabelle_context_before_target=target.context_before_target,
             isabelle_proof_prefix=target.proof_prefix,
             isabelle_target_proof_span=list(target.proof_span)))
-        native = NativeSearch(CONFIG)
-        with patch.object(native,"encode_symbols",side_effect=lambda text:text), patch.object(native,"run_build",return_value=0):
-            result = native.replay(record,"by simp",directory=self.root/"native-replay",deadline=time.monotonic()+10)
-        source = Path(result["replay_theory_path"]).read_text()
+        _, source, _ = prepare_context(record, CONFIG)
         self.assertGreater(source.index("quick_and_dirty = true"), source.index("theory HeaderTest"))
         self.assertLess(source.index("quick_and_dirty = false"), source.index("lemma goal"))
 

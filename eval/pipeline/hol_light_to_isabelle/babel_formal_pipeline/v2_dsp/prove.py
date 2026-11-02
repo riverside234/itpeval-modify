@@ -1,4 +1,4 @@
-"""Fill DSP sketches and replay the completed individual target proofs."""
+"""Fill DSP sketches with the original PISA checker; no replay stage."""
 
 from __future__ import annotations
 
@@ -12,12 +12,12 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import (
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.checker import CHECKER_VERSION, Checker, verification_input
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.generate_sketch import DEFAULT_OUTPUT as DEFAULT_INPUT
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig
-from .input_contract import (MODES, align_samples, envelope, load_inputs, output_path as native_output_path,
+from .input_contract import (MODES, align_samples, envelope, load_inputs, output_path as pisa_output_path,
                              validate_artifacts, save_results)
 
 
-DEFAULT_OUTPUT = native_output_path(None, results_dir=RESULTS_DIR, filename="verified.jsonl", mode="draft")
-DEFAULT_PROVE_OUTPUT = native_output_path(None, results_dir=RESULTS_DIR, filename="prove.jsonl", mode="draft")
+DEFAULT_OUTPUT = pisa_output_path(None, results_dir=RESULTS_DIR, filename="verified.jsonl", mode="draft")
+DEFAULT_PROVE_OUTPUT = pisa_output_path(None, results_dir=RESULTS_DIR, filename="prove.jsonl", mode="draft")
 _DEFAULT_PROVE = object()
 
 
@@ -25,7 +25,7 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
                    output_path: str | None = None, prove_output=_DEFAULT_PROVE,
                    topic: str | None = None, target_key: str | None = None,
                    limit: int | None = None, resume: bool = True,
-                   replay_only: bool = False, expected: list[dict] | None = None,
+                   expected: list[dict] | None = None,
                    expected_samples: int | None = None, results_dir: str = RESULTS_DIR,
                    expected_source: str = "babel-formal", sketch_source: str = "draft") -> list[dict]:
     records = load_inputs(input_path, mode=sketch_source, artifacts=True, samples=True, topic=topic, target_key=target_key, limit=limit)
@@ -33,10 +33,10 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
     if not records:
         raise ValueError("no matching DSP Sketch records")
     require_source(records, expected_source)
-    output_path = native_output_path(output_path, results_dir=results_dir, filename="verified.jsonl",
+    output_path = pisa_output_path(output_path, results_dir=results_dir, filename="verified.jsonl",
                                      mode=sketch_source, records=records)
     if prove_output is _DEFAULT_PROVE:
-        prove_output = native_output_path(None, results_dir=results_dir, filename="prove.jsonl",
+        prove_output = pisa_output_path(None, results_dir=results_dir, filename="prove.jsonl",
                                           mode=sketch_source, records=records)
     if repo_path(input_path) == repo_path(output_path) or prove_output and repo_path(input_path) == repo_path(prove_output):
         raise ValueError("Sketch/Prove input and verification outputs must be distinct")
@@ -59,19 +59,18 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
         identity = fingerprint({
             **envelope(sketch_source), "record": record, "backend": backend,
             "config": config.__dict__, "checker_version": CHECKER_VERSION,
-            "replay_only": replay_only,
         })
         result = completed.get(identity) if backend_error is None else None
         if result is None:
             if backend_error is not None and not record.get("sketch_error"):
                 result = {**verification_input(record, sketch_source), **envelope(sketch_source), "verified": False,
-                          "prove_success": False, "replay_verified": False,
+                          "prove_success": False, "verification_method": "dsp_pisa_completion",
                           "checker_version": CHECKER_VERSION, "step_results": [],
                           "failure_category": "toolchain_error",
                           "verify_error": f"{type(backend_error).__name__}: {backend_error}"}
             else:
                 result = Checker(config, results_dir=results_dir).check(
-                    record, replay_only=replay_only, backend_metadata=backend)
+                    record, backend_metadata=backend)
             result["verify_fingerprint"] = identity
         results.append(result)
         print(f"DSP {'PASS' if result['verified'] else 'FAIL'} "
@@ -98,13 +97,12 @@ def main(*, default_input: str = DEFAULT_INPUT, default_output: str = DEFAULT_OU
     parser.add_argument("--target-key")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--no-resume", action="store_true")
-    parser.add_argument("--replay-only", action="store_true")
     args = parser.parse_args()
     validate_layout(args.expected_root)
     records = prove_sketches(
         config=DspConfig.load(args.config), input_path=args.input, output_path=args.output,
         prove_output=args.prove_output, topic=args.topic, target_key=args.target_key,
-        limit=args.limit, resume=not args.no_resume, replay_only=args.replay_only, results_dir=results_dir, expected_source=expected_source, sketch_source=args.sketch_source)
+        limit=args.limit, resume=not args.no_resume, results_dir=results_dir, expected_source=expected_source, sketch_source=args.sketch_source)
     print(json.dumps({"targets": len({key(row) for row in records}),
                       "verified_samples": sum(bool(row["verified"]) for row in records)}, indent=2))
 

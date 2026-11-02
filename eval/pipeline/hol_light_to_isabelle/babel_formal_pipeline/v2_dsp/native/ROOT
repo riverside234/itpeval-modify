@@ -1,3 +1,0 @@
-session DSP_Native = HOL +
-  options [document = false]
-  theories DSP_Native (global)

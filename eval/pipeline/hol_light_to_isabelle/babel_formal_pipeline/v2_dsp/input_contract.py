@@ -11,8 +11,8 @@ from ..inventory import inventory_hol_declarations
 from ..theory_context import validate_context, normalize_body
 from ..isabelle_syntax import tokens
 
-SCHEMA_VERSION = "hol_light_to_isabelle_dsp_v2"
-ISABELLE_VERSION = "Isabelle2026"
+SCHEMA_VERSION = "hol_light_to_isabelle_dsp_pisa_v1"
+ISABELLE_VERSION = "Isabelle2021"
 MODES = ("draft", "hol-light-proof")
 SKETCH_VALIDATOR_VERSION = "isabelle_sketch_structure_v2"
 CONTEXT_FIELDS = ("isabelle_statement", "isabelle_theory_template",
@@ -115,12 +115,12 @@ def validate_artifacts(records: list[dict], mode: str) -> None:
                 or row.get("sketch_source") != mode
                 or row.get("expected_isabelle_version") != ISABELLE_VERSION
                 or row.get("draft_used") is not (mode == "draft")):
-            raise ValueError("incompatible DSP artifact: use a separate Isabelle2026/mode output file; "
-                             "old PISA results cannot be resumed")
+            raise ValueError("incompatible DSP artifact: use a separate Isabelle2021/mode output file; "
+                             "old native/PISA results cannot be resumed")
         backend = row.get("backend_metadata") or {}
-        if backend and (backend.get("backend") != "isabelle-native"
+        if backend and (backend.get("backend") != "dsp-pisa"
                         or backend.get("isabelle_version") != ISABELLE_VERSION):
-            raise ValueError("incompatible native backend in reused DSP artifact")
+            raise ValueError("incompatible DSP/PISA backend in reused DSP artifact")
 
 
 def load_inputs(path, *, mode: str, samples: bool = False, artifacts: bool = False,
@@ -226,12 +226,11 @@ def summarize_results(records: list[dict], *, mode: str, expected=None, expected
         "draft": profiles(unique.values(), "draft_model") if mode == "draft" else [],
         "sketch": profiles(records, "sketch_model"),
     }
-    # Only count the current check's steps. Replay-only rows may also carry
-    # historical native_search metadata from the saved proof they replayed.
+    # Count only attempts from the current PISA check.
     steps = [row.get("step_results") or [] for row in records]
     gap_modes = {"heuristic", "hammer", "reconstruction"}
     summary["search_activity"] = {
-        "samples_with_native_search": sum(any(s.get("mode") in gap_modes | {"search"}
+        "samples_with_pisa_search": sum(any(s.get("mode") in gap_modes | {"search"}
                                               for s in sample) for sample in steps),
         "samples_with_gap_filling": sum(any(s.get("mode") in gap_modes for s in sample) for sample in steps),
         "samples_with_sledgehammer": sum(any(s.get("mode") == "hammer" for s in sample) for sample in steps),
@@ -260,7 +259,7 @@ def output_path(path, *, results_dir: str, filename: str, mode: str, config=None
             providers = {(r.get("draft_model") or {}).get("provider", "openai") for r in records or []}
             if providers != {"openai"} and providers:
                 profile = ("qwen_draft_" if providers == {"vllm"} else "mixed_drafts_") + profile
-    return str(Path(results_dir) / "v2-dsp-isabelle2026" /
+    return str(Path(results_dir) / "v2-dsp-pisa-isabelle2021" /
                ("direct" if mode == "hol-light-proof" else "draft") / profile / filename)
 
 

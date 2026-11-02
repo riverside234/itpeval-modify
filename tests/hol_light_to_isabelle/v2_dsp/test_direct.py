@@ -44,7 +44,7 @@ class DirectTests(unittest.TestCase):
             self.assertIn(self.record[field], prompt.user_prompt)
         for secret in ("DRAFT_SECRET", "DRAFT_MODEL_SECRET", "INFORMAL_SECRET", "COMPLETED_TARGET_SECRET"):
             self.assertNotIn(secret, prompt.user_prompt + prompt.system_prompt)
-        self.assertIn("Isabelle2026", prompt.system_prompt)
+        self.assertIn("Isabelle2021", prompt.system_prompt)
 
     def test_direct_mode_requires_all_source_fields_and_masking(self):
         for field in ("hol_light_statement", "hol_light_proof", "hol_light_reference_context"):
@@ -166,8 +166,8 @@ class DirectTests(unittest.TestCase):
         self.assertTrue(all(row["failure_category"] == "capability_error" for row in rows))
 
 
-    def test_direct_sketch_search_and_replay_handoff_for_both_datasets(self):
-        from v2_dsp.test_checker import BACKEND, CONFIG, FakeNative
+    def test_direct_sketch_pisa_handoff_for_both_datasets(self):
+        from v2_dsp.test_checker import BACKEND, CONFIG, fake_job
         from eval.pipeline.hol_light_to_isabelle.v2_dsp.prove import prove_sketches
         from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.extract_hol_light import extract_records as hundred
         for raw in (self.record, hundred(topic="030_the_ballot_problem", target_key="all_countings")[0]):
@@ -182,7 +182,7 @@ class DirectTests(unittest.TestCase):
                     generate_sketches(input_path=exported, output_path=sketches, sketch_source=MODE,
                                       expected_source=raw["source"], samples=2)
                 with patch(MODULE + "runtime.DspConfig.metadata", return_value=BACKEND), patch(
-                        MODULE + "checker.NativeSearch", FakeNative):
+                        MODULE + "checker.run_job", fake_job):
                     result = prove_sketches(config=CONFIG, input_path=sketches, output_path=verified,
                         prove_output=None, expected=rows, expected_samples=2, sketch_source=MODE,
                         expected_source=raw["source"], results_dir=str(self.path))

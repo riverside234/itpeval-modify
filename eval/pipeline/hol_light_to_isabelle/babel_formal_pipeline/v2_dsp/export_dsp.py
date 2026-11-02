@@ -1,12 +1,12 @@
-"""Normalize saved Drafts or extracted HOL Light proofs for native Isabelle Sketch."""
+"""Normalize saved Drafts or extracted HOL Light proofs for Isabelle Sketch."""
 from __future__ import annotations
 import argparse
 from ..common import LAB_REPO_ROOT, RESULTS_DIR, key, repo_path, require_source, validate_layout, write_jsonl, read_jsonl
 from ..generate_draft import DEFAULT_OUTPUT as DEFAULT_INPUT
 from .input_contract import (SCHEMA_VERSION, MODES, clean_record, envelope, input_metadata,
-                             load_inputs, output_path as native_output_path, validate_artifacts)
+                             load_inputs, output_path as pisa_output_path, validate_artifacts)
 
-DEFAULT_OUTPUT = native_output_path(None, results_dir=RESULTS_DIR, filename="inputs.jsonl", mode="draft")
+DEFAULT_OUTPUT = pisa_output_path(None, results_dir=RESULTS_DIR, filename="inputs.jsonl", mode="draft")
 
 
 def export_record(record: dict, *, expected_source: str = "babel-formal",
@@ -30,7 +30,7 @@ def export_inputs(*, input_path: str, output_path: str | None = None, sketch_sou
                   expected_source="babel-formal", results_dir=RESULTS_DIR) -> list[dict]:
     records = load_inputs(input_path, mode=sketch_source, topic=topic, target_key=target_key, limit=limit)
     require_source(records, expected_source)
-    destination = native_output_path(output_path, results_dir=results_dir,
+    destination = pisa_output_path(output_path, results_dir=results_dir,
                                            filename="inputs.jsonl", mode=sketch_source)
     if repo_path(input_path) == repo_path(destination):
         raise ValueError("source input and DSP export must be distinct")

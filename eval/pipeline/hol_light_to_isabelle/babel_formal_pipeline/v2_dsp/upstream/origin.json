@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/albertqjiang/draft_sketch_prove",
+  "commit": "647aa65ca7b89f4e0f7a65dc15b4e64a81af5e80",
+  "source_file": "autoformalization/checker.py",
+  "source_sha256_lf": "445fda6b54fe56a0b97b672885e19e915df316552e811b276bc99e237fd5d01f",
+  "copied_from_local": true,
+  "unchanged_methods_ast_sha256": {
+    "_parse_output": "36c3a10c6db860dc09f65c72deccdc7ce178f6f36c7a349dc8462113ddefa393",
+    "_run_step": "bd91d632ec9f1337294bdf6ca8c89a920cf41b4d01349bd4a71ff775354bc276",
+    "_run_sledgehammer": "8ff5016a24f87efab626fcd4e1c87666db1be311aa94779196ae24f4c0ddbcda",
+    "get_parsed": "33fa102ea615de75c6dabaea8b8fc6dccca3bf6aadac0950a916ba76586993c6"
+  }
+}

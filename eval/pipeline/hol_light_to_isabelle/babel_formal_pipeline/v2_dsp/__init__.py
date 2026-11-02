@@ -1,1 +1,1 @@
-"""Individual Isabelle2026 theorem Sketches, native search and fresh replay."""
+"""Individual Isabelle2021 theorem Sketches, original DSP/PISA proving."""

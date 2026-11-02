@@ -12,7 +12,7 @@ theorem. Draft generation is in this dataset package.
 | Pipeline | Package | Proof verification |
 |---|---|---|
 | v2-itpeval | v2_itpeval | Complete proof checked through ITPEval with Isabelle2024 |
-| v2-dsp | v2_dsp | Isar Sketch, native Isabelle2026 search, then a fresh replay build |
+| v2-dsp | v2_dsp | Isar Sketch checked by original DSP/PISA with Isabelle2021 |
 
 This dataset's code now lives in `babel_formal_pipeline/`. Existing JSONL
 files and default output paths remain usable. Both `v2_itpeval.run` and
@@ -95,52 +95,43 @@ full masked template.
 
 ## v2-dsp
 
-The DSP-style baseline now uses **Isabelle2026 native search and fresh replay**.
-It supports saved mathematical Drafts and direct completed HOL Light proof
-inputs. Isabelle installation and native acceptance will run on the lab
-computer. The separate ITPEval baseline continues to use Isabelle2024.
+The baseline uses **original DSP + PISA + Isabelle2021**, with the checker copied
+from the local original DSP repository. Saved mathematical Drafts and direct HOL
+Light proofs are supported. There is no separate replay stage.
 
-See [native DSP setup, both modes and lab commands](v2_dsp/README.md).
-The example configuration is `eval/configs/hol_light_to_isabelle/v2_dsp.example.json`.
-Old PISA configurations/results require new native configuration and outputs.
-No PISA, JAR, gRPC or original DSP checkout is needed by the active backend.
-
-The normal runner preflights the runtime and target contexts before model
-calls. A dry run previews the full selected prompt without native execution
-or inference. Standalone stages and legacy entry points remain available.
+See [DSP/PISA setup, both modes and consolidated lab preflight](v2_dsp/README.md).
+Use `eval/configs/hol_light_to_isabelle/v2_dsp_2021.example.json` as the config
+starting point. The normal runner checks capabilities and target contexts before
+model calls; `--dry-run` previews the selected prompt without native execution or
+inference. `--skip-sketch` consumes saved Sketches.
 
 ## Results and interpretation
 
-Native DSP outputs use schema `hol_light_to_isabelle_dsp_v2` under
-`eval/results/hol_light_to_isabelle_v2/v2-dsp-isabelle2026/`, separated by
-`draft`/`direct` and inference profile. Direct mode has no Draft fields or
-Draft-generation metadata. Draft mode retains the exact Draft as
-`informal_proof`. Both preserve the oracle and original preceding context.
+DSP outputs use schema `hol_light_to_isabelle_dsp_pisa_v1` under
+`eval/results/hol_light_to_isabelle_v2/v2-dsp-pisa-isabelle2021/`, separated by
+`draft`/`direct` and inference profile. Direct mode has no Draft fields. Draft
+mode retains the exact Draft as `informal_proof`. Both preserve the oracle and
+original preceding context. Old native artifacts are rejected; reuse records and
+Drafts, then regenerate DSP exports and Sketches with the new prompt/config.
 
-Keep the same original target cohort, sample counts and search budgets for
-the Draft/direct comparison on Isabelle2026. Failed Drafts, invalid contexts
-and missing Sketches remain in the denominator. The Isabelle2024 ITPEval
-baseline uses a different verifier/Sketch contract and is reported separately.
+Keep the same cohort, sample counts and budgets when comparing Draft/direct modes.
+Failed Drafts, contexts and Sketches remain in the denominator. Earlier masked
+helpers remain admitted background. Each selected target and generated intermediate
+claim must be proved. `verified` and `prove_success` both mean the original
+PISA completion result; `prove.jsonl` and `verified.jsonl` are two saved copies of
+that single result, without an additional proof replay.
 
-Earlier masked helpers remain admitted background. Each selected target and
-new intermediate claim must be proved. Native search must yield executable
-reconstructions and close the target and its scopes; `verified` additionally
-requires a fresh proof build without search helpers. Resume checks include
-the mode, consumed text, target context, inference profile, native
-release/adapter/session identity, provers and budgets.
+The Isabelle2024 ITPEval baseline retains its own verifier and output directories.
+Runtime/source/build identity, consumed context, prompt and model settings are part
+of DSP resume checks. Historical 2026 reports remain available.
 
 ## Verification
 
-Run the regression suite without an API key or native prover installation:
-
-~~~bash
+```bash
 python -m unittest discover -s tests/hol_light_to_isabelle -p 'test_*.py'
-~~~
+```
 
-The suite checks extraction across the 163 Babel and 99 Hundred Theorems
-targets, legacy imports, masked
-context identity and scopes, stale caches, failed Drafts, DSP reconstruction,
-replay failures, timeouts, and process ownership. DSP search tests use an
-explicit fake adapters; they do not establish native Isabelle2026
-compatibility. Run native preflight and the opt-in integration tests on the
-lab computer before the experiment.
+The offline suite covers all 163 Babel and 99 Hundred Theorems extracted targets,
+masked contexts, stale artifacts, failed Drafts, copied DSP behavior, process
+ownership and reports. Transport tests use explicit fakes. Run the consolidated
+PISA preflight on Linux to check actual Isabelle2021, ATP and dataset compatibility.

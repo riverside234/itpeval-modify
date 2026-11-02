@@ -1,4 +1,4 @@
-"""Search and replay Hundred Theorems sketches with the shared DSP checker."""
+"""Run original DSP/PISA on Hundred Theorems sketches."""
 
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp import prove as _engine
 from ..common import RESULTS_DIR, SOURCE

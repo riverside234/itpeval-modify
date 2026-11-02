@@ -1,0 +1,23 @@
+{
+  "src/main/python/PisaFlexibleClient.py": "a5fc48a63536a8c9da89df28185ef6f50c8f92b22e56a6d6d4aa056bbdfd30ae",
+  "src/main/protobuf/server.proto": "461b6cd04c714fa5771cd8571afbf2eafccf84ff3d6556367a9632ffb0c4c6d2",
+  "lib/scala-isabelle_2.13.jar": "38b7acd7e7efd8b32744e9855841b81010fbfcf6e481bf2c0ddca034281ceb20",
+  "project/build.properties": "6d3d010869d29a52ff8c191852532612e2c18e508ff067850c9bb93a1b254230",
+  "project/plugins.sbt": "964c1ccfda2de2f4af279e7faaa876636a5e09125c5f63ec21e88d70f344b0a3",
+  "src/main/scala/pisa/agent/CheckSyntax.scala": "f72c1f398ec3c8ede41b046e1d8f114fa3429d5c050a9b761a6bc30d6c08af18",
+  "src/main/scala/pisa/agent/CloseGaps.scala": "672f4ced1618831227f810ba4c295ea98fb8d53cab35096cd746ef2af240845f",
+  "src/main/scala/pisa/agent/ExtractWithHammer.scala": "8b09806da9e4679b5a0ede886487fd047483e1c1b7fe83efd61fbc06978854ee",
+  "src/main/scala/pisa/agent/OracleSearch.scala": "438a7b2d035d769568a0a2f8e88ec4ab8b14c5eaa185e4c80ec6fbbc84cd61fd",
+  "src/main/scala/pisa/agent/PisaConjecturerNormalOrder.scala": "98d767181589fd076b2ba4e609e6241d64d4fa84d8db541b2fbab7230e21f90e",
+  "src/main/scala/pisa/agent/PisaHammerTest.scala": "99358d2b78e731bfcf7623c5413a0446355528971a2637405e3733b3391fa91c",
+  "src/main/scala/pisa/agent/PisaSearch.scala": "67a0410a9ccdc45a0987a6f96b49d186a20ab5ed1f4cc26982de5a6902ea2b21",
+  "src/main/scala/pisa/agent/PisaStat.scala": "621eb816e925e94388beef05e7f3ef8fda5957157f5d33dcfcaa6d7ad48d6fa8",
+  "src/main/scala/pisa/agent/RefactorTest.scala": "df20e588b713fd2e95cf849fd2458fa10f276d2c85e7e47f2abe8c94f64793c5",
+  "src/main/scala/pisa/agent/TPUServerPisaSearch.scala": "8b92251daf8ff7a6027c7a3e3e1876485b8972237161939f053a89ee9123dfd3",
+  "src/main/scala/pisa/server/ConjecturerServer.scala": "ad73b8abb869e9299155a81d151939319fbe8f06d904a78ce20bd77323b90998",
+  "src/main/scala/pisa/server/HammFacts.scala": "ba28b67630df20930afd8d3884aa567b6839038067e522a9e0995712a8c91b34",
+  "src/main/scala/pisa/server/PisaOneStage.scala": "3469f010d6f46e03d3fe5d8797cf22958ef87191e4e9049b73bc69a189dd2854",
+  "src/main/scala/pisa/server/PisaOneStageServers.scala": "c89791a73abb7e71f255c7c1ea2ba5aead7f47ac721bcd18728600840dc4e81f",
+  "src/main/scala/pisa/server/PisaOS.scala": "6734536882b551712b9ffdf65a129394ceb6764e3f873b4a66c07ea392c6a955",
+  "src/main/scala/pisa/utils/TheoryManager.scala": "6880a6fbc3030100755ada04392a961b029fb8163213c93ffbe08a1493afc9c1"
+}

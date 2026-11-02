@@ -1,4 +1,4 @@
-"""One recorded Isabelle2026 acceptance run: setup, controls, datasets and diagnostic ZIP."""
+"""One original DSP/PISA Isabelle2021 acceptance run, saved with portable diagnostics."""
 from __future__ import annotations
 
 import argparse
@@ -7,19 +7,17 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
-import shutil
 import time
 import uuid
 import zipfile
 
 from ..common import fingerprint, key, latest_records, repo_path, validate_layout
-from .acceptance import (FIXTURE, PreparedNative, dataset_cases, proof_cases, run_fixture, run_proof_case)
+from .acceptance import dataset_cases, proof_cases, run_proof_case
 from .checker import CHECKER_VERSION, Checker
-from .native_search import NativeFailure, NativeSearch
-from .runtime import DspConfig, NATIVE_DIR, hash_file
+from .runtime import DspConfig, PACKAGE, PisaFailure, hash_file
 
-REPORT_VERSION = "isabelle2026_lab_preflight_v1"
-DEFAULT_REPORT_ROOT = "eval/preflight_results/isabelle2026"
+REPORT_VERSION = "dsp_pisa_isabelle2021_lab_preflight_v1"
+DEFAULT_REPORT_ROOT = "eval/preflight_results/pisa_isabelle2021"
 SENTINELS = {
     ("babel-formal", "circle_average"): "circleAverage_center_independent",
     ("hundred-theorems", "030_the_ballot_problem"): "all_countings",
@@ -107,9 +105,9 @@ def discover_records(*, dataset="both", inputs=(), topic=None, target_key=None, 
 
 def error_payload(exc):
     return {"ok": False, "error": f"{type(exc).__name__}: {exc}",
-            "failure_category": exc.category if isinstance(exc, NativeFailure) else
+            "failure_category": exc.category if isinstance(exc, PisaFailure) else
                 "timeout" if isinstance(exc, TimeoutError) else "preflight_error",
-            **(exc.details if isinstance(exc, NativeFailure) else {})}
+            **(exc.details if isinstance(exc, PisaFailure) else {})}
 
 
 class Report:
@@ -122,7 +120,7 @@ class Report:
                      "scope": scope, "checks": [], "active_check": None,
                      "diagnostic_bundle": "diagnostics.zip", "report_directory": str(self.path),
                      "acceptance_sha256": {p.name: hash_file(p) for p in
-                         (Path(__file__), Path(__file__).with_name("acceptance.py"), FIXTURE)}}
+                         (Path(__file__), Path(__file__).with_name("acceptance.py"), PACKAGE / "upstream/checker.py")}}
         self.checkpoint()
 
     def checkpoint(self):
@@ -135,7 +133,7 @@ class Report:
         self.data["ok"] = (self.data["status"] == "complete" and self.data["backend_ok"]
                            and self.data["contexts_ok"] and not self.data.get("bundle_error"))
         write_json(self.path / "report.json", self.data)
-        lines = ["# Isabelle2026 lab preflight", "", f"Status: **{self.data['status']}**; overall OK: **{self.data['ok']}**.",
+        lines = ["# DSP/PISA Isabelle2021 lab preflight", "", f"Status: **{self.data['status']}**; overall OK: **{self.data['ok']}**.",
                  f"Backend OK: **{self.data['backend_ok']}**; selected dataset checks OK: **{self.data['contexts_ok']}**.",
                  "", "Scope: `" + self.data["scope"]["selection"] + "`; " + str(self.data["scope"]["selected_contexts"]) + " contexts.",
                  "", "| Check | Domain | Status | Failure | Details |", "| --- | --- | --- | --- | --- |"]
@@ -194,33 +192,23 @@ class Report:
         return self.data
 
 
-def snapshot_infrastructure(parent: Path, report: Report):
-    destination = report.path / "infrastructure"
-    destination.mkdir(exist_ok=True)
-    for path in parent.iterdir():
-        if path.is_file() and (path.name in {"ROOT", "build.log", "build.processes.json", "command.json"}
-                               or path.suffix in {".ML", ".thy"}):
-            shutil.copyfile(path, destination / path.name)
-
-
 def run_lab_preflight(*, config_path, records, scope, selection_issues=(), output_root=DEFAULT_REPORT_ROOT):
     report = Report(output_root, scope)
-    pending = []
-    config = backend = parent = None
-    interrupted = False
+    pending, interrupted = [], False
+    config = backend = None
     def run(name, domain, fn, *, blocked=None):
-        pending.remove((name, domain))
         report.start(name, domain)
         started = time.monotonic()
         try:
             payload = {"ok": False, "error": blocked} if blocked else fn()
         except KeyboardInterrupt:
-            report.record(name, domain, {"ok": False, "error": "interrupted by user", "failure_category": "interrupted"},
-                          duration=time.monotonic() - started)
+            report.record(name, domain, {"ok": False, "error": "interrupted by user", "failure_category": "interrupted"})
+            pending.remove((name, domain))
             raise
         except Exception as exc:
             payload = error_payload(exc)
-        report.record(name, domain, payload, duration=time.monotonic() - started, blocked=bool(blocked))
+        report.record(name, domain, payload, duration=time.monotonic()-started, blocked=bool(blocked))
+        pending.remove((name, domain))
         return payload
     try:
         controls = proof_cases()
@@ -229,11 +217,11 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
             try:
                 proofs.extend(dataset_cases([row]))
             except Exception as exc:
-                issues.append({"target": key(row), "error": f"{type(exc).__name__}: {exc}"})
-        context_jobs = [("context_" + row["source"] + "_" + row["topic"] + "_" + row["target_key"], row) for row in records]
-        pending = [("input_selection", "selection"), ("metadata", "setup"), ("infrastructure", "setup"), ("native_fixture", "backend")]
+                issues.append({"target": key(row), "error": str(exc)})
+        jobs = [("context_" + row["source"] + "_" + row["topic"] + "_" + row["target_key"], row) for row in records]
+        pending = [("input_selection", "selection"), ("metadata", "setup"), ("pisa_transport", "setup")]
         pending += [(c.name, "backend") for c in controls] + [(c.name, "dataset_proof") for c in proofs]
-        pending += [(name, "context") for name, _ in context_jobs]
+        pending += [(name, "context") for name, _ in jobs]
         report.data["planned_checks"] = [dict(name=n, domain=d) for n, d in pending]
         run("input_selection", "selection", lambda: {"ok": not issues and bool(records), "issues": issues})
         def metadata():
@@ -242,39 +230,28 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
             write_json(report.path / "config.json", config.__dict__)
             backend = config.metadata()
             write_json(report.path / "backend.json", backend)
-            shutil.copyfile(NATIVE_DIR / "release_sources.json", report.path / "release_sources.json")
-            return {"ok": True, "backend_fingerprint": backend["backend_fingerprint"], "backend_file": "backend.json"}
+            return {"ok": True, "backend_fingerprint": backend["backend_fingerprint"]}
         setup = run("metadata", "setup", metadata)
-        def infrastructure():
-            nonlocal parent
-            try:
-                parent = NativeSearch(config).infrastructure(deadline=time.monotonic() + config.target_timeout_s)
-            except NativeFailure as exc:
-                log = exc.details.get("build_log_path")
-                if log and Path(log).parent.is_dir():
-                    snapshot_infrastructure(Path(log).parent, report)
-                raise
-            snapshot_infrastructure(parent[0], report)
-            return {"ok": True, "session": parent[1], "snapshot": "infrastructure"}
-        infra = run("infrastructure", "setup", infrastructure, blocked=None if setup["ok"] else "metadata/setup failed")
-        blocked = None if infra["ok"] else "native infrastructure unavailable; see setup diagnostics"
-        run("native_fixture", "backend", lambda: run_fixture(config, parent, report.path / "fixture"), blocked=blocked)
+        transport = run("pisa_transport", "setup", lambda: run_proof_case(controls[0], config=config, backend=backend,
+            directory=report.path / "transport"), blocked=None if setup["ok"] else "metadata/setup failed")
+        blocked = None if transport["ok"] else "PISA startup/transport unavailable; see setup diagnostics"
         for case, domain in [(c, "backend") for c in controls] + [(c, "dataset_proof") for c in proofs]:
-            run(case.name, domain, lambda case=case: run_proof_case(case, config=config, backend=backend, parent=parent,
+            run(case.name, domain, lambda case=case: run_proof_case(case, config=config, backend=backend,
                 directory=report.path / "cases" / case.name), blocked=blocked)
-        for name, row in context_jobs:
-            def context_check(row=row):
-                checked = Checker(config, results_dir=str(report.path), native_factory=lambda cfg: PreparedNative(cfg, parent)).check_context(
-                    row, backend_metadata=backend)
-                return {"ok": checked["baseline_ok"], "target": key(row), "result": checked}
-            run(name, "context", context_check, blocked=blocked)
+        for name, row in jobs:
+            def check(row=row):
+                result = Checker(config, results_dir=str(report.path)).check_context(row, backend_metadata=backend)
+                return {"ok": result["baseline_ok"], "target": key(row), "result": result}
+            run(name, "context", check, blocked=blocked)
     except KeyboardInterrupt:
         interrupted = True
     except Exception as exc:
         report.record("orchestration_error", "setup", error_payload(exc))
     finally:
+        completed = {(r["name"], r["domain"]) for r in report.data["checks"]}
         for name, domain in pending:
-            report.record(name, domain, {"ok": False, "error": "not executed because the run was interrupted or aborted"}, blocked=True)
+            if (name, domain) not in completed:
+                report.record(name, domain, {"ok": False, "error": "run interrupted or aborted"}, blocked=True)
         result = report.finish(interrupted=interrupted)
     return result
 

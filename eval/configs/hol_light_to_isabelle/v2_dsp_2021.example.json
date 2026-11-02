@@ -1,0 +1,16 @@
+{
+  "backend": "dsp-pisa",
+  "expected_isabelle_version": "Isabelle2021",
+  "isabelle_home": "itpeval/_toolchains/Isabelle2021",
+  "pisa_root": "external/Portal-to-ISAbelle",
+  "java_bin": "java",
+  "port": 9000,
+  "startup_timeout_s": 600,
+  "step_timeout_s": 60,
+  "hammer_timeout_s": 60,
+  "target_timeout_s": 1800,
+  "theory_imports": {
+    "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+    "Tagged_Division": "HOL-Analysis.Tagged_Division"
+  }
+}

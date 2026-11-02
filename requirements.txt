@@ -2,9 +2,11 @@
 # Run from the repository root: python -m pip install -r requirements.txt
 #
 # Install this repository and its dependencies from pyproject.toml:
-# anthropic, google-genai, httpx, openai, python-dotenv, requests.
+# anthropic, google-genai, httpx, openai, python-dotenv, requests,
+# grpcio, grpcio-tools, func-timeout (original DSP/PISA client).
 # Covers data collection/extraction, API generation, the vLLM HTTP client,
 # and orchestration of Isabelle/DSP proof compilation and verification.
-# Isabelle and other formal prover toolchains are installed separately.
+# Isabelle2021, Java 11, sbt, and the pinned PISA server are installed separately.
+# See eval/pipeline/hol_light_to_isabelle/babel_formal_pipeline/v2_dsp/README.md.
 # Keep vLLM/PyTorch in the separate Python 3.12 server environment.
 -e .

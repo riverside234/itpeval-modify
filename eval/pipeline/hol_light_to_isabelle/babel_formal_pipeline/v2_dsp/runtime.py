@@ -1,211 +1,204 @@
-"""Native Isabelle2026 configuration, release checks and owned process lifecycle."""
+"""Pinned original DSP/PISA runtime, with bounded jobs and owned-process cleanup."""
 from __future__ import annotations
 
+from dataclasses import asdict, dataclass, field, fields
 import hashlib
 import json
 import math
 import os
+from pathlib import Path
 import re
 import shlex
 import signal
 import subprocess
+import sys
 import time
-from dataclasses import asdict, dataclass, field, fields
-from pathlib import Path
+import zipfile
+import uuid
 
 from ..common import fingerprint, repo_path, repository_commit
 
-NATIVE_DIR = Path(__file__).resolve().parent / "native"
-RUNTIME_DIR = "itpeval/.runs/isabelle2026-native"
+PACKAGE = Path(__file__).resolve().parent
+PISA_COMMIT = "690eed41fa03fe04ec015bb375c668cd6fd94261"
+DSP_COMMIT = "647aa65ca7b89f4e0f7a65dc15b4e64a81af5e80"
+RUNTIME_DIR = "itpeval/.runs/isabelle2021-pisa"
 PROC_ROOT = Path("/proc")
 
 
-def hash_file(path: Path) -> str:
+def hash_file(path):
     digest = hashlib.sha256()
-    with path.open("rb") as stream:
+    with Path(path).open("rb") as stream:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
 
 
-def adapter_hashes() -> dict:
-    package = Path(__file__).resolve().parent
-    paths = list(NATIVE_DIR.iterdir()) + [package / name for name in (
-        "runtime.py", "native_search.py", "checker.py", "input_contract.py")]
-    paths += [package.parent / name for name in (
-        "theory_context.py", "sanitize_isabelle.py", "isabelle_syntax.py", "prompt.py", "common.py")]
-    return {path.name: hash_file(path) for path in paths if path.is_file()}
+def source_hash(path):
+    path = Path(path)
+    if path.suffix == ".jar":
+        return hash_file(path)
+    return hashlib.sha256(path.read_text(encoding="utf-8").encode()).hexdigest()
+
+
+class PisaFailure(RuntimeError):
+    def __init__(self, category, message, *, details=None):
+        super().__init__(message)
+        self.category, self.details = category, details or {}
 
 
 @dataclass(frozen=True)
 class DspConfig:
-    isabelle_home: str = "itpeval/_toolchains/Isabelle2026"
-    expected_isabelle_version: str = "Isabelle2026"
-    backend: str = "isabelle-native"
-    base_session: str = "HOL"
-    session_roots: tuple[str, ...] = ()
-    session_dependencies: tuple[str, ...] = ()
-    # Resolve relocated bare imports to the same theory in its owning session.
+    backend: str = "dsp-pisa"
+    expected_isabelle_version: str = "Isabelle2021"
+    isabelle_home: str = "itpeval/_toolchains/Isabelle2021"
+    pisa_root: str = "external/Portal-to-ISAbelle"
+    java_bin: str = "java"
+    port: int = 9000
+    startup_timeout_s: float = 600
+    step_timeout_s: float = 60
+    hammer_timeout_s: float = 60
+    target_timeout_s: float = 1800
     theory_imports: dict[str, str] = field(default_factory=dict)
-    threads: int = 4
-    provers: tuple[str, ...] | None = None
-    startup_timeout_s: float = 120
-    step_timeout_s: float = 10
-    hammer_timeout_s: float = 40
-    preplay_timeout_s: float = 10
-    target_timeout_s: float = 1200
-    replay_timeout_s: float = 1200
 
     def __post_init__(self):
-        if self.backend != "isabelle-native" or self.expected_isabelle_version != "Isabelle2026":
-            raise ValueError("v2-dsp requires isabelle-native/Isabelle2026; migrate the old PISA config")
-        if isinstance(self.threads, bool) or not isinstance(self.threads, int) or self.threads < 1:
-            raise ValueError("threads must be a positive integer")
-        for name in ("startup_timeout_s", "step_timeout_s", "hammer_timeout_s", "preplay_timeout_s",
-                     "target_timeout_s", "replay_timeout_s"):
+        if self.backend != "dsp-pisa" or self.expected_isabelle_version != "Isabelle2021":
+            raise ValueError("use the DSP/PISA Isabelle2021 configuration; Isabelle2026 is retired")
+        if isinstance(self.port, bool) or not isinstance(self.port, int) or not 1 <= self.port <= 65535:
+            raise ValueError("port must be an integer in 1..65535")
+        for name in ("startup_timeout_s", "step_timeout_s", "hammer_timeout_s", "target_timeout_s"):
             value = getattr(self, name)
-            if isinstance(value, bool) or not isinstance(value, (float, int)) or not math.isfinite(value) or value <= 0:
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
                 raise ValueError(name + " must be finite and positive")
-            # Timeout.apply deliberately ignores values below one millisecond.
-            if name in {"step_timeout_s", "hammer_timeout_s", "preplay_timeout_s"} and value < 0.001:
-                raise ValueError(name + " must be at least 0.001 seconds (Isabelle timeout resolution)")
-        for name in ("session_roots", "session_dependencies"):
-            value = getattr(self, name)
-            if not isinstance(value, (tuple, list)) or any(not isinstance(x, str) or not x.strip() for x in value):
-                raise ValueError(name + " must be a list of nonempty strings")
-        for name in [self.base_session, *self.session_dependencies]:
-            if not re.fullmatch(r"[A-Za-z_][A-Za-z_0-9.+-]*", name):
-                raise ValueError("invalid session name")
         if not isinstance(self.theory_imports, dict):
-            raise ValueError("theory_imports must map bare theory names to session-qualified names")
+            raise ValueError("theory_imports must be a mapping")
         for original, qualified in self.theory_imports.items():
             if (not isinstance(original, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]*", original)
-                    or not isinstance(qualified, str) or not re.fullmatch(
-                        r"[A-Za-z_][A-Za-z_0-9.+-]*\." + re.escape(original), qualified)):
-                raise ValueError("theory_imports may only qualify a bare name without changing its basename")
-        if self.provers is not None and (not isinstance(self.provers, (tuple, list)) or not self.provers
-                or any(not isinstance(x, str) or not re.fullmatch(r"[A-Za-z_0-9-]+", x) for x in self.provers)):
-            raise ValueError("provers must be null (native defaults) or a nonempty list of names")
+                or not isinstance(qualified, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z_0-9.+-]*\." + re.escape(original), qualified)):
+                raise ValueError("theory_imports must qualify a bare theory without changing its basename")
 
     @classmethod
-    def load(cls, path: str) -> DspConfig:
-        with repo_path(path).open(encoding="utf-8") as stream:
-            data = json.load(stream)
+    def load(cls, path):
+        data = json.loads(repo_path(path).read_text(encoding="utf-8"))
         if not isinstance(data, dict):
-            raise ValueError("DSP configuration must be a JSON object")
-        if any(name in data for name in ("pisa_python_path", "pisa_jar", "dsp_repo_root", "port", "java_bin", "server_class")):
-            raise ValueError("PISA configuration is obsolete: copy v2_dsp.example.json and install Isabelle2026; "
-                             "PISA/JAR/gRPC and the original DSP checkout are no longer used")
-        unknown = set(data) - {field.name for field in fields(cls)}
+            raise ValueError("DSP config must be a JSON object")
+        unknown = set(data) - {f.name for f in fields(cls)}
         if unknown:
-            raise ValueError("unknown native config fields: " + ", ".join(sorted(unknown)))
-        data["isabelle_home"] = str(repo_path(data.get("isabelle_home", cls.isabelle_home)))
-        for name in ("session_roots", "session_dependencies", "provers"):
-            if name in data and data[name] is not None:
-                if not isinstance(data[name], list):
-                    raise ValueError(name + " must be a JSON list")
-                data[name] = tuple(data[name])
-        data["session_roots"] = tuple(str(repo_path(p)) for p in data.get("session_roots", ()))
+            raise ValueError("obsolete/unknown DSP settings: " + ", ".join(sorted(unknown)) +
+                             "; copy v2_dsp_2021.example.json")
+        for name in ("isabelle_home", "pisa_root"):
+            if name in data:
+                data[name] = str(repo_path(data[name]))
         return cls(**data)
 
     @property
-    def executable(self) -> Path:
-        return repo_path(self.isabelle_home) / "bin" / "isabelle"
+    def root(self):
+        return repo_path(self.pisa_root)
 
-    def environment(self) -> dict:
-        """Use Isabelle's USER_HOME override; never change OS HOME or existing settings."""
-        root = repo_path(RUNTIME_DIR)
-        user = root / "user_home"
-        settings = user / ".isabelle" / "Isabelle2026" / "etc" / "settings"
+    @property
+    def jar(self):
+        return self.root / "target/scala-2.13/PISA-assembly-0.1.jar"
+
+    @property
+    def generated(self):
+        return self.root / "generated/python"
+
+    @property
+    def executable(self):
+        return repo_path(self.isabelle_home) / "bin/isabelle"
+
+    def environment(self):
+        runtime = repo_path(RUNTIME_DIR)
+        user = runtime / "user_home"
+        settings = user / ".isabelle/Isabelle2021/etc/settings"
         settings.parent.mkdir(parents=True, exist_ok=True)
-        temp = root / "tmp"
+        temp = runtime / "tmp"
         temp.mkdir(exist_ok=True)
-        expected = "\n".join([
-            "# Generated only for this isolated Isabelle2026 runtime.",
+        text = "\n".join([
+            "# Isolated Isabelle2021 settings for original DSP/PISA.",
+            "ISABELLE_HEAPS=" + shlex.quote(str(runtime / "heaps")),
             "ISABELLE_TMP_PREFIX=" + shlex.quote(str(temp / "isabelle")),
-            "ISABELLE_HEAPS=" + shlex.quote(str(root / "heaps")),
-            "ISABELLE_BROWSER_INFO=" + shlex.quote(str(root / "browser_info")),
-            "ISABELLE_COMPONENTS_BASE=" + shlex.quote(str(root / "components")), ""])
-        if not settings.is_file() or settings.read_text(encoding="utf-8") != expected:
-            settings.write_text(expected, encoding="utf-8")
+            "ISABELLE_BROWSER_INFO=" + shlex.quote(str(runtime / "browser_info")), ""])
+        if not settings.is_file() or settings.read_text(encoding="utf-8") != text:
+            settings.write_text(text, encoding="utf-8")
         env = {k: v for k, v in os.environ.items() if not k.startswith("ISABELLE_") and k != "BASH_ENV"}
-        env.update(USER_HOME=str(user), ISABELLE_IDENTIFIER="Isabelle2026",
-                   TMPDIR=str(temp), TMP=str(temp), TEMP=str(temp))
+        env.update(USER_HOME=str(user), ISABELLE_IDENTIFIER="Isabelle2021", TMPDIR=str(temp), TMP=str(temp), TEMP=str(temp))
+        env["PYTHONPATH"] = os.pathsep.join([str(repo_path(".")), str(self.generated), str(self.root / "src/main/python")])
         return env
 
-    def metadata(self) -> dict:
+    def metadata(self):
         if os.name == "nt":
-            raise RuntimeError("native Isabelle2026 runs on the Linux lab machine; local dry-run/offline tests are supported")
-        home = repo_path(self.isabelle_home)
-        if not self.executable.is_file():
-            raise FileNotFoundError("Install Isabelle2026 separately at " + str(home))
-        release = json.loads((NATIVE_DIR / "release_sources.json").read_text(encoding="utf-8"))
-        source_hashes = {}
-        for name, expected in release["sha256"].items():
-            actual = hash_file(home / name)
-            if actual != expected:
-                raise ValueError("Isabelle2026 release source mismatch: " + name)
-            source_hashes[name] = actual
+            raise RuntimeError("Run DSP/PISA/Isabelle2021 on the Linux lab host; offline tests work locally")
+        actual = subprocess.run(["git", "-C", str(self.root), "rev-parse", "HEAD"],
+            check=True, capture_output=True, text=True, timeout=30).stdout.strip()
+        if actual != PISA_COMMIT:
+            raise ValueError("PISA must be pinned to " + PISA_COMMIT + "; current HEAD=" + actual)
+        expected = json.loads((PACKAGE / "upstream/pisa_sources.json").read_text(encoding="utf-8"))
+        for name, digest in expected.items():
+            if source_hash(self.root / name) != digest:
+                raise ValueError("PISA source differs from the pinned original: " + name)
+        stamp = json.loads((self.root / "pisa-build.json").read_text(encoding="utf-8"))
+        if stamp.get("commit") != PISA_COMMIT or stamp.get("jar_sha256") != hash_file(self.jar):
+            raise ValueError("PISA build stamp missing/stale; run prepare_pisa --build")
+        if stamp.get("sources") != expected or stamp.get("build_sbt_sha256") != source_hash(self.root / "build.sbt"):
+            raise ValueError("PISA build does not match its pinned source/build settings")
+        client_hashes = {name: hash_file(self.generated / name) for name in ("server_pb2.py", "server_pb2_grpc.py")}
+        if client_hashes != stamp.get("generated_client_sha256"):
+            raise ValueError("generated PISA stubs changed; rerun prepare_pisa --build")
+        server_class = f"pisa/server/PisaOneStageServer{self.port}.class"
+        with zipfile.ZipFile(self.jar) as jar:
+            if server_class not in jar.namelist():
+                raise ValueError("PISA JAR does not provide port " + str(self.port))
         env = self.environment()
-        def command(*args):
-            run = subprocess.run([str(self.executable), *args], env=env, capture_output=True,
-                                 text=True, encoding="utf-8", errors="replace", check=True,
-                                 timeout=self.startup_timeout_s)
-            return run.stdout.strip()
-        version = command("version")
+        def command(args):
+            run = subprocess.run(args, capture_output=True, text=True, check=True, timeout=self.startup_timeout_s, env=env)
+            return (run.stdout or run.stderr).strip()
+        version = command([str(self.executable), "version"])
         if version != self.expected_isabelle_version:
-            raise ValueError(f"expected {self.expected_isabelle_version}; found {version!r}")
-        settings = {}
-        for name in ("ISABELLE_HOME_USER", "ISABELLE_HEAPS", "ISABELLE_TMP_PREFIX", "ISABELLE_HEAPS_SYSTEM"):
-            value = command("getenv", "-b", name)
+            raise ValueError(f"expected Isabelle2021, found {version!r}")
+        java = command([self.java_bin, "-version"])
+        if not re.search(r'version "11(?:[.\"]|$)', java):
+            raise ValueError("original PISA needs Java 11: " + java)
+        command([sys.executable, "-c", "import grpc, func_timeout, server_pb2, server_pb2_grpc, PisaFlexibleClient"])
+        settings = {name: command([str(self.executable), "getenv", "-b", name])
+                    for name in ("ISABELLE_HOME_USER", "ISABELLE_HEAPS", "ISABELLE_TMP_PREFIX")}
+        for value in settings.values():
             repo_path(value)
-            settings[name] = value
-        distribution_sources = {}
-        source_root = home / "src"
-        if source_root.is_dir():
-            for path in sorted(source_root.rglob("*")):
-                if path.is_file() and (path.name in {"ROOT", "ROOTS"} or path.suffix in {".thy", ".ML", ".scala"}):
-                    repo_path(path)
-                    distribution_sources[str(path.relative_to(home))] = hash_file(path)
-        heap_identity = {}
-        for variable in ("ISABELLE_HEAPS_SYSTEM", "ISABELLE_HEAPS"):
-            heap_root = repo_path(settings[variable])
-            for session in (self.base_session, *self.session_dependencies):
-                if heap_root.is_dir():
-                    for path in sorted(heap_root.rglob(session)):
-                        if path.is_file():
-                            repo_path(path)
-                            heap_identity[str(path)] = hash_file(path)
-        dependencies = {}
-        for directory in self.session_roots:
-            root = repo_path(directory)
-            if not (root / "ROOT").is_file() and not (root / "ROOTS").is_file():
-                raise FileNotFoundError("session root must contain ROOT or ROOTS: " + str(root))
-            for path in sorted(root.rglob("*")):
-                if path.is_file() and (path.name in {"ROOT", "ROOTS"} or path.suffix in {".thy", ".ML"}) and not any(
-                        part in {".git", "heaps", "browser_info", "__pycache__"} for part in path.relative_to(root).parts):
-                    repo_path(path)
-                    dependencies[str(path)] = hash_file(path)
-        # Track external prover binaries/settings, without retaining huge executable contents.
-        components = {}
-        contrib = home / "contrib"
-        if contrib.is_dir():
-            for component in sorted(contrib.iterdir()):
-                if component.is_dir() and any(component.name.lower().startswith(prefix) for prefix in
-                        ("e-", "vampire-", "verit-", "z3-", "cvc4-", "cvc5-", "spass-", "zipperposition-")):
-                    components[component.name] = {str(p.relative_to(component)): hash_file(p)
-                        for p in sorted(component.rglob("*")) if p.is_file() and (
-                            p.name in {"settings", "VERSION", "version"} or (os.access(p, os.X_OK) and not p.suffix in {".so", ".jar"}))}
-        data = {"backend": self.backend, "isabelle_version": version,
-                "isabelle_executable": str(self.executable), "release_sources": source_hashes,
-                "distribution_components": components, "native_adapter_sha256": adapter_hashes(),
-                "distribution_sources_sha256": fingerprint(distribution_sources),
-                "distribution_source_file_count": len(distribution_sources), "session_heaps_sha256": heap_identity,
-                "session_sources_sha256": dependencies, "settings": settings,
-                "itpeval_commit": repository_commit(), "config": asdict(self),
-                "background_policy": "earlier_masked_helpers_admitted"}
-        data["backend_fingerprint"] = fingerprint(data)
-        return data
+        result = {"backend": "dsp-pisa", "isabelle_version": version, "pisa_commit": actual,
+            "dsp_commit": DSP_COMMIT, "itpeval_commit": repository_commit(), "config": asdict(self),
+            "java_version": java, "settings": settings, "pisa_jar_sha256": stamp["jar_sha256"],
+            "generated_client_sha256": client_hashes, "dsp_checker_sha256": source_hash(PACKAGE / "upstream/checker.py"),
+            "adapter_sha256": {name: source_hash(PACKAGE / name) for name in
+                ("checker.py", "runtime.py", "pisa_worker.py", "pisa_context.py", "input_contract.py")},
+            "replay_enabled": False, "server_limits": "Original PISA: 10s transitions; 40s normalhammer"}
+        result["backend_fingerprint"] = fingerprint(result)
+        return result
+
+
+def run_job(config, directory, request):
+    """Run the copied checker in an isolated worker; never build/replay a proof."""
+    # Original PISA uses these literal strings as its transport framing.
+    if any(marker in request["formal"] for marker in ("<SEP>", "<apply to top level state>")):
+        raise PisaFailure("context_error" if request["action"] == "context" else "rejected_proof",
+                          "theory text contains a reserved PISA protocol delimiter")
+    directory.mkdir(parents=True, exist_ok=True)
+    request = {**request, "request_id": uuid.uuid4().hex}
+    request["input_sha256"] = fingerprint(request)
+    request_path = directory / "input.json"
+    request_path.write_text(json.dumps({"config": asdict(config), "request": request}, ensure_ascii=False, indent=2), encoding="utf-8")
+    command = [sys.executable, "-m", __package__ + ".pisa_worker", str(request_path)]
+    (directory / "command.json").write_text(json.dumps(command), encoding="utf-8")
+    process = OwnedProcess(command, directory=repo_path("."), env=config.environment(),
+        log_path=directory / "worker.log", timeout_s=config.target_timeout_s,
+        deadline=time.monotonic() + config.target_timeout_s)
+    try:
+        code = process.run()
+        result = json.loads((directory / "result.json").read_text(encoding="utf-8"))
+        if code != 0 or result.get("request_id") != request["request_id"] or result.get("input_sha256") != request["input_sha256"]:
+            raise PisaFailure("worker_failure", "PISA worker exited or returned a mismatched result")
+        return result
+    except (OSError, ValueError, TimeoutError) as exc:
+        raise PisaFailure("timeout" if isinstance(exc, TimeoutError) else "worker_failure", str(exc),
+                          details={"workdir": str(directory), "worker_log": str(directory / "worker.log")}) from exc
 
 
 class OwnedProcess:
@@ -303,7 +296,7 @@ class OwnedProcess:
         started = time.monotonic()
         expires = min(started + self.timeout, self.deadline)
         if expires <= started:
-            raise TimeoutError("native whole-target deadline exceeded")
+            raise TimeoutError("PISA whole-target deadline exceeded")
         startup_expires = (min(expires, started + self.startup_timeout)
                            if self.startup_timeout is not None else None)
         self.directory.mkdir(parents=True, exist_ok=True)
@@ -318,12 +311,12 @@ class OwnedProcess:
                     now = time.monotonic()
                     remaining = expires - now
                     if remaining <= 0:
-                        raise TimeoutError("native build deadline exceeded; inspect " + str(self.log_path))
+                        raise TimeoutError("PISA job deadline exceeded; inspect " + str(self.log_path))
                     if startup_expires is not None:
                         if self.ready_path.is_file():
                             startup_expires = None
                         elif now >= startup_expires:
-                            raise TimeoutError("native worker startup deadline exceeded; inspect " + str(self.log_path))
+                            raise TimeoutError("PISA worker startup deadline exceeded; inspect " + str(self.log_path))
                         else:
                             remaining = min(remaining, startup_expires - now)
                     try:

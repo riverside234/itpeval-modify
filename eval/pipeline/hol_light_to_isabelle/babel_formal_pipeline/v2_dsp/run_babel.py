@@ -1,4 +1,4 @@
-"""Run saved-Draft or direct HOL Light Sketch with DSP-style native Isabelle2026."""
+"""Run saved-Draft or direct HOL Light Sketch with original DSP/PISA Isabelle2021."""
 from __future__ import annotations
 
 import argparse
@@ -35,7 +35,6 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
     parser.add_argument("--no-resume", action="store_true")
     parser.add_argument("--fail-fast", action="store_true")
     parser.add_argument("--skip-sketch", action="store_true")
-    parser.add_argument("--skip-prove", action="store_true", help="Replay saved completed --prove-output proofs")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     validate_layout(args.expected_root)
@@ -80,7 +79,7 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
         sketch_source=mode, expected_source=expected_source, results_dir=results_dir,
         continue_on_error=not args.fail_fast)
     run_dir = str(Path(args.output).parent)
-    if not args.skip_sketch and not args.skip_prove:
+    if not args.skip_sketch:
         blocked = {}
         try:
             backend = config.metadata()
@@ -97,7 +96,7 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
                         "error": json.dumps(check),
                     }
                     if check.get("baseline_ok"):
-                        capability_error = "native capability controls failed: " + json.dumps(check)
+                        capability_error = "PISA capability controls failed: " + json.dumps(check)
                         break
                     if args.fail_fast:
                         raise RuntimeError("target context preflight failed: " + json.dumps(check))
@@ -109,17 +108,17 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
             if args.fail_fast:
                 raise
             blocked = {key(row): {"failure_category": "toolchain_error",
-                                  "error": "native preflight failed before inference: " + str(exc)} for row in exported}
+                                  "error": "PISA preflight failed before inference: " + str(exc)} for row in exported}
         generate_sketches(input_path=args.dsp_output, output_path=args.sketch_output, **filters,
             samples=args.samples, resume=not args.no_resume, continue_on_error=not args.fail_fast,
             blocked_targets=blocked, llm_config=llm, sketch_source=mode, expected_source=expected_source,
             prompt_builder=builder, prompt_version=version, results_dir=results_dir)
-    proof_input = args.prove_output if args.skip_prove else args.sketch_output
+    proof_input = args.sketch_output
     if not repo_path(proof_input).is_file():
-        parser.error("requested saved Sketch/Prove artifact does not exist")
+        parser.error("requested saved Sketch artifact does not exist")
     results = prove_sketches(config=config, input_path=proof_input, output_path=args.output,
-        prove_output=None if args.skip_prove else args.prove_output, **filters,
-        resume=not args.no_resume, replay_only=args.skip_prove, expected=exported,
+        prove_output=args.prove_output, **filters,
+        resume=not args.no_resume, expected=exported,
         expected_samples=args.samples, results_dir=run_dir, sketch_source=mode, expected_source=expected_source)
     summary_path = repo_path(args.output).with_suffix(".summary.json")
     print(summary_path.read_text(encoding="utf-8"))

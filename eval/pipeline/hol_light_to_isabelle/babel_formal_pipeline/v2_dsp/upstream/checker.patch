@@ -1,0 +1,161 @@
+--- original/autoformalization/checker.py
++++ upstream/checker.py
+@@ -1,18 +1,12 @@
+-import os
+-import shutil
+-import json
+-import signal
+-import subprocess
+-import psutil
++"""Copied from local draft_sketch_prove/autoformalization/checker.py (647aa65).
++See ORIGIN.md and checker.patch for the small integration changes.
++"""
+ import time
+ 
+-from autoformalization.utils import get_info_from_response_path
+ 
+-
+-try:
+-    from PisaFlexibleClient import initialise_env
+-except:
+-    print("Set $PISA_PATH to /yourpath/to/Portal-to-ISAbelle/src/main/python")
++def initialise_env(*args, **kwargs):
++    from PisaFlexibleClient import initialise_env as create
++    return create(*args, **kwargs)
+ 
+ 
+ class Checker(object):
+@@ -33,6 +27,9 @@
+             isa_path=self.isa_path,
+             theory_file_path=self.theory_file
+         )
++        if not env.successful_starting:
++            detail = getattr(env.stub, "last_error", "")
++            raise RuntimeError("PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: " + detail)
+         print("Start initialising environment")
+         env.post('<initialise>')
+         return env
+@@ -43,8 +40,6 @@
+         except:
+             print("env.post('exit') timed out")
+             pass
+-        os.system("ps aux | grep Isabelle | awk '{print $2}' | xargs kill -9 > /dev/null 2>&1")
+-        os.system("ps aux | grep poly | awk '{print $2}' | xargs kill -9 > /dev/null 2>&1")
+ 
+     def _parse_output(self, obs):
+         """Parse the sledgehammer output, otherwise return an empty string"""
+@@ -83,10 +78,11 @@
+         env = self._initialize()
+ 
+         # Wrap and parse theorem
+-        theory = Checker.minif2f_wrap_theorem(formal)
++        theory = formal  # Caller supplies the original dataset header/prefix/target.
+         steps = Checker.get_parsed(env, theory)
+ 
+         done = False
++        reward = 0.0
+         reason = ''
+         success = False
+         step_results = []
+@@ -105,11 +101,11 @@
+                     success = False
+                     done = False
+                     break
+-            except:
+-                # Timeout - end the proof attempt
++            except Exception as exc:
++                # RPC/step failure - end the proof attempt
+                 success = False
+                 done = False
+-                reason = 'timeout (%d)' % len(step_results)
++                reason = '%s: %s' % (type(exc).__name__, exc)
+                 step_results.append(dict(index=i, step=step, output=''))
+                 break
+ 
+@@ -124,7 +120,8 @@
+             'reason': reason,
+             'num_steps': len(steps),
+             'last_step': len(step_results),
+-            'step_results': step_results
++            'step_results': step_results,
++            'final_state': tls_name,
+         }
+         # Exit environment
+         self._exit(env)
+@@ -147,76 +144,3 @@
+         steps = [s for s in steps if s != '$' and s.strip() != '']
+         return steps
+ 
+-
+-def evaluate_one_problem(
+-    datapath, 
+-    dump_path="/private/home/aqj/workdir/hongwu_AUTOF_MINIF2F/2022_08_19_07_47_41/data/evaluation", 
+-    isa_path="/private/home/aqj/Isabelle2021", 
+-    pisa_path="/large_experiments/theorem/aqj/third_party_software/pisa_jars", 
+-    afp_path="/private/home/aqj/afp-2021-10-22"
+-):
+-    file_info = get_info_from_response_path(datapath)
+-
+-    job_id = os.environ.get("SLURM_JOB_ID", None)
+-    if os.path.exists("/scratch/slurm_tmpdir/") and job_id is not None:
+-        tmp_dir = f"/scratch/slurm_tmpdir/{job_id}"
+-        if not os.path.exists(tmp_dir):
+-            print(
+-                f"/scratch/slurm_tmpdir/{job_id} not found! not setting TMPDIR"
+-            )
+-            return
+-        print(f"Setting TMPDIR to {tmp_dir}")
+-        os.environ["TMPDIR"] = tmp_dir
+-    else:
+-        raise AssertionError("Not setting TMPDIR")
+-
+-    SLURM_ARRAY_TASK_ID = os.environ.get("SLURM_ARRAY_TASK_ID", None)
+-    SLURM_ARRAY_TASK_ID = int(SLURM_ARRAY_TASK_ID)
+-
+-    residue = SLURM_ARRAY_TASK_ID % 200
+-    port = residue + 8000
+-    jar_path = os.path.join(pisa_path, f"pisa_copy{residue}.jar")
+-
+-    # Copy over the Isabelle directory
+-    copied_isa_path = os.path.join(tmp_dir, f"Isabelle2021_{SLURM_ARRAY_TASK_ID}")
+-    if not os.path.exists(copied_isa_path):
+-        shutil.copytree(isa_path, copied_isa_path, symlinks=True)
+-
+-    # Copy over the AFP directory
+-    copied_afp_path = os.path.join(tmp_dir, f"afp_copy_{SLURM_ARRAY_TASK_ID}")
+-    if not os.path.exists(copied_afp_path):
+-        shutil.copytree(afp_path, copied_afp_path, symlinks=True)
+-    minif2f_working_directory = os.path.join(copied_afp_path, "thys", "Symmetric_Polynomials")
+-    minif2f_theory_filepath = os.path.join(minif2f_working_directory, "Interactive.thy")
+-
+-    print("port:", port)
+-    sub = subprocess.Popen(["java", "-cp", jar_path, f"pisa.server.PisaOneStageServer{port}"]).pid
+-    print(f"Server started with pid {sub}")
+-    time.sleep(10)
+-
+-    checker = Checker(
+-        working_dir=minif2f_working_directory,
+-        isa_path=copied_isa_path,
+-        theory_file=minif2f_theory_filepath,
+-        port=port,
+-    )
+-
+-    result = checker.check(file_info["theorem"] + "\n" + file_info["proof"])
+-    dump_file_path = os.path.join(dump_path, f"{datapath.split('/')[-1].rstrip('.json')}_eval.json")
+-    json.dump(
+-        {
+-            "id": file_info["id"],
+-            "generation_params": file_info["generation_params"],
+-            "success": result["success"],
+-            "result": result,
+-        }, open(dump_file_path, "w")
+-    )
+-
+-    try:
+-        parent = psutil.Process(sub)
+-        children = parent.children(recursive=True)
+-        for process in children:
+-            process.send_signal(signal.SIGTERM)
+-        parent.send_signal(signal.SIGTERM)
+-    except psutil.NoSuchProcess:
+-        pass

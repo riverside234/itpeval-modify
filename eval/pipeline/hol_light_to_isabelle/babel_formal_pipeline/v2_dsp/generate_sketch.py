@@ -1,4 +1,4 @@
-"""Generate Isabelle2026 Sketches from saved Drafts or completed HOL Light proofs."""
+"""Generate Isabelle2021 Sketches from saved Drafts or completed HOL Light proofs."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import (
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import normalize_visible_content
 from .input_contract import (MODES, envelope, clean_record, input_metadata, load_inputs,
                              validate_artifacts, normalize_sketch, SKETCH_VALIDATOR_VERSION, draft_provenance,
-                             output_path as native_output_path)
+                             output_path as pisa_output_path)
 from .direct_sketch_prompt import build_direct_sketch_prompt, DIRECT_PROMPT_VERSION
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.export_dsp import DEFAULT_OUTPUT as DEFAULT_INPUT
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.sketch_prompt import (
@@ -24,7 +24,7 @@ from eval.pipeline.proof_transfer.llm import call_draft_model, resolve_model_con
 from eval.pipeline.inference.client import visible_text
 
 
-DEFAULT_OUTPUT = native_output_path(None, results_dir=RESULTS_DIR, filename="sketches.jsonl", mode="draft")
+DEFAULT_OUTPUT = pisa_output_path(None, results_dir=RESULTS_DIR, filename="sketches.jsonl", mode="draft")
 
 
 def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | None = None,
@@ -56,7 +56,7 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
         llm_config, model=model, reasoning_effort=reasoning_effort,
         max_output_tokens=max_output_tokens, default_effort="high",
         dry_run=dry_run)
-    output_path = native_output_path(output_path, results_dir=results_dir, filename="sketches.jsonl",
+    output_path = pisa_output_path(output_path, results_dir=results_dir, filename="sketches.jsonl",
                                      mode=sketch_source, config=config, records=records)
     if dry_run:
         from .export_dsp import export_record

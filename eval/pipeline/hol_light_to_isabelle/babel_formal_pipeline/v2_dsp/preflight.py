@@ -1,4 +1,4 @@
-"""Native capability gate and extracted-record context checks, without model calls."""
+"""PISA capability gate and extracted-record context checks, without model calls."""
 from __future__ import annotations
 
 import argparse
@@ -8,7 +8,7 @@ from ..common import LAB_REPO_ROOT, RESULTS_DIR, key, latest_records, repo_path,
 from ..extract_hol_light import DEFAULT_OUTPUT as DEFAULT_INPUT
 from ..sanitize_isabelle import sanitize_target
 from .checker import Checker
-from .native_search import NativeFailure
+from .runtime import PisaFailure
 from .export_dsp import export_record
 from .input_contract import MODES
 from .runtime import DspConfig
@@ -59,10 +59,10 @@ def preflight(record: dict, *, config: DspConfig, controls: bool = True,
                 "valid_control_verified": bool(good["verified"]),
                 "hammer_control_verified": bool(hammer["verified"]) and any(
                     row["mode"] == "hammer" and row["success"] for row in hammer["step_results"]),
-                "invalid_control_rejected": not bad["verified"] and bad["failure_category"] == "sketch_step_failure",
+                "invalid_control_rejected": not bad["verified"] and bad["failure_category"] == "proof_failure",
                 "admitted_control_rejected": not admitted["verified"] and admitted["failure_category"] == "rejected_proof",
-                "self_reference_rejected": not self_reference["verified"] and self_reference["failure_category"] == "sketch_step_failure",
-                "later_reference_rejected": not later["verified"] and later["failure_category"] == "sketch_step_failure",
+                "self_reference_rejected": not self_reference["verified"] and self_reference["failure_category"] == "proof_failure",
+                "later_reference_rejected": not later["verified"] and later["failure_category"] == "proof_failure",
                 "controls": {"valid": good, "hammer": hammer, "invalid": bad, "admitted": admitted,
                              "self_reference": self_reference, "later_reference": later},
             })
@@ -73,11 +73,11 @@ def preflight(record: dict, *, config: DspConfig, controls: bool = True,
             result["ok"] = True
     except Exception as exc:
         result["error"] = f"{type(exc).__name__}: {exc}"
-        if isinstance(exc, NativeFailure):
+        if isinstance(exc, PisaFailure):
             result.update(exc.details)
-        result["failure_category"] = (exc.category if isinstance(exc, NativeFailure) else
+        result["failure_category"] = (exc.category if isinstance(exc, PisaFailure) else
                                       "timeout" if isinstance(exc, TimeoutError) else "preflight_error")
-    directory = repo_path(results_dir) / "preflight"
+    directory = repo_path("eval/preflight_results/pisa_isabelle2021/single-target")
     directory.mkdir(parents=True, exist_ok=True)
     from ..common import fingerprint
     path = directory / (fingerprint({"key": key(record), "mode": sketch_source})[:20] + ".json")

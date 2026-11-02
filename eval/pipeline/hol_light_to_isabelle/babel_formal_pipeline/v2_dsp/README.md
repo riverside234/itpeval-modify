@@ -1,491 +1,194 @@
-# DSP-style native Isabelle2026
+# Original DSP + PISA + Isabelle2021
 
-This baseline uses the original DSP heuristic ordering with repository-owned
-Isabelle/ML search and fresh proof replay. It is distinct from a reproduction
-of the original PISA-based DSP stack. Both Babel Formal and Hundred Theorems
-support two Sketch inputs on this same backend:
+Both datasets now use the checker copied directly from the local
+`mathLLM/draft_sketch_prove/autoformalization/checker.py`. It tries DSP's original
+eleven heuristic methods, then PISA's `normalhammer`, and accepts the original
+PISA completion result. **There is no separate replay stage.** The Isabelle2024
+baseline remains in `v2_itpeval/`.
 
-| Input mode | Input file | Model input |
-| --- | --- | --- |
-| `draft` (default) | `--drafts` saved successful/failed Draft records | Saved mathematical Draft, oracle declaration and original preceding Isabelle context |
-| `hol-light-proof` | `--records` extracted records | Selected completed HOL Light statement/proof, required proof-masked source reference, oracle and preceding Isabelle context |
+[Copied checker](upstream/checker.py) · [Provenance and patch](upstream/ORIGIN.md) ·
+[Review of the pulled reports](PROVER_REVIEW.md)
 
-Direct mode never generates a Draft and excludes Draft text/generation metadata
-from its normalized artifacts. GPT API and Qwen/vLLM remain selectable with
-`--sketch-llm-config`. Only visible final response content is stored.
-The separate `v2_itpeval` pipeline continues to use its Isabelle2024 configuration.
+## Lab setup
 
-## Prompt contracts and revisions
+Use Linux, the main **Python 3.10** environment, **Isabelle2021**, **Java 11**,
+Git, and `sbt` on `PATH`. PISA's project selects sbt 1.4.3 and Scala 2.13.
+The API and separate Python 3.12 vLLM inference options remain available.
 
-Both datasets use the same instructions with dataset-specific prompt versions:
+Download the Linux bundle from the official
+[Isabelle2021 installation page](https://www.isabelle.in.tum.de/website-Isabelle2021/installation.html)
+and extract it under `itpeval/_toolchains/Isabelle2021/`. Keep the archive under
+the repository too. The installed version must print exactly `Isabelle2021`;
+`Isabelle2021-1` and later releases are different runtimes. For example, after
+downloading the archive:
 
-| Stage | Input and expected output | Current version suffix |
-| --- | --- | --- |
-| Draft | Completed selected HOL Light proof, masked source reference and oracle context -> mathematical claims with justifications in target vocabulary | `hol_light_to_isabelle_p3` |
-| Draft to Sketch | Saved mathematical Draft and oracle context -> Isabelle Isar proof body | `isabelle2026_draft_p5` |
-| Direct to Sketch | Completed selected HOL Light proof, masked source reference and oracle context -> Isabelle Isar proof body | `isabelle2026_direct_p4` |
-
-The Draft uses numbered steps with `Claim:` and `Justification:`. Each step
-identifies its premises and earlier-step dependencies. It distinguishes constants
-from defining equations, available facts from claims being proved, and local
-assumptions from the outer theorem context. Substitutions and side conditions
-remain explicit; it gives mathematical reasoning rather than proof commands.
-Both Sketch prompts preserve that argument and use the same rules for available
-facts, proof prefixes, local claims, and standalone `sledgehammer` gaps. Earlier
-masked helper statements are available background; the selected target and later
-declarations cannot justify the target. There is no brevity or step-count target.
-The shared Draft builder also supplies newly generated Drafts to `v2_itpeval`.
-Complete proofs with zero gaps are valid. Draft step headings do not require
-one `have` per step: adjacent rewrites/helper applications can share a method
-when it preserves the argument and all necessary dependencies. The p3 Draft
-from the successful `547adaf` run can be reused with this Sketch revision;
-regenerating that Draft is unnecessary.
-
-Rerun `generate_draft` on the extracted records to use the revised Draft prompt,
-then run saved-Draft mode with that output. The DSP runner consumes saved Drafts
-and does not regenerate them. Direct mode uses the revised prompt on its next
-Sketch generation. Prompt versions and hashes prevent generation from reusing
-old prompt outputs; `--skip-sketch` deliberately uses the saved Sketch instead.
-Use separate output paths to compare prompt revisions, and add `--dry-run` to
-the generation command to inspect the prompt before inference.
-
-A structured Isabelle proof starts with `proof -` (or an appropriate proof
-method) and ends with `qed`. A terminal `by` takes method expressions; it does
-not open an indented block. Both Sketch prompts now demonstrate this distinction.
-Generation rejects the observed `by`/`have` mixture and unparenthesized sequences
-of bare names before invoking native search. These are lexical checks, not a
-complete Isabelle parser. Imported methods and mathematical correctness still
-require native checking and fresh replay.
-
-`sketch_response_content` stores only the model's visible final response,
-including when the Sketch fails validation; reasoning and prompts are excluded.
-The API usage metadata also survives validation failure. The
-`sketch_validator_version` participates in generation resume identity.
-A failed validation remains a failed sample; the pipeline does not silently
-repair it or request additional samples.
-
-
-The default API model is now `gpt-6.1-terra` for Draft, Draft-to-Sketch and
-Direct-to-Sketch. Draft keeps medium reasoning effort; Sketch keeps high.
-Explicit model/profile selections still override the default. The Qwen/vLLM
-profile remains selectable. The exact identifier and both reasoning settings
-are supported by the [official model documentation](https://developers.openai.com/api/docs/models/gpt-6.1-terra).
-
-To adopt both revisions, rerun `generate_draft` from the extracted records,
-then pass that new Draft file to the DSP runner. The runner does not refresh
-saved Draft text automatically. The revised prompt version and model metadata
-invalidate generation reuse; use fresh output paths to preserve old experiments.
-A copied local API profile that pins the previous model must be updated or
-explicitly overridden with `--model` (generators) or `--sketch-model` (runner).
-
-## Install and configure on the lab computer
-
-Use the existing Python >=3.10 ITPEval conda environment. Install the official
-**Isabelle2026 Linux distribution** separately under
-`/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026`.
-Use the platform distribution with its bundled provers and heaps, rather than
-the source-only archive. Obtain and verify its published checksum from the
-[official distribution directory](https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/).
-This change does not install Isabelle on the local Windows computer.
-
-~~~bash
+```bash
 cd /data/not_backed_up/yxu209/itpeval-modify
-python -m pip install -e .
-cp eval/configs/hol_light_to_isabelle/v2_dsp.example.json \
-   eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
-~~~
+mkdir -p itpeval/_toolchains
+tar -xzf itpeval/_toolchains/Isabelle2021_linux.tar.gz -C itpeval/_toolchains
+```
 
-Edit the local JSON to set the actual `isabelle_home`. All paths must be under
-the ITPEval root. PISA, a JAR, gRPC, Scala-Isabelle and the original DSP checkout
-are not required. Old PISA configurations/results are rejected with migration
-messages; use new output directories.
+Activate the main environment, then prepare PISA:
 
-The default base session is `HOL`. For other standard/AFP imports, configure
-`session_dependencies` and any `session_roots` containing compatible 2026
-`ROOT`/`ROOTS` files. For example, a theory importing
-`HOL-Analysis.Analysis` needs the compatible `HOL-Analysis` session available.
-Preflight every target prefix. The adapter can qualify explicitly configured
-bare imports to their owning session; it preserves the imported theory's
-basename and never replaces it with a different or broader theory. Oracle
-statements, assumptions and stored dataset contexts remain unchanged.
+```bash
+python -m pip install -r requirements.txt
+PIPE=eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp
+CFG=eval/configs/hol_light_to_isabelle/v2_dsp_2021.local.json
+cp -n eval/configs/hol_light_to_isabelle/v2_dsp_2021.example.json "$CFG"
 
-Python pins the checked ML interfaces against hashes extracted from the
-[Isabelle2026 release source archive](https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2026.tar.gz).
-The native infrastructure is then compiled on the installed distribution.
-Installations, version-specific Isabelle user settings, heaps and temporary
-files stay under the repository. The OS `HOME` and Isabelle2024 installation
-are preserved. Native execution is intended for the Linux lab host.
+java -version  # Must be Java 11; set java_bin in CFG if needed.
+python -m "${PIPE}.prepare_pisa" \
+  --expected-root "$PWD" --config "$CFG" --build
+```
 
-## Consolidated lab acceptance (recommended)
+This clones PISA into `external/Portal-to-ISAbelle/` if absent and pins
+`690eed41fa03fe04ec015bb375c668cd6fd94261`. An existing checkout at another
+revision or with changes to pinned sources produces an explicit error; changes
+are not overwritten. Setup fixes the upstream local JAR URL in `build.sbt`,
+regenerates Python gRPC bindings from the unchanged protocol, and builds
+`PISA-assembly-0.1.jar`. The build log is
+`external/Portal-to-ISAbelle/pisa-build.log`.
 
-After syncing these changes and activating the main Python 3.10 environment,
-run this single command from the lab repository root. It uses the existing native
-config, extracts records from the checked-in aligned data, and makes no LLM calls.
-No saved Draft, Sketch, or `ITPEVAL_NATIVE_ISABELLE2026_CONFIG` variable is required.
+Initialize the repository-local Isabelle environment and build the HOL heap.
+Original PISA uses `build = false`; this prepares its base runtime, not a
+replay of a generated proof:
 
-~~~bash
-cd /data/not_backed_up/yxu209/itpeval-modify
-python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.lab_preflight \
-  --expected-root "$PWD" \
-  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
-~~~
+```bash
+eval "$(python -m "${PIPE}.prepare_pisa" --config "$CFG" --print-env)"
+"$PWD/itpeval/_toolchains/Isabelle2021/bin/isabelle" build -b HOL
+```
 
-This shared command checks **both datasets**. The default scope currently has
-**65 checks**: input selection, release/configuration identity, one infrastructure
-build, a native ML regression fixture, 26 proof/search/replay controls, three
-real-theorem proof checks, and 32 contexts spanning all 29 available topics.
-The largest preceding context in each topic is selected, plus the historical
-`circleAverage_center_independent`, `all_countings`, and `rsum_bound` regressions.
-This samples context compatibility; it does not establish proof success for all
-targets. The real-theorem controls use fixed diagnostic proofs, not model outputs.
+If the config uses another installation path, use that `bin/isabelle` instead.
+Settings, heaps, temporary files and build caches are under
+`itpeval/.runs/isabelle2021-pisa/`. OS `HOME` and `CODEX_HOME` are preserved.
+Each job starts its own server on the configured port, default 9000. Do not start
+another PISA server manually; an occupied port fails rather than attaching to it.
+Run one pipeline at a time on that port.
 
-The controls exercise integrated tactics and the external **E** ATP separately,
-`using ... by ...` with whitespace/comments, multiple goals/gaps, partial-goal
-rejection, local Isar constructs, decoded unsafe methods/settings, unavailable
-provers, self/later-fact leakage, inherited theories, ML timeouts, saved-proof
-context checking, and fresh replay (including an intentionally corrupted replay).
-A negative control passes only when it produces the specified rejection. One
-failed control/context does not skip the others. Infrastructure failure blocks
-its dependents explicitly instead of recompiling the same failing setup per case.
+## Consolidated lab preflight
 
-Every invocation creates a unique, **Git-trackable** directory:
+Run this once after setup. It makes no LLM calls and extracts its inputs in
+memory, so saved Drafts or Sketches are not required:
 
-~~~text
-eval/preflight_results/isabelle2026/<UTC-timestamp>-<run-id>/
-  report.json          # complete scope, check statuses, fingerprints, file references
-  summary.md           # readable results and failure reasons
-  events.jsonl         # incremental check completion history
-  config.json          # effective native configuration
-  backend.json         # release/source/adapter/session/prover identity, when available
-  release_sources.json
-  details/             # individual checks, native results and errors
-  infrastructure/      # copied ROOT, adapter sources, compilation logs
-  fixture/             # native ML regression build artifacts
-  cases/               # proof-control inputs, search output and fresh replay files
-  work/                # selected dataset context jobs
-  diagnostics.zip      # complete run diagnostics; excludes heaps/toolchains
-~~~
+```bash
+python -m "${PIPE}.lab_preflight" \
+  --expected-root "$PWD" --config "$CFG" \
+  --dataset both --all-targets
+```
 
-The report is checkpointed after each check. Ctrl-C saves completed checks, marks
-unrun checks as blocked, and attempts to finish the diagnostic bundle. Exit codes:
-`0` only when all selected checks pass; `1` for any failure/blocked check or bundle
-failure; `130` for an interrupted run. Inspect `backend_ok` and `contexts_ok`
-separately: missing Hundred dependency theories or inherited target contexts must
-remain failed dataset checks even when the backend controls pass. A stock install
-may therefore pass the backend while the overall report remains unsuccessful.
+With the current data it checks **all 262 target contexts** (163 Babel, 99 Hundred
+Theorems), setup, 16 proof controls, and three real-theorem proof checks. Controls
+cover explicit methods, the original heuristic order, forced `normalhammer`,
+`using` facts, comments, multiple gaps, nested proofs, local definitions, invalid
+methods, self/later references, admissions, unsafe commands, and incomplete goals.
+Forced hammer is diagnostic only; normal runs use the original search order.
 
-The report folder is explicitly unignored, including JSON, logs and ZIPs. After
-reviewing the result, stage it normally (no `git add -f` needed):
+For a smaller first pass omit `--all-targets`: 32 representative/sentinel contexts
+across 29 topics, **54 total checks**. That does not establish readiness for every
+target. Add `--plan-only` to inspect coverage without executing or writing outputs.
+Filters include `--dataset hundred-theorems`, `--topic ...`, and `--target-key ...`.
+Repeat `--input <records.jsonl>` to use saved record files instead of extraction.
 
-~~~bash
-git add eval/preflight_results/isabelle2026/
-git commit -m "Record Isabelle2026 lab preflight"
-git push
-~~~
+Each run creates a unique folder:
 
-Scope options for the same command:
+```text
+eval/preflight_results/pisa_isabelle2021/<UTC-time>-<run-id>/
+├── report.json, summary.md, events.jsonl
+├── config.json, backend.json       # when setup reaches these stages
+├── details/                       # exact result of each check
+├── transport/, cases/, work/       # input, RPC, JVM and worker logs
+└── diagnostics.zip                # portable copy of the run
+```
 
-- `--plan-only`: print the scope and cases without Isabelle, models, or file writes.
-- `--all-targets`: check every available target context (currently 163 Babel + 99 Hundred).
-- `--dataset hundred-theorems` or `--dataset babel-formal`: restrict dataset contexts.
-- `--topic ... --target-key ...`: focus on a particular target; backend controls still run.
-- `--input path/to/records.jsonl`: use saved records instead of extracting; repeat for both datasets.
-- `--output-root ...`: choose another repository-local parent; ensure a custom path is trackable.
+The **entire directory is not Git-ignored**, including logs, JSON and ZIP files.
+Push the complete run folder after it finishes. Reports are checkpointed after
+each check. A caught Ctrl-C also saves a partial report and bundle. Exit codes:
+0 all passed, 1 failed/blocked checks, 130 interruption. A setup failure blocks
+its dependent checks once; independent proof/context failures are all collected.
 
-The smaller per-target `preflight` gate below remains available for experiment
-runs. Use `lab_preflight` for a consolidated, portable diagnostic report to push.
-The [708e204 review](PROVER_REVIEW.md#lab-result-708e204-and-consolidated-preflight)
-explains the rejected `using integral_shift by metis` reconstruction fixed in p6.
+`backend_ok` covers setup and fixed controls; `contexts_ok` covers input selection,
+real dataset proof checks, and selected contexts. Neither measures model accuracy.
+The previous 2026 report had seven dataset import/dependency failures. An older
+prover does not automatically supply those libraries; see the linked review.
+Install compatible library/AFP dependencies before counting those contexts as
+ready. Failures remain explicit and stay in the requested denominator.
 
-## Native gate before model calls
+The focused `preflight` command still accepts `--input`, `--topic`, and
+`--target-key`, using the same config. Its report is saved under
+`eval/preflight_results/pisa_isabelle2021/single-target/`. Use `lab_preflight`
+above for comprehensive acceptance with a complete diagnostics bundle.
 
-~~~bash
-python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.preflight \
-  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
-  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
-  --input eval/results/hol_light_to_isabelle_v2/single_records.jsonl \
-  --topic circle_average --target-key circleAverage_center_independent
-~~~
+## Experiment commands
 
-This accepts raw extracted records without requiring a Draft. It checks the
-original prefix and executes positive, forced-native-Sledgehammer, invalid
-method, admission, self-reference and later-fact controls. The hammer control
-bypasses all heuristics and must obtain, apply and independently replay a
-concrete reconstruction. Controls must pass before the runner invokes a model.
-Preflight checks the backend, target context and fixed capability controls. It
-does not validate a future model-generated Sketch. A successful preflight and a
-later syntax/proof failure are therefore compatible. The pulled single-theorem
-failure and regeneration commands are documented in [PROVER_REVIEW.md](PROVER_REVIEW.md#pulled-single-theorem-run-c8fb3cb).
-The subsequent [547adaf review](PROVER_REVIEW.md#successful-single-theorem-runs-547adaf)
-confirms both proof modes passed native checking and replay; neither needed
-heuristic gap filling or Sledgehammer on that target.
-The first run builds the infrastructure heap and can require a larger
-`startup_timeout_s` than later runs. Failed gates/context checks are recorded;
-failed targets remain in the selected cohort.
+Saved mathematical Draft to Sketch to Prove:
 
-Sledgehammer diagnostics are retained on failure in
-`controls.hammer.prover_settings` in the preflight JSON report: resolved provers,
-native outcome/messages, preplay results/counts, reconstruction source and
-candidate count. A successful `isabelle build` alone does not imply successful
-search; consult the structured report/result XML.
+```bash
+DATA=eval/results/hol_light_to_isabelle_v2
+python -m "${PIPE}.run_babel" \
+  --expected-root "$PWD" --config "$CFG" \
+  --sketch-source draft --drafts "$DATA/babel_formal_v2_drafts.jsonl" \
+  --topic circle_average --target-key circleAverage_center_independent --samples 1
+```
 
-For all-target context acceptance, remove the topic/target filters and add
-`--all-targets`. For Hundred Theorems use
-`eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.preflight`
-and its extracted records. Native preflight is required on the lab installation;
-local offline tests do not establish native proof-search compatibility.
+Direct completed HOL Light proof to Sketch to Prove:
 
-## Hundred Theorems: imports after relocating a library theory
+```bash
+python -m "${PIPE}.run_babel" \
+  --expected-root "$PWD" --config "$CFG" \
+  --sketch-source hol-light-proof --records "$DATA/babel_formal_v2_exact_name_records.jsonl" \
+  --topic circle_average --target-key circleAverage_center_independent --samples 1
+```
 
-Some Hundred Theorems files are copies of standard-library theories whose
-imports were local to their original session. A temporary job cannot find
-`Lebesgue_Measure` or `Tagged_Division` by those bare names. The example config
-and the tracked `v2_dsp_2026.local.json` now include:
-
-~~~json
-"theory_imports": {
-  "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
-  "Tagged_Division": "HOL-Analysis.Tagged_Division"
-}
-~~~
-
-Add this field to any separately maintained config used as `$CFG`. The mapping
-only adds a session qualifier to the same theory name. Other unresolved bare
-imports need their own verified mappings; the adapter does not guess owners.
-Global imports such as `Main`, and already qualified imports, are unchanged.
-
-For `015_the_fundamental_theorem_of_integral_calculus/rsum_bound`, both the native
-driver and replay theory import `HOL-Analysis.Lebesgue_Measure`,
-`HOL-Analysis.Tagged_Division`, and `HOL-Real_Asymp.Real_Asymp`. Their generated
-`ROOT` files automatically include `sessions "HOL-Analysis" "HOL-Real_Asymp"`
-from those qualified names, in addition to configured session dependencies.
-The parent stays `HOL`; importing the complete original target theory or using
-its whole library session as the parent could expose the existing target proof.
-
-Only generated runtime headers are qualified. Parsed JSONL records, template
-hashes, proof spans, oracle declarations and all preceding mathematical content
-are preserved. Each job stores `import_resolution.json`; successful native
-results also record that mapping. This behavior follows Isabelle's
-[session-import rules](https://github.com/isabelle-prover/mirror-isabelle/blob/master/src/Doc/System/Sessions.thy).
-
-Missing imports now report `failure_category: "import_error"`, the absolute
-`workdir` and `build_log_path`, the actual `build_returncode`, and a bounded
-`build_log_excerpt`. Context failures with a structured native result keep its
-step diagnostics too. The batch runner preserves the failure category and
-makes no model call for that blocked target. Replay failures retain their build
-errors rather than only saying to inspect a log.
-
-After updating the code and `$CFG`, rerun the original preflight command. See
-[the 52fa4ea review](PROVER_REVIEW.md#hundred-theorems-rsum_bound-preflight-52fa4ea)
-for the exact command and the native regression check. This failure happens
-before Sketch generation or Sledgehammer, so no prompt change addresses it.
-
-## Run the matched experiments
-
-Saved-Draft mode:
-
-~~~bash
-DSP_RUN_DIR=eval/results/hol_light_to_isabelle_v2/v2-dsp-isabelle2026/draft/api-smoke
-python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.run_babel \
-  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
-  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
-  --sketch-source draft \
-  --drafts eval/results/hol_light_to_isabelle_v2/single_drafts.jsonl \
-  --topic circle_average --target-key circleAverage_center_independent \
-  --samples 1 \
-  --dsp-output "$DSP_RUN_DIR/inputs.jsonl" \
-  --sketch-output "$DSP_RUN_DIR/sketches.jsonl" \
-  --prove-output "$DSP_RUN_DIR/prove.jsonl" \
-  --output "$DSP_RUN_DIR/verified.jsonl"
-~~~
-
-Direct completed HOL Light proof to Sketch:
-
-~~~bash
-DSP_RUN_DIR=eval/results/hol_light_to_isabelle_v2/v2-dsp-isabelle2026/direct/api-smoke
-python -m eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.run_babel \
-  --expected-root /data/not_backed_up/yxu209/itpeval-modify \
-  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json \
-  --sketch-source hol-light-proof \
-  --records eval/results/hol_light_to_isabelle_v2/single_records.jsonl \
-  --topic circle_average --target-key circleAverage_center_independent \
-  --samples 1 \
-  --dsp-output "$DSP_RUN_DIR/inputs.jsonl" \
-  --sketch-output "$DSP_RUN_DIR/sketches.jsonl" \
-  --prove-output "$DSP_RUN_DIR/prove.jsonl" \
-  --output "$DSP_RUN_DIR/verified.jsonl"
-~~~
-
-`--drafts` and `--records` are mutually exclusive and must match the selected mode.
-Add `--dry-run` to preview the complete prompt without model calls, output writes
-or native execution. `--skip-sketch` searches saved Sketches; `--skip-prove`
-replays saved completed proofs without searching or invoking a model.
-Omit topic/target filters for all targets, including failed Drafts in Draft mode.
-Compare both modes on the same original target cohort, with equal sample counts,
-search budgets and native configuration. Summary files report Draft and Sketch
-usage separately.
-
-For Hundred Theorems, use
+For Hundred Theorems use
 `eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.run_hundred`,
-its records/Drafts, and a directory under
-`eval/results/hol_light_to_isabelle_v2/hundred-theorems/v2-dsp-isabelle2026/`.
-Both datasets retain their standalone `export_dsp`, `generate_sketch` and `prove`
-commands. Export/generation accept `--sketch-source` with `--records` or `--drafts`;
-`--input` remains a compatibility spelling. Verification accepts
-`--sketch-source` and saved `--input`, with `--replay-only` for completed proofs.
+its records/Draft file and the corresponding topic/target filters. Both frontends
+share the checker. Omit filters for a batch. `--dry-run` previews prompts;
+`--skip-sketch` consumes saved Sketches. `--sketch-llm-config` selects API or vLLM.
+Defaults remain `gpt-6.1-terra`, medium reasoning for Draft and high for Sketch.
+The runner checks the runtime and target contexts before model calls.
 
-For Qwen, add
-`--sketch-llm-config eval/configs/inference/qwen_vllm.example.json` and choose a
-separate Qwen run directory. Server setup remains in [vllm/README.md](../../../../../vllm/README.md).
-Measure the complete direct prompt, including the masked reference, before a batch:
+## Results and migration
 
-~~~bash
-python vllm/check_server.py \
-  --llm-config eval/configs/inference/qwen_vllm.example.json \
-  --stage dsp-sketch --sketch-source hol-light-proof \
-  --records eval/results/hol_light_to_isabelle_v2/single_records.jsonl
-~~~
+New schema: `hol_light_to_isabelle_dsp_pisa_v1`. Default result directories:
 
-The vLLM client also checks the complete prompt for every inference request and
-rejects overflow without truncation. API profiles use provider context-limit
-errors when a local tokenizer is unavailable.
+```text
+eval/results/hol_light_to_isabelle_v2/
+├── v2-dsp-pisa-isabelle2021/{draft,direct}/<inference-profile>/
+└── hundred-theorems/v2-dsp-pisa-isabelle2021/{draft,direct}/<inference-profile>/
+```
 
-## Artifacts, proof policy and resume
+Runs save `inputs.jsonl`, `sketches.jsonl`, `prove.jsonl`, `verified.jsonl`, and
+summaries. **`prove.jsonl` and `verified.jsonl` contain the same one-pass result**;
+the final filename is retained for existing consumers. `verified == prove_success`
+means the upstream checker completed with `done` and reward 1.0.
+`verification_method` is `dsp_pisa_completion`. There is no `replay_verified`,
+replay subprocess, or separately assembled/rebuilt proof. The original Sketch
+and `dsp_result.step_results` retain proof commands and reconstruction outputs;
+`step_results` also records attempted methods and observations.
 
-Defaults are separated by dataset, `v2-dsp-isabelle2026`, `draft`/`direct` and
-model-profile fingerprint. Each run stores `inputs.jsonl`, `sketches.jsonl`,
-`prove.jsonl`, `verified.jsonl`, summaries, `preflight/` reports and `work/` jobs.
-Infrastructure/runtime files live in `itpeval/.runs/isabelle2026-native/`.
+Each PISA job receives the original header, preceding definitions/masked helper
+statements, and exact selected declaration. Earlier helpers are admitted background;
+admission is disabled before the selected proof. Generated admissions/unsafe commands
+and later declarations are rejected. The copied miniF2F proof wrapper is unused;
+the job directory is named `miniF2F` only because original PISA uses that convention
+to select its HOL runtime.
 
-Schema `hol_light_to_isabelle_dsp_v2` records the mode, `draft_used`, expected
-version, visible model output/usage, input/prompt/model fingerprints, actual
-backend identity, per-attempt results, original Sketch and reconstructed proof.
-Search requests/results use versioned XML with matching request IDs and input
-hashes. A zero exit code or console suggestion cannot substitute for a valid
-matching search result. Native commands, section-relative source lines/state
-IDs, input files and process logs are preserved on failure.
+Reuse extracted records and saved mathematical Drafts. Regenerate DSP exports and
+Sketches with the Isabelle2021 prompts/config. Old native and earlier PISA artifacts
+are rejected rather than resumed. Historical 2026 reports/config stay available;
+use the new 2021 config. `--replay-only` and `--skip-prove` were removed. Resume
+checks include runtime/source/build identity, inputs, model, prompt, and budgets.
+Keep the same cohort, budgets, and sample counts when comparing experiment modes.
+Failed Drafts, contexts, Sketches and missing samples stay in the denominator.
 
-Only the original imports and preceding target context enter search. The full
-masked target theory is not imported. Earlier masked helpers are admitted
-background; the target and generated intermediate claims must be proved.
-Each gap tries the ordered DSP heuristics from the same saved state, then
-native Sledgehammer. ATP reconstructions require a native `Played` result.
-Isabelle2026's integrated tactic provers return an already executed command
-with no separate preplay list; their structured sendback is also supported.
-Serialization enables PIDE markup locally so batch mode cannot discard the
-sendback wrapper. Every candidate executes from the saved proof state. When
-Isabelle returns `apply` for one of several subgoals, reconstruction requires a
-strict reduction in remaining goals and continues until the entire obligation
-closes. Zero remaining goals are finished with `done` when needed. Partial
-progress never counts as a completed gap or target. Executable proof text uses
-`Token.unparse` to preserve quoted terms, cartouches and comments.
-The reconstructed target must close its original scopes, and a fresh
-`isabelle build` of the resulting theory must succeed without search helpers.
+## Tests
 
-`prove_success` records proof completion; `verified` and `replay_verified`
-require fresh replay. Replay-only verification first runs the native context gate
-without search, so a changed parent/import graph cannot bypass target/later-fact
-checks. A target theory already inherited from the parent/imports is rejected
-before executing its copied prefix. The fresh replay still imports no search
-helper theory. New checks clear old native results and log paths.
-
-Proof bodies cannot use ML tactics via quoted, escaped, or qualified names, or
-change `quick_and_dirty` / `smt_oracle`. Both native search and replay explicitly
-disable those two settings at the target boundary. Earlier masked helpers
-remain admitted background.
-
-Interruptions/timeouts abort the isolated job.
-Startup, method, hammer, preplay and replay budgets are capped by the whole-target
-deadline. `startup_timeout_s` applies separately to infrastructure compilation
-and to worker startup/import loading, ending when that request's readiness
-marker appears. ML method, hammer, and preplay limits must be at least 0.001
-seconds: Isabelle ignores smaller timeouts. An exhausted sub-millisecond
-remaining budget aborts before executing another operation. Builds pin
-`timeout_scale=1.0`. Timeout/launch failures retain the actual build directory,
-session, exit status when available, and log excerpt, even without result XML.
-Cleanup tracks children from every Linux thread and checks
-process start times before signaling owned descendants.
-
-The [2026-10-31 prover review](PROVER_REVIEW.md) records the source comparison,
-fixed bugs, and native regression cases. The checker version is
-`dsp_isabelle2026_native_p6`; adapter and checker changes invalidate old
-verification caches. Preflight now includes a quoted goal to exercise proof
-serialization and fresh replay.
-
-Resume fingerprints include consumed text (the direct source proof/reference
-or saved Draft), target context, model/profile, native adapter, release/session
-sources/heaps, provers and budgets. Changing any relevant input invalidates
-reuse. Mixing modes or old PISA results in a reused file is rejected, including
-when `--no-resume` is supplied. Missing/stale Sketches and context failures
-remain explicit failed samples in the denominator. Success is relative to the
-supplied admitted background, not an admission-free proof of the whole file.
-
-### Histories and summaries
-
-Draft and Sketch JSONL files are append-only histories. The loader selects the
-latest record per target/sample within that target's latest input, Draft
-provenance, Sketch model, prompt and validator settings. It does not combine
-sample 0 from a new model with sample 1 from an older model. With a requested
-cohort/K, absent current samples become `missing_sketch` failures. Same-setting
-failures remain failures rather than falling back to older successes.
-
-Sketch reuse also checks Draft model, prompt, generation identity/time and
-response metadata. Two Draft generations with identical mathematical text
-retain their own attribution. A new Draft generation can therefore invalidate
-Sketch reuse even when the visible text is unchanged.
-
-Prove/verified files are current result snapshots. Re-evaluating a target replaces
-all its saved sample indices, including obsolete indices when K decreases.
-Unselected targets are preserved with resume enabled; historical Draft/Sketch
-logs are preserved separately. Use separate run directories for comparisons.
-
-Each summary describes the current invocation's selection (`summary_scope`),
-while `stored_samples` counts all rows in its paired JSONL, including retained
-unselected targets. `llm_profiles` exposes the recorded Draft/Sketch model and
-reasoning settings. `search_activity` counts search execution, heuristic attempts,
-Sledgehammer calls and reconstruction attempts from native steps; empty
-`prover_settings` is expected for a complete proof that never invokes Sledgehammer.
-These counts describe the selected proof results, not the preflight controls or
-all historical inference attempts. `llm_usage` likewise counts the selected
-Draft once per target and selected Sketch once per sample, not total historical
-API spend.
-
-The `547adaf` artifacts record `gpt-6.1-terra` and **medium** reasoning for both
-Sketch modes. To request high explicitly, pass `--sketch-reasoning-effort high`
-to the runner (`--reasoning-effort high` to standalone `generate_sketch`). The
-code default remains high; profile/CLI overrides are honored. `--skip-sketch`
-uses the saved model/prompt settings, regardless of newly specified inference
-options; inspect `llm_profiles` in the summary for what was actually evaluated.
-
-## Validation
-
-Offline checks, with no native installation or LLM calls:
-
-~~~bash
+```bash
 python -m unittest discover -s tests/hol_light_to_isabelle -p 'test_*.py'
-~~~
+```
 
-After lab installation, use `lab_preflight` above for the recorded acceptance
-run. Developers can also opt into the real integration tests (no model calls). These include a forced external **E** ATP
-case, in addition to integrated tactic provers: the ordinary `True` preflight
-can succeed using an integrated tactic and alone does not establish that an
-external prover works. The suite also exercises actual ML timeout behavior,
-quoted/escaped method filtering, inherited target theory rejection, and replay
-context checks:
-
-
-~~~bash
-export ITPEVAL_NATIVE_ISABELLE2026_CONFIG=eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
-python -m unittest discover -s tests/hol_light_to_isabelle/v2_dsp -p 'test_native_integration.py'
-~~~
-
-Native integration and representative context acceptance for both datasets
-are pending until executed on the lab computer. Run all-target context
-preflight before the matched experiment; source compatibility and proof quality
-are not established by offline mocks.
-
-The [comprehensive audit](PROVER_REVIEW.md#comprehensive-isabelle2026-audit-after-0be9014)
-records the new regressions, source references and the static import/context
-survey of all 163 Babel and 99 Hundred targets. That static survey does not
-replace native acceptance of each target; Hundred topics include unresolved
-bare imports and AFP dependencies absent from a stock Isabelle installation.
+Offline tests check copied-method identity, setup, handoffs, failure accounting,
+timeouts, process ownership, and reports. Native Isabelle2021/PISA execution still
+requires the lab run. The optional integration test uses the same acceptance cases
+and is enabled by `ITPEVAL_PISA_ISABELLE2021_CONFIG="$CFG"`; normally the single
+consolidated lab preflight is sufficient without repeating that test.

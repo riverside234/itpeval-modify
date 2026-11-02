@@ -1,3 +1,6 @@
+> Historical reports: the active DSP baseline is original DSP/PISA with Isabelle2021.
+> See [current lab preflight](../pisa_isabelle2021/README.md). Existing reports are retained unchanged.
+
 # Isabelle2026 lab preflight reports
 
 This folder is intentionally **not ignored by Git**. The consolidated lab

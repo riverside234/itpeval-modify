@@ -1,3 +1,58 @@
+# DSP/PISA rollback review
+
+Date: 2026-11-01. The active backend is original DSP + PISA + Isabelle2021.
+The native Isabelle2026 review below is historical; its ML paths, fixtures and
+replay requirements no longer describe active code.
+
+## Pulled preflight results
+
+Reviewed `eval/preflight_results/isabelle2026/20261101T065608Z-a25df37e/report.json`:
+65 checks, **57 passed, 8 failed**. All 26 proof/search controls and all three
+real-theorem proof checks passed. The infrastructure fixture failed because
+`OS.Process.sleep` was not declared in the Isabelle/ML environment. This does
+not indicate that all native proof search was broken.
+
+The other seven failures were dataset import/dependency issues:
+
+| Hundred Theorems topic | Missing dependency reported |
+| --- | --- |
+| 011, infinitude of primes | Bare `Euclidean_Algorithm` |
+| 027, triangle angles | Bare `Angles` |
+| 049, Cayley-Hamilton | Bare `Square_Matrix` |
+| 052, subsets / core Set | Bare `Lattices` and `Boolean_Algebras` |
+| 065, isosceles triangle | Bare `Angles` |
+| 089, factor/remainder | Bare `Primes` |
+| 098, Bertrand | AFP session `Pratt_Certificate` |
+
+The Fundamental Theorem of Integral Calculus context, including `rsum_bound`,
+passed. Fixing imports alone cannot make a core `Set` target valid when the target
+theory is already inherited; the context-leakage guard remains. Changing prover
+versions does not automatically resolve missing dependencies. Matching library
+versions still need installation and compatibility checks on the lab host.
+
+## Requested rollback
+
+The checker is copied directly from local `mathLLM/draft_sketch_prove`; see
+[provenance and complete patch](upstream/ORIGIN.md). The original heuristic and
+normalhammer algorithm is preserved. PISA is pinned to an Isabelle2021 revision.
+The custom native ML backend, fixture and separate replay stage were removed.
+Both datasets share the checker with separate data/results directories. API and
+vLLM inference remain available.
+
+The new consolidated preflight stores reports and all RPC/JVM/worker logs under
+`eval/preflight_results/pisa_isabelle2021/`, outside Git ignore rules. It separates
+setup/backend controls from real dataset-context checks, requires specific expected
+negative outcomes, collects independent failures, and checkpoints each result.
+`--all-targets` covers all 262 extracted candidate contexts.
+
+Offline tests cover the copied algorithm, setup, handoffs, failure/resume accounting,
+context selection, timeouts, owned-process cleanup and report behavior. Native
+execution and ATP availability still require the Linux lab preflight. Original
+source reduces custom implementation; it cannot guarantee compatibility with every
+dataset theory or eliminate upstream bugs.
+
+---
+
 # Native DSP prover review
 
 Date: 2026-10-31
