@@ -1,0 +1,188 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 13,
+    "last_step": 13,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory V2Control imports Main begin",
+        "output": "",
+        "step_time": 0.025484800338745117
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.0189821720123291
+      },
+      {
+        "index": 2,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.020327329635620117
+      },
+      {
+        "index": 3,
+        "step": "lemma v2_control: \"True\"",
+        "output": "",
+        "step_time": 0.0169827938079834
+      },
+      {
+        "index": 4,
+        "step": "proof -",
+        "output": "",
+        "step_time": 0.018141746520996094
+      },
+      {
+        "index": 5,
+        "step": "define t where \"t = True\"",
+        "output": "",
+        "step_time": 0.02310037612915039
+      },
+      {
+        "index": 6,
+        "step": "have ht: t",
+        "output": "",
+        "step_time": 0.02344369888305664
+      },
+      {
+        "index": 7,
+        "step": "unfolding t_def",
+        "output": "",
+        "step_time": 0.01897144317626953
+      },
+      {
+        "index": 8,
+        "step": "by simp",
+        "output": "",
+        "step_time": 0.01869821548461914
+      },
+      {
+        "index": 9,
+        "step": "show True",
+        "output": "",
+        "step_time": 0.02166008949279785
+      },
+      {
+        "index": 10,
+        "step": "using ht",
+        "output": "",
+        "step_time": 0.01650238037109375
+      },
+      {
+        "index": 11,
+        "step": "by simp",
+        "output": "",
+        "step_time": 0.017705917358398438
+      },
+      {
+        "index": 12,
+        "step": "qed",
+        "output": "",
+        "step_time": 0.017290115356445312
+      }
+    ],
+    "final_state": "default_12"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory V2Control imports Main begin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025474586058408022
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018977105035446584
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020321425050497055
+    },
+    {
+      "mode": "search",
+      "command": "lemma v2_control: \"True\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.016978583997115493
+    },
+    {
+      "mode": "search",
+      "command": "proof -",
+      "success": true,
+      "observation": "proof (state)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.01813631597906351
+    },
+    {
+      "mode": "search",
+      "command": "define t where \"t = True\"",
+      "success": true,
+      "observation": "proof (state)\nthis:\n  t = True\n\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.02309412497561425
+    },
+    {
+      "mode": "search",
+      "command": "have ht: t",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. t",
+      "duration_seconds": 0.023438162985257804
+    },
+    {
+      "mode": "search",
+      "command": "unfolding t_def",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.018966660019941628
+    },
+    {
+      "mode": "search",
+      "command": "by simp",
+      "success": true,
+      "observation": "proof (state)\nthis:\n  t\n\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.018692662939429283
+    },
+    {
+      "mode": "search",
+      "command": "show True",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.021654501906596124
+    },
+    {
+      "mode": "search",
+      "command": "using ht",
+      "success": true,
+      "observation": "proof (prove)\nusing this:\n  t\n\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.01649683201685548
+    },
+    {
+      "mode": "search",
+      "command": "by simp",
+      "success": true,
+      "observation": "proof (state)\nthis:\n  True\n\ngoal:\nNo subgoals!",
+      "duration_seconds": 0.017700407071970403
+    },
+    {
+      "mode": "search",
+      "command": "qed",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01728411507792771
+    }
+  ],
+  "failure_category": null,
+  "request_id": "7d97d60c56f14935a75eaf77ba9dbbba",
+  "input_sha256": "3550fea779f8fd0ebeda3b7734431614fa5cf843a67ec6b9bb7ab5373aefe763",
+  "duration_seconds": 8.392339379992336
+}

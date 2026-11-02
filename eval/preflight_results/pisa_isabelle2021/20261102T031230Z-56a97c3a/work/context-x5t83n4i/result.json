@@ -1,0 +1,99 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 6,
+    "last_step": 6,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory comp_commute\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.022780656814575195
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.017313718795776367
+      },
+      {
+        "index": 2,
+        "step": "definition myComp :: \"('b \\<Rightarrow> 'c) \\<Rightarrow> ('a \\<Rightarrow> 'b) \\<Rightarrow> ('a \\<Rightarrow> 'c)\"\n  where \"myComp g f \\<equiv> \\<lambda>x. g (f x)\"",
+        "output": "",
+        "step_time": 0.023398160934448242
+      },
+      {
+        "index": 3,
+        "step": "definition myId :: \"'a \\<Rightarrow> 'a\"\n  where \"myId \\<equiv> \\<lambda>x. x\"",
+        "output": "",
+        "step_time": 0.02231574058532715
+      },
+      {
+        "index": 4,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.019043445587158203
+      },
+      {
+        "index": 5,
+        "step": "lemma comp_assoc:\n  \"myComp h (myComp g f) = myComp (myComp h g) f\"",
+        "output": "",
+        "step_time": 0.02450728416442871
+      }
+    ],
+    "final_state": "default_5",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory comp_commute\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.022772845928557217
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017309415037743747
+    },
+    {
+      "mode": "search",
+      "command": "definition myComp :: \"('b \\<Rightarrow> 'c) \\<Rightarrow> ('a \\<Rightarrow> 'b) \\<Rightarrow> ('a \\<Rightarrow> 'c)\"\n  where \"myComp g f \\<equiv> \\<lambda>x. g (f x)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02339367405511439
+    },
+    {
+      "mode": "search",
+      "command": "definition myId :: \"'a \\<Rightarrow> 'a\"\n  where \"myId \\<equiv> \\<lambda>x. x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.022311337059363723
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019039922975935042
+    },
+    {
+      "mode": "search",
+      "command": "lemma comp_assoc:\n  \"myComp h (myComp g f) = myComp (myComp h g) f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. myComp h (myComp g f) = myComp (myComp h g) f",
+      "duration_seconds": 0.02450220996979624
+    }
+  ],
+  "failure_category": null,
+  "request_id": "d92124e9329344adb2698be1406e53c2",
+  "input_sha256": "92598485ad48c8c113928891acc983927bd505ea11b3a902901ba3b26fc01a7b",
+  "duration_seconds": 10.112551960046403
+}

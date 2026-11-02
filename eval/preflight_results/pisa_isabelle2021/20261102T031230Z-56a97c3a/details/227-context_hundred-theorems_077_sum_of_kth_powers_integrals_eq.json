@@ -1,0 +1,278 @@
+{
+  "name": "context_hundred-theorems_077_sum_of_kth_powers_integrals_eq",
+  "domain": "context",
+  "status": "pass",
+  "duration_seconds": 8.655,
+  "details": "details/227-context_hundred-theorems_077_sum_of_kth_powers_integrals_eq.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "payload": {
+    "ok": true,
+    "target": [
+      "hundred-theorems",
+      60,
+      "077_sum_of_kth_powers",
+      "integrals_eq"
+    ],
+    "result": {
+      "baseline_ok": true,
+      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-myra0xf0",
+      "backend_metadata": {
+        "backend": "dsp-pisa",
+        "isabelle_version": "Isabelle2021",
+        "isabelle_version_raw": "Isabelle2021: February 2021",
+        "pisa_commit": "690eed41fa03fe04ec015bb375c668cd6fd94261",
+        "dsp_commit": "647aa65ca7b89f4e0f7a65dc15b4e64a81af5e80",
+        "itpeval_commit": "43cd12524b5948471be994d91f41d86a2b801955",
+        "config": {
+          "backend": "dsp-pisa",
+          "expected_isabelle_version": "Isabelle2021",
+          "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+          "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+          "java_bin": "java",
+          "port": 9000,
+          "startup_timeout_s": 600,
+          "step_timeout_s": 60,
+          "hammer_timeout_s": 60,
+          "target_timeout_s": 1800,
+          "theory_imports": {
+            "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+            "Tagged_Division": "HOL-Analysis.Tagged_Division"
+          }
+        },
+        "java_version": "openjdk version \"11.0.30-internal\" 2026-01-20\nOpenJDK Runtime Environment (build 11.0.30-internal+0-adhoc.conda.src)\nOpenJDK 64-Bit Server VM (build 11.0.30-internal+0-adhoc.conda.src, mixed mode)",
+        "settings": {
+          "ISABELLE_HOME_USER": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/user_home/.isabelle/Isabelle2021",
+          "ISABELLE_HEAPS": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/heaps",
+          "ISABELLE_TMP_PREFIX": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/tmp/isabelle"
+        },
+        "pisa_jar_sha256": "e5ffdcba4e5030445d905862100647f67939bea41be475c7de87c5c33d14ddc9",
+        "generated_client_sha256": {
+          "server_pb2.py": "042bdec4a5037139edd0663d6e9a799ae1cda2d4b03266330d29ca58ae32c1be",
+          "server_pb2_grpc.py": "8545f68a3bad2cc52e7c099db8d6e5cd08037f49ea6f6477325e16a7a4fe3e71"
+        },
+        "dsp_checker_sha256": "48665c5b4f8d4f99f39310ace83a7161cbf9391048954c118b33c25c739db7cf",
+        "adapter_sha256": {
+          "checker.py": "10972fe91256d63de624c55466487292ce4f7f4a33457c5c545c5c0b55d1f2ab",
+          "runtime.py": "1b94e57a493fd575998241d8c36b3c508c1795e4861cdc8918b434456891396f",
+          "pisa_worker.py": "dc5f663ca5ccc3689105303c755812093769ba36015886972e17ac55a914588a",
+          "pisa_context.py": "cc90618f858bc43355cce53a675826696e595a8d365b89b39f1beb1433a5efc5",
+          "input_contract.py": "089ac776a5eae25bb655ef6ecdd1a8aef9f6df088df3a947df1034bd8dafee56"
+        },
+        "replay_enabled": false,
+        "server_limits": "Original PISA: 10s transitions; 40s normalhammer",
+        "backend_fingerprint": "5803aeb1ffaf08d200d7cf8966ec42571a62b83e9a81cfbbe3b06f2efae0903e"
+      },
+      "pisa_result": {
+        "success": true,
+        "error": "",
+        "dsp_result": {
+          "success": true,
+          "reason": "",
+          "num_steps": 13,
+          "last_step": 13,
+          "step_results": [
+            {
+              "index": 0,
+              "step": "(*  \n  File:       Bernoulli.thy\n  Author:     Lukas Bulwahn <lukas.bulwahn-at-gmail.com> \n  Author:     Manuel Eberl <manuel@pruvisto.org> \n*)\n",
+              "output": "",
+              "step_time": 0.022057056427001953
+            },
+            {
+              "index": 1,
+              "step": "section \\<open>Bernoulli numbers\\<close>",
+              "output": "",
+              "step_time": 0.016083240509033203
+            },
+            {
+              "index": 2,
+              "step": "theory Bernoulli\nimports Complex_Main\nbegin",
+              "output": "",
+              "step_time": 0.01518106460571289
+            },
+            {
+              "index": 3,
+              "step": "declare [[quick_and_dirty = true]]",
+              "output": "",
+              "step_time": 0.016013622283935547
+            },
+            {
+              "index": 4,
+              "step": "subsection \\<open>Preliminaries\\<close>",
+              "output": "",
+              "step_time": 0.014905452728271484
+            },
+            {
+              "index": 5,
+              "step": "lemma power_numeral_reduce: \"a ^ numeral n = a * a ^ pred_numeral n\"",
+              "output": "",
+              "step_time": 0.02546977996826172
+            },
+            {
+              "index": 6,
+              "step": "sorry",
+              "output": "",
+              "step_time": 0.021871328353881836
+            },
+            {
+              "index": 7,
+              "step": "lemma fact_diff_Suc: \"n < Suc m \\<Longrightarrow> fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)\"",
+              "output": "",
+              "step_time": 0.022222280502319336
+            },
+            {
+              "index": 8,
+              "step": "sorry",
+              "output": "",
+              "step_time": 0.016879796981811523
+            },
+            {
+              "index": 9,
+              "step": "lemma of_nat_binomial_Suc:\n  assumes \"k \\<le> n\"\n  shows   \"(of_nat (Suc n choose k) :: 'a :: field_char_0) = \n             of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)\"",
+              "output": "",
+              "step_time": 0.021244287490844727
+            },
+            {
+              "index": 10,
+              "step": "sorry",
+              "output": "",
+              "step_time": 0.018927335739135742
+            },
+            {
+              "index": 11,
+              "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+              "output": "",
+              "step_time": 0.017737865447998047
+            },
+            {
+              "index": 12,
+              "step": "lemma integrals_eq:\n  assumes \"f 0 = g 0\"\n  assumes \"\\<And> x. ((\\<lambda>x. f x - g x) has_real_derivative 0) (at x)\"\n  shows \"f x = g x\"",
+              "output": "",
+              "step_time": 0.020497798919677734
+            }
+          ],
+          "final_state": "default_12",
+          "context_ready": true,
+          "proof_level": "1"
+        },
+        "step_results": [
+          {
+            "mode": "search",
+            "command": "(*  \n  File:       Bernoulli.thy\n  Author:     Lukas Bulwahn <lukas.bulwahn-at-gmail.com> \n  Author:     Manuel Eberl <manuel@pruvisto.org> \n*)\n",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.022047473001293838
+          },
+          {
+            "mode": "search",
+            "command": "section \\<open>Bernoulli numbers\\<close>",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.01607917610090226
+          },
+          {
+            "mode": "search",
+            "command": "theory Bernoulli\nimports Complex_Main\nbegin",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.015177355031482875
+          },
+          {
+            "mode": "search",
+            "command": "declare [[quick_and_dirty = true]]",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.016008498962037265
+          },
+          {
+            "mode": "search",
+            "command": "subsection \\<open>Preliminaries\\<close>",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.01490077399648726
+          },
+          {
+            "mode": "search",
+            "command": "lemma power_numeral_reduce: \"a ^ numeral n = a * a ^ pred_numeral n\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. a ^ numeral n = a * a ^ pred_numeral n",
+            "duration_seconds": 0.02546355896629393
+          },
+          {
+            "mode": "search",
+            "command": "sorry",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.02186410501599312
+          },
+          {
+            "mode": "search",
+            "command": "lemma fact_diff_Suc: \"n < Suc m \\<Longrightarrow> fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. n < Suc m \\<Longrightarrow>\n    fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)",
+            "duration_seconds": 0.02221721294336021
+          },
+          {
+            "mode": "search",
+            "command": "sorry",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.01687481498811394
+          },
+          {
+            "mode": "search",
+            "command": "lemma of_nat_binomial_Suc:\n  assumes \"k \\<le> n\"\n  shows   \"(of_nat (Suc n choose k) :: 'a :: field_char_0) = \n             of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_nat (Suc n choose k) =\n    of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)",
+            "duration_seconds": 0.021240763016976416
+          },
+          {
+            "mode": "search",
+            "command": "sorry",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.018923457944765687
+          },
+          {
+            "mode": "search",
+            "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.017734277993440628
+          },
+          {
+            "mode": "search",
+            "command": "lemma integrals_eq:\n  assumes \"f 0 = g 0\"\n  assumes \"\\<And> x. ((\\<lambda>x. f x - g x) has_real_derivative 0) (at x)\"\n  shows \"f x = g x\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. f x = g x",
+            "duration_seconds": 0.02049409004393965
+          }
+        ],
+        "failure_category": null,
+        "request_id": "d17c708045944601b059e82ad2850217",
+        "input_sha256": "869ac9cc31c3bbcec79a0dad96fc9ad30220d76521d162084031325825cdc004",
+        "duration_seconds": 8.55349497194402
+      },
+      "import_resolution": {
+        "original_imports": [
+          "Complex_Main"
+        ],
+        "resolved_imports": [
+          "Complex_Main"
+        ],
+        "session_dependencies": []
+      },
+      "draft_context_policy": "original_masked_prefix",
+      "context_sha256": "0bc4c940b06ca99ee7c210310acdd6ee044d953bd2b4fee3d5faf5d0b3e7484a",
+      "statement_sha256": "3a1b0d75b2c630b2d1c35946cc7996ed35fb74d5af1ee9a70e812a210a12a013",
+      "template_sha256": "c2e71006415086577b1bca0ea99856c2ef2bbb0f30ee7c61803efb8d8b062ce8",
+      "background_policy": "earlier_masked_helpers_admitted",
+      "admitted_background_names": [
+        "power_numeral_reduce",
+        "fact_diff_Suc",
+        "of_nat_binomial_Suc"
+      ],
+      "admitted_background_count": 3
+    }
+  }
+}

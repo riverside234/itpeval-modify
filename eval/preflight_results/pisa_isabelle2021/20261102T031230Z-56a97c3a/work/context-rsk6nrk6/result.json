@@ -1,0 +1,1737 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 132,
+    "last_step": 132,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "(*  Title:      HOL/Analysis/Inner_Product.thy\n    Author:     Brian Huffman\n*)\n\n",
+        "output": "",
+        "step_time": 0.023273468017578125
+      },
+      {
+        "index": 1,
+        "step": "section \\<open>Inner Product Spaces and Gradient Derivative\\<close>",
+        "output": "",
+        "step_time": 0.017789363861083984
+      },
+      {
+        "index": 2,
+        "step": "theory Inner_Product\nimports Complex_Main\nbegin",
+        "output": "",
+        "step_time": 0.015500068664550781
+      },
+      {
+        "index": 3,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.015419483184814453
+      },
+      {
+        "index": 4,
+        "step": "subsection \\<open>Real inner product spaces\\<close>",
+        "output": "",
+        "step_time": 0.016193389892578125
+      },
+      {
+        "index": 5,
+        "step": "text \\<open>\n  Temporarily relax type constraints for \\<^term>\\<open>open\\<close>, \\<^term>\\<open>uniformity\\<close>,\n  \\<^term>\\<open>dist\\<close>, and \\<^term>\\<open>norm\\<close>.\n\\<close>",
+        "output": "",
+        "step_time": 0.024463653564453125
+      },
+      {
+        "index": 6,
+        "step": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>open\\<close>, SOME \\<^typ>\\<open>'a::open set \\<Rightarrow> bool\\<close>)\\<close>",
+        "output": "",
+        "step_time": 0.02757716178894043
+      },
+      {
+        "index": 7,
+        "step": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>dist\\<close>, SOME \\<^typ>\\<open>'a::dist \\<Rightarrow> 'a \\<Rightarrow> real\\<close>)\\<close>",
+        "output": "",
+        "step_time": 0.020507335662841797
+      },
+      {
+        "index": 8,
+        "step": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>uniformity\\<close>, SOME \\<^typ>\\<open>('a::uniformity \\<times> 'a) filter\\<close>)\\<close>",
+        "output": "",
+        "step_time": 0.020688533782958984
+      },
+      {
+        "index": 9,
+        "step": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>norm\\<close>, SOME \\<^typ>\\<open>'a::norm \\<Rightarrow> real\\<close>)\\<close>",
+        "output": "",
+        "step_time": 0.01897263526916504
+      },
+      {
+        "index": 10,
+        "step": "class real_inner = real_vector + sgn_div_norm + dist_norm + uniformity_dist + open_uniformity +\n  fixes inner :: \"'a \\<Rightarrow> 'a \\<Rightarrow> real\"\n  assumes inner_commute: \"inner x y = inner y x\"\n  and inner_add_left: \"inner (x + y) z = inner x z + inner y z\"\n  and inner_scaleR_left [simp]: \"inner (scaleR r x) y = r * (inner x y)\"\n  and inner_ge_zero [simp]: \"0 \\<le> inner x x\"\n  and inner_eq_zero_iff [simp]: \"inner x x = 0 \\<longleftrightarrow> x = 0\"\n  and norm_eq_sqrt_inner: \"norm x = sqrt (inner x x)\"\nbegin",
+        "output": "",
+        "step_time": 0.6176974773406982
+      },
+      {
+        "index": 11,
+        "step": "lemma inner_zero_left [simp]: \"inner 0 x = 0\"",
+        "output": "",
+        "step_time": 0.019906282424926758
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.024041414260864258
+      },
+      {
+        "index": 13,
+        "step": "lemma inner_minus_left [simp]: \"inner (- x) y = - inner x y\"",
+        "output": "",
+        "step_time": 0.02044224739074707
+      },
+      {
+        "index": 14,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0209808349609375
+      },
+      {
+        "index": 15,
+        "step": "lemma inner_diff_left: \"inner (x - y) z = inner x z - inner y z\"",
+        "output": "",
+        "step_time": 0.0468449592590332
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.025160551071166992
+      },
+      {
+        "index": 17,
+        "step": "lemma inner_sum_left: \"inner (\\<Sum>x\\<in>A. f x) y = (\\<Sum>x\\<in>A. inner (f x) y)\"",
+        "output": "",
+        "step_time": 0.020560741424560547
+      },
+      {
+        "index": 18,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.021948575973510742
+      },
+      {
+        "index": 19,
+        "step": "lemma all_zero_iff [simp]: \"(\\<forall>u. inner x u = 0) \\<longleftrightarrow> (x = 0)\"",
+        "output": "",
+        "step_time": 0.018650531768798828
+      },
+      {
+        "index": 20,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.02019643783569336
+      },
+      {
+        "index": 21,
+        "step": "text \\<open>Transfer distributivity rules to right argument.\\<close>",
+        "output": "",
+        "step_time": 0.013391494750976562
+      },
+      {
+        "index": 22,
+        "step": "lemma inner_add_right: \"inner x (y + z) = inner x y + inner x z\"",
+        "output": "",
+        "step_time": 0.020868778228759766
+      },
+      {
+        "index": 23,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01929306983947754
+      },
+      {
+        "index": 24,
+        "step": "lemma inner_scaleR_right [simp]: \"inner x (scaleR r y) = r * (inner x y)\"",
+        "output": "",
+        "step_time": 0.01970505714416504
+      },
+      {
+        "index": 25,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01936030387878418
+      },
+      {
+        "index": 26,
+        "step": "lemma inner_zero_right [simp]: \"inner x 0 = 0\"",
+        "output": "",
+        "step_time": 0.016707420349121094
+      },
+      {
+        "index": 27,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0190582275390625
+      },
+      {
+        "index": 28,
+        "step": "lemma inner_minus_right [simp]: \"inner x (- y) = - inner x y\"",
+        "output": "",
+        "step_time": 0.0194704532623291
+      },
+      {
+        "index": 29,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019898653030395508
+      },
+      {
+        "index": 30,
+        "step": "lemma inner_diff_right: \"inner x (y - z) = inner x y - inner x z\"",
+        "output": "",
+        "step_time": 0.01709461212158203
+      },
+      {
+        "index": 31,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.020029067993164062
+      },
+      {
+        "index": 32,
+        "step": "lemma inner_sum_right: \"inner x (\\<Sum>y\\<in>A. f y) = (\\<Sum>y\\<in>A. inner x (f y))\"",
+        "output": "",
+        "step_time": 0.02174234390258789
+      },
+      {
+        "index": 33,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.03151345252990723
+      },
+      {
+        "index": 34,
+        "step": "lemmas inner_add [algebra_simps] = inner_add_left inner_add_right",
+        "output": "",
+        "step_time": 0.019452333450317383
+      },
+      {
+        "index": 35,
+        "step": "lemmas inner_diff [algebra_simps]  = inner_diff_left inner_diff_right",
+        "output": "",
+        "step_time": 0.02027440071105957
+      },
+      {
+        "index": 36,
+        "step": "lemmas inner_scaleR = inner_scaleR_left inner_scaleR_right",
+        "output": "",
+        "step_time": 0.017242908477783203
+      },
+      {
+        "index": 37,
+        "step": "text \\<open>Legacy theorem names\\<close>",
+        "output": "",
+        "step_time": 0.013092517852783203
+      },
+      {
+        "index": 38,
+        "step": "lemmas inner_left_distrib = inner_add_left",
+        "output": "",
+        "step_time": 0.017938613891601562
+      },
+      {
+        "index": 39,
+        "step": "lemmas inner_right_distrib = inner_add_right",
+        "output": "",
+        "step_time": 0.016290664672851562
+      },
+      {
+        "index": 40,
+        "step": "lemmas inner_distrib = inner_left_distrib inner_right_distrib",
+        "output": "",
+        "step_time": 0.018403291702270508
+      },
+      {
+        "index": 41,
+        "step": "lemma inner_gt_zero_iff [simp]: \"0 < inner x x \\<longleftrightarrow> x \\<noteq> 0\"",
+        "output": "",
+        "step_time": 0.01272726058959961
+      },
+      {
+        "index": 42,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016927003860473633
+      },
+      {
+        "index": 43,
+        "step": "lemma power2_norm_eq_inner: \"(norm x)\\<^sup>2 = inner x x\"",
+        "output": "",
+        "step_time": 0.01628708839416504
+      },
+      {
+        "index": 44,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014917135238647461
+      },
+      {
+        "index": 45,
+        "step": "lemma dot_square_norm: \"inner x x = (norm x)\\<^sup>2\"",
+        "output": "",
+        "step_time": 0.014990091323852539
+      },
+      {
+        "index": 46,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01433420181274414
+      },
+      {
+        "index": 47,
+        "step": "text \\<open>Identities involving real multiplication and division.\\<close>",
+        "output": "",
+        "step_time": 0.01023411750793457
+      },
+      {
+        "index": 48,
+        "step": "lemma inner_mult_left: \"inner (of_real m * a) b = m * (inner a b)\"",
+        "output": "",
+        "step_time": 0.01575160026550293
+      },
+      {
+        "index": 49,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016252517700195312
+      },
+      {
+        "index": 50,
+        "step": "lemma inner_mult_right: \"inner a (of_real m * b) = m * (inner a b)\"",
+        "output": "",
+        "step_time": 0.016970396041870117
+      },
+      {
+        "index": 51,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016808748245239258
+      },
+      {
+        "index": 52,
+        "step": "lemma inner_mult_left': \"inner (a * of_real m) b = m * (inner a b)\"",
+        "output": "",
+        "step_time": 0.015943527221679688
+      },
+      {
+        "index": 53,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016383886337280273
+      },
+      {
+        "index": 54,
+        "step": "lemma inner_mult_right': \"inner a (b * of_real m) = (inner a b) * m\"",
+        "output": "",
+        "step_time": 0.01526498794555664
+      },
+      {
+        "index": 55,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013792991638183594
+      },
+      {
+        "index": 56,
+        "step": "lemma Cauchy_Schwarz_ineq:\n  \"(inner x y)\\<^sup>2 \\<le> inner x x * inner y y\"",
+        "output": "",
+        "step_time": 0.01666855812072754
+      },
+      {
+        "index": 57,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012373924255371094
+      },
+      {
+        "index": 58,
+        "step": "lemma Cauchy_Schwarz_ineq2:\n  \"\\<bar>inner x y\\<bar> \\<le> norm x * norm y\"",
+        "output": "",
+        "step_time": 0.01566600799560547
+      },
+      {
+        "index": 59,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017352819442749023
+      },
+      {
+        "index": 60,
+        "step": "lemma norm_cauchy_schwarz: \"inner x y \\<le> norm x * norm y\"",
+        "output": "",
+        "step_time": 0.013789892196655273
+      },
+      {
+        "index": 61,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011415719985961914
+      },
+      {
+        "index": 62,
+        "step": "subclass real_normed_vector",
+        "output": "",
+        "step_time": 0.053180694580078125
+      },
+      {
+        "index": 63,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.1993703842163086
+      },
+      {
+        "index": 64,
+        "step": "end",
+        "output": "",
+        "step_time": 0.009366035461425781
+      },
+      {
+        "index": 65,
+        "step": "lemma square_bound_lemma:\n  fixes x :: real\n  shows \"x < (1 + x) * (1 + x)\"",
+        "output": "",
+        "step_time": 0.012295246124267578
+      },
+      {
+        "index": 66,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009856224060058594
+      },
+      {
+        "index": 67,
+        "step": "lemma square_continuous:\n  fixes e :: real\n  shows \"e > 0 \\<Longrightarrow> \\<exists>d. 0 < d \\<and> (\\<forall>y. \\<bar>y - x\\<bar> < d \\<longrightarrow> \\<bar>y * y - x * x\\<bar> < e)\"",
+        "output": "",
+        "step_time": 0.015324831008911133
+      },
+      {
+        "index": 68,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009125471115112305
+      },
+      {
+        "index": 69,
+        "step": "lemma norm_le: \"norm x \\<le> norm y \\<longleftrightarrow> inner x x \\<le> inner y y\"",
+        "output": "",
+        "step_time": 0.012564897537231445
+      },
+      {
+        "index": 70,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.008900165557861328
+      },
+      {
+        "index": 71,
+        "step": "lemma norm_lt: \"norm x < norm y \\<longleftrightarrow> inner x x < inner y y\"",
+        "output": "",
+        "step_time": 0.010942697525024414
+      },
+      {
+        "index": 72,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01050257682800293
+      },
+      {
+        "index": 73,
+        "step": "lemma norm_eq: \"norm x = norm y \\<longleftrightarrow> inner x x = inner y y\"",
+        "output": "",
+        "step_time": 0.012296676635742188
+      },
+      {
+        "index": 74,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012048006057739258
+      },
+      {
+        "index": 75,
+        "step": "lemma norm_eq_1: \"norm x = 1 \\<longleftrightarrow> inner x x = 1\"",
+        "output": "",
+        "step_time": 0.009868144989013672
+      },
+      {
+        "index": 76,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.007932662963867188
+      },
+      {
+        "index": 77,
+        "step": "lemma inner_divide_left:\n  fixes a :: \"'a :: {real_inner,real_div_algebra}\"\n  shows \"inner (a / of_real m) b = (inner a b) / m\"",
+        "output": "",
+        "step_time": 0.013309240341186523
+      },
+      {
+        "index": 78,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010733842849731445
+      },
+      {
+        "index": 79,
+        "step": "lemma inner_divide_right:\n  fixes a :: \"'a :: {real_inner,real_div_algebra}\"\n  shows \"inner a (b / of_real m) = (inner a b) / m\"",
+        "output": "",
+        "step_time": 0.013078451156616211
+      },
+      {
+        "index": 80,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.00813436508178711
+      },
+      {
+        "index": 81,
+        "step": "text \\<open>\n  Re-enable constraints for \\<^term>\\<open>open\\<close>, \\<^term>\\<open>uniformity\\<close>,\n  \\<^term>\\<open>dist\\<close>, and \\<^term>\\<open>norm\\<close>.\n\\<close>",
+        "output": "",
+        "step_time": 0.012606382369995117
+      },
+      {
+        "index": 82,
+        "step": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>open\\<close>, SOME \\<^typ>\\<open>'a::topological_space set \\<Rightarrow> bool\\<close>)\\<close>",
+        "output": "",
+        "step_time": 0.015192747116088867
+      },
+      {
+        "index": 83,
+        "step": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>uniformity\\<close>, SOME \\<^typ>\\<open>('a::uniform_space \\<times> 'a) filter\\<close>)\\<close>",
+        "output": "",
+        "step_time": 0.01244211196899414
+      },
+      {
+        "index": 84,
+        "step": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>dist\\<close>, SOME \\<^typ>\\<open>'a::metric_space \\<Rightarrow> 'a \\<Rightarrow> real\\<close>)\\<close>",
+        "output": "",
+        "step_time": 0.0119171142578125
+      },
+      {
+        "index": 85,
+        "step": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>norm\\<close>, SOME \\<^typ>\\<open>'a::real_normed_vector \\<Rightarrow> real\\<close>)\\<close>",
+        "output": "",
+        "step_time": 0.011285781860351562
+      },
+      {
+        "index": 86,
+        "step": "lemma bounded_bilinear_inner:\n  \"bounded_bilinear (inner::'a::real_inner \\<Rightarrow> 'a \\<Rightarrow> real)\"",
+        "output": "",
+        "step_time": 0.010859012603759766
+      },
+      {
+        "index": 87,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01027536392211914
+      },
+      {
+        "index": 88,
+        "step": "lemmas tendsto_inner [tendsto_intros] =\n  bounded_bilinear.tendsto [OF bounded_bilinear_inner]",
+        "output": "",
+        "step_time": 0.010164260864257812
+      },
+      {
+        "index": 89,
+        "step": "lemmas isCont_inner [simp] =\n  bounded_bilinear.isCont [OF bounded_bilinear_inner]",
+        "output": "",
+        "step_time": 0.010859966278076172
+      },
+      {
+        "index": 90,
+        "step": "lemmas has_derivative_inner [derivative_intros] =\n  bounded_bilinear.FDERIV [OF bounded_bilinear_inner]",
+        "output": "",
+        "step_time": 0.010883808135986328
+      },
+      {
+        "index": 91,
+        "step": "lemmas bounded_linear_inner_left =\n  bounded_bilinear.bounded_linear_left [OF bounded_bilinear_inner]",
+        "output": "",
+        "step_time": 0.008992433547973633
+      },
+      {
+        "index": 92,
+        "step": "lemmas bounded_linear_inner_right =\n  bounded_bilinear.bounded_linear_right [OF bounded_bilinear_inner]",
+        "output": "",
+        "step_time": 0.009750843048095703
+      },
+      {
+        "index": 93,
+        "step": "lemmas bounded_linear_inner_left_comp = bounded_linear_inner_left[THEN bounded_linear_compose]",
+        "output": "",
+        "step_time": 0.009274482727050781
+      },
+      {
+        "index": 94,
+        "step": "lemmas bounded_linear_inner_right_comp = bounded_linear_inner_right[THEN bounded_linear_compose]",
+        "output": "",
+        "step_time": 0.00703120231628418
+      },
+      {
+        "index": 95,
+        "step": "lemmas has_derivative_inner_right [derivative_intros] =\n  bounded_linear.has_derivative [OF bounded_linear_inner_right]",
+        "output": "",
+        "step_time": 0.012979269027709961
+      },
+      {
+        "index": 96,
+        "step": "lemmas has_derivative_inner_left [derivative_intros] =\n  bounded_linear.has_derivative [OF bounded_linear_inner_left]",
+        "output": "",
+        "step_time": 0.010047197341918945
+      },
+      {
+        "index": 97,
+        "step": "lemma differentiable_inner [simp]:\n  \"f differentiable (at x within s) \\<Longrightarrow> g differentiable at x within s \\<Longrightarrow> (\\<lambda>x. inner (f x) (g x)) differentiable at x within s\"",
+        "output": "",
+        "step_time": 0.014167070388793945
+      },
+      {
+        "index": 98,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010303974151611328
+      },
+      {
+        "index": 99,
+        "step": "subsection \\<open>Class instances\\<close>",
+        "output": "",
+        "step_time": 0.006623268127441406
+      },
+      {
+        "index": 100,
+        "step": "instantiation real :: real_inner\nbegin",
+        "output": "",
+        "step_time": 0.009636163711547852
+      },
+      {
+        "index": 101,
+        "step": "definition inner_real_def [simp]: \"inner = (*)\"",
+        "output": "",
+        "step_time": 0.01764655113220215
+      },
+      {
+        "index": 102,
+        "step": "instance",
+        "output": "",
+        "step_time": 0.005979776382446289
+      },
+      {
+        "index": 103,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.007506847381591797
+      },
+      {
+        "index": 104,
+        "step": "end",
+        "output": "",
+        "step_time": 0.00780940055847168
+      },
+      {
+        "index": 105,
+        "step": "lemma\n  shows real_inner_1_left[simp]: \"inner 1 x = x\"\n    and real_inner_1_right[simp]: \"inner x 1 = x\"",
+        "output": "",
+        "step_time": 0.010690927505493164
+      },
+      {
+        "index": 106,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.007761955261230469
+      },
+      {
+        "index": 107,
+        "step": "instantiation complex :: real_inner\nbegin",
+        "output": "",
+        "step_time": 0.006957054138183594
+      },
+      {
+        "index": 108,
+        "step": "definition inner_complex_def:\n  \"inner x y = Re x * Re y + Im x * Im y\"",
+        "output": "",
+        "step_time": 0.01704239845275879
+      },
+      {
+        "index": 109,
+        "step": "instance",
+        "output": "",
+        "step_time": 0.007439136505126953
+      },
+      {
+        "index": 110,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.007284641265869141
+      },
+      {
+        "index": 111,
+        "step": "end",
+        "output": "",
+        "step_time": 0.007892608642578125
+      },
+      {
+        "index": 112,
+        "step": "lemma complex_inner_1 [simp]: \"inner 1 x = Re x\"",
+        "output": "",
+        "step_time": 0.007570505142211914
+      },
+      {
+        "index": 113,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.006592988967895508
+      },
+      {
+        "index": 114,
+        "step": "lemma complex_inner_1_right [simp]: \"inner x 1 = Re x\"",
+        "output": "",
+        "step_time": 0.0068912506103515625
+      },
+      {
+        "index": 115,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.008424520492553711
+      },
+      {
+        "index": 116,
+        "step": "lemma complex_inner_i_left [simp]: \"inner \\<i> x = Im x\"",
+        "output": "",
+        "step_time": 0.007283449172973633
+      },
+      {
+        "index": 117,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.007596254348754883
+      },
+      {
+        "index": 118,
+        "step": "lemma complex_inner_i_right [simp]: \"inner x \\<i> = Im x\"",
+        "output": "",
+        "step_time": 0.006714344024658203
+      },
+      {
+        "index": 119,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.008025407791137695
+      },
+      {
+        "index": 120,
+        "step": "lemma dot_square_norm: \"inner x x = (norm x)\\<^sup>2\"",
+        "output": "",
+        "step_time": 0.007959127426147461
+      },
+      {
+        "index": 121,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011299610137939453
+      },
+      {
+        "index": 122,
+        "step": "lemma norm_eq_square: \"norm x = a \\<longleftrightarrow> 0 \\<le> a \\<and> inner x x = a\\<^sup>2\"",
+        "output": "",
+        "step_time": 0.010806798934936523
+      },
+      {
+        "index": 123,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.007735729217529297
+      },
+      {
+        "index": 124,
+        "step": "lemma norm_le_square: \"norm x \\<le> a \\<longleftrightarrow> 0 \\<le> a \\<and> inner x x \\<le> a\\<^sup>2\"",
+        "output": "",
+        "step_time": 0.011669397354125977
+      },
+      {
+        "index": 125,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.00904703140258789
+      },
+      {
+        "index": 126,
+        "step": "lemma norm_ge_square: \"norm x \\<ge> a \\<longleftrightarrow> a \\<le> 0 \\<or> inner x x \\<ge> a\\<^sup>2\"",
+        "output": "",
+        "step_time": 0.01003408432006836
+      },
+      {
+        "index": 127,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009569644927978516
+      },
+      {
+        "index": 128,
+        "step": "lemma norm_lt_square: \"norm x < a \\<longleftrightarrow> 0 < a \\<and> inner x x < a\\<^sup>2\"",
+        "output": "",
+        "step_time": 0.008458375930786133
+      },
+      {
+        "index": 129,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.006737947463989258
+      },
+      {
+        "index": 130,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.008754491806030273
+      },
+      {
+        "index": 131,
+        "step": "lemma norm_gt_square: \"norm x > a \\<longleftrightarrow> a < 0 \\<or> inner x x > a\\<^sup>2\"",
+        "output": "",
+        "step_time": 0.009086370468139648
+      }
+    ],
+    "final_state": "default_131",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "(*  Title:      HOL/Analysis/Inner_Product.thy\n    Author:     Brian Huffman\n*)\n\n",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023265287978574634
+    },
+    {
+      "mode": "search",
+      "command": "section \\<open>Inner Product Spaces and Gradient Derivative\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01778431609272957
+    },
+    {
+      "mode": "search",
+      "command": "theory Inner_Product\nimports Complex_Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015497062006033957
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015416144975461066
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Real inner product spaces\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016187574015930295
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>\n  Temporarily relax type constraints for \\<^term>\\<open>open\\<close>, \\<^term>\\<open>uniformity\\<close>,\n  \\<^term>\\<open>dist\\<close>, and \\<^term>\\<open>norm\\<close>.\n\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024457933963276446
+    },
+    {
+      "mode": "search",
+      "command": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>open\\<close>, SOME \\<^typ>\\<open>'a::open set \\<Rightarrow> bool\\<close>)\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.027572749997489154
+    },
+    {
+      "mode": "search",
+      "command": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>dist\\<close>, SOME \\<^typ>\\<open>'a::dist \\<Rightarrow> 'a \\<Rightarrow> real\\<close>)\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020503000007010996
+    },
+    {
+      "mode": "search",
+      "command": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>uniformity\\<close>, SOME \\<^typ>\\<open>('a::uniformity \\<times> 'a) filter\\<close>)\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02068268007133156
+    },
+    {
+      "mode": "search",
+      "command": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>norm\\<close>, SOME \\<^typ>\\<open>'a::norm \\<Rightarrow> real\\<close>)\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01896750007290393
+    },
+    {
+      "mode": "search",
+      "command": "class real_inner = real_vector + sgn_div_norm + dist_norm + uniformity_dist + open_uniformity +\n  fixes inner :: \"'a \\<Rightarrow> 'a \\<Rightarrow> real\"\n  assumes inner_commute: \"inner x y = inner y x\"\n  and inner_add_left: \"inner (x + y) z = inner x z + inner y z\"\n  and inner_scaleR_left [simp]: \"inner (scaleR r x) y = r * (inner x y)\"\n  and inner_ge_zero [simp]: \"0 \\<le> inner x x\"\n  and inner_eq_zero_iff [simp]: \"inner x x = 0 \\<longleftrightarrow> x = 0\"\n  and norm_eq_sqrt_inner: \"norm x = sqrt (inner x x)\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.6176904770545661
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_zero_left [simp]: \"inner 0 x = 0\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner (0::'a) x = 0",
+      "duration_seconds": 0.01990200101863593
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02403724705800414
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_minus_left [simp]: \"inner (- x) y = - inner x y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner (- x) y = - inner x y",
+      "duration_seconds": 0.0204359790077433
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020975838997401297
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_diff_left: \"inner (x - y) z = inner x z - inner y z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner (x - y) z = inner x z - inner y z",
+      "duration_seconds": 0.04684037808328867
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025156651972793043
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_sum_left: \"inner (\\<Sum>x\\<in>A. f x) y = (\\<Sum>x\\<in>A. inner (f x) y)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner (sum f A) y = (\\<Sum>x\\<in>A. inner (f x) y)",
+      "duration_seconds": 0.02055619703605771
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.021943347994238138
+    },
+    {
+      "mode": "search",
+      "command": "lemma all_zero_iff [simp]: \"(\\<forall>u. inner x u = 0) \\<longleftrightarrow> (x = 0)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (\\<forall>u. inner x u = 0) = (x = (0::'a))",
+      "duration_seconds": 0.018645458039827645
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02019103500060737
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>Transfer distributivity rules to right argument.\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013382883043959737
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_add_right: \"inner x (y + z) = inner x y + inner x z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x (y + z) = inner x y + inner x z",
+      "duration_seconds": 0.020859853946603835
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019284176058135927
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_scaleR_right [simp]: \"inner x (scaleR r y) = r * (inner x y)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x (r *\\<^sub>R y) = r * inner x y",
+      "duration_seconds": 0.0196989590767771
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01935571408830583
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_zero_right [simp]: \"inner x 0 = 0\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x (0::'a) = 0",
+      "duration_seconds": 0.016703794011846185
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019054477917961776
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_minus_right [simp]: \"inner x (- y) = - inner x y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x (- y) = - inner x y",
+      "duration_seconds": 0.019465942052192986
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019894433906301856
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_diff_right: \"inner x (y - z) = inner x y - inner x z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x (y - z) = inner x y - inner x z",
+      "duration_seconds": 0.017090087989345193
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02002400206401944
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_sum_right: \"inner x (\\<Sum>y\\<in>A. f y) = (\\<Sum>y\\<in>A. inner x (f y))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x (sum f A) = (\\<Sum>y\\<in>A. inner x (f y))",
+      "duration_seconds": 0.02173755399417132
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.031505614053457975
+    },
+    {
+      "mode": "search",
+      "command": "lemmas inner_add [algebra_simps] = inner_add_left inner_add_right",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019442800083197653
+    },
+    {
+      "mode": "search",
+      "command": "lemmas inner_diff [algebra_simps]  = inner_diff_left inner_diff_right",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0202650889987126
+    },
+    {
+      "mode": "search",
+      "command": "lemmas inner_scaleR = inner_scaleR_left inner_scaleR_right",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017233310965821147
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>Legacy theorem names\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013083013938739896
+    },
+    {
+      "mode": "search",
+      "command": "lemmas inner_left_distrib = inner_add_left",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017929396010003984
+    },
+    {
+      "mode": "search",
+      "command": "lemmas inner_right_distrib = inner_add_right",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016283039934933186
+    },
+    {
+      "mode": "search",
+      "command": "lemmas inner_distrib = inner_left_distrib inner_right_distrib",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01839389291126281
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_gt_zero_iff [simp]: \"0 < inner x x \\<longleftrightarrow> x \\<noteq> 0\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (0 < inner x x) = (x \\<noteq> (0::'a))",
+      "duration_seconds": 0.012717807898297906
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01691807701718062
+    },
+    {
+      "mode": "search",
+      "command": "lemma power2_norm_eq_inner: \"(norm x)\\<^sup>2 = inner x x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (norm x)\\<^sup>2 = inner x x",
+      "duration_seconds": 0.01627718808595091
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014908118057064712
+    },
+    {
+      "mode": "search",
+      "command": "lemma dot_square_norm: \"inner x x = (norm x)\\<^sup>2\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x x = (norm x)\\<^sup>2",
+      "duration_seconds": 0.014980704989284277
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014325206982903183
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>Identities involving real multiplication and division.\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010227850987575948
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_mult_left: \"inner (of_real m * a) b = m * (inner a b)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner (of_real m * a) b = m * inner a b",
+      "duration_seconds": 0.01574355596676469
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016243431949988008
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_mult_right: \"inner a (of_real m * b) = m * (inner a b)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner a (of_real m * b) = m * inner a b",
+      "duration_seconds": 0.01696094695944339
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016799974022433162
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_mult_left': \"inner (a * of_real m) b = m * (inner a b)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner (a * of_real m) b = m * inner a b",
+      "duration_seconds": 0.015933359041810036
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016375242033973336
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_mult_right': \"inner a (b * of_real m) = (inner a b) * m\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner a (b * of_real m) = inner a b * m",
+      "duration_seconds": 0.015255930018611252
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0137842099647969
+    },
+    {
+      "mode": "search",
+      "command": "lemma Cauchy_Schwarz_ineq:\n  \"(inner x y)\\<^sup>2 \\<le> inner x x * inner y y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (inner x y)\\<^sup>2 \\<le> inner x x * inner y y",
+      "duration_seconds": 0.01665951998438686
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012368913041427732
+    },
+    {
+      "mode": "search",
+      "command": "lemma Cauchy_Schwarz_ineq2:\n  \"\\<bar>inner x y\\<bar> \\<le> norm x * norm y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<bar>inner x y\\<bar> \\<le> norm x * norm y",
+      "duration_seconds": 0.015662824036553502
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017345523927360773
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_cauchy_schwarz: \"inner x y \\<le> norm x * norm y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x y \\<le> norm x * norm y",
+      "duration_seconds": 0.01378101494628936
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011409520986489952
+    },
+    {
+      "mode": "search",
+      "command": "subclass real_normed_vector",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. class.real_normed_vector (-) dist norm (+) (0::'a) uminus (*\\<^sub>R)\n     sgn uniformity open",
+      "duration_seconds": 0.05317156505770981
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.1993647119961679
+    },
+    {
+      "mode": "search",
+      "command": "end",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009361249045468867
+    },
+    {
+      "mode": "search",
+      "command": "lemma square_bound_lemma:\n  fixes x :: real\n  shows \"x < (1 + x) * (1 + x)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x < (1 + x) * (1 + x)",
+      "duration_seconds": 0.012286805897019804
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009849858935922384
+    },
+    {
+      "mode": "search",
+      "command": "lemma square_continuous:\n  fixes e :: real\n  shows \"e > 0 \\<Longrightarrow> \\<exists>d. 0 < d \\<and> (\\<forall>y. \\<bar>y - x\\<bar> < d \\<longrightarrow> \\<bar>y * y - x * x\\<bar> < e)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. 0 < e \\<Longrightarrow>\n    \\<exists>d>0.\n       \\<forall>y.\n          \\<bar>y - x\\<bar> < d \\<longrightarrow>\n          \\<bar>y * y - x * x\\<bar> < e",
+      "duration_seconds": 0.015315488097257912
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009119847905822098
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_le: \"norm x \\<le> norm y \\<longleftrightarrow> inner x x \\<le> inner y y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (norm x \\<le> norm y) = (inner x x \\<le> inner y y)",
+      "duration_seconds": 0.012556085013784468
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008894705097191036
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_lt: \"norm x < norm y \\<longleftrightarrow> inner x x < inner y y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (norm x < norm y) = (inner x x < inner y y)",
+      "duration_seconds": 0.010933750891126692
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010496457922272384
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_eq: \"norm x = norm y \\<longleftrightarrow> inner x x = inner y y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (norm x = norm y) = (inner x x = inner y y)",
+      "duration_seconds": 0.012287980993278325
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012038908083923161
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_eq_1: \"norm x = 1 \\<longleftrightarrow> inner x x = 1\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (norm x = 1) = (inner x x = 1)",
+      "duration_seconds": 0.009861747967079282
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.007924942998215556
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_divide_left:\n  fixes a :: \"'a :: {real_inner,real_div_algebra}\"\n  shows \"inner (a / of_real m) b = (inner a b) / m\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner (a / of_real m) b = inner a b / m",
+      "duration_seconds": 0.013305068016052246
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010726451990194619
+    },
+    {
+      "mode": "search",
+      "command": "lemma inner_divide_right:\n  fixes a :: \"'a :: {real_inner,real_div_algebra}\"\n  shows \"inner a (b / of_real m) = (inner a b) / m\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner a (b / of_real m) = inner a b / m",
+      "duration_seconds": 0.01306874502915889
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008128116023726761
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>\n  Re-enable constraints for \\<^term>\\<open>open\\<close>, \\<^term>\\<open>uniformity\\<close>,\n  \\<^term>\\<open>dist\\<close>, and \\<^term>\\<open>norm\\<close>.\n\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012597549008205533
+    },
+    {
+      "mode": "search",
+      "command": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>open\\<close>, SOME \\<^typ>\\<open>'a::topological_space set \\<Rightarrow> bool\\<close>)\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015182964969426394
+    },
+    {
+      "mode": "search",
+      "command": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>uniformity\\<close>, SOME \\<^typ>\\<open>('a::uniform_space \\<times> 'a) filter\\<close>)\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012432574992999434
+    },
+    {
+      "mode": "search",
+      "command": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>dist\\<close>, SOME \\<^typ>\\<open>'a::metric_space \\<Rightarrow> 'a \\<Rightarrow> real\\<close>)\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011907454114407301
+    },
+    {
+      "mode": "search",
+      "command": "setup \\<open>Sign.add_const_constraint\n  (\\<^const_name>\\<open>norm\\<close>, SOME \\<^typ>\\<open>'a::real_normed_vector \\<Rightarrow> real\\<close>)\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011276044067926705
+    },
+    {
+      "mode": "search",
+      "command": "lemma bounded_bilinear_inner:\n  \"bounded_bilinear (inner::'a::real_inner \\<Rightarrow> 'a \\<Rightarrow> real)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bounded_bilinear inner",
+      "duration_seconds": 0.010836697998456657
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01026667992118746
+    },
+    {
+      "mode": "search",
+      "command": "lemmas tendsto_inner [tendsto_intros] =\n  bounded_bilinear.tendsto [OF bounded_bilinear_inner]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01015465590171516
+    },
+    {
+      "mode": "search",
+      "command": "lemmas isCont_inner [simp] =\n  bounded_bilinear.isCont [OF bounded_bilinear_inner]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01085045700892806
+    },
+    {
+      "mode": "search",
+      "command": "lemmas has_derivative_inner [derivative_intros] =\n  bounded_bilinear.FDERIV [OF bounded_bilinear_inner]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01087675103917718
+    },
+    {
+      "mode": "search",
+      "command": "lemmas bounded_linear_inner_left =\n  bounded_bilinear.bounded_linear_left [OF bounded_bilinear_inner]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008985624997876585
+    },
+    {
+      "mode": "search",
+      "command": "lemmas bounded_linear_inner_right =\n  bounded_bilinear.bounded_linear_right [OF bounded_bilinear_inner]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009745354996994138
+    },
+    {
+      "mode": "search",
+      "command": "lemmas bounded_linear_inner_left_comp = bounded_linear_inner_left[THEN bounded_linear_compose]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009270786074921489
+    },
+    {
+      "mode": "search",
+      "command": "lemmas bounded_linear_inner_right_comp = bounded_linear_inner_right[THEN bounded_linear_compose]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.007024972001090646
+    },
+    {
+      "mode": "search",
+      "command": "lemmas has_derivative_inner_right [derivative_intros] =\n  bounded_linear.has_derivative [OF bounded_linear_inner_right]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012975125922821462
+    },
+    {
+      "mode": "search",
+      "command": "lemmas has_derivative_inner_left [derivative_intros] =\n  bounded_linear.has_derivative [OF bounded_linear_inner_left]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010045221075415611
+    },
+    {
+      "mode": "search",
+      "command": "lemma differentiable_inner [simp]:\n  \"f differentiable (at x within s) \\<Longrightarrow> g differentiable at x within s \\<Longrightarrow> (\\<lambda>x. inner (f x) (g x)) differentiable at x within s\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>f differentiable at x within s;\n     g differentiable at x within s\\<rbrakk>\n    \\<Longrightarrow> (\\<lambda>x. inner (f x) (g x)) differentiable at x\n                      within s",
+      "duration_seconds": 0.014161217957735062
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010298048960976303
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Class instances\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.006618703017011285
+    },
+    {
+      "mode": "search",
+      "command": "instantiation real :: real_inner\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009632954956032336
+    },
+    {
+      "mode": "search",
+      "command": "definition inner_real_def [simp]: \"inner = (*)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017640708945691586
+    },
+    {
+      "mode": "search",
+      "command": "instance",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. OFCLASS(real, real_inner_class)",
+      "duration_seconds": 0.005976321990601718
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.007504137000069022
+    },
+    {
+      "mode": "search",
+      "command": "end",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.007806275971233845
+    },
+    {
+      "mode": "search",
+      "command": "lemma\n  shows real_inner_1_left[simp]: \"inner 1 x = x\"\n    and real_inner_1_right[simp]: \"inner x 1 = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner 1 x = x &&& inner x 1 = x",
+      "duration_seconds": 0.010686457040719688
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.007758410996757448
+    },
+    {
+      "mode": "search",
+      "command": "instantiation complex :: real_inner\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.006953730946406722
+    },
+    {
+      "mode": "search",
+      "command": "definition inner_complex_def:\n  \"inner x y = Re x * Re y + Im x * Im y\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01703068893402815
+    },
+    {
+      "mode": "search",
+      "command": "instance",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. OFCLASS(complex, real_inner_class)",
+      "duration_seconds": 0.00743492494802922
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.00728105497546494
+    },
+    {
+      "mode": "search",
+      "command": "end",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.007889377069659531
+    },
+    {
+      "mode": "search",
+      "command": "lemma complex_inner_1 [simp]: \"inner 1 x = Re x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner 1 x = Re x",
+      "duration_seconds": 0.007558054989203811
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.006589591968804598
+    },
+    {
+      "mode": "search",
+      "command": "lemma complex_inner_1_right [simp]: \"inner x 1 = Re x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x 1 = Re x",
+      "duration_seconds": 0.006887104013003409
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008421251084655523
+    },
+    {
+      "mode": "search",
+      "command": "lemma complex_inner_i_left [simp]: \"inner \\<i> x = Im x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner \\<i> x = Im x",
+      "duration_seconds": 0.007280607940629125
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.007593707065097988
+    },
+    {
+      "mode": "search",
+      "command": "lemma complex_inner_i_right [simp]: \"inner x \\<i> = Im x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x \\<i> = Im x",
+      "duration_seconds": 0.006711503956466913
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008022663998417556
+    },
+    {
+      "mode": "search",
+      "command": "lemma dot_square_norm: \"inner x x = (norm x)\\<^sup>2\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inner x x = (norm x)\\<^sup>2",
+      "duration_seconds": 0.007955798064358532
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011295630945824087
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_eq_square: \"norm x = a \\<longleftrightarrow> 0 \\<le> a \\<and> inner x x = a\\<^sup>2\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (norm x = a) = (0 \\<le> a \\<and> inner x x = a\\<^sup>2)",
+      "duration_seconds": 0.010801912983879447
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.007732641999609768
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_le_square: \"norm x \\<le> a \\<longleftrightarrow> 0 \\<le> a \\<and> inner x x \\<le> a\\<^sup>2\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (norm x \\<le> a) = (0 \\<le> a \\<and> inner x x \\<le> a\\<^sup>2)",
+      "duration_seconds": 0.011664730962365866
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009043244062922895
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_ge_square: \"norm x \\<ge> a \\<longleftrightarrow> a \\<le> 0 \\<or> inner x x \\<ge> a\\<^sup>2\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (a \\<le> norm x) = (a \\<le> 0 \\<or> a\\<^sup>2 \\<le> inner x x)",
+      "duration_seconds": 0.0100293830037117
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009564689011313021
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_lt_square: \"norm x < a \\<longleftrightarrow> 0 < a \\<and> inner x x < a\\<^sup>2\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (norm x < a) = (0 < a \\<and> inner x x < a\\<^sup>2)",
+      "duration_seconds": 0.008450674009509385
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.006734193069860339
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008751051966100931
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_gt_square: \"norm x > a \\<longleftrightarrow> a < 0 \\<or> inner x x > a\\<^sup>2\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (a < norm x) = (a < 0 \\<or> a\\<^sup>2 < inner x x)",
+      "duration_seconds": 0.009082600008696318
+    }
+  ],
+  "failure_category": null,
+  "request_id": "449c2612b93949bbadf012c9021a1fe9",
+  "input_sha256": "65ba7a6df401cb86cd6779e3ad6899deead2ae28cdae827776ae72db38a62e80",
+  "duration_seconds": 11.917129573994316
+}

@@ -1,0 +1,171 @@
+Server is running. Press Ctrl-C to stop.
+Checkpoint 1
+Checkpoint 2
+Checkpoint 3
+Checkpoint 4
+Checkpoint 4
+Checkpoint 5
+Checkpoint 6
+Checkpoint 7
+Checkpoint 8
+Checkpoint 9
+Checkpoint 9_1
+Checkpoint 9_2
+Checkpoint 9_3
+Checkpoint 9_4
+Checkpoint 9_5
+/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/cases/explicit_direct/work/target-s_8ly76o/miniF2F
+de.unruh.isabelle.pure.TheoryHeader@6acbc4f9
+List(Main)
+Checkpoint 10
+Checkpoint 11
+Checkpoint 12
+Checkpoint 13
+Checkpoint 14
+Intialising the problem...
+Intialised...
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Exception in thread "main" zio.FiberFailure: Fiber failed.
+An interrupt was produced by #104.
+
+Fiber:Id(1793589173698,1) was supposed to continue to:
+  a future continuation at zio.ZIO.run(ZIO.scala:1640)
+  a future continuation at zio.ZManaged.use(ZManaged.scala:1025)
+  a future continuation at zio.ZIO.exitCode(ZIO.scala:543)
+
+Fiber:Id(1793589173698,1) execution trace:
+  at zio.ZIO$.never(ZIO.scala:3618)
+  at zio.ZManaged.use(ZManaged.scala:1026)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:161)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:154)
+  at zio.ZIO$.effectSuspendTotal(ZIO.scala:2640)
+  at zio.ZIO$.bracketExit(ZIO.scala:2273)
+  at zio.internal.FiberContext.evaluateNow(FiberContext.scala:559)
+  at zio.ZIO.bracket_(ZIO.scala:256)
+  at zio.ZIO.run(ZIO.scala:1640)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:154)
+  at zio.ZManaged.flatMap(ZManaged.scala:312)
+  at zio.ZManaged.flatMap(ZManaged.scala:312)
+  at zio.ZManaged.map(ZManaged.scala:449)
+  at zio.ZManaged.map(ZManaged.scala:449)
+  at zio.ZManaged.flatMap(ZManaged.scala:312)
+  at zio.ZManaged.map(ZManaged.scala:449)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:161)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:154)
+  at zio.ZManaged$.makeExit(ZManaged.scala:1901)
+  at zio.ZManaged$ReleaseMap$$anon$1.add(ZManaged.scala:1301)
+  at zio.ZManaged$ReleaseMap$$anon$1.addIfOpen(ZManaged.scala:1311)
+  at zio.ZIO.flatten(ZIO.scala:617)
+  at zio.ZRef$Atomic.modify(ZRef.scala:213)
+  at zio.ZManaged$.makeExit(ZManaged.scala:1900)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:161)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:154)
+  at zio.ZIO$.effectSuspendTotal(ZIO.scala:2640)
+  at zio.ZIO$.bracketExit(ZIO.scala:2273)
+  at zio.internal.FiberContext.evaluateNow(FiberContext.scala:559)
+  at zio.ZIO.bracket_(ZIO.scala:256)
+  at zio.ZIO.run(ZIO.scala:1640)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:161)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:154)
+  at <unknown>.<unknown>(Server.scala:0)
+  at zio.ZIO.unit(ZIO.scala:1994)
+  at scalapb.zio_grpc.Server$ServiceImpl.start(Server.scala:29)
+  at zio.ZIO.bracket_(ZIO.scala:256)
+  at zio.internal.FiberContext.evaluateNow(FiberContext.scala:555)
+  at zio.ZManaged$.makeExit(ZManaged.scala:1899)
+  at zio.ZIO$AccessPartiallyApplied$.apply(ZIO.scala:4101)
+  at zio.ZManaged.flatMap(ZManaged.scala:311)
+  at zio.ZManaged.map(ZManaged.scala:449)
+  at zio.ZManaged.flatMap(ZManaged.scala:312)
+  at zio.ZManaged.map(ZManaged.scala:449)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:161)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:154)
+  at zio.ZIO$.effectSuspendTotal(ZIO.scala:2640)
+  at zio.ZIO$.bracketExit(ZIO.scala:2273)
+  at zio.internal.FiberContext.evaluateNow(FiberContext.scala:559)
+  at zio.ZIO.bracket_(ZIO.scala:256)
+  at zio.ZIO.run(ZIO.scala:1640)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:154)
+  at zio.ZManaged.mapM(ZManaged.scala:474)
+  at pisa.server.ZioServer$ZServer$$anon$3.bind(ZioServer.scala:35)
+  at zio.ZIO$.runtime(ZIO.scala:3713)
+  at zio.ZIO$.runtime(ZIO.scala:3712)
+  at zio.ZIO$.runtime(ZIO.scala:3712)
+  at zio.ZIO$AccessPartiallyApplied$.apply(ZIO.scala:4101)
+  at scalapb.zio_grpc.ZBindableService$$anon$1.bindService(ZBindableService.scala:31)
+  at zio.ZIO.bracket_(ZIO.scala:256)
+  at zio.internal.FiberContext.evaluateNow(FiberContext.scala:555)
+  at zio.ZIO.provideSome(ZIO.scala:1171)
+  at zio.ZManaged.mapM(ZManaged.scala:474)
+  at zio.ZManaged$.succeed(ZManaged.scala:2223)
+  at zio.ZManaged.flatMap(ZManaged.scala:311)
+  at zio.ZManaged$.succeed(ZManaged.scala:2223)
+  at zio.ZManaged.flatMap(ZManaged.scala:311)
+  at zio.ZManaged$.succeed(ZManaged.scala:2223)
+  at zio.ZManaged.flatMap(ZManaged.scala:311)
+  at zio.ZManaged$.fromEffect(ZManaged.scala:1758)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:161)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:154)
+  at zio.ZIO$.effectSuspendTotal(ZIO.scala:2640)
+  at zio.ZIO$.bracketExit(ZIO.scala:2273)
+  at zio.internal.FiberContext.evaluateNow(FiberContext.scala:559)
+  at zio.ZIO.bracket_(ZIO.scala:256)
+  at zio.ZIO.run(ZIO.scala:1640)
+  at zio.internal.FiberContext$InterruptExit$.apply(FiberContext.scala:154)
+  at zio.ZLayer$MemoMap$.make(ZLayer.scala:2251)
+  at zio.ZRefM$.make(ZRefM.scala:500)
+  at zio.Semaphore$.make(Semaphore.scala:127)
+  at zio.ZRef$.make(ZRef.scala:749)
+  at zio.ZRefM$.make(ZRefM.scala:499)
+  at zio.ZRef$.make(ZRef.scala:749)
+  at zio.ZIO.bracket_(ZIO.scala:256)
+  at zio.internal.FiberContext.evaluateNow(FiberContext.scala:555)
+  at zio.ZIO.provideSome(ZIO.scala:1171)
+  at zio.ZIO.bracket_(ZIO.scala:256)
+  at zio.internal.FiberContext.evaluateNow(FiberContext.scala:555)
+  at zio.ZIO.provideSome(ZIO.scala:1171)
+  at zio.ZManaged.use(ZManaged.scala:1026)
+  at zio.ZManaged$ReleaseMap$.make(ZManaged.scala:1297)
+  at zio.ZRef$.make(ZRef.scala:749)
+  at scalapb.zio_grpc.ServerMain.myAppLogic(ServerMain.scala:23)
+  at zio.console.package$Console$Service$$anon$1.putStrLn(package.scala:73)
+  at zio.console.package$.putStrLn(package.scala:122)
+
+Fiber:Id(1793589173698,1) was spawned by:
+
+Fiber:Id(1793589173647,0) was supposed to continue to:
+  a future continuation at zio.App.main(App.scala:57)
+  a future continuation at zio.App.main(App.scala:56)
+
+Fiber:Id(1793589173647,0) ZIO Execution trace: <empty trace>
+
+Fiber:Id(1793589173647,0) was spawned by: <empty trace>

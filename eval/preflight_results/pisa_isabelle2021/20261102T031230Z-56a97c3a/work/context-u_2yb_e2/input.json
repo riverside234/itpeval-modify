@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory group\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\n\n\nlocale group =\n  fixes mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\"\n  assumes mul_assoc : \"a ** (b ** c) = (a ** b) ** c\"\n    and   mul_one   : \"a ** one = a\"\n    and   one_mul   : \"one ** a = a\"\n    and   mul_inv_l : \"inv a ** a = one\"\n    and   mul_inv_r : \"a ** inv a = one\"\nbegin\n\n\n\nlemma mul_left_cancel:\n  assumes h: \"a ** b = a ** c\"\n  shows \"b = c\"\n  sorry\nlemma mul_right_cancel:\n  assumes h: \"b ** a = c ** a\"\n  shows \"b = c\"\n  sorry\nlemma inv_inv: \"inv (inv a) = a\"\n  sorry\nlemma inv_mul: \"inv (a ** b) = inv b ** inv a\"\n  sorry\nlemma inv_eq_of_mul_eq_one:\n  assumes h: \"a ** b = one\"\n  shows \"b = inv a\"\n  sorry\nend\n\n\n\n\nlocale group_comm = group +\n  assumes mul_comm : \"a ** b = b ** a\"\nbegin\n\nlemma mul_rotate': \"a ** (b ** c) = b ** (c ** a)\"\n  sorry\nend\n\n\n\n\nlocale group_action =\n  group mul one inv\n    for mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\" +\n  fixes act :: \"'a => 'b => 'b\"  (infixr \"acts\" 73)\n  assumes act_one : \"one acts x = x\"\n    and   act_mul : \"(g ** h) acts x = g acts (h acts x)\"\nbegin\n\n\n\nlemma act_inv: \"inv g acts (g acts x) = x\"\n  sorry\nlemma act_inv_r: \"g acts (inv g acts x) = x\"\n  sorry\ndefinition orbit :: \"'b => 'b => bool\"\n  where \"orbit x y == (EX g. g acts x = y)\"\n\ndefinition stabilizer :: \"'b => 'a => bool\"\n  where \"stabilizer x g == g acts x = x\"\n\nlemma orbit_refl: \"orbit x x\"\n  sorry\nlemma orbit_sym:\n  assumes \"orbit x y\"\n  shows \"orbit y x\"\n  sorry\nlemma orbit_trans:\n  assumes \"orbit x y\" \"orbit y z\"\n  shows \"orbit x z\"\n  sorry\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma orbit_partition:\n  assumes hxy: \"orbit x y\"\n  shows \"orbit x z = orbit y z\"\n  ",
+    "theory_name": "group",
+    "request_id": "ac72e41b0dc14da58fcaf485e8eaadbe",
+    "input_sha256": "0ea81ea7058b07030af82567e1a5f9c85c650b7c81a9e789ebb26c816d63dcbc"
+  }
+}

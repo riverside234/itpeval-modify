@@ -1,0 +1,190 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 13,
+    "last_step": 13,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "(*  \n  File:       Bernoulli.thy\n  Author:     Lukas Bulwahn <lukas.bulwahn-at-gmail.com> \n  Author:     Manuel Eberl <manuel@pruvisto.org> \n*)\n",
+        "output": "",
+        "step_time": 0.022057056427001953
+      },
+      {
+        "index": 1,
+        "step": "section \\<open>Bernoulli numbers\\<close>",
+        "output": "",
+        "step_time": 0.016083240509033203
+      },
+      {
+        "index": 2,
+        "step": "theory Bernoulli\nimports Complex_Main\nbegin",
+        "output": "",
+        "step_time": 0.01518106460571289
+      },
+      {
+        "index": 3,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.016013622283935547
+      },
+      {
+        "index": 4,
+        "step": "subsection \\<open>Preliminaries\\<close>",
+        "output": "",
+        "step_time": 0.014905452728271484
+      },
+      {
+        "index": 5,
+        "step": "lemma power_numeral_reduce: \"a ^ numeral n = a * a ^ pred_numeral n\"",
+        "output": "",
+        "step_time": 0.02546977996826172
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.021871328353881836
+      },
+      {
+        "index": 7,
+        "step": "lemma fact_diff_Suc: \"n < Suc m \\<Longrightarrow> fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)\"",
+        "output": "",
+        "step_time": 0.022222280502319336
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016879796981811523
+      },
+      {
+        "index": 9,
+        "step": "lemma of_nat_binomial_Suc:\n  assumes \"k \\<le> n\"\n  shows   \"(of_nat (Suc n choose k) :: 'a :: field_char_0) = \n             of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)\"",
+        "output": "",
+        "step_time": 0.021244287490844727
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.018927335739135742
+      },
+      {
+        "index": 11,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.017737865447998047
+      },
+      {
+        "index": 12,
+        "step": "lemma integrals_eq:\n  assumes \"f 0 = g 0\"\n  assumes \"\\<And> x. ((\\<lambda>x. f x - g x) has_real_derivative 0) (at x)\"\n  shows \"f x = g x\"",
+        "output": "",
+        "step_time": 0.020497798919677734
+      }
+    ],
+    "final_state": "default_12",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "(*  \n  File:       Bernoulli.thy\n  Author:     Lukas Bulwahn <lukas.bulwahn-at-gmail.com> \n  Author:     Manuel Eberl <manuel@pruvisto.org> \n*)\n",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.022047473001293838
+    },
+    {
+      "mode": "search",
+      "command": "section \\<open>Bernoulli numbers\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01607917610090226
+    },
+    {
+      "mode": "search",
+      "command": "theory Bernoulli\nimports Complex_Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015177355031482875
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016008498962037265
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Preliminaries\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01490077399648726
+    },
+    {
+      "mode": "search",
+      "command": "lemma power_numeral_reduce: \"a ^ numeral n = a * a ^ pred_numeral n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. a ^ numeral n = a * a ^ pred_numeral n",
+      "duration_seconds": 0.02546355896629393
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02186410501599312
+    },
+    {
+      "mode": "search",
+      "command": "lemma fact_diff_Suc: \"n < Suc m \\<Longrightarrow> fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. n < Suc m \\<Longrightarrow>\n    fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)",
+      "duration_seconds": 0.02221721294336021
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01687481498811394
+    },
+    {
+      "mode": "search",
+      "command": "lemma of_nat_binomial_Suc:\n  assumes \"k \\<le> n\"\n  shows   \"(of_nat (Suc n choose k) :: 'a :: field_char_0) = \n             of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_nat (Suc n choose k) =\n    of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)",
+      "duration_seconds": 0.021240763016976416
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018923457944765687
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017734277993440628
+    },
+    {
+      "mode": "search",
+      "command": "lemma integrals_eq:\n  assumes \"f 0 = g 0\"\n  assumes \"\\<And> x. ((\\<lambda>x. f x - g x) has_real_derivative 0) (at x)\"\n  shows \"f x = g x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. f x = g x",
+      "duration_seconds": 0.02049409004393965
+    }
+  ],
+  "failure_category": null,
+  "request_id": "d17c708045944601b059e82ad2850217",
+  "input_sha256": "869ac9cc31c3bbcec79a0dad96fc9ad30220d76521d162084031325825cdc004",
+  "duration_seconds": 8.55349497194402
+}

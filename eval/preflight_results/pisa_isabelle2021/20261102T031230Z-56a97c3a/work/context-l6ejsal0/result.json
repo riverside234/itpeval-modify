@@ -1,0 +1,125 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 8,
+    "last_step": 8,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory polynomial\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.02401447296142578
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.017652273178100586
+      },
+      {
+        "index": 2,
+        "step": "datatype mynat = Nat_O | Nat_S mynat",
+        "output": "",
+        "step_time": 0.32857584953308105
+      },
+      {
+        "index": 3,
+        "step": "fun mynat_add :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> mynat\" where\n  \"mynat_add Nat_O m = m\"\n| \"mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)\"",
+        "output": "",
+        "step_time": 0.09412217140197754
+      },
+      {
+        "index": 4,
+        "step": "lemma mynat_add_O_left: \"mynat_add Nat_O m = m\"",
+        "output": "",
+        "step_time": 0.021142959594726562
+      },
+      {
+        "index": 5,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01983356475830078
+      },
+      {
+        "index": 6,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.01728534698486328
+      },
+      {
+        "index": 7,
+        "step": "lemma mynat_add_S_left: \"mynat_add (Nat_S n) m = Nat_S (mynat_add n m)\"",
+        "output": "",
+        "step_time": 0.021836042404174805
+      }
+    ],
+    "final_state": "default_7",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory polynomial\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024001159938052297
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017643103026784956
+    },
+    {
+      "mode": "search",
+      "command": "datatype mynat = Nat_O | Nat_S mynat",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.3285676079103723
+    },
+    {
+      "mode": "search",
+      "command": "fun mynat_add :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> mynat\" where\n  \"mynat_add Nat_O m = m\"\n| \"mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.09411364502739161
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_add_O_left: \"mynat_add Nat_O m = m\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add Nat_O m = m",
+      "duration_seconds": 0.02113542298320681
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019828996970318258
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01727942400611937
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_add_S_left: \"mynat_add (Nat_S n) m = Nat_S (mynat_add n m)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add (Nat_S n) m = Nat_S (mynat_add n m)",
+      "duration_seconds": 0.021830811048857868
+    }
+  ],
+  "failure_category": null,
+  "request_id": "3bdacf1d637b48408c057a00f90cf8e9",
+  "input_sha256": "2520852cc78ab16eab6e5329bf80378eb5cb3f8f90651d6e309b9051fe01703d",
+  "duration_seconds": 8.829699373920448
+}

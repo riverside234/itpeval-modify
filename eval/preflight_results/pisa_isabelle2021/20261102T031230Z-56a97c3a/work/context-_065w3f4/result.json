@@ -1,0 +1,112 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 7,
+    "last_step": 7,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory graph_paths\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.023284435272216797
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.017069339752197266
+      },
+      {
+        "index": 2,
+        "step": "inductive Path :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  for E :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\nwhere\n  Pnil:  \"Path E v v\"\n| Pstep: \"Path E u v \\<Longrightarrow> E v w \\<Longrightarrow> Path E u w\"",
+        "output": "",
+        "step_time": 0.03916311264038086
+      },
+      {
+        "index": 3,
+        "step": "definition undirected :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"undirected E \\<equiv> \\<forall>x y. E x y \\<longrightarrow> E y x\"",
+        "output": "",
+        "step_time": 0.02312445640563965
+      },
+      {
+        "index": 4,
+        "step": "definition Erev :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  where \"Erev E x y \\<equiv> E y x\"",
+        "output": "",
+        "step_time": 0.02373528480529785
+      },
+      {
+        "index": 5,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.01646566390991211
+      },
+      {
+        "index": 6,
+        "step": "lemma path_refl: \"Path E v v\"",
+        "output": "",
+        "step_time": 0.02000570297241211
+      }
+    ],
+    "final_state": "default_6",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory graph_paths\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02327657595742494
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017062950995750725
+    },
+    {
+      "mode": "search",
+      "command": "inductive Path :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  for E :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\nwhere\n  Pnil:  \"Path E v v\"\n| Pstep: \"Path E u v \\<Longrightarrow> E v w \\<Longrightarrow> Path E u w\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03915607405360788
+    },
+    {
+      "mode": "search",
+      "command": "definition undirected :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"undirected E \\<equiv> \\<forall>x y. E x y \\<longrightarrow> E y x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02311963401734829
+    },
+    {
+      "mode": "search",
+      "command": "definition Erev :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  where \"Erev E x y \\<equiv> E y x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023729142965748906
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016459773993119597
+    },
+    {
+      "mode": "search",
+      "command": "lemma path_refl: \"Path E v v\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. Path E v v",
+      "duration_seconds": 0.019999574054963887
+    }
+  ],
+  "failure_category": null,
+  "request_id": "bde892fee6b0415da334aa00cd548142",
+  "input_sha256": "99a80825418ce681a2546e2e7e03c5624a49f98975825d908f4273abb809d595",
+  "duration_seconds": 7.559575228951871
+}

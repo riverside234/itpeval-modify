@@ -1,0 +1,1 @@
+["java", "-cp", "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle/target/scala-2.13/PISA-assembly-0.1.jar", "pisa.server.PisaOneStageServer9000"]

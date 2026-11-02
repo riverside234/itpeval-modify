@@ -1,0 +1,268 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 19,
+    "last_step": 19,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory comp_commute\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.02347278594970703
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01729297637939453
+      },
+      {
+        "index": 2,
+        "step": "definition myComp :: \"('b \\<Rightarrow> 'c) \\<Rightarrow> ('a \\<Rightarrow> 'b) \\<Rightarrow> ('a \\<Rightarrow> 'c)\"\n  where \"myComp g f \\<equiv> \\<lambda>x. g (f x)\"",
+        "output": "",
+        "step_time": 0.025793075561523438
+      },
+      {
+        "index": 3,
+        "step": "definition myId :: \"'a \\<Rightarrow> 'a\"\n  where \"myId \\<equiv> \\<lambda>x. x\"",
+        "output": "",
+        "step_time": 0.023324012756347656
+      },
+      {
+        "index": 4,
+        "step": "lemma comp_assoc:\n  \"myComp h (myComp g f) = myComp (myComp h g) f\"",
+        "output": "",
+        "step_time": 0.022458791732788086
+      },
+      {
+        "index": 5,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.021149873733520508
+      },
+      {
+        "index": 6,
+        "step": "lemma comp_id_l:\n  \"myComp myId f = f\"",
+        "output": "",
+        "step_time": 0.01993584632873535
+      },
+      {
+        "index": 7,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019795656204223633
+      },
+      {
+        "index": 8,
+        "step": "lemma comp_id_r:\n  \"myComp f myId = f\"",
+        "output": "",
+        "step_time": 0.01772475242614746
+      },
+      {
+        "index": 9,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.018435239791870117
+      },
+      {
+        "index": 10,
+        "step": "definition commute :: \"('a \\<Rightarrow> 'a) \\<Rightarrow> ('a \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"commute f g \\<equiv> myComp f g = myComp g f\"",
+        "output": "",
+        "step_time": 0.023726463317871094
+      },
+      {
+        "index": 11,
+        "step": "lemma commute_symm:\n  \"commute f g \\<Longrightarrow> commute g f\"",
+        "output": "",
+        "step_time": 0.018089771270751953
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016752958297729492
+      },
+      {
+        "index": 13,
+        "step": "lemma commute_with_id_l:\n  \"commute f myId\"",
+        "output": "",
+        "step_time": 0.0176541805267334
+      },
+      {
+        "index": 14,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01661062240600586
+      },
+      {
+        "index": 15,
+        "step": "lemma commute_with_id_r:\n  \"commute myId f\"",
+        "output": "",
+        "step_time": 0.01769566535949707
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.021573543548583984
+      },
+      {
+        "index": 17,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.012176990509033203
+      },
+      {
+        "index": 18,
+        "step": "lemma commute_refl:\n  \"commute f f\"",
+        "output": "",
+        "step_time": 0.03154611587524414
+      }
+    ],
+    "final_state": "default_18",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory comp_commute\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023464332916773856
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017288481001742184
+    },
+    {
+      "mode": "search",
+      "command": "definition myComp :: \"('b \\<Rightarrow> 'c) \\<Rightarrow> ('a \\<Rightarrow> 'b) \\<Rightarrow> ('a \\<Rightarrow> 'c)\"\n  where \"myComp g f \\<equiv> \\<lambda>x. g (f x)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025788535946048796
+    },
+    {
+      "mode": "search",
+      "command": "definition myId :: \"'a \\<Rightarrow> 'a\"\n  where \"myId \\<equiv> \\<lambda>x. x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02331904403399676
+    },
+    {
+      "mode": "search",
+      "command": "lemma comp_assoc:\n  \"myComp h (myComp g f) = myComp (myComp h g) f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. myComp h (myComp g f) = myComp (myComp h g) f",
+      "duration_seconds": 0.02245293406303972
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.021143796970136464
+    },
+    {
+      "mode": "search",
+      "command": "lemma comp_id_l:\n  \"myComp myId f = f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. myComp myId f = f",
+      "duration_seconds": 0.019930692040361464
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01979021599981934
+    },
+    {
+      "mode": "search",
+      "command": "lemma comp_id_r:\n  \"myComp f myId = f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. myComp f myId = f",
+      "duration_seconds": 0.01771978393662721
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018430524971336126
+    },
+    {
+      "mode": "search",
+      "command": "definition commute :: \"('a \\<Rightarrow> 'a) \\<Rightarrow> ('a \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"commute f g \\<equiv> myComp f g = myComp g f\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023723272024653852
+    },
+    {
+      "mode": "search",
+      "command": "lemma commute_symm:\n  \"commute f g \\<Longrightarrow> commute g f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. commute f g \\<Longrightarrow> commute g f",
+      "duration_seconds": 0.018084881943650544
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01674890296999365
+    },
+    {
+      "mode": "search",
+      "command": "lemma commute_with_id_l:\n  \"commute f myId\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. commute f myId",
+      "duration_seconds": 0.017648741020821035
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01660465099848807
+    },
+    {
+      "mode": "search",
+      "command": "lemma commute_with_id_r:\n  \"commute myId f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. commute myId f",
+      "duration_seconds": 0.017690886976197362
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.021568809053860605
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012172203045338392
+    },
+    {
+      "mode": "search",
+      "command": "lemma commute_refl:\n  \"commute f f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. commute f f",
+      "duration_seconds": 0.03154081501998007
+    }
+  ],
+  "failure_category": null,
+  "request_id": "8ca8274ea87f4093a8c11d491965e505",
+  "input_sha256": "6443fedd25ffd317372f03a1762abf742b7a38eee8ec2890f724c8f3c76693f6",
+  "duration_seconds": 11.071530007990077
+}

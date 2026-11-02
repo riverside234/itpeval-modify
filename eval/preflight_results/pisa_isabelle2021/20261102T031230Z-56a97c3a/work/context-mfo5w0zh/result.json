@@ -1,0 +1,320 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 23,
+    "last_step": 23,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory zero_le_one_elem\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.025272846221923828
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01678609848022461
+      },
+      {
+        "index": 2,
+        "step": "locale zero_le_one_setup =\n  fixes decEq      :: \"'m \\<Rightarrow> 'm \\<Rightarrow> bool\"\n    and zero       :: \"'a\"\n    and one        :: \"'a\"\n    and le         :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"   (infix \"\\<preceq>\" 50)\n    and le_antisym :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  assumes le_refl      : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans     : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   zero_le_one  : \"zero \\<preceq> one\"\n    and   zero_le_zero : \"zero \\<preceq> zero\"\n    and   le_antisym   : \"\\<And>x y. x \\<preceq> y \\<Longrightarrow> y \\<preceq> x \\<Longrightarrow> x = y\"\nbegin",
+        "output": "",
+        "step_time": 0.032901763916015625
+      },
+      {
+        "index": 3,
+        "step": "definition One_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"One_matrix i j \\<equiv> if decEq i j then one else zero\"",
+        "output": "",
+        "step_time": 0.024124622344970703
+      },
+      {
+        "index": 4,
+        "step": "definition Zero_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"Zero_matrix \\<equiv> \\<lambda>_ _. zero\"",
+        "output": "",
+        "step_time": 0.024819612503051758
+      },
+      {
+        "index": 5,
+        "step": "definition matrix_le :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_le A B \\<equiv> \\<forall>i j. A i j \\<preceq> B i j\"",
+        "output": "",
+        "step_time": 0.030289888381958008
+      },
+      {
+        "index": 6,
+        "step": "definition matrix_eq :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_eq A B \\<equiv> \\<forall>i j. A i j = B i j\"",
+        "output": "",
+        "step_time": 0.027225255966186523
+      },
+      {
+        "index": 7,
+        "step": "lemma zero_le_one_elem: \"zero \\<preceq> One_matrix i j\"",
+        "output": "",
+        "step_time": 0.02055644989013672
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017892122268676758
+      },
+      {
+        "index": 9,
+        "step": "lemma Zero_le_One_matrix: \"matrix_le Zero_matrix One_matrix\"",
+        "output": "",
+        "step_time": 0.019960403442382812
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.018511295318603516
+      },
+      {
+        "index": 11,
+        "step": "lemma matrix_le_refl: \"matrix_le A A\"",
+        "output": "",
+        "step_time": 0.017138242721557617
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016811132431030273
+      },
+      {
+        "index": 13,
+        "step": "lemma matrix_le_trans: \"matrix_le A B \\<Longrightarrow> matrix_le B C \\<Longrightarrow> matrix_le A C\"",
+        "output": "",
+        "step_time": 0.0176546573638916
+      },
+      {
+        "index": 14,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01846146583557129
+      },
+      {
+        "index": 15,
+        "step": "lemma matrix_eq_refl: \"matrix_eq A A\"",
+        "output": "",
+        "step_time": 0.016726016998291016
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01888895034790039
+      },
+      {
+        "index": 17,
+        "step": "lemma matrix_eq_sym: \"matrix_eq A B \\<Longrightarrow> matrix_eq B A\"",
+        "output": "",
+        "step_time": 0.014983654022216797
+      },
+      {
+        "index": 18,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.03118133544921875
+      },
+      {
+        "index": 19,
+        "step": "lemma matrix_eq_trans: \"matrix_eq A B \\<Longrightarrow> matrix_eq B C \\<Longrightarrow> matrix_eq A C\"",
+        "output": "",
+        "step_time": 0.012746810913085938
+      },
+      {
+        "index": 20,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01585221290588379
+      },
+      {
+        "index": 21,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.013859272003173828
+      },
+      {
+        "index": 22,
+        "step": "lemma matrix_eq_le: \"matrix_eq A B \\<Longrightarrow> matrix_le A B \\<and> matrix_le B A\"",
+        "output": "",
+        "step_time": 0.01642298698425293
+      }
+    ],
+    "final_state": "default_22",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory zero_le_one_elem\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025261481991037726
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016780257923528552
+    },
+    {
+      "mode": "search",
+      "command": "locale zero_le_one_setup =\n  fixes decEq      :: \"'m \\<Rightarrow> 'm \\<Rightarrow> bool\"\n    and zero       :: \"'a\"\n    and one        :: \"'a\"\n    and le         :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"   (infix \"\\<preceq>\" 50)\n    and le_antisym :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  assumes le_refl      : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans     : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   zero_le_one  : \"zero \\<preceq> one\"\n    and   zero_le_zero : \"zero \\<preceq> zero\"\n    and   le_antisym   : \"\\<And>x y. x \\<preceq> y \\<Longrightarrow> y \\<preceq> x \\<Longrightarrow> x = y\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03289534791838378
+    },
+    {
+      "mode": "search",
+      "command": "definition One_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"One_matrix i j \\<equiv> if decEq i j then one else zero\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024118989007547498
+    },
+    {
+      "mode": "search",
+      "command": "definition Zero_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"Zero_matrix \\<equiv> \\<lambda>_ _. zero\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024813688010908663
+    },
+    {
+      "mode": "search",
+      "command": "definition matrix_le :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_le A B \\<equiv> \\<forall>i j. A i j \\<preceq> B i j\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.030284540029242635
+    },
+    {
+      "mode": "search",
+      "command": "definition matrix_eq :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_eq A B \\<equiv> \\<forall>i j. A i j = B i j\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.027219904004596174
+    },
+    {
+      "mode": "search",
+      "command": "lemma zero_le_one_elem: \"zero \\<preceq> One_matrix i j\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. zero \\<preceq> One_matrix i j",
+      "duration_seconds": 0.02055230096448213
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017886304995045066
+    },
+    {
+      "mode": "search",
+      "command": "lemma Zero_le_One_matrix: \"matrix_le Zero_matrix One_matrix\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. matrix_le Zero_matrix One_matrix",
+      "duration_seconds": 0.019954639952629805
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018506543012335896
+    },
+    {
+      "mode": "search",
+      "command": "lemma matrix_le_refl: \"matrix_le A A\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. matrix_le A A",
+      "duration_seconds": 0.01713407493662089
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01680630398914218
+    },
+    {
+      "mode": "search",
+      "command": "lemma matrix_le_trans: \"matrix_le A B \\<Longrightarrow> matrix_le B C \\<Longrightarrow> matrix_le A C\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>matrix_le A B; matrix_le B C\\<rbrakk>\n    \\<Longrightarrow> matrix_le A C",
+      "duration_seconds": 0.01764986093621701
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01845759490970522
+    },
+    {
+      "mode": "search",
+      "command": "lemma matrix_eq_refl: \"matrix_eq A A\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. matrix_eq A A",
+      "duration_seconds": 0.016722293104976416
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018885854980908334
+    },
+    {
+      "mode": "search",
+      "command": "lemma matrix_eq_sym: \"matrix_eq A B \\<Longrightarrow> matrix_eq B A\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. matrix_eq A B \\<Longrightarrow> matrix_eq B A",
+      "duration_seconds": 0.01497591391671449
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03117607906460762
+    },
+    {
+      "mode": "search",
+      "command": "lemma matrix_eq_trans: \"matrix_eq A B \\<Longrightarrow> matrix_eq B C \\<Longrightarrow> matrix_eq A C\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>matrix_eq A B; matrix_eq B C\\<rbrakk>\n    \\<Longrightarrow> matrix_eq A C",
+      "duration_seconds": 0.012741444981656969
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01584565790835768
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013850675080902874
+    },
+    {
+      "mode": "search",
+      "command": "lemma matrix_eq_le: \"matrix_eq A B \\<Longrightarrow> matrix_le A B \\<and> matrix_le B A\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. matrix_eq A B \\<Longrightarrow> matrix_le A B \\<and> matrix_le B A",
+      "duration_seconds": 0.016413959092460573
+    }
+  ],
+  "failure_category": null,
+  "request_id": "578497f31b904ae587b69ad076245a23",
+  "input_sha256": "0830701a72ba6ba04a5d8ced1951b55eede53badccfa10c0af46deeae6f6a6cc",
+  "duration_seconds": 6.8499574160669
+}

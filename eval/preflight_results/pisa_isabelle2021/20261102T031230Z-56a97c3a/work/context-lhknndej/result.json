@@ -1,0 +1,1139 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 86,
+    "last_step": 86,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "(* Author: Lukas Bulwahn <lukas.bulwahn-at-gmail.com> *)\n\n",
+        "output": "",
+        "step_time": 0.024257898330688477
+      },
+      {
+        "index": 1,
+        "step": "section \\<open>Ptolemy's Theorem\\<close>",
+        "output": "",
+        "step_time": 0.020941495895385742
+      },
+      {
+        "index": 2,
+        "step": "theory Ptolemys_Theorem\nimports\n  \"HOL-Analysis.Multivariate_Analysis\"\nbegin",
+        "output": "",
+        "step_time": 0.01691746711730957
+      },
+      {
+        "index": 3,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.017630338668823242
+      },
+      {
+        "index": 4,
+        "step": "subsection \\<open>Preliminaries\\<close>",
+        "output": "",
+        "step_time": 0.01690220832824707
+      },
+      {
+        "index": 5,
+        "step": "subsubsection \\<open>Additions to Rat theory\\<close>",
+        "output": "",
+        "step_time": 0.019295692443847656
+      },
+      {
+        "index": 6,
+        "step": "hide_const (open) normalize",
+        "output": "",
+        "step_time": 0.01984882354736328
+      },
+      {
+        "index": 7,
+        "step": "subsubsection \\<open>Additions to Transcendental theory\\<close>",
+        "output": "",
+        "step_time": 0.018184185028076172
+      },
+      {
+        "index": 8,
+        "step": "text \\<open>\nLemmas about @{const arcsin} and @{const arccos} commonly involve to show that their argument is\nin the domain of those partial functions, i.e., the argument @{term y} is between @{term \"-1::real\"}\nand @{term \"1::real\"}.\nAs the argumentation for @{term \"(-1::real) \\<le> y\"} and @{term \"y \\<le> (1::real)\"} is often very similar,\nwe prefer to prove @{term \"\\<bar>y\\<bar> \\<le> (1::real)\"} to the two goals above.\n\nThe lemma for rewriting the term @{term \"cos (arccos y)\"} is already provided in the Isabelle\ndistribution with name @{thm [source] cos_arccos_abs}. Here, we further provide the analogue on\n@{term \"arcsin\"} for rewriting @{term \"sin (arcsin y)\"}.\n\\<close>",
+        "output": "",
+        "step_time": 0.027521848678588867
+      },
+      {
+        "index": 9,
+        "step": "lemma sin_arcsin_abs: \"\\<bar>y\\<bar> \\<le> 1 \\<Longrightarrow> sin (arcsin y) = y\"",
+        "output": "",
+        "step_time": 0.020891904830932617
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01770162582397461
+      },
+      {
+        "index": 11,
+        "step": "text \\<open>\nThe further lemmas are the required variants from existing lemmas @{thm [source] arccos_lbound}\nand @{thm [source] arccos_ubound}.\n\\<close>",
+        "output": "",
+        "step_time": 0.01854991912841797
+      },
+      {
+        "index": 12,
+        "step": "lemma arccos_lbound_abs [simp]:\n  \"\\<bar>y\\<bar> \\<le> 1 \\<Longrightarrow> 0 \\<le> arccos y\"",
+        "output": "",
+        "step_time": 0.01942920684814453
+      },
+      {
+        "index": 13,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01744246482849121
+      },
+      {
+        "index": 14,
+        "step": "lemma arccos_ubound_abs [simp]:\n  \"\\<bar>y\\<bar> \\<le> 1 \\<Longrightarrow> arccos y \\<le> pi\"",
+        "output": "",
+        "step_time": 0.01807570457458496
+      },
+      {
+        "index": 15,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.038332223892211914
+      },
+      {
+        "index": 16,
+        "step": "text \\<open>\nAs we choose angles to be between @{term \"0::real\"} between @{term \"2 * pi\"},\nwe need some lemmas to reason about the sign of @{term \"sin x\"}\nfor angles @{term \"x\"}.\n\\<close>",
+        "output": "",
+        "step_time": 0.0232088565826416
+      },
+      {
+        "index": 17,
+        "step": "lemma sin_ge_zero_iff:\n  assumes \"0 \\<le> x\" \"x < 2 * pi\"\n  shows \"0 \\<le> sin x \\<longleftrightarrow> x \\<le> pi\"",
+        "output": "",
+        "step_time": 0.018591880798339844
+      },
+      {
+        "index": 18,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.015152215957641602
+      },
+      {
+        "index": 19,
+        "step": "lemma sin_less_zero_iff:\n  assumes \"0 \\<le> x\" \"x < 2 * pi\"\n  shows \"sin x < 0 \\<longleftrightarrow> pi < x\"",
+        "output": "",
+        "step_time": 0.015534400939941406
+      },
+      {
+        "index": 20,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0127410888671875
+      },
+      {
+        "index": 21,
+        "step": "subsubsection \\<open>Addition to Finite-Cartesian-Product theory\\<close>",
+        "output": "",
+        "step_time": 0.011813640594482422
+      },
+      {
+        "index": 22,
+        "step": "text \\<open>\nHere follow generally useful additions and specialised equations\nfor two-dimensional real-valued vectors.\n\\<close>",
+        "output": "",
+        "step_time": 0.012987136840820312
+      },
+      {
+        "index": 23,
+        "step": "lemma axis_nth_eq_0 [simp]:\n  assumes \"i \\<noteq> j\"\n  shows \"axis i x $ j = 0\"",
+        "output": "",
+        "step_time": 0.01551198959350586
+      },
+      {
+        "index": 24,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013591289520263672
+      },
+      {
+        "index": 25,
+        "step": "lemma norm_axis:\n  fixes x :: real\n  shows \"norm (axis i x) = abs x\"",
+        "output": "",
+        "step_time": 0.01448822021484375
+      },
+      {
+        "index": 26,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013188838958740234
+      },
+      {
+        "index": 27,
+        "step": "lemma norm_eq_on_real_2_vec:\n  fixes x :: \"real ^ 2\"\n  shows \"norm x = sqrt ((x $ 1) ^ 2 + (x $ 2) ^ 2)\"",
+        "output": "",
+        "step_time": 0.016408681869506836
+      },
+      {
+        "index": 28,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01493382453918457
+      },
+      {
+        "index": 29,
+        "step": "lemma dist_eq_on_real_2_vec:\n  fixes a b :: \"real ^ 2\"\n  shows \"dist a b = sqrt ((a $ 1 - b $ 1) ^ 2 + (a $ 2 - b $ 2) ^ 2)\"",
+        "output": "",
+        "step_time": 0.020311832427978516
+      },
+      {
+        "index": 30,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013429880142211914
+      },
+      {
+        "index": 31,
+        "step": "subsection \\<open>Polar Form of Two-Dimensional Real-Valued Vectors\\<close>",
+        "output": "",
+        "step_time": 0.012806892395019531
+      },
+      {
+        "index": 32,
+        "step": "subsubsection \\<open>Definitions to Transfer to Polar Form and Back\\<close>",
+        "output": "",
+        "step_time": 0.012139320373535156
+      },
+      {
+        "index": 33,
+        "step": "definition of_radiant :: \"real \\<Rightarrow> real ^ 2\"\nwhere\n  \"of_radiant \\<omega> = axis 1 (cos \\<omega>) + axis 2 (sin \\<omega>)\"",
+        "output": "",
+        "step_time": 0.024425745010375977
+      },
+      {
+        "index": 34,
+        "step": "definition normalize :: \"real ^ 2 \\<Rightarrow> real ^ 2\"\nwhere\n  \"normalize p = (if p = 0 then axis 1 1 else (1 / norm p) *\\<^sub>R p)\"",
+        "output": "",
+        "step_time": 0.026113271713256836
+      },
+      {
+        "index": 35,
+        "step": "definition radiant_of :: \"real ^ 2 \\<Rightarrow> real\"\nwhere\n  \"radiant_of p = (THE \\<omega>. 0 \\<le> \\<omega> \\<and> \\<omega> < 2 * pi \\<and> of_radiant \\<omega> = normalize p)\"",
+        "output": "",
+        "step_time": 0.02420520782470703
+      },
+      {
+        "index": 36,
+        "step": "text \\<open>\nThe vector @{term \"of_radiant \\<omega>\"} is the vector with length @{term \"1::real\"} and angle @{term \"\\<omega>\"}\nto the first axis.\nWe normalize vectors to length @{term \"1::real\"} keeping their orientation with the normalize function.\nConversely, @{term \"radiant_of p\"} is the angle of vector @{term p} to the first axis, where we\nchoose @{term \"radiant_of\"} to return angles between @{term \"0::real\"} and @{term \"2 * pi\"},\nfollowing the usual high-school convention.\nWith these definitions, we can express the main result\n@{term \"norm p *\\<^sub>R of_radiant (radiant_of p) = p\"}.\nNote that the main result holds for any definition of @{term \"radiant_of 0\"}.\nSo, we choose to define @{term \"normalize 0\"} and @{term \"radiant_of 0\"}, such that\n@{term \"radiant_of 0 = 0\"}.\n\\<close>",
+        "output": "",
+        "step_time": 0.022847652435302734
+      },
+      {
+        "index": 37,
+        "step": "subsubsection \\<open>Lemmas on @{const of_radiant}\\<close>",
+        "output": "",
+        "step_time": 0.01048731803894043
+      },
+      {
+        "index": 38,
+        "step": "lemma nth_of_radiant_1 [simp]:\n  \"of_radiant \\<omega> $ 1 = cos \\<omega>\"",
+        "output": "",
+        "step_time": 0.014555692672729492
+      },
+      {
+        "index": 39,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014377355575561523
+      },
+      {
+        "index": 40,
+        "step": "lemma nth_of_radiant_2 [simp]:\n  \"of_radiant \\<omega> $ 2 = sin \\<omega>\"",
+        "output": "",
+        "step_time": 0.013237714767456055
+      },
+      {
+        "index": 41,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012327909469604492
+      },
+      {
+        "index": 42,
+        "step": "lemma norm_of_radiant:\n  \"norm (of_radiant \\<omega>) = 1\"",
+        "output": "",
+        "step_time": 0.011528730392456055
+      },
+      {
+        "index": 43,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01020050048828125
+      },
+      {
+        "index": 44,
+        "step": "lemma of_radiant_plus_2pi:\n  \"of_radiant (\\<omega> + 2 * pi) = of_radiant \\<omega>\"",
+        "output": "",
+        "step_time": 0.013177156448364258
+      },
+      {
+        "index": 45,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009941816329956055
+      },
+      {
+        "index": 46,
+        "step": "lemma of_radiant_minus_2pi:\n  \"of_radiant (\\<omega> - 2 * pi) = of_radiant \\<omega>\"",
+        "output": "",
+        "step_time": 0.014613151550292969
+      },
+      {
+        "index": 47,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010174274444580078
+      },
+      {
+        "index": 48,
+        "step": "subsubsection \\<open>Lemmas on @{const normalize}\\<close>",
+        "output": "",
+        "step_time": 0.011305809020996094
+      },
+      {
+        "index": 49,
+        "step": "lemma normalize_eq:\n  \"norm p *\\<^sub>R normalize p = p\"",
+        "output": "",
+        "step_time": 0.012252569198608398
+      },
+      {
+        "index": 50,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012284994125366211
+      },
+      {
+        "index": 51,
+        "step": "lemma norm_normalize:\n  \"norm (normalize p) = 1\"",
+        "output": "",
+        "step_time": 0.013649940490722656
+      },
+      {
+        "index": 52,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011427164077758789
+      },
+      {
+        "index": 53,
+        "step": "lemma nth_normalize [simp]:\n  \"\\<bar>normalize p $ i\\<bar> \\<le> 1\"",
+        "output": "",
+        "step_time": 0.01100301742553711
+      },
+      {
+        "index": 54,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01291513442993164
+      },
+      {
+        "index": 55,
+        "step": "lemma normalize_square:\n  \"(normalize p $ 1)\\<^sup>2 + (normalize p $ 2)\\<^sup>2 = 1\"",
+        "output": "",
+        "step_time": 0.014728784561157227
+      },
+      {
+        "index": 56,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013757944107055664
+      },
+      {
+        "index": 57,
+        "step": "lemma nth_normalize_ge_zero_iff:\n  \"0 \\<le> normalize p $ i \\<longleftrightarrow> 0 \\<le> p $ i\"",
+        "output": "",
+        "step_time": 0.015888214111328125
+      },
+      {
+        "index": 58,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012238502502441406
+      },
+      {
+        "index": 59,
+        "step": "lemma nth_normalize_less_zero_iff:\n  \"normalize p $ i < 0 \\<longleftrightarrow> p $ i < 0\"",
+        "output": "",
+        "step_time": 0.014245271682739258
+      },
+      {
+        "index": 60,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012060403823852539
+      },
+      {
+        "index": 61,
+        "step": "lemma normalize_boundary_iff:\n  \"\\<bar>normalize p $ 1\\<bar> = 1 \\<longleftrightarrow> p $ 2 = 0\"",
+        "output": "",
+        "step_time": 0.01491403579711914
+      },
+      {
+        "index": 62,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009952306747436523
+      },
+      {
+        "index": 63,
+        "step": "lemma between_normalize_if_distant_from_0:\n  assumes \"norm p \\<ge> 1\"\n  shows \"between (0, p) (normalize p)\"",
+        "output": "",
+        "step_time": 0.013727664947509766
+      },
+      {
+        "index": 64,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.008190155029296875
+      },
+      {
+        "index": 65,
+        "step": "lemma between_normalize_if_near_0:\n  assumes \"norm p \\<le> 1\"\n  shows \"between (0, normalize p) p\"",
+        "output": "",
+        "step_time": 0.013921976089477539
+      },
+      {
+        "index": 66,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0100250244140625
+      },
+      {
+        "index": 67,
+        "step": "subsubsection \\<open>Lemmas on @{const radiant_of}\\<close>",
+        "output": "",
+        "step_time": 0.011040925979614258
+      },
+      {
+        "index": 68,
+        "step": "lemma radiant_of:\n  \"0 \\<le> radiant_of p \\<and> radiant_of p < 2 * pi \\<and> of_radiant (radiant_of p) = normalize p\"",
+        "output": "",
+        "step_time": 0.016478538513183594
+      },
+      {
+        "index": 69,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009462356567382812
+      },
+      {
+        "index": 70,
+        "step": "lemma radiant_of_bounds [simp]:\n  \"0 \\<le> radiant_of p\" \"radiant_of p < 2 * pi\"",
+        "output": "",
+        "step_time": 0.009752035140991211
+      },
+      {
+        "index": 71,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010787725448608398
+      },
+      {
+        "index": 72,
+        "step": "lemma radiant_of_weak_ubound [simp]:\n  \"radiant_of p \\<le> 2 * pi\"",
+        "output": "",
+        "step_time": 0.009711265563964844
+      },
+      {
+        "index": 73,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.008944272994995117
+      },
+      {
+        "index": 74,
+        "step": "subsubsection \\<open>Main Equations for Transforming to Polar Form\\<close>",
+        "output": "",
+        "step_time": 0.008932352066040039
+      },
+      {
+        "index": 75,
+        "step": "lemma polar_form_eq:\n  \"norm p *\\<^sub>R of_radiant (radiant_of p) = p\"",
+        "output": "",
+        "step_time": 0.008249282836914062
+      },
+      {
+        "index": 76,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009095430374145508
+      },
+      {
+        "index": 77,
+        "step": "lemma relative_polar_form_eq:\n  \"Q + dist P Q *\\<^sub>R of_radiant (radiant_of (P - Q)) = P\"",
+        "output": "",
+        "step_time": 0.014299154281616211
+      },
+      {
+        "index": 78,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012643814086914062
+      },
+      {
+        "index": 79,
+        "step": "subsection \\<open>Ptolemy's Theorem\\<close>",
+        "output": "",
+        "step_time": 0.011502742767333984
+      },
+      {
+        "index": 80,
+        "step": "lemma dist_circle_segment:\n  assumes \"0 \\<le> radius\" \"0 \\<le> \\<alpha>\" \"\\<alpha> \\<le> \\<beta>\" \"\\<beta> \\<le> 2 * pi\"\n  shows \"dist (center + radius *\\<^sub>R of_radiant \\<alpha>) (center + radius *\\<^sub>R of_radiant \\<beta>) = 2 * radius * sin ((\\<beta> - \\<alpha>) / 2)\"\n    (is \"?lhs = ?rhs\")",
+        "output": "",
+        "step_time": 0.015560388565063477
+      },
+      {
+        "index": 81,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.015175819396972656
+      },
+      {
+        "index": 82,
+        "step": "theorem ptolemy_trigonometric:\n  fixes \\<omega>\\<^sub>1 \\<omega>\\<^sub>2 \\<omega>\\<^sub>3 :: real\n  shows \"sin (\\<omega>\\<^sub>1 + \\<omega>\\<^sub>2) * sin (\\<omega>\\<^sub>2 + \\<omega>\\<^sub>3) = sin \\<omega>\\<^sub>1 * sin \\<omega>\\<^sub>3 + sin \\<omega>\\<^sub>2 * sin (\\<omega>\\<^sub>1 + \\<omega>\\<^sub>2 + \\<omega>\\<^sub>3)\"",
+        "output": "",
+        "step_time": 0.014832496643066406
+      },
+      {
+        "index": 83,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01022195816040039
+      },
+      {
+        "index": 84,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.00940561294555664
+      },
+      {
+        "index": 85,
+        "step": "theorem ptolemy:\n  fixes A B C D center :: \"real ^ 2\"\n  assumes \"dist center A = radius\" and \"dist center B = radius\"\n  assumes \"dist center C = radius\" and \"dist center D = radius\"\n  assumes ordering_of_points:\n    \"radiant_of (A - center) \\<le> radiant_of (B - center)\"\n    \"radiant_of (B - center) \\<le> radiant_of (C - center)\"\n    \"radiant_of (C - center) \\<le> radiant_of (D - center)\"\n  shows \"dist A C * dist B D = dist A B * dist C D + dist A D * dist B C\"",
+        "output": "",
+        "step_time": 0.019386768341064453
+      }
+    ],
+    "final_state": "default_85",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "(* Author: Lukas Bulwahn <lukas.bulwahn-at-gmail.com> *)\n\n",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0242493050172925
+    },
+    {
+      "mode": "search",
+      "command": "section \\<open>Ptolemy's Theorem\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020937836030498147
+    },
+    {
+      "mode": "search",
+      "command": "theory Ptolemys_Theorem\nimports\n  \"HOL-Analysis.Multivariate_Analysis\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01691304799169302
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017625060980208218
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Preliminaries\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01689613307826221
+    },
+    {
+      "mode": "search",
+      "command": "subsubsection \\<open>Additions to Rat theory\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01928957097698003
+    },
+    {
+      "mode": "search",
+      "command": "hide_const (open) normalize",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019845545990392566
+    },
+    {
+      "mode": "search",
+      "command": "subsubsection \\<open>Additions to Transcendental theory\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01818123704288155
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>\nLemmas about @{const arcsin} and @{const arccos} commonly involve to show that their argument is\nin the domain of those partial functions, i.e., the argument @{term y} is between @{term \"-1::real\"}\nand @{term \"1::real\"}.\nAs the argumentation for @{term \"(-1::real) \\<le> y\"} and @{term \"y \\<le> (1::real)\"} is often very similar,\nwe prefer to prove @{term \"\\<bar>y\\<bar> \\<le> (1::real)\"} to the two goals above.\n\nThe lemma for rewriting the term @{term \"cos (arccos y)\"} is already provided in the Isabelle\ndistribution with name @{thm [source] cos_arccos_abs}. Here, we further provide the analogue on\n@{term \"arcsin\"} for rewriting @{term \"sin (arcsin y)\"}.\n\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.027516194037161767
+    },
+    {
+      "mode": "search",
+      "command": "lemma sin_arcsin_abs: \"\\<bar>y\\<bar> \\<le> 1 \\<Longrightarrow> sin (arcsin y) = y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<bar>y\\<bar> \\<le> 1 \\<Longrightarrow> sin (arcsin y) = y",
+      "duration_seconds": 0.02088829898275435
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017696638009510934
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>\nThe further lemmas are the required variants from existing lemmas @{thm [source] arccos_lbound}\nand @{thm [source] arccos_ubound}.\n\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018545252038165927
+    },
+    {
+      "mode": "search",
+      "command": "lemma arccos_lbound_abs [simp]:\n  \"\\<bar>y\\<bar> \\<le> 1 \\<Longrightarrow> 0 \\<le> arccos y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<bar>y\\<bar> \\<le> 1 \\<Longrightarrow> 0 \\<le> arccos y",
+      "duration_seconds": 0.019423933932557702
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01743822800926864
+    },
+    {
+      "mode": "search",
+      "command": "lemma arccos_ubound_abs [simp]:\n  \"\\<bar>y\\<bar> \\<le> 1 \\<Longrightarrow> arccos y \\<le> pi\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<bar>y\\<bar> \\<le> 1 \\<Longrightarrow> arccos y \\<le> pi",
+      "duration_seconds": 0.018070211983285844
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03832524595782161
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>\nAs we choose angles to be between @{term \"0::real\"} between @{term \"2 * pi\"},\nwe need some lemmas to reason about the sign of @{term \"sin x\"}\nfor angles @{term \"x\"}.\n\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02320361800957471
+    },
+    {
+      "mode": "search",
+      "command": "lemma sin_ge_zero_iff:\n  assumes \"0 \\<le> x\" \"x < 2 * pi\"\n  shows \"0 \\<le> sin x \\<longleftrightarrow> x \\<le> pi\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (0 \\<le> sin x) = (x \\<le> pi)",
+      "duration_seconds": 0.01858272193931043
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015145896933972836
+    },
+    {
+      "mode": "search",
+      "command": "lemma sin_less_zero_iff:\n  assumes \"0 \\<le> x\" \"x < 2 * pi\"\n  shows \"sin x < 0 \\<longleftrightarrow> pi < x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (sin x < 0) = (pi < x)",
+      "duration_seconds": 0.01552839099895209
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012735507916659117
+    },
+    {
+      "mode": "search",
+      "command": "subsubsection \\<open>Addition to Finite-Cartesian-Product theory\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011809317977167666
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>\nHere follow generally useful additions and specialised equations\nfor two-dimensional real-valued vectors.\n\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012982763932086527
+    },
+    {
+      "mode": "search",
+      "command": "lemma axis_nth_eq_0 [simp]:\n  assumes \"i \\<noteq> j\"\n  shows \"axis i x $ j = 0\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. axis i x $ j = (0::'b)",
+      "duration_seconds": 0.015507781994529068
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013587111025117338
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_axis:\n  fixes x :: real\n  shows \"norm (axis i x) = abs x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. norm (axis i x) = \\<bar>x\\<bar>",
+      "duration_seconds": 0.01448466395959258
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013186461059376597
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_eq_on_real_2_vec:\n  fixes x :: \"real ^ 2\"\n  shows \"norm x = sqrt ((x $ 1) ^ 2 + (x $ 2) ^ 2)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. norm x = sqrt ((x $ 1)\\<^sup>2 + (x $ 2)\\<^sup>2)",
+      "duration_seconds": 0.016405191039666533
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014930639998055995
+    },
+    {
+      "mode": "search",
+      "command": "lemma dist_eq_on_real_2_vec:\n  fixes a b :: \"real ^ 2\"\n  shows \"dist a b = sqrt ((a $ 1 - b $ 1) ^ 2 + (a $ 2 - b $ 2) ^ 2)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. dist a b = sqrt ((a $ 1 - b $ 1)\\<^sup>2 + (a $ 2 - b $ 2)\\<^sup>2)",
+      "duration_seconds": 0.020302562043070793
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01342430291697383
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Polar Form of Two-Dimensional Real-Valued Vectors\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012802677927538753
+    },
+    {
+      "mode": "search",
+      "command": "subsubsection \\<open>Definitions to Transfer to Polar Form and Back\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01213464792817831
+    },
+    {
+      "mode": "search",
+      "command": "definition of_radiant :: \"real \\<Rightarrow> real ^ 2\"\nwhere\n  \"of_radiant \\<omega> = axis 1 (cos \\<omega>) + axis 2 (sin \\<omega>)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024417579057626426
+    },
+    {
+      "mode": "search",
+      "command": "definition normalize :: \"real ^ 2 \\<Rightarrow> real ^ 2\"\nwhere\n  \"normalize p = (if p = 0 then axis 1 1 else (1 / norm p) *\\<^sub>R p)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02610699797514826
+    },
+    {
+      "mode": "search",
+      "command": "definition radiant_of :: \"real ^ 2 \\<Rightarrow> real\"\nwhere\n  \"radiant_of p = (THE \\<omega>. 0 \\<le> \\<omega> \\<and> \\<omega> < 2 * pi \\<and> of_radiant \\<omega> = normalize p)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024197108927182853
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>\nThe vector @{term \"of_radiant \\<omega>\"} is the vector with length @{term \"1::real\"} and angle @{term \"\\<omega>\"}\nto the first axis.\nWe normalize vectors to length @{term \"1::real\"} keeping their orientation with the normalize function.\nConversely, @{term \"radiant_of p\"} is the angle of vector @{term p} to the first axis, where we\nchoose @{term \"radiant_of\"} to return angles between @{term \"0::real\"} and @{term \"2 * pi\"},\nfollowing the usual high-school convention.\nWith these definitions, we can express the main result\n@{term \"norm p *\\<^sub>R of_radiant (radiant_of p) = p\"}.\nNote that the main result holds for any definition of @{term \"radiant_of 0\"}.\nSo, we choose to define @{term \"normalize 0\"} and @{term \"radiant_of 0\"}, such that\n@{term \"radiant_of 0 = 0\"}.\n\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.022836880991235375
+    },
+    {
+      "mode": "search",
+      "command": "subsubsection \\<open>Lemmas on @{const of_radiant}\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010480665019713342
+    },
+    {
+      "mode": "search",
+      "command": "lemma nth_of_radiant_1 [simp]:\n  \"of_radiant \\<omega> $ 1 = cos \\<omega>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_radiant \\<omega> $ 1 = cos \\<omega>",
+      "duration_seconds": 0.014550670981407166
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014373930054716766
+    },
+    {
+      "mode": "search",
+      "command": "lemma nth_of_radiant_2 [simp]:\n  \"of_radiant \\<omega> $ 2 = sin \\<omega>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_radiant \\<omega> $ 2 = sin \\<omega>",
+      "duration_seconds": 0.013233299017883837
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012323923991061747
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_of_radiant:\n  \"norm (of_radiant \\<omega>) = 1\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. norm (of_radiant \\<omega>) = 1",
+      "duration_seconds": 0.011523840017616749
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010197421070188284
+    },
+    {
+      "mode": "search",
+      "command": "lemma of_radiant_plus_2pi:\n  \"of_radiant (\\<omega> + 2 * pi) = of_radiant \\<omega>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_radiant (\\<omega> + 2 * pi) = of_radiant \\<omega>",
+      "duration_seconds": 0.013172738952562213
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.00993828393984586
+    },
+    {
+      "mode": "search",
+      "command": "lemma of_radiant_minus_2pi:\n  \"of_radiant (\\<omega> - 2 * pi) = of_radiant \\<omega>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_radiant (\\<omega> - 2 * pi) = of_radiant \\<omega>",
+      "duration_seconds": 0.014609130914323032
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010171245085075498
+    },
+    {
+      "mode": "search",
+      "command": "subsubsection \\<open>Lemmas on @{const normalize}\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011297677061520517
+    },
+    {
+      "mode": "search",
+      "command": "lemma normalize_eq:\n  \"norm p *\\<^sub>R normalize p = p\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. norm p *\\<^sub>R normalize p = p",
+      "duration_seconds": 0.01224641699809581
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012280886992812157
+    },
+    {
+      "mode": "search",
+      "command": "lemma norm_normalize:\n  \"norm (normalize p) = 1\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. norm (normalize p) = 1",
+      "duration_seconds": 0.013646295992657542
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011423396994359791
+    },
+    {
+      "mode": "search",
+      "command": "lemma nth_normalize [simp]:\n  \"\\<bar>normalize p $ i\\<bar> \\<le> 1\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<bar>normalize p $ i\\<bar> \\<le> 1",
+      "duration_seconds": 0.010999865015037358
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012910261051729321
+    },
+    {
+      "mode": "search",
+      "command": "lemma normalize_square:\n  \"(normalize p $ 1)\\<^sup>2 + (normalize p $ 2)\\<^sup>2 = 1\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (normalize p $ 1)\\<^sup>2 + (normalize p $ 2)\\<^sup>2 = 1",
+      "duration_seconds": 0.01472478499636054
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013753985054790974
+    },
+    {
+      "mode": "search",
+      "command": "lemma nth_normalize_ge_zero_iff:\n  \"0 \\<le> normalize p $ i \\<longleftrightarrow> 0 \\<le> p $ i\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (0 \\<le> normalize p $ i) = (0 \\<le> p $ i)",
+      "duration_seconds": 0.01588260498829186
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012234970927238464
+    },
+    {
+      "mode": "search",
+      "command": "lemma nth_normalize_less_zero_iff:\n  \"normalize p $ i < 0 \\<longleftrightarrow> p $ i < 0\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (normalize p $ i < 0) = (p $ i < 0)",
+      "duration_seconds": 0.014242372941225767
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012055746046826243
+    },
+    {
+      "mode": "search",
+      "command": "lemma normalize_boundary_iff:\n  \"\\<bar>normalize p $ 1\\<bar> = 1 \\<longleftrightarrow> p $ 2 = 0\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (\\<bar>normalize p $ 1\\<bar> = 1) = (p $ 2 = 0)",
+      "duration_seconds": 0.014908973942510784
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009947702987119555
+    },
+    {
+      "mode": "search",
+      "command": "lemma between_normalize_if_distant_from_0:\n  assumes \"norm p \\<ge> 1\"\n  shows \"between (0, p) (normalize p)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. between (0, p) (normalize p)",
+      "duration_seconds": 0.013723516021855175
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008184876991435885
+    },
+    {
+      "mode": "search",
+      "command": "lemma between_normalize_if_near_0:\n  assumes \"norm p \\<le> 1\"\n  shows \"between (0, normalize p) p\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. between (0, normalize p) p",
+      "duration_seconds": 0.013917114934884012
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010021466994658113
+    },
+    {
+      "mode": "search",
+      "command": "subsubsection \\<open>Lemmas on @{const radiant_of}\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011037064949050546
+    },
+    {
+      "mode": "search",
+      "command": "lemma radiant_of:\n  \"0 \\<le> radiant_of p \\<and> radiant_of p < 2 * pi \\<and> of_radiant (radiant_of p) = normalize p\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. 0 \\<le> radiant_of p \\<and>\n    radiant_of p < 2 * pi \\<and> of_radiant (radiant_of p) = normalize p",
+      "duration_seconds": 0.01647348201368004
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.00945816095918417
+    },
+    {
+      "mode": "search",
+      "command": "lemma radiant_of_bounds [simp]:\n  \"0 \\<le> radiant_of p\" \"radiant_of p < 2 * pi\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. 0 \\<le> radiant_of p &&& radiant_of p < 2 * pi",
+      "duration_seconds": 0.009748353972099721
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010784602025523782
+    },
+    {
+      "mode": "search",
+      "command": "lemma radiant_of_weak_ubound [simp]:\n  \"radiant_of p \\<le> 2 * pi\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. radiant_of p \\<le> 2 * pi",
+      "duration_seconds": 0.009703131974674761
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008938611950725317
+    },
+    {
+      "mode": "search",
+      "command": "subsubsection \\<open>Main Equations for Transforming to Polar Form\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008927335031330585
+    },
+    {
+      "mode": "search",
+      "command": "lemma polar_form_eq:\n  \"norm p *\\<^sub>R of_radiant (radiant_of p) = p\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. norm p *\\<^sub>R of_radiant (radiant_of p) = p",
+      "duration_seconds": 0.008245720993727446
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009089719038456678
+    },
+    {
+      "mode": "search",
+      "command": "lemma relative_polar_form_eq:\n  \"Q + dist P Q *\\<^sub>R of_radiant (radiant_of (P - Q)) = P\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. Q + dist P Q *\\<^sub>R of_radiant (radiant_of (P - Q)) = P",
+      "duration_seconds": 0.014290911029092968
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01263504393864423
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Ptolemy's Theorem\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011497972998768091
+    },
+    {
+      "mode": "search",
+      "command": "lemma dist_circle_segment:\n  assumes \"0 \\<le> radius\" \"0 \\<le> \\<alpha>\" \"\\<alpha> \\<le> \\<beta>\" \"\\<beta> \\<le> 2 * pi\"\n  shows \"dist (center + radius *\\<^sub>R of_radiant \\<alpha>) (center + radius *\\<^sub>R of_radiant \\<beta>) = 2 * radius * sin ((\\<beta> - \\<alpha>) / 2)\"\n    (is \"?lhs = ?rhs\")",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. dist (center + radius *\\<^sub>R of_radiant \\<alpha>)\n     (center + radius *\\<^sub>R of_radiant \\<beta>) =\n    2 * radius * sin ((\\<beta> - \\<alpha>) / 2)",
+      "duration_seconds": 0.015553038101643324
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01516994007397443
+    },
+    {
+      "mode": "search",
+      "command": "theorem ptolemy_trigonometric:\n  fixes \\<omega>\\<^sub>1 \\<omega>\\<^sub>2 \\<omega>\\<^sub>3 :: real\n  shows \"sin (\\<omega>\\<^sub>1 + \\<omega>\\<^sub>2) * sin (\\<omega>\\<^sub>2 + \\<omega>\\<^sub>3) = sin \\<omega>\\<^sub>1 * sin \\<omega>\\<^sub>3 + sin \\<omega>\\<^sub>2 * sin (\\<omega>\\<^sub>1 + \\<omega>\\<^sub>2 + \\<omega>\\<^sub>3)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. sin (\\<omega>\\<^sub>1 + \\<omega>\\<^sub>2) *\n    sin (\\<omega>\\<^sub>2 + \\<omega>\\<^sub>3) =\n    sin \\<omega>\\<^sub>1 * sin \\<omega>\\<^sub>3 +\n    sin \\<omega>\\<^sub>2 *\n    sin (\\<omega>\\<^sub>1 + \\<omega>\\<^sub>2 + \\<omega>\\<^sub>3)",
+      "duration_seconds": 0.014826457016170025
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010218351031653583
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009402121999301016
+    },
+    {
+      "mode": "search",
+      "command": "theorem ptolemy:\n  fixes A B C D center :: \"real ^ 2\"\n  assumes \"dist center A = radius\" and \"dist center B = radius\"\n  assumes \"dist center C = radius\" and \"dist center D = radius\"\n  assumes ordering_of_points:\n    \"radiant_of (A - center) \\<le> radiant_of (B - center)\"\n    \"radiant_of (B - center) \\<le> radiant_of (C - center)\"\n    \"radiant_of (C - center) \\<le> radiant_of (D - center)\"\n  shows \"dist A C * dist B D = dist A B * dist C D + dist A D * dist B C\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. dist A C * dist B D = dist A B * dist C D + dist A D * dist B C",
+      "duration_seconds": 0.019378164084628224
+    }
+  ],
+  "failure_category": null,
+  "request_id": "5a9d145d13274299b1261541aaa5c18d",
+  "input_sha256": "e9bda5fb18d16bde2a713a9fb8dd10a5cf6879325c8f24f8a47ee54cd0bcbb09",
+  "duration_seconds": 54.357038527028635
+}

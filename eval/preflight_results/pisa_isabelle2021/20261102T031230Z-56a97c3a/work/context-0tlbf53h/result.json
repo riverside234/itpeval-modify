@@ -1,0 +1,346 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 25,
+    "last_step": 25,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory circle_average\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.024474382400512695
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.016346454620361328
+      },
+      {
+        "index": 2,
+        "step": "locale circle_average_setup =\n  fixes zero     :: \"'r\"\n    and add      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"     (infixl \"+C\" 65)\n    and integral :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> 'r\"\n  assumes add_zero      : \"\\<And>x. x +C zero = x\"\n    and   add_comm      : \"\\<And>x y. x +C y = y +C x\"\n    and   add_assoc     : \"\\<And>x y z. (x +C y) +C z = x +C (y +C z)\"\n    and   integral_ext  : \"\\<And>g h. (\\<forall>\\<theta>. g \\<theta> = h \\<theta>) \\<Longrightarrow> integral g = integral h\"\n    and   integral_const: \"\\<And>c. integral (\\<lambda>_. c) = c\"\n    and   integral_add  : \"\\<And>f g. integral (\\<lambda>\\<theta>. f \\<theta> +C g \\<theta>) = integral f +C integral g\"\n    and   integral_shift: \"\\<And>f c. integral (\\<lambda>\\<theta>. f (\\<theta> +C c)) = integral f\"\nbegin",
+        "output": "",
+        "step_time": 0.042053937911987305
+      },
+      {
+        "index": 3,
+        "step": "definition circleMap :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"circleMap c \\<theta> \\<equiv> \\<theta> +C c\"",
+        "output": "",
+        "step_time": 0.02568221092224121
+      },
+      {
+        "index": 4,
+        "step": "definition circleAverage :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"circleAverage f c \\<equiv> integral (\\<lambda>\\<theta>. f (circleMap c \\<theta>))\"",
+        "output": "",
+        "step_time": 0.025772809982299805
+      },
+      {
+        "index": 5,
+        "step": "lemma circleMap_zero: \"circleMap zero \\<theta> = \\<theta>\"",
+        "output": "",
+        "step_time": 0.02728867530822754
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.020145416259765625
+      },
+      {
+        "index": 7,
+        "step": "lemma circleAverage_zero: \"circleAverage f zero = integral f\"",
+        "output": "",
+        "step_time": 0.022279977798461914
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017972707748413086
+      },
+      {
+        "index": 9,
+        "step": "lemma circleAverage_add:\n  \"circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage f c +C circleAverage g c\"",
+        "output": "",
+        "step_time": 0.023551225662231445
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.018201828002929688
+      },
+      {
+        "index": 11,
+        "step": "lemma circleAverage_fun_add:\n  \"circleAverage (\\<lambda>z. f (z +C c)) zero = circleAverage f c\"",
+        "output": "",
+        "step_time": 0.020954370498657227
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019976139068603516
+      },
+      {
+        "index": 13,
+        "step": "lemma circleMap_add:\n  \"circleMap (c +C d) \\<theta> = circleMap c (circleMap d \\<theta>)\"",
+        "output": "",
+        "step_time": 0.01926732063293457
+      },
+      {
+        "index": 14,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017859458923339844
+      },
+      {
+        "index": 15,
+        "step": "lemma circleAverage_shift:\n  \"circleAverage f (c +C d) = circleAverage (\\<lambda>z. f (z +C d)) c\"",
+        "output": "",
+        "step_time": 0.018134593963623047
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019580841064453125
+      },
+      {
+        "index": 17,
+        "step": "lemma circleAverage_const:\n  \"circleAverage (\\<lambda>_. k) c = k\"",
+        "output": "",
+        "step_time": 0.014393091201782227
+      },
+      {
+        "index": 18,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0333256721496582
+      },
+      {
+        "index": 19,
+        "step": "lemma circleAverage_add_const:\n  \"circleAverage (\\<lambda>z. f z +C k) c = circleAverage f c +C k\"",
+        "output": "",
+        "step_time": 0.014384984970092773
+      },
+      {
+        "index": 20,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01390981674194336
+      },
+      {
+        "index": 21,
+        "step": "lemma circleAverage_comm_add:\n  \"circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage (\\<lambda>z. g z +C f z) c\"",
+        "output": "",
+        "step_time": 0.014939069747924805
+      },
+      {
+        "index": 22,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016397714614868164
+      },
+      {
+        "index": 23,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.008821725845336914
+      },
+      {
+        "index": 24,
+        "step": "lemma circleAverage_add_assoc:\n  \"circleAverage (\\<lambda>z. (f z +C g z) +C h z) c =\n   circleAverage f c +C (circleAverage g c +C circleAverage h c)\"",
+        "output": "",
+        "step_time": 0.016781091690063477
+      }
+    ],
+    "final_state": "default_24",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory circle_average\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024466285947710276
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016341482987627387
+    },
+    {
+      "mode": "search",
+      "command": "locale circle_average_setup =\n  fixes zero     :: \"'r\"\n    and add      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"     (infixl \"+C\" 65)\n    and integral :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> 'r\"\n  assumes add_zero      : \"\\<And>x. x +C zero = x\"\n    and   add_comm      : \"\\<And>x y. x +C y = y +C x\"\n    and   add_assoc     : \"\\<And>x y z. (x +C y) +C z = x +C (y +C z)\"\n    and   integral_ext  : \"\\<And>g h. (\\<forall>\\<theta>. g \\<theta> = h \\<theta>) \\<Longrightarrow> integral g = integral h\"\n    and   integral_const: \"\\<And>c. integral (\\<lambda>_. c) = c\"\n    and   integral_add  : \"\\<And>f g. integral (\\<lambda>\\<theta>. f \\<theta> +C g \\<theta>) = integral f +C integral g\"\n    and   integral_shift: \"\\<And>f c. integral (\\<lambda>\\<theta>. f (\\<theta> +C c)) = integral f\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.04204554995521903
+    },
+    {
+      "mode": "search",
+      "command": "definition circleMap :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"circleMap c \\<theta> \\<equiv> \\<theta> +C c\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025676183053292334
+    },
+    {
+      "mode": "search",
+      "command": "definition circleAverage :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"circleAverage f c \\<equiv> integral (\\<lambda>\\<theta>. f (circleMap c \\<theta>))\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025765198981389403
+    },
+    {
+      "mode": "search",
+      "command": "lemma circleMap_zero: \"circleMap zero \\<theta> = \\<theta>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. circleMap zero \\<theta> = \\<theta>",
+      "duration_seconds": 0.02728180994745344
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02013973705470562
+    },
+    {
+      "mode": "search",
+      "command": "lemma circleAverage_zero: \"circleAverage f zero = integral f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. circleAverage f zero = integral f",
+      "duration_seconds": 0.022274018032476306
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017960184952244163
+    },
+    {
+      "mode": "search",
+      "command": "lemma circleAverage_add:\n  \"circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage f c +C circleAverage g c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. circleAverage (\\<lambda>z. f z +C g z) c =\n    circleAverage f c +C circleAverage g c",
+      "duration_seconds": 0.023543944000266492
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01819743902888149
+    },
+    {
+      "mode": "search",
+      "command": "lemma circleAverage_fun_add:\n  \"circleAverage (\\<lambda>z. f (z +C c)) zero = circleAverage f c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. circleAverage (\\<lambda>z. f (z +C c)) zero = circleAverage f c",
+      "duration_seconds": 0.020948951947502792
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019972688984125853
+    },
+    {
+      "mode": "search",
+      "command": "lemma circleMap_add:\n  \"circleMap (c +C d) \\<theta> = circleMap c (circleMap d \\<theta>)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. circleMap (c +C d) \\<theta> = circleMap c (circleMap d \\<theta>)",
+      "duration_seconds": 0.019263437017798424
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01785526203457266
+    },
+    {
+      "mode": "search",
+      "command": "lemma circleAverage_shift:\n  \"circleAverage f (c +C d) = circleAverage (\\<lambda>z. f (z +C d)) c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. circleAverage f (c +C d) = circleAverage (\\<lambda>z. f (z +C d)) c",
+      "duration_seconds": 0.01813043700531125
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019577407045289874
+    },
+    {
+      "mode": "search",
+      "command": "lemma circleAverage_const:\n  \"circleAverage (\\<lambda>_. k) c = k\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. circleAverage (\\<lambda>_. k) c = k",
+      "duration_seconds": 0.014389099087566137
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03332101600244641
+    },
+    {
+      "mode": "search",
+      "command": "lemma circleAverage_add_const:\n  \"circleAverage (\\<lambda>z. f z +C k) c = circleAverage f c +C k\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. circleAverage (\\<lambda>z. f z +C k) c = circleAverage f c +C k",
+      "duration_seconds": 0.014381967019289732
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01390574302058667
+    },
+    {
+      "mode": "search",
+      "command": "lemma circleAverage_comm_add:\n  \"circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage (\\<lambda>z. g z +C f z) c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. circleAverage (\\<lambda>z. f z +C g z) c =\n    circleAverage (\\<lambda>z. g z +C f z) c",
+      "duration_seconds": 0.014930750010535121
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016392263933084905
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.00881764991208911
+    },
+    {
+      "mode": "search",
+      "command": "lemma circleAverage_add_assoc:\n  \"circleAverage (\\<lambda>z. (f z +C g z) +C h z) c =\n   circleAverage f c +C (circleAverage g c +C circleAverage h c)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. circleAverage (\\<lambda>z. f z +C g z +C h z) c =\n    circleAverage f c +C (circleAverage g c +C circleAverage h c)",
+      "duration_seconds": 0.01677208603359759
+    }
+  ],
+  "failure_category": null,
+  "request_id": "d38c9a03cc884dedb1478a782f00beb2",
+  "input_sha256": "6ae695855e2512990e4b54e403892489e9dfeef656520647c329f3711bf02ba4",
+  "duration_seconds": 7.5173398070037365
+}

@@ -1,0 +1,138 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 9,
+    "last_step": 9,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory group\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.024394989013671875
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.018152952194213867
+      },
+      {
+        "index": 2,
+        "step": "locale group =\n  fixes mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\"\n  assumes mul_assoc : \"a ** (b ** c) = (a ** b) ** c\"\n    and   mul_one   : \"a ** one = a\"\n    and   one_mul   : \"one ** a = a\"\n    and   mul_inv_l : \"inv a ** a = one\"\n    and   mul_inv_r : \"a ** inv a = one\"\nbegin",
+        "output": "",
+        "step_time": 0.03466367721557617
+      },
+      {
+        "index": 3,
+        "step": "lemma mul_left_cancel:\n  assumes h: \"a ** b = a ** c\"\n  shows \"b = c\"",
+        "output": "",
+        "step_time": 0.021107912063598633
+      },
+      {
+        "index": 4,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01886725425720215
+      },
+      {
+        "index": 5,
+        "step": "lemma mul_right_cancel:\n  assumes h: \"b ** a = c ** a\"\n  shows \"b = c\"",
+        "output": "",
+        "step_time": 0.022155284881591797
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0241549015045166
+      },
+      {
+        "index": 7,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.018731117248535156
+      },
+      {
+        "index": 8,
+        "step": "lemma inv_inv: \"inv (inv a) = a\"",
+        "output": "",
+        "step_time": 0.02000117301940918
+      }
+    ],
+    "final_state": "default_8",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory group\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024386159027926624
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01814832293894142
+    },
+    {
+      "mode": "search",
+      "command": "locale group =\n  fixes mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\"\n  assumes mul_assoc : \"a ** (b ** c) = (a ** b) ** c\"\n    and   mul_one   : \"a ** one = a\"\n    and   one_mul   : \"one ** a = a\"\n    and   mul_inv_l : \"inv a ** a = one\"\n    and   mul_inv_r : \"a ** inv a = one\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.034656786010600626
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_left_cancel:\n  assumes h: \"a ** b = a ** c\"\n  shows \"b = c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. b = c",
+      "duration_seconds": 0.02110314299352467
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0188633119687438
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_right_cancel:\n  assumes h: \"b ** a = c ** a\"\n  shows \"b = c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. b = c",
+      "duration_seconds": 0.02215075504500419
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02415132604073733
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018727307091467083
+    },
+    {
+      "mode": "search",
+      "command": "lemma inv_inv: \"inv (inv a) = a\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inv (inv a) = a",
+      "duration_seconds": 0.01999576890375465
+    }
+  ],
+  "failure_category": null,
+  "request_id": "1676043d733741d193b1072641ca843f",
+  "input_sha256": "7e6040523c271cb240a8bf464f73e9847570e7edecc68d873abfb35697dca9bc",
+  "duration_seconds": 8.939464161056094
+}

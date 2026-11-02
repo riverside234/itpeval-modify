@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory set_algebra\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\ndefinition sUnion :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sUnion A B \\<equiv> \\<lambda>x. A x \\<or> B x\"\n\ndefinition sInter :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sInter A B \\<equiv> \\<lambda>x. A x \\<and> B x\"\n\ndefinition sCompl :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sCompl A \\<equiv> \\<lambda>x. \\<not> A x\"\n\nlemma inter_distrib_left:\n  \"\\<forall>x. sInter A (sUnion B C) x \\<longleftrightarrow> sUnion (sInter A B) (sInter A C) x\"\n  sorry\nlemma inter_distrib_right:\n  \"\\<forall>x. sInter (sUnion A B) C x \\<longleftrightarrow> sUnion (sInter A C) (sInter B C) x\"\n  sorry\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma de_morgan_union:\n  \"\\<forall>x. sCompl (sUnion A B) x \\<longleftrightarrow> sInter (sCompl A) (sCompl B) x\"\n  ",
+    "theory_name": "set_algebra",
+    "request_id": "803bd6fcccbd41128052ce0e9e7b6db1",
+    "input_sha256": "094b5cac03bc054c1ac86427ae3b23d154920dfaa411722ae9055a089ab24283"
+  }
+}

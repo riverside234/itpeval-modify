@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory galois\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\n\n\n\n\nlocale field_like =\n  fixes zero_F one_F :: \"'f\"\n    and add_F :: \"'f \\<Rightarrow> 'f \\<Rightarrow> 'f\"  (infixl \"+F\" 65)\n    and mul_F :: \"'f \\<Rightarrow> 'f \\<Rightarrow> 'f\"  (infixl \"*F\" 70)\n    and opp_F :: \"'f \\<Rightarrow> 'f\"\n    and inv_F :: \"'f \\<Rightarrow> 'f\"\n  assumes add_comm    : \"\\<And>x y. x +F y = y +F x\"\n    and   add_assoc   : \"\\<And>x y z. (x +F y) +F z = x +F (y +F z)\"\n    and   add_zero    : \"\\<And>x. x +F zero_F = x\"\n    and   add_inv_l   : \"\\<And>x. opp_F x +F x = zero_F\"\n    and   mul_comm    : \"\\<And>x y. x *F y = y *F x\"\n    and   mul_assoc   : \"\\<And>x y z. (x *F y) *F z = x *F (y *F z)\"\n    and   mul_one_l   : \"\\<And>x. one_F *F x = x\"\n    and   mul_inv_l   : \"\\<And>x. x \\<noteq> zero_F \\<Longrightarrow> inv_F x *F x = one_F\"\n    and   distrib_l   : \"\\<And>x y z. x *F (y +F z) = (x *F y) +F (x *F z)\"\n    and   zero_neq_one: \"zero_F \\<noteq> one_F\"\n    and   inv_nonzero : \"\\<And>x. x \\<noteq> zero_F \\<Longrightarrow> inv_F x \\<noteq> zero_F\"\nbegin\n\n\nlemma zero_add: \"zero_F +F x = x\"\n  sorry\nlemma mul_one_r: \"x *F one_F = x\"\n  sorry\nlemma mul_inv_r: \"x \\<noteq> zero_F \\<Longrightarrow> x *F inv_F x = one_F\"\n  sorry\n\n\nlemma add_cancel_l: \"x +F y = x +F z \\<Longrightarrow> y = z\"\n  sorry\nlemma add_cancel_r: \"y +F x = z +F x \\<Longrightarrow> y = z\"\n  sorry\nlemma mul_cancel_l: \"x \\<noteq> zero_F \\<Longrightarrow> x *F y = x *F z \\<Longrightarrow> y = z\"\n  sorry\nlemma mul_cancel_r: \"x \\<noteq> zero_F \\<Longrightarrow> y *F x = z *F x \\<Longrightarrow> y = z\"\n  sorry\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma inv_unique: \"x \\<noteq> zero_F \\<Longrightarrow> x *F y = one_F \\<Longrightarrow> y = inv_F x\"\n  ",
+    "theory_name": "galois",
+    "request_id": "e43c5212a1ab43918b94ba073c4d2b97",
+    "input_sha256": "943b99cea67afee2e06bfbc772ad23bf55fee6161604986fa0b3ff75ba95a8a9"
+  }
+}

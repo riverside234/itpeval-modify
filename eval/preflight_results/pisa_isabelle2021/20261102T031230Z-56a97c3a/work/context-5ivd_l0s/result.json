@@ -1,0 +1,164 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 11,
+    "last_step": 11,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory zero_le_one_elem\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.024477005004882812
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.018464326858520508
+      },
+      {
+        "index": 2,
+        "step": "locale zero_le_one_setup =\n  fixes decEq      :: \"'m \\<Rightarrow> 'm \\<Rightarrow> bool\"\n    and zero       :: \"'a\"\n    and one        :: \"'a\"\n    and le         :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"   (infix \"\\<preceq>\" 50)\n    and le_antisym :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  assumes le_refl      : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans     : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   zero_le_one  : \"zero \\<preceq> one\"\n    and   zero_le_zero : \"zero \\<preceq> zero\"\n    and   le_antisym   : \"\\<And>x y. x \\<preceq> y \\<Longrightarrow> y \\<preceq> x \\<Longrightarrow> x = y\"\nbegin",
+        "output": "",
+        "step_time": 0.02924823760986328
+      },
+      {
+        "index": 3,
+        "step": "definition One_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"One_matrix i j \\<equiv> if decEq i j then one else zero\"",
+        "output": "",
+        "step_time": 0.027261734008789062
+      },
+      {
+        "index": 4,
+        "step": "definition Zero_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"Zero_matrix \\<equiv> \\<lambda>_ _. zero\"",
+        "output": "",
+        "step_time": 0.025028228759765625
+      },
+      {
+        "index": 5,
+        "step": "definition matrix_le :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_le A B \\<equiv> \\<forall>i j. A i j \\<preceq> B i j\"",
+        "output": "",
+        "step_time": 0.03197121620178223
+      },
+      {
+        "index": 6,
+        "step": "definition matrix_eq :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_eq A B \\<equiv> \\<forall>i j. A i j = B i j\"",
+        "output": "",
+        "step_time": 0.02896571159362793
+      },
+      {
+        "index": 7,
+        "step": "lemma zero_le_one_elem: \"zero \\<preceq> One_matrix i j\"",
+        "output": "",
+        "step_time": 0.022849321365356445
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01858830451965332
+      },
+      {
+        "index": 9,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.017480850219726562
+      },
+      {
+        "index": 10,
+        "step": "lemma Zero_le_One_matrix: \"matrix_le Zero_matrix One_matrix\"",
+        "output": "",
+        "step_time": 0.02030181884765625
+      }
+    ],
+    "final_state": "default_10",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory zero_le_one_elem\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024467961979098618
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018456274992786348
+    },
+    {
+      "mode": "search",
+      "command": "locale zero_le_one_setup =\n  fixes decEq      :: \"'m \\<Rightarrow> 'm \\<Rightarrow> bool\"\n    and zero       :: \"'a\"\n    and one        :: \"'a\"\n    and le         :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"   (infix \"\\<preceq>\" 50)\n    and le_antisym :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  assumes le_refl      : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans     : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   zero_le_one  : \"zero \\<preceq> one\"\n    and   zero_le_zero : \"zero \\<preceq> zero\"\n    and   le_antisym   : \"\\<And>x y. x \\<preceq> y \\<Longrightarrow> y \\<preceq> x \\<Longrightarrow> x = y\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.029239602969028056
+    },
+    {
+      "mode": "search",
+      "command": "definition One_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"One_matrix i j \\<equiv> if decEq i j then one else zero\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.027256280067376792
+    },
+    {
+      "mode": "search",
+      "command": "definition Zero_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"Zero_matrix \\<equiv> \\<lambda>_ _. zero\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02502230799291283
+    },
+    {
+      "mode": "search",
+      "command": "definition matrix_le :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_le A B \\<equiv> \\<forall>i j. A i j \\<preceq> B i j\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03196456003934145
+    },
+    {
+      "mode": "search",
+      "command": "definition matrix_eq :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_eq A B \\<equiv> \\<forall>i j. A i j = B i j\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.028958932030946016
+    },
+    {
+      "mode": "search",
+      "command": "lemma zero_le_one_elem: \"zero \\<preceq> One_matrix i j\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. zero \\<preceq> One_matrix i j",
+      "duration_seconds": 0.02284317696467042
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018581916927359998
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017474655993282795
+    },
+    {
+      "mode": "search",
+      "command": "lemma Zero_le_One_matrix: \"matrix_le Zero_matrix One_matrix\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. matrix_le Zero_matrix One_matrix",
+      "duration_seconds": 0.02029694605153054
+    }
+  ],
+  "failure_category": null,
+  "request_id": "2620bea1d673438d95635641a89fb75d",
+  "input_sha256": "0e964623ca51ea32dcaaf1f41add1ad30aeb273547c7bfdb90c062e15fb061f5",
+  "duration_seconds": 8.190251274965703
+}

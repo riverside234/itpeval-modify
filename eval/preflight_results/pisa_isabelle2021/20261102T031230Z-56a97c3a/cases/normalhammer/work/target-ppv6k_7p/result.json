@@ -1,0 +1,123 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 8,
+    "last_step": 8,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory V2Control imports Main begin",
+        "output": "",
+        "step_time": 0.02390885353088379
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01875472068786621
+      },
+      {
+        "index": 2,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.018987417221069336
+      },
+      {
+        "index": 3,
+        "step": "lemma v2_control: \"True\"",
+        "output": "",
+        "step_time": 0.01751112937927246
+      },
+      {
+        "index": 4,
+        "step": "proof -",
+        "output": "",
+        "step_time": 0.016179800033569336
+      },
+      {
+        "index": 5,
+        "step": "show \"True\"",
+        "output": "",
+        "step_time": 0.0274655818939209
+      },
+      {
+        "index": 6,
+        "step": "sledgehammer",
+        "output": "by simp ",
+        "step_time": 0.7380399703979492
+      },
+      {
+        "index": 7,
+        "step": "qed",
+        "output": "",
+        "step_time": 0.019442319869995117
+      }
+    ],
+    "final_state": "default_7"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory V2Control imports Main begin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023895462974905968
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018748483038507402
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0189830269664526
+    },
+    {
+      "mode": "search",
+      "command": "lemma v2_control: \"True\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.017504872055724263
+    },
+    {
+      "mode": "search",
+      "command": "proof -",
+      "success": true,
+      "observation": "proof (state)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.016171941999346018
+    },
+    {
+      "mode": "search",
+      "command": "show \"True\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.02746007591485977
+    },
+    {
+      "mode": "hammer",
+      "command": "normalhammer",
+      "success": true,
+      "observation": "by simp <hammer> proof (state)\nthis:\n  True\n\ngoal:\nNo subgoals!",
+      "duration_seconds": 0.7380230160197243
+    },
+    {
+      "mode": "search",
+      "command": "qed",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01943548792041838
+    }
+  ],
+  "failure_category": null,
+  "request_id": "9a961517224e498397b8f66e9330cbea",
+  "input_sha256": "c4ca830e65d4f0ca6d9ab834f7894396250891e973c64f66e688c0913410505f",
+  "duration_seconds": 8.4485925110057
+}

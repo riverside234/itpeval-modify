@@ -1,0 +1,1230 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 93,
+    "last_step": 93,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "(*  \n  File:       Bernoulli.thy\n  Author:     Lukas Bulwahn <lukas.bulwahn-at-gmail.com> \n  Author:     Manuel Eberl <manuel@pruvisto.org> \n*)\n",
+        "output": "",
+        "step_time": 0.025409221649169922
+      },
+      {
+        "index": 1,
+        "step": "section \\<open>Bernoulli numbers\\<close>",
+        "output": "",
+        "step_time": 0.016869306564331055
+      },
+      {
+        "index": 2,
+        "step": "theory Bernoulli\nimports Complex_Main\nbegin",
+        "output": "",
+        "step_time": 0.01797795295715332
+      },
+      {
+        "index": 3,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.017375707626342773
+      },
+      {
+        "index": 4,
+        "step": "subsection \\<open>Preliminaries\\<close>",
+        "output": "",
+        "step_time": 0.016100406646728516
+      },
+      {
+        "index": 5,
+        "step": "lemma power_numeral_reduce: \"a ^ numeral n = a * a ^ pred_numeral n\"",
+        "output": "",
+        "step_time": 0.027851581573486328
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.02595353126525879
+      },
+      {
+        "index": 7,
+        "step": "lemma fact_diff_Suc: \"n < Suc m \\<Longrightarrow> fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)\"",
+        "output": "",
+        "step_time": 0.021502017974853516
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017601728439331055
+      },
+      {
+        "index": 9,
+        "step": "lemma of_nat_binomial_Suc:\n  assumes \"k \\<le> n\"\n  shows   \"(of_nat (Suc n choose k) :: 'a :: field_char_0) = \n             of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)\"",
+        "output": "",
+        "step_time": 0.022002220153808594
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0187227725982666
+      },
+      {
+        "index": 11,
+        "step": "lemma integrals_eq:\n  assumes \"f 0 = g 0\"\n  assumes \"\\<And> x. ((\\<lambda>x. f x - g x) has_real_derivative 0) (at x)\"\n  shows \"f x = g x\"",
+        "output": "",
+        "step_time": 0.020380496978759766
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019285917282104492
+      },
+      {
+        "index": 13,
+        "step": "lemma sum_diff: \"((\\<Sum>i\\<le>n::nat. f (i + 1) - f i)::'a::field) = f (n + 1) - f 0\"",
+        "output": "",
+        "step_time": 0.01978445053100586
+      },
+      {
+        "index": 14,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.018474102020263672
+      },
+      {
+        "index": 15,
+        "step": "lemma Rats_sum: \"(\\<And>x. x \\<in> A \\<Longrightarrow> f x \\<in> \\<rat>) \\<Longrightarrow> sum f A \\<in> \\<rat>\"",
+        "output": "",
+        "step_time": 0.02361130714416504
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.04155278205871582
+      },
+      {
+        "index": 17,
+        "step": "subsection \\<open>Bernoulli Numbers and Bernoulli Polynomials\\<close>",
+        "output": "",
+        "step_time": 0.011465787887573242
+      },
+      {
+        "index": 18,
+        "step": "declare sum.cong [fundef_cong]",
+        "output": "",
+        "step_time": 0.013595819473266602
+      },
+      {
+        "index": 19,
+        "step": "fun bernoulli :: \"nat \\<Rightarrow> 'a :: field_char_0\"\nwhere\n  \"bernoulli 0 = 1\"\n| \"bernoulli (Suc n) =  (-1 / (of_nat n + 2)) * (\\<Sum>k \\<le> n. (of_nat (n + 2 choose k) * bernoulli k))\"",
+        "output": "",
+        "step_time": 0.08406639099121094
+      },
+      {
+        "index": 20,
+        "step": "declare bernoulli.simps[simp del]",
+        "output": "",
+        "step_time": 0.011644124984741211
+      },
+      {
+        "index": 21,
+        "step": "lemmas bernoulli_0 [simp] = bernoulli.simps(1)",
+        "output": "",
+        "step_time": 0.011277198791503906
+      },
+      {
+        "index": 22,
+        "step": "lemmas bernoulli_Suc = bernoulli.simps(2)",
+        "output": "",
+        "step_time": 0.012752056121826172
+      },
+      {
+        "index": 23,
+        "step": "lemma bernoulli_1 [simp]: \"bernoulli 1 = -1/2\"",
+        "output": "",
+        "step_time": 0.013681411743164062
+      },
+      {
+        "index": 24,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011790752410888672
+      },
+      {
+        "index": 25,
+        "step": "lemma bernoulli_Suc_0 [simp]: \"bernoulli (Suc 0) = -1/2\"",
+        "output": "",
+        "step_time": 0.014814615249633789
+      },
+      {
+        "index": 26,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01219630241394043
+      },
+      {
+        "index": 27,
+        "step": "lemma of_rat_bernoulli: \"of_rat (bernoulli n) = bernoulli n\"",
+        "output": "",
+        "step_time": 0.011660337448120117
+      },
+      {
+        "index": 28,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012187480926513672
+      },
+      {
+        "index": 29,
+        "step": "lemma of_real_of_rat: \"of_real (of_rat x) = (of_rat x :: 'a :: real_field)\"",
+        "output": "",
+        "step_time": 0.014864921569824219
+      },
+      {
+        "index": 30,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01271963119506836
+      },
+      {
+        "index": 31,
+        "step": "lemma of_real_bernoulli: \"of_real (bernoulli n) = (bernoulli n :: 'a :: real_field)\"",
+        "output": "",
+        "step_time": 0.015669584274291992
+      },
+      {
+        "index": 32,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013589859008789062
+      },
+      {
+        "index": 33,
+        "step": "text \\<open>\n  The ``normal'' Bernoulli numbers are the negative Bernoulli numbers $B_n^{-}$ we just defined\n  (so called because $B_1^{-} = -\\frac{1}{2}$). There is also another convention, the \n  positive Bernoulli numbers $B_n^{+}$, which differ from the negative ones only in that \n  $B_1^{+} = \\frac{1}{2}$. Both conventions have their justification, since a number of theorems \n  are easier to state with one than the other.\n\\<close>",
+        "output": "",
+        "step_time": 0.010534286499023438
+      },
+      {
+        "index": 34,
+        "step": "definition bernoulli' :: \"nat \\<Rightarrow> 'a :: field_char_0\" where\n  \"bernoulli' n = (if n = 1 then 1/2 else bernoulli n)\"",
+        "output": "",
+        "step_time": 0.018829345703125
+      },
+      {
+        "index": 35,
+        "step": "lemma bernoulli'_0 [simp]: \"bernoulli' 0 = 1\"",
+        "output": "",
+        "step_time": 0.013883352279663086
+      },
+      {
+        "index": 36,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012398242950439453
+      },
+      {
+        "index": 37,
+        "step": "lemma bernoulli'_1 [simp]: \"bernoulli' (Suc 0) = 1/2\"",
+        "output": "",
+        "step_time": 0.014050006866455078
+      },
+      {
+        "index": 38,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011689186096191406
+      },
+      {
+        "index": 39,
+        "step": "lemma bernoulli_conv_bernoulli': \"n \\<noteq> 1 \\<Longrightarrow> bernoulli n = bernoulli' n\"",
+        "output": "",
+        "step_time": 0.01375579833984375
+      },
+      {
+        "index": 40,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010098457336425781
+      },
+      {
+        "index": 41,
+        "step": "lemma bernoulli'_conv_bernoulli: \"n \\<noteq> 1 \\<Longrightarrow> bernoulli' n = bernoulli n\"",
+        "output": "",
+        "step_time": 0.011548757553100586
+      },
+      {
+        "index": 42,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010568857192993164
+      },
+      {
+        "index": 43,
+        "step": "lemma bernoulli_conv_bernoulli'_if: \n    \"n \\<noteq> 1 \\<Longrightarrow> bernoulli n = (if n = 1 then -1/2 else bernoulli' n)\"",
+        "output": "",
+        "step_time": 0.012169122695922852
+      },
+      {
+        "index": 44,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01114034652709961
+      },
+      {
+        "index": 45,
+        "step": "lemma of_rat_bernoulli': \"of_rat (bernoulli' n) = bernoulli' n\"",
+        "output": "",
+        "step_time": 0.011751174926757812
+      },
+      {
+        "index": 46,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.008932113647460938
+      },
+      {
+        "index": 47,
+        "step": "lemma of_real_bernoulli': \"of_real (bernoulli' n) = (bernoulli' n :: 'a :: real_field)\"",
+        "output": "",
+        "step_time": 0.011775016784667969
+      },
+      {
+        "index": 48,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010719776153564453
+      },
+      {
+        "index": 49,
+        "step": "lemma bernoulli_in_Rats: \"bernoulli n \\<in> \\<rat>\"",
+        "output": "",
+        "step_time": 0.011693716049194336
+      },
+      {
+        "index": 50,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009236335754394531
+      },
+      {
+        "index": 51,
+        "step": "lemma bernoulli'_in_Rats: \"bernoulli' n \\<in> \\<rat>\"",
+        "output": "",
+        "step_time": 0.013555526733398438
+      },
+      {
+        "index": 52,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009464263916015625
+      },
+      {
+        "index": 53,
+        "step": "definition bernpoly :: \"nat \\<Rightarrow> 'a \\<Rightarrow> 'a :: real_algebra_1\" where\n  \"bernpoly n = (\\<lambda>x. \\<Sum>k \\<le> n. of_nat (n choose k) * of_real (bernoulli k) * x ^ (n - k))\"",
+        "output": "",
+        "step_time": 0.024274349212646484
+      },
+      {
+        "index": 54,
+        "step": "lemma bernpoly_altdef:\n  \"bernpoly n = (\\<lambda>x. \\<Sum>k\\<le>n. of_nat (n choose k) * of_real (bernoulli (n - k)) * x ^ k)\"",
+        "output": "",
+        "step_time": 0.01894831657409668
+      },
+      {
+        "index": 55,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011942148208618164
+      },
+      {
+        "index": 56,
+        "step": "lemma bernoulli_Suc': \n  \"bernoulli (Suc n) = -1/(of_nat n + 2) * (\\<Sum>k\\<le>n. of_nat (n + 2 choose (k + 2)) * bernoulli (n - k))\"",
+        "output": "",
+        "step_time": 0.01686859130859375
+      },
+      {
+        "index": 57,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01214456558227539
+      },
+      {
+        "index": 58,
+        "step": "subsection \\<open>Basic Observations on Bernoulli Polynomials\\<close>",
+        "output": "",
+        "step_time": 0.009022951126098633
+      },
+      {
+        "index": 59,
+        "step": "lemma bernpoly_0 [simp]: \"bernpoly n 0 = of_real (bernoulli n)\"",
+        "output": "",
+        "step_time": 0.01073598861694336
+      },
+      {
+        "index": 60,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011597633361816406
+      },
+      {
+        "index": 61,
+        "step": "lemma continuous_on_bernpoly [continuous_intros]: \n  \"continuous_on A (bernpoly n :: 'a \\<Rightarrow> 'a :: real_normed_algebra_1)\"",
+        "output": "",
+        "step_time": 0.011396646499633789
+      },
+      {
+        "index": 62,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.007870197296142578
+      },
+      {
+        "index": 63,
+        "step": "lemma isCont_bernpoly [continuous_intros]: \n  \"isCont (bernpoly n :: 'a \\<Rightarrow> 'a :: real_normed_algebra_1) x\"",
+        "output": "",
+        "step_time": 0.012464523315429688
+      },
+      {
+        "index": 64,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011874675750732422
+      },
+      {
+        "index": 65,
+        "step": "lemma has_field_derivative_bernpoly:\n  \"(bernpoly (Suc n) has_field_derivative \n     (of_nat (n + 1) * bernpoly n x :: 'a :: real_normed_field)) (at x)\"",
+        "output": "",
+        "step_time": 0.01571822166442871
+      },
+      {
+        "index": 66,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010886907577514648
+      },
+      {
+        "index": 67,
+        "step": "lemmas has_field_derivative_bernpoly' [derivative_intros] =\n  DERIV_chain'[OF _ has_field_derivative_bernpoly]",
+        "output": "",
+        "step_time": 0.010334253311157227
+      },
+      {
+        "index": 68,
+        "step": "lemma sum_binomial_times_bernoulli:\n  \"(\\<Sum>k\\<le>n. of_nat ((Suc n) choose k) * bernoulli k) = (if n = 0 then 1 else 0)\"",
+        "output": "",
+        "step_time": 0.015204429626464844
+      },
+      {
+        "index": 69,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013096332550048828
+      },
+      {
+        "index": 70,
+        "step": "lemma sum_binomial_times_bernoulli':\n  \"(\\<Sum>k<n. of_nat (n choose k) * bernoulli k :: 'a :: field_char_0) = (if n = 1 then 1 else 0)\"",
+        "output": "",
+        "step_time": 0.014003992080688477
+      },
+      {
+        "index": 71,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009839057922363281
+      },
+      {
+        "index": 72,
+        "step": "lemma binomial_unroll:\n  \"n > 0 \\<Longrightarrow> (n choose k) = (if k = 0 then 1 else ((n - 1) choose (k - 1)) + ((n - 1) choose k))\"",
+        "output": "",
+        "step_time": 0.013799428939819336
+      },
+      {
+        "index": 73,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009365558624267578
+      },
+      {
+        "index": 74,
+        "step": "lemma sum_unroll:\n  \"(\\<Sum>k\\<le>n::nat. f k) = (if n = 0 then f 0 else f n + (\\<Sum>k\\<le>n - 1. f k))\"",
+        "output": "",
+        "step_time": 0.017140626907348633
+      },
+      {
+        "index": 75,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014261722564697266
+      },
+      {
+        "index": 76,
+        "step": "lemma bernoulli_unroll:\n  \"n > 0 \\<Longrightarrow> bernoulli n = - 1 / (of_nat n + 1) * (\\<Sum>k\\<le>n - 1. of_nat (n + 1 choose k) * bernoulli k)\"",
+        "output": "",
+        "step_time": 0.01867079734802246
+      },
+      {
+        "index": 77,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013113260269165039
+      },
+      {
+        "index": 78,
+        "step": "lemmas bernoulli_unroll_all = binomial_unroll bernoulli_unroll sum_unroll bernpoly_def",
+        "output": "",
+        "step_time": 0.016401052474975586
+      },
+      {
+        "index": 79,
+        "step": "lemma bernpoly_1_1: \"bernpoly 1 1 = of_real (1/2)\"",
+        "output": "",
+        "step_time": 0.012769460678100586
+      },
+      {
+        "index": 80,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010738849639892578
+      },
+      {
+        "index": 81,
+        "step": "subsection \\<open>Sum of Powers with Bernoulli Polynomials\\<close>",
+        "output": "",
+        "step_time": 0.008433103561401367
+      },
+      {
+        "index": 82,
+        "step": "\n\n(* TODO: Generalisation not possible here because mean-value theorem \n   is only available for reals *)\n",
+        "output": "",
+        "step_time": 0.008271932601928711
+      },
+      {
+        "index": 83,
+        "step": "lemma diff_bernpoly:\n  fixes x :: real\n  shows \"bernpoly n (x + 1) - bernpoly n x = of_nat n * x ^ (n - 1)\"",
+        "output": "",
+        "step_time": 0.01384878158569336
+      },
+      {
+        "index": 84,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011748790740966797
+      },
+      {
+        "index": 85,
+        "step": "lemma bernpoly_of_real: \"bernpoly n (of_real x) = of_real (bernpoly n x)\"",
+        "output": "",
+        "step_time": 0.012913703918457031
+      },
+      {
+        "index": 86,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.00940704345703125
+      },
+      {
+        "index": 87,
+        "step": "lemma bernpoly_1:\n  assumes \"n \\<noteq> 1\"\n  shows   \"bernpoly n 1 = of_real (bernoulli n)\"",
+        "output": "",
+        "step_time": 0.012186527252197266
+      },
+      {
+        "index": 88,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010635852813720703
+      },
+      {
+        "index": 89,
+        "step": "lemma bernpoly_1': \"bernpoly n 1 = of_real (bernoulli' n)\"",
+        "output": "",
+        "step_time": 0.013193607330322266
+      },
+      {
+        "index": 90,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009076595306396484
+      },
+      {
+        "index": 91,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.009816646575927734
+      },
+      {
+        "index": 92,
+        "step": "theorem sum_of_powers: \n  \"(\\<Sum>k\\<le>n::nat. (real k) ^ m) = (bernpoly (Suc m) (n + 1) - bernpoly (Suc m) 0) / (m + 1)\"",
+        "output": "",
+        "step_time": 0.020827054977416992
+      }
+    ],
+    "final_state": "default_92",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "(*  \n  File:       Bernoulli.thy\n  Author:     Lukas Bulwahn <lukas.bulwahn-at-gmail.com> \n  Author:     Manuel Eberl <manuel@pruvisto.org> \n*)\n",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025402320083230734
+    },
+    {
+      "mode": "search",
+      "command": "section \\<open>Bernoulli numbers\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016864818055182695
+    },
+    {
+      "mode": "search",
+      "command": "theory Bernoulli\nimports Complex_Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017972041969187558
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017370356945320964
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Preliminaries\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01609612989705056
+    },
+    {
+      "mode": "search",
+      "command": "lemma power_numeral_reduce: \"a ^ numeral n = a * a ^ pred_numeral n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. a ^ numeral n = a * a ^ pred_numeral n",
+      "duration_seconds": 0.027844856958836317
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02594915102235973
+    },
+    {
+      "mode": "search",
+      "command": "lemma fact_diff_Suc: \"n < Suc m \\<Longrightarrow> fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. n < Suc m \\<Longrightarrow>\n    fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)",
+      "duration_seconds": 0.02149862505029887
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017598230973817408
+    },
+    {
+      "mode": "search",
+      "command": "lemma of_nat_binomial_Suc:\n  assumes \"k \\<le> n\"\n  shows   \"(of_nat (Suc n choose k) :: 'a :: field_char_0) = \n             of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_nat (Suc n choose k) =\n    of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)",
+      "duration_seconds": 0.021998525015078485
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018720671068876982
+    },
+    {
+      "mode": "search",
+      "command": "lemma integrals_eq:\n  assumes \"f 0 = g 0\"\n  assumes \"\\<And> x. ((\\<lambda>x. f x - g x) has_real_derivative 0) (at x)\"\n  shows \"f x = g x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. f x = g x",
+      "duration_seconds": 0.0203784970799461
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019284095033071935
+    },
+    {
+      "mode": "search",
+      "command": "lemma sum_diff: \"((\\<Sum>i\\<le>n::nat. f (i + 1) - f i)::'a::field) = f (n + 1) - f 0\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (\\<Sum>i\\<le>n. f (i + 1) - f i) = f (n + 1) - f 0",
+      "duration_seconds": 0.019782569957897067
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01847255404572934
+    },
+    {
+      "mode": "search",
+      "command": "lemma Rats_sum: \"(\\<And>x. x \\<in> A \\<Longrightarrow> f x \\<in> \\<rat>) \\<Longrightarrow> sum f A \\<in> \\<rat>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (\\<And>x.\n        x \\<in> A \\<Longrightarrow> f x \\<in> \\<rat>) \\<Longrightarrow>\n    sum f A \\<in> \\<rat>",
+      "duration_seconds": 0.02360973204486072
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.041548992972821
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Bernoulli Numbers and Bernoulli Polynomials\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011463450966402888
+    },
+    {
+      "mode": "search",
+      "command": "declare sum.cong [fundef_cong]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013592073926702142
+    },
+    {
+      "mode": "search",
+      "command": "fun bernoulli :: \"nat \\<Rightarrow> 'a :: field_char_0\"\nwhere\n  \"bernoulli 0 = 1\"\n| \"bernoulli (Suc n) =  (-1 / (of_nat n + 2)) * (\\<Sum>k \\<le> n. (of_nat (n + 2 choose k) * bernoulli k))\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.08406163495965302
+    },
+    {
+      "mode": "search",
+      "command": "declare bernoulli.simps[simp del]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011639748932793736
+    },
+    {
+      "mode": "search",
+      "command": "lemmas bernoulli_0 [simp] = bernoulli.simps(1)",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011274295044131577
+    },
+    {
+      "mode": "search",
+      "command": "lemmas bernoulli_Suc = bernoulli.simps(2)",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012748230015859008
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli_1 [simp]: \"bernoulli 1 = -1/2\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernoulli 1 = - (1::'a) / (2::'a)",
+      "duration_seconds": 0.01367883593775332
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011786547023802996
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli_Suc_0 [simp]: \"bernoulli (Suc 0) = -1/2\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernoulli (Suc 0) = - (1::'a) / (2::'a)",
+      "duration_seconds": 0.014806720078922808
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01218940201215446
+    },
+    {
+      "mode": "search",
+      "command": "lemma of_rat_bernoulli: \"of_rat (bernoulli n) = bernoulli n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_rat (bernoulli n) = bernoulli n",
+      "duration_seconds": 0.011655363952741027
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012184530030936003
+    },
+    {
+      "mode": "search",
+      "command": "lemma of_real_of_rat: \"of_real (of_rat x) = (of_rat x :: 'a :: real_field)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_real (real_of_rat x) = of_rat x",
+      "duration_seconds": 0.014862220035865903
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012717630947008729
+    },
+    {
+      "mode": "search",
+      "command": "lemma of_real_bernoulli: \"of_real (bernoulli n) = (bernoulli n :: 'a :: real_field)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_real (bernoulli n) = bernoulli n",
+      "duration_seconds": 0.01566590298898518
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013586928020231426
+    },
+    {
+      "mode": "search",
+      "command": "text \\<open>\n  The ``normal'' Bernoulli numbers are the negative Bernoulli numbers $B_n^{-}$ we just defined\n  (so called because $B_1^{-} = -\\frac{1}{2}$). There is also another convention, the \n  positive Bernoulli numbers $B_n^{+}$, which differ from the negative ones only in that \n  $B_1^{+} = \\frac{1}{2}$. Both conventions have their justification, since a number of theorems \n  are easier to state with one than the other.\n\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010531548992730677
+    },
+    {
+      "mode": "search",
+      "command": "definition bernoulli' :: \"nat \\<Rightarrow> 'a :: field_char_0\" where\n  \"bernoulli' n = (if n = 1 then 1/2 else bernoulli n)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01882543705869466
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli'_0 [simp]: \"bernoulli' 0 = 1\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernoulli' 0 = (1::'a)",
+      "duration_seconds": 0.013880747952498496
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012394979014061391
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli'_1 [simp]: \"bernoulli' (Suc 0) = 1/2\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernoulli' (Suc 0) = (1::'a) / (2::'a)",
+      "duration_seconds": 0.014046463067643344
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01168495207093656
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli_conv_bernoulli': \"n \\<noteq> 1 \\<Longrightarrow> bernoulli n = bernoulli' n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. n \\<noteq> 1 \\<Longrightarrow> bernoulli n = bernoulli' n",
+      "duration_seconds": 0.0137513040099293
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010093744029290974
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli'_conv_bernoulli: \"n \\<noteq> 1 \\<Longrightarrow> bernoulli' n = bernoulli n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. n \\<noteq> 1 \\<Longrightarrow> bernoulli' n = bernoulli n",
+      "duration_seconds": 0.011543674976564944
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010564755997620523
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli_conv_bernoulli'_if: \n    \"n \\<noteq> 1 \\<Longrightarrow> bernoulli n = (if n = 1 then -1/2 else bernoulli' n)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. n \\<noteq> 1 \\<Longrightarrow>\n    bernoulli n = (if n = 1 then - (1::'a) / (2::'a) else bernoulli' n)",
+      "duration_seconds": 0.01216377702075988
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011135553941130638
+    },
+    {
+      "mode": "search",
+      "command": "lemma of_rat_bernoulli': \"of_rat (bernoulli' n) = bernoulli' n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_rat (bernoulli' n) = bernoulli' n",
+      "duration_seconds": 0.01174697803799063
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008924094028770924
+    },
+    {
+      "mode": "search",
+      "command": "lemma of_real_bernoulli': \"of_real (bernoulli' n) = (bernoulli' n :: 'a :: real_field)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. of_real (bernoulli' n) = bernoulli' n",
+      "duration_seconds": 0.011768985074013472
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01071443606633693
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli_in_Rats: \"bernoulli n \\<in> \\<rat>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernoulli n \\<in> \\<rat>",
+      "duration_seconds": 0.011690321960486472
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0092329679755494
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli'_in_Rats: \"bernoulli' n \\<in> \\<rat>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernoulli' n \\<in> \\<rat>",
+      "duration_seconds": 0.013550539966672659
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009458901011385024
+    },
+    {
+      "mode": "search",
+      "command": "definition bernpoly :: \"nat \\<Rightarrow> 'a \\<Rightarrow> 'a :: real_algebra_1\" where\n  \"bernpoly n = (\\<lambda>x. \\<Sum>k \\<le> n. of_nat (n choose k) * of_real (bernoulli k) * x ^ (n - k))\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024267214932478964
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernpoly_altdef:\n  \"bernpoly n = (\\<lambda>x. \\<Sum>k\\<le>n. of_nat (n choose k) * of_real (bernoulli (n - k)) * x ^ k)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernpoly n =\n    (\\<lambda>x.\n        \\<Sum>k\\<le>n.\n           of_nat (n choose k) * of_real (bernoulli (n - k)) * x ^ k)",
+      "duration_seconds": 0.018943088012747467
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011935433954931796
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli_Suc': \n  \"bernoulli (Suc n) = -1/(of_nat n + 2) * (\\<Sum>k\\<le>n. of_nat (n + 2 choose (k + 2)) * bernoulli (n - k))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernoulli (Suc n) =\n    - (1::'a) / (of_nat n + (2::'a)) *\n    (\\<Sum>k\\<le>n. of_nat (n + 2 choose (k + 2)) * bernoulli (n - k))",
+      "duration_seconds": 0.0168635209556669
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012139969039708376
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Basic Observations on Bernoulli Polynomials\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009015777963213623
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernpoly_0 [simp]: \"bernpoly n 0 = of_real (bernoulli n)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernpoly n (0::'a) = of_real (bernoulli n)",
+      "duration_seconds": 0.010729816975072026
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011592500959523022
+    },
+    {
+      "mode": "search",
+      "command": "lemma continuous_on_bernpoly [continuous_intros]: \n  \"continuous_on A (bernpoly n :: 'a \\<Rightarrow> 'a :: real_normed_algebra_1)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. continuous_on A (bernpoly n)",
+      "duration_seconds": 0.011392103973776102
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.007866632076911628
+    },
+    {
+      "mode": "search",
+      "command": "lemma isCont_bernpoly [continuous_intros]: \n  \"isCont (bernpoly n :: 'a \\<Rightarrow> 'a :: real_normed_algebra_1) x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. isCont (bernpoly n) x",
+      "duration_seconds": 0.012461050064302981
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011870573973283172
+    },
+    {
+      "mode": "search",
+      "command": "lemma has_field_derivative_bernpoly:\n  \"(bernpoly (Suc n) has_field_derivative \n     (of_nat (n + 1) * bernpoly n x :: 'a :: real_normed_field)) (at x)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (bernpoly (Suc n) has_field_derivative of_nat (n + 1) * bernpoly n x)\n     (at x)",
+      "duration_seconds": 0.015714113018475473
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01088296202942729
+    },
+    {
+      "mode": "search",
+      "command": "lemmas has_field_derivative_bernpoly' [derivative_intros] =\n  DERIV_chain'[OF _ has_field_derivative_bernpoly]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010330351069569588
+    },
+    {
+      "mode": "search",
+      "command": "lemma sum_binomial_times_bernoulli:\n  \"(\\<Sum>k\\<le>n. of_nat ((Suc n) choose k) * bernoulli k) = (if n = 0 then 1 else 0)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (\\<Sum>k\\<le>n. of_nat (Suc n choose k) * bernoulli k) =\n    (if n = 0 then 1::'a else (0::'a))",
+      "duration_seconds": 0.015200276975519955
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01309152995236218
+    },
+    {
+      "mode": "search",
+      "command": "lemma sum_binomial_times_bernoulli':\n  \"(\\<Sum>k<n. of_nat (n choose k) * bernoulli k :: 'a :: field_char_0) = (if n = 1 then 1 else 0)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (\\<Sum>k<n. of_nat (n choose k) * bernoulli k) =\n    (if n = 1 then 1::'a else (0::'a))",
+      "duration_seconds": 0.013999480055645108
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009836058947257698
+    },
+    {
+      "mode": "search",
+      "command": "lemma binomial_unroll:\n  \"n > 0 \\<Longrightarrow> (n choose k) = (if k = 0 then 1 else ((n - 1) choose (k - 1)) + ((n - 1) choose k))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. 0 < n \\<Longrightarrow>\n    n choose k =\n    (if k = 0 then 1 else n - 1 choose (k - 1) + (n - 1 choose k))",
+      "duration_seconds": 0.013795601087622344
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.00936196290422231
+    },
+    {
+      "mode": "search",
+      "command": "lemma sum_unroll:\n  \"(\\<Sum>k\\<le>n::nat. f k) = (if n = 0 then f 0 else f n + (\\<Sum>k\\<le>n - 1. f k))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. sum f {..n} = (if n = 0 then f 0 else f n + sum f {..n - 1})",
+      "duration_seconds": 0.01713185105472803
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014252937980927527
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernoulli_unroll:\n  \"n > 0 \\<Longrightarrow> bernoulli n = - 1 / (of_nat n + 1) * (\\<Sum>k\\<le>n - 1. of_nat (n + 1 choose k) * bernoulli k)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. 0 < n \\<Longrightarrow>\n    bernoulli n =\n    - (1::'a) / (of_nat n + (1::'a)) *\n    (\\<Sum>k\\<le>n - 1. of_nat (n + 1 choose k) * bernoulli k)",
+      "duration_seconds": 0.0186575559200719
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013107523089274764
+    },
+    {
+      "mode": "search",
+      "command": "lemmas bernoulli_unroll_all = binomial_unroll bernoulli_unroll sum_unroll bernpoly_def",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016391338082030416
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernpoly_1_1: \"bernpoly 1 1 = of_real (1/2)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernpoly 1 (1::'a) = of_real (1 / 2)",
+      "duration_seconds": 0.01276337297167629
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010733406990766525
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Sum of Powers with Bernoulli Polynomials\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008428505039773881
+    },
+    {
+      "mode": "search",
+      "command": "\n\n(* TODO: Generalisation not possible here because mean-value theorem \n   is only available for reals *)\n",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.008267085999250412
+    },
+    {
+      "mode": "search",
+      "command": "lemma diff_bernpoly:\n  fixes x :: real\n  shows \"bernpoly n (x + 1) - bernpoly n x = of_nat n * x ^ (n - 1)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernpoly n (x + 1) - bernpoly n x = real n * x ^ (n - 1)",
+      "duration_seconds": 0.013843974098563194
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011745380004867911
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernpoly_of_real: \"bernpoly n (of_real x) = of_real (bernpoly n x)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernpoly n (of_real x) = of_real (bernpoly n x)",
+      "duration_seconds": 0.01290999201592058
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.00940289197023958
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernpoly_1:\n  assumes \"n \\<noteq> 1\"\n  shows   \"bernpoly n 1 = of_real (bernoulli n)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernpoly n (1::'a) = of_real (bernoulli n)",
+      "duration_seconds": 0.01217775302939117
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010630896082147956
+    },
+    {
+      "mode": "search",
+      "command": "lemma bernpoly_1': \"bernpoly n 1 = of_real (bernoulli' n)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. bernpoly n (1::'a) = of_real (bernoulli' n)",
+      "duration_seconds": 0.013186200987547636
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009070890955626965
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009812003001570702
+    },
+    {
+      "mode": "search",
+      "command": "theorem sum_of_powers: \n  \"(\\<Sum>k\\<le>n::nat. (real k) ^ m) = (bernpoly (Suc m) (n + 1) - bernpoly (Suc m) 0) / (m + 1)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (\\<Sum>k\\<le>n. real k ^ m) =\n    (bernpoly (Suc m) (real n + 1) - bernpoly (Suc m) 0) / (real m + 1)",
+      "duration_seconds": 0.020817161072045565
+    }
+  ],
+  "failure_category": null,
+  "request_id": "d330d690dad746f4be308bc66c9dd310",
+  "input_sha256": "840655409255828de45171b57f277808012ba519d69711d2ef2e6c6f3635f64c",
+  "duration_seconds": 11.886355494032614
+}

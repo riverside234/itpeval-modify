@@ -1,0 +1,203 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 14,
+    "last_step": 14,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory ideals\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.0225067138671875
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.017982006072998047
+      },
+      {
+        "index": 2,
+        "step": "locale cring =\n  fixes zero :: \"'r\"\n    and one  :: \"'r\"\n    and add  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"+R\" 65)\n    and mul  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"*R\" 70)\n    and opp  :: \"'r \\<Rightarrow> 'r\"\n  assumes add_comm  : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero  : \"\\<And>x. x +R zero = x\"\n    and   add_opp   : \"\\<And>x. x +R opp x = zero\"\n    and   mul_comm  : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_one   : \"\\<And>x. x *R one = x\"\n    and   dist_l    : \"\\<And>a x y. a *R (x +R y) = (a *R x) +R (a *R y)\"\n    and   opp_add   : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\nbegin",
+        "output": "",
+        "step_time": 0.044150590896606445
+      },
+      {
+        "index": 3,
+        "step": "lemma add_left_comm: \"x +R (y +R z) = y +R (x +R z)\"",
+        "output": "",
+        "step_time": 0.020696640014648438
+      },
+      {
+        "index": 4,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01812601089477539
+      },
+      {
+        "index": 5,
+        "step": "lemma zero_add: \"zero +R x = x\"",
+        "output": "",
+        "step_time": 0.0235750675201416
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.021724462509155273
+      },
+      {
+        "index": 7,
+        "step": "definition IsIdeal :: \"('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"IsIdeal I \\<equiv>\n    I zero \\<and>\n    (\\<forall>x y. I x \\<longrightarrow> I y \\<longrightarrow> I (x +R y)) \\<and>\n    (\\<forall>x.   I x \\<longrightarrow> I (opp x)) \\<and>\n    (\\<forall>a x. I x \\<longrightarrow> I (a *R x))\"",
+        "output": "",
+        "step_time": 0.03097391128540039
+      },
+      {
+        "index": 8,
+        "step": "definition Inter :: \"('i \\<Rightarrow> 'r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"Inter F \\<equiv> \\<lambda>x. \\<forall>i. F i x\"",
+        "output": "",
+        "step_time": 0.026894330978393555
+      },
+      {
+        "index": 9,
+        "step": "lemma inter_isIdeal:\n  assumes h: \"\\<forall>i. IsIdeal (F i)\"\n  shows \"IsIdeal (Inter F)\"",
+        "output": "",
+        "step_time": 0.02111363410949707
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017805814743041992
+      },
+      {
+        "index": 11,
+        "step": "definition isum :: \"('r \\<Rightarrow> bool) \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"isum I J \\<equiv> \\<lambda>x. \\<exists>a b. I a \\<and> J b \\<and> x = a +R b\"",
+        "output": "",
+        "step_time": 0.025704145431518555
+      },
+      {
+        "index": 12,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.01610732078552246
+      },
+      {
+        "index": 13,
+        "step": "lemma sum_isIdeal:\n  assumes hI: \"IsIdeal I\" and hJ: \"IsIdeal J\"\n  shows \"IsIdeal (isum I J)\"",
+        "output": "",
+        "step_time": 0.022451400756835938
+      }
+    ],
+    "final_state": "default_13",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory ideals\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.022499112994410098
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017977030016481876
+    },
+    {
+      "mode": "search",
+      "command": "locale cring =\n  fixes zero :: \"'r\"\n    and one  :: \"'r\"\n    and add  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"+R\" 65)\n    and mul  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"*R\" 70)\n    and opp  :: \"'r \\<Rightarrow> 'r\"\n  assumes add_comm  : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero  : \"\\<And>x. x +R zero = x\"\n    and   add_opp   : \"\\<And>x. x +R opp x = zero\"\n    and   mul_comm  : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_one   : \"\\<And>x. x *R one = x\"\n    and   dist_l    : \"\\<And>a x y. a *R (x +R y) = (a *R x) +R (a *R y)\"\n    and   opp_add   : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.044144385028630495
+    },
+    {
+      "mode": "search",
+      "command": "lemma add_left_comm: \"x +R (y +R z) = y +R (x +R z)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x +R (y +R z) = y +R (x +R z)",
+      "duration_seconds": 0.020687956013716757
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01811998907942325
+    },
+    {
+      "mode": "search",
+      "command": "lemma zero_add: \"zero +R x = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. zero +R x = x",
+      "duration_seconds": 0.02356981800403446
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.021719372016377747
+    },
+    {
+      "mode": "search",
+      "command": "definition IsIdeal :: \"('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"IsIdeal I \\<equiv>\n    I zero \\<and>\n    (\\<forall>x y. I x \\<longrightarrow> I y \\<longrightarrow> I (x +R y)) \\<and>\n    (\\<forall>x.   I x \\<longrightarrow> I (opp x)) \\<and>\n    (\\<forall>a x. I x \\<longrightarrow> I (a *R x))\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.030966265010647476
+    },
+    {
+      "mode": "search",
+      "command": "definition Inter :: \"('i \\<Rightarrow> 'r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"Inter F \\<equiv> \\<lambda>x. \\<forall>i. F i x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.026887834072113037
+    },
+    {
+      "mode": "search",
+      "command": "lemma inter_isIdeal:\n  assumes h: \"\\<forall>i. IsIdeal (F i)\"\n  shows \"IsIdeal (Inter F)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. IsIdeal (local.Inter F)",
+      "duration_seconds": 0.021109132911078632
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017801946960389614
+    },
+    {
+      "mode": "search",
+      "command": "definition isum :: \"('r \\<Rightarrow> bool) \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"isum I J \\<equiv> \\<lambda>x. \\<exists>a b. I a \\<and> J b \\<and> x = a +R b\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025696425000205636
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01610201201401651
+    },
+    {
+      "mode": "search",
+      "command": "lemma sum_isIdeal:\n  assumes hI: \"IsIdeal I\" and hJ: \"IsIdeal J\"\n  shows \"IsIdeal (isum I J)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. IsIdeal (isum I J)",
+      "duration_seconds": 0.02244715904816985
+    }
+  ],
+  "failure_category": null,
+  "request_id": "40b6c8c9b3154138bff64105377cac47",
+  "input_sha256": "049f959a67a7af9896802f8134dc56b52376219311c6dbe0eab79b89dde4e072",
+  "duration_seconds": 8.131361929001287
+}

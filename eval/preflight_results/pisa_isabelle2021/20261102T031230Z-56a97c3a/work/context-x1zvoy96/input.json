@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory polynomial\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\n\n\n\n\n\ndatatype mynat = Nat_O | Nat_S mynat\n\nfun mynat_add :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> mynat\" where\n  \"mynat_add Nat_O m = m\"\n| \"mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)\"\n\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma mynat_add_O_left: \"mynat_add Nat_O m = m\"\n  ",
+    "theory_name": "polynomial",
+    "request_id": "b84f6e6c899741359f34a88979afa0be",
+    "input_sha256": "c0dd6878070f1c70041673318ace3c2c686ce8a47de3782c8f5431a03b7f06e6"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "success": false,
+  "error": "RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+  "failure_category": "context_error",
+  "step_results": [],
+  "request_id": "129e2ea8be6147999bfbf7640adbdf7f",
+  "input_sha256": "a1751ee2e59de68c8d41bd26df547b2042de4e34704eb15837ab1041dc02ce60",
+  "duration_seconds": 7.340636502020061
+}

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory limits_uniqueness\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\nlocale abs_field =\n  fixes zero    :: \"'r\"\n    and one     :: \"'r\"\n    and add     :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"+R\" 65)\n    and mul     :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"*R\" 70)\n    and opp     :: \"'r \\<Rightarrow> 'r\"\n    and absV    :: \"'r \\<Rightarrow> 'r\"\n    and le      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<preceq>\" 50)\n    and lt      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<prec>\" 50)\n\n    and natLe   :: \"'n \\<Rightarrow> 'n \\<Rightarrow> bool\"\n    and natMax  :: \"'n \\<Rightarrow> 'n \\<Rightarrow> 'n\"\n  assumes le_max_left    : \"\\<And>x y. natLe x (natMax x y)\"\n    and   le_max_right   : \"\\<And>x y. natLe y (natMax x y)\"\n    and   add_comm       : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc      : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero       : \"\\<And>x. x +R zero = x\"\n    and   add_opp        : \"\\<And>x. x +R opp x = zero\"\n    and   opp_add        : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\n    and   le_refl        : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans       : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   add_le_add     : \"\\<And>a b c d. a \\<preceq> b \\<Longrightarrow> c \\<preceq> d \\<Longrightarrow> a +R c \\<preceq> b +R d\"\n    and   abs_nonneg     : \"\\<And>x. zero \\<preceq> absV x\"\n    and   abs_triangle   : \"\\<And>x y. absV (x +R y) \\<preceq> absV x +R absV y\"\n    and   abs_sub_symm   : \"\\<And>x y. absV (x +R opp y) = absV (y +R opp x)\"\n    and   sub_decomp     : \"\\<And>x y z. x +R opp z = (x +R opp y) +R (y +R opp z)\"\n    and   sub_eq_zero    : \"\\<And>x y. x +R opp y = zero \\<Longrightarrow> x = y\"\n    and   eq_of_forall_eps2 :\n            \"\\<And>x. (\\<forall>eps. zero \\<prec> eps \\<longrightarrow> absV x \\<preceq> eps +R eps) \\<Longrightarrow> x = zero\"\nbegin\n\n\n\n\n\ndefinition sub :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"sub x y \\<equiv> x +R opp y\"\n\ndefinition limit :: \"('n \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"limit u l \\<equiv>\n    \\<forall>eps. zero \\<prec> eps \\<longrightarrow>\n      (\\<exists>N. \\<forall>n. natLe N n \\<longrightarrow> absV (sub (u n) l) \\<preceq> eps)\"\n\n\n\n\n\nlemma sub_self_zero: \"sub x x = zero\"\n  sorry\nlemma sub_decomp_lem: \"sub x z = (sub x y) +R (sub y z)\"\n  sorry\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma abs_sub_triangle:\n  \"absV (sub x z) \\<preceq> absV (sub x y) +R absV (sub y z)\"\n  ",
+    "theory_name": "limits_uniqueness",
+    "request_id": "3c7163010f844940a6b0a16bc67bf8d8",
+    "input_sha256": "261c65e526057fad68696b4d85dc9d841506ec4fd864fce7a3ceaf35a8ff2067"
+  }
+}

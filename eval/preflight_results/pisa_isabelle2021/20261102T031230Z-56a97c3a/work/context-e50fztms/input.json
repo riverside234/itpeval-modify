@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory circle_average\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\nlocale circle_average_setup =\n  fixes zero     :: \"'r\"\n    and add      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"     (infixl \"+C\" 65)\n    and integral :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> 'r\"\n  assumes add_zero      : \"\\<And>x. x +C zero = x\"\n    and   add_comm      : \"\\<And>x y. x +C y = y +C x\"\n    and   add_assoc     : \"\\<And>x y z. (x +C y) +C z = x +C (y +C z)\"\n    and   integral_ext  : \"\\<And>g h. (\\<forall>\\<theta>. g \\<theta> = h \\<theta>) \\<Longrightarrow> integral g = integral h\"\n    and   integral_const: \"\\<And>c. integral (\\<lambda>_. c) = c\"\n    and   integral_add  : \"\\<And>f g. integral (\\<lambda>\\<theta>. f \\<theta> +C g \\<theta>) = integral f +C integral g\"\n    and   integral_shift: \"\\<And>f c. integral (\\<lambda>\\<theta>. f (\\<theta> +C c)) = integral f\"\nbegin\n\n\n\n\n\ndefinition circleMap :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"circleMap c \\<theta> \\<equiv> \\<theta> +C c\"\n\ndefinition circleAverage :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"circleAverage f c \\<equiv> integral (\\<lambda>\\<theta>. f (circleMap c \\<theta>))\"\n\n\n\n\n\nlemma circleMap_zero: \"circleMap zero \\<theta> = \\<theta>\"\n  sorry\nlemma circleAverage_zero: \"circleAverage f zero = integral f\"\n  sorry\nlemma circleAverage_add:\n  \"circleAverage (\\<lambda>z. f z +C g z) c =\n   circleAverage f c +C circleAverage g c\"\n  sorry\nlemma circleAverage_fun_add:\n  \"circleAverage (\\<lambda>z. f (z +C c)) zero = circleAverage f c\"\n  sorry\nlemma circleMap_add:\n  \"circleMap (c +C d) \\<theta> = circleMap c (circleMap d \\<theta>)\"\n  sorry\nlemma circleAverage_shift:\n  \"circleAverage f (c +C d) = circleAverage (\\<lambda>z. f (z +C d)) c\"\n  sorry\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma circleAverage_const:\n  \"circleAverage (\\<lambda>_. k) c = k\"\n  ",
+    "theory_name": "circle_average",
+    "request_id": "6e47cf27fd6a4d45aa2afe6895d5ee60",
+    "input_sha256": "faa0fc9375277fe32164abf0da074c7dd1d2d74e4807bdf8398ee328a0ba0317"
+  }
+}

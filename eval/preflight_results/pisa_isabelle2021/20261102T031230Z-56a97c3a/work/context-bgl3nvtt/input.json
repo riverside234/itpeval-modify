@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory group\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\n\n\nlocale group =\n  fixes mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\"\n  assumes mul_assoc : \"a ** (b ** c) = (a ** b) ** c\"\n    and   mul_one   : \"a ** one = a\"\n    and   one_mul   : \"one ** a = a\"\n    and   mul_inv_l : \"inv a ** a = one\"\n    and   mul_inv_r : \"a ** inv a = one\"\nbegin\n\n\n\nlemma mul_left_cancel:\n  assumes h: \"a ** b = a ** c\"\n  shows \"b = c\"\n  sorry\nlemma mul_right_cancel:\n  assumes h: \"b ** a = c ** a\"\n  shows \"b = c\"\n  sorry\nlemma inv_inv: \"inv (inv a) = a\"\n  sorry\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma inv_mul: \"inv (a ** b) = inv b ** inv a\"\n  ",
+    "theory_name": "group",
+    "request_id": "fa24ad9f32c44f25b10e256760e53b52",
+    "input_sha256": "f8ce3faa015cd1ce6386e87d9c3941196a671373aed4e8916badc740bc658234"
+  }
+}

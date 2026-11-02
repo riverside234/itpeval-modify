@@ -1,0 +1,13 @@
+Initializing environment
+ISA_PATH: /data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021
+THEORY_FILE: /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-m8t4jurc/miniF2F/Polynomial.thy
+WORKING_DIR: /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-m8t4jurc/miniF2F
+You entered the path to the Isabelle executable: /data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021 
+We have successfully received it.
+You entered the path to the Isabelle working directory: /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-m8t4jurc/miniF2F We have successfully received it.
+Failure at initialising Isabelle process. Make sure the path your provide is where the Isabelle executable is.
+<_InactiveRpcError of RPC that terminated with:
+	status = StatusCode.INTERNAL
+	details = ""
+	debug_error_string = "INTERNAL"
+>

@@ -1,0 +1,606 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 45,
+    "last_step": 45,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory probability\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.023291826248168945
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.017336130142211914
+      },
+      {
+        "index": 2,
+        "step": "datatype 'a mylist = NilL | ConsL 'a \"'a mylist\"",
+        "output": "",
+        "step_time": 0.339449405670166
+      },
+      {
+        "index": 3,
+        "step": "primrec mapL :: \"('a \\<Rightarrow> 'b) \\<Rightarrow> 'a mylist \\<Rightarrow> 'b mylist\" where\n  \"mapL f NilL        = NilL\"\n| \"mapL f (ConsL x xs) = ConsL (f x) (mapL f xs)\"",
+        "output": "",
+        "step_time": 0.032059669494628906
+      },
+      {
+        "index": 4,
+        "step": "primrec fold_addL :: \"('a \\<Rightarrow> 'a \\<Rightarrow> 'a) \\<Rightarrow> 'a \\<Rightarrow> 'a mylist \\<Rightarrow> 'a\" where\n  \"fold_addL add z NilL        = z\"\n| \"fold_addL add z (ConsL x xs) = add x (fold_addL add z xs)\"",
+        "output": "",
+        "step_time": 0.033606767654418945
+      },
+      {
+        "index": 5,
+        "step": "inductive InL :: \"'a \\<Rightarrow> 'a mylist \\<Rightarrow> bool\" where\n  In_head : \"InL x (ConsL x xs)\"\n| In_tail : \"InL x xs \\<Longrightarrow> InL x (ConsL y xs)\"",
+        "output": "",
+        "step_time": 0.03803086280822754
+      },
+      {
+        "index": 6,
+        "step": "inductive NoDupL :: \"'a mylist \\<Rightarrow> bool\" where\n  ND_nil  : \"NoDupL NilL\"\n| ND_cons : \"\\<lbrakk>\\<not> InL x xs; NoDupL xs\\<rbrakk> \\<Longrightarrow> NoDupL (ConsL x xs)\"",
+        "output": "",
+        "step_time": 0.04475212097167969
+      },
+      {
+        "index": 7,
+        "step": "type_synonym 'a event = \"'a \\<Rightarrow> bool\"",
+        "output": "",
+        "step_time": 0.022721052169799805
+      },
+      {
+        "index": 8,
+        "step": "definition ev_false :: \"'a event\" where \"ev_false \\<equiv> \\<lambda>_. False\"",
+        "output": "",
+        "step_time": 0.027081727981567383
+      },
+      {
+        "index": 9,
+        "step": "definition ev_true  :: \"'a event\" where \"ev_true  \\<equiv> \\<lambda>_. True\"",
+        "output": "",
+        "step_time": 0.02684783935546875
+      },
+      {
+        "index": 10,
+        "step": "definition ev_inter :: \"'a event \\<Rightarrow> 'a event \\<Rightarrow> 'a event\"\n  where \"ev_inter A B \\<equiv> \\<lambda>\\<omega>. A \\<omega> \\<and> B \\<omega>\"",
+        "output": "",
+        "step_time": 0.0270843505859375
+      },
+      {
+        "index": 11,
+        "step": "definition ev_union :: \"'a event \\<Rightarrow> 'a event \\<Rightarrow> 'a event\"\n  where \"ev_union A B \\<equiv> \\<lambda>\\<omega>. A \\<omega> \\<or> B \\<omega>\"",
+        "output": "",
+        "step_time": 0.02753734588623047
+      },
+      {
+        "index": 12,
+        "step": "definition ev_compl :: \"'a event \\<Rightarrow> 'a event\"\n  where \"ev_compl A \\<equiv> \\<lambda>\\<omega>. \\<not> A \\<omega>\"",
+        "output": "",
+        "step_time": 0.026935338973999023
+      },
+      {
+        "index": 13,
+        "step": "definition ev_diff  :: \"'a event \\<Rightarrow> 'a event \\<Rightarrow> 'a event\"\n  where \"ev_diff A B \\<equiv> \\<lambda>\\<omega>. A \\<omega> \\<and> \\<not> B \\<omega>\"",
+        "output": "",
+        "step_time": 0.02750253677368164
+      },
+      {
+        "index": 14,
+        "step": "definition disjoint :: \"'a event \\<Rightarrow> 'a event \\<Rightarrow> bool\"\n  where \"disjoint A B \\<equiv> \\<forall>\\<omega>. \\<not> (A \\<omega> \\<and> B \\<omega>)\"",
+        "output": "",
+        "step_time": 0.024254560470581055
+      },
+      {
+        "index": 15,
+        "step": "fun pairwise_disjoint :: \"('a event) mylist \\<Rightarrow> bool\" where\n  \"pairwise_disjoint NilL = True\"\n| \"pairwise_disjoint (ConsL _ NilL) = True\"\n| \"pairwise_disjoint (ConsL A (ConsL B xs)) =\n     (disjoint A B \\<and>\n      (\\<forall>C. InL C (ConsL B xs) \\<longrightarrow> disjoint A C) \\<and>\n      pairwise_disjoint (ConsL B xs))\"",
+        "output": "",
+        "step_time": 0.12776851654052734
+      },
+      {
+        "index": 16,
+        "step": "primrec bigUnion :: \"('a event) mylist \\<Rightarrow> 'a event\" where\n  \"bigUnion NilL         = ev_false\"\n| \"bigUnion (ConsL A xs) = ev_union A (bigUnion xs)\"",
+        "output": "",
+        "step_time": 0.057459354400634766
+      },
+      {
+        "index": 17,
+        "step": "lemma ev_inter_comm:\n  \"\\<forall>\\<omega>. ev_inter A B \\<omega> \\<longleftrightarrow> ev_inter B A \\<omega>\"",
+        "output": "",
+        "step_time": 0.0172884464263916
+      },
+      {
+        "index": 18,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.015270471572875977
+      },
+      {
+        "index": 19,
+        "step": "lemma ev_union_comm:\n  \"\\<forall>\\<omega>. ev_union A B \\<omega> \\<longleftrightarrow> ev_union B A \\<omega>\"",
+        "output": "",
+        "step_time": 0.016938209533691406
+      },
+      {
+        "index": 20,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014547109603881836
+      },
+      {
+        "index": 21,
+        "step": "lemma ev_inter_assoc:\n  \"\\<forall>\\<omega>. ev_inter (ev_inter A B) C \\<omega> \\<longleftrightarrow> ev_inter A (ev_inter B C) \\<omega>\"",
+        "output": "",
+        "step_time": 0.01708698272705078
+      },
+      {
+        "index": 22,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013677597045898438
+      },
+      {
+        "index": 23,
+        "step": "lemma ev_union_assoc:\n  \"\\<forall>\\<omega>. ev_union (ev_union A B) C \\<omega> \\<longleftrightarrow> ev_union A (ev_union B C) \\<omega>\"",
+        "output": "",
+        "step_time": 0.017503738403320312
+      },
+      {
+        "index": 24,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014101982116699219
+      },
+      {
+        "index": 25,
+        "step": "lemma ev_inter_distrib_left:\n  \"\\<forall>\\<omega>. ev_inter A (ev_union B C) \\<omega> \\<longleftrightarrow> ev_union (ev_inter A B) (ev_inter A C) \\<omega>\"",
+        "output": "",
+        "step_time": 0.01712179183959961
+      },
+      {
+        "index": 26,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013451099395751953
+      },
+      {
+        "index": 27,
+        "step": "lemma disjoint_bigUnion:\n  \"(\\<forall>C. InL C xs \\<longrightarrow> disjoint A C) \\<Longrightarrow> disjoint A (bigUnion xs)\"",
+        "output": "",
+        "step_time": 0.016298532485961914
+      },
+      {
+        "index": 28,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011687278747558594
+      },
+      {
+        "index": 29,
+        "step": "locale probability_setup =\n  fixes zero one :: \"'r\"\n    and add       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"+R\" 65)\n    and opp       :: \"'r \\<Rightarrow> 'r\"\n    and mul       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"*R\" 70)\n    and prob      :: \"('a \\<Rightarrow> bool) \\<Rightarrow> 'r\"\n    and cprob     :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> 'r\"\n\n  assumes\n    add_comm      : \"\\<And>x y.   x +R y = y +R x\"\n    and add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and add_zero  : \"\\<And>x.     x +R zero = x\"\n    and add_opp   : \"\\<And>x.     x +R opp x = zero\"\n    and mul_comm  : \"\\<And>x y.   x *R y = y *R x\"\n    and mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and mul_one   : \"\\<And>x.     x *R one = x\"\n    and dist_l    : \"\\<And>x y z. x *R (y +R z) = (x *R y) +R (x *R z)\"\n    and mul_zero  : \"\\<And>x.     x *R zero = zero\"\n    and opp_zero  : \"opp zero = zero\"\n    and opp_opp   : \"\\<And>x.     opp (opp x) = x\"\n    and opp_mul_right : \"\\<And>x y. x *R opp y = opp (x *R y)\"\n    and opp_mul_left  : \"\\<And>x y. opp x *R y = opp (x *R y)\"\n\n    and prob_ext  : \"\\<And>A B. (\\<forall>\\<omega>. A \\<omega> \\<longleftrightarrow> B \\<omega>) \\<Longrightarrow> prob A = prob B\"\n    and prob_false_ax : \"prob ev_false = zero\"\n    and prob_true_ax  : \"prob ev_true  = one\"\n    and prob_union_ax :\n          \"\\<And>A B. prob (ev_union A B) =\n           prob A +R (prob B +R opp (prob (ev_inter A B)))\"\n    and prob_compl_ax : \"\\<And>A. prob (ev_compl A) = one +R opp (prob A)\"\n    and cprob_mul     : \"\\<And>A B. prob (ev_inter A B) = cprob A B *R prob B\"\n    and prob_union_disjoint :\n          \"\\<And>A B. disjoint A B \\<Longrightarrow>\n           prob (ev_union A B) = prob A +R prob B\"\n    and disjoint_head_tail :\n          \"\\<And>A xs. pairwise_disjoint (ConsL A xs) \\<Longrightarrow>\n           disjoint A (bigUnion xs)\"\n    and indep_compl_both_ax :\n          \"\\<And>A B. prob (ev_inter A B) = prob A *R prob B \\<Longrightarrow>\n           prob (ev_inter (ev_compl A) (ev_compl B)) =\n           prob (ev_compl A) *R prob (ev_compl B)\"\n    and inclusion_exclusion_three :\n          \"\\<And>A B C.\n           prob (ev_union (ev_union A B) C) =\n           prob A +R (prob B +R (prob C +R\n             opp (prob (ev_inter A B) +R\n                  (prob (ev_inter A C) +R\n                   (prob (ev_inter B C) +R\n                    opp (prob (ev_inter (ev_inter A B) C)))))))\"\nbegin",
+        "output": "",
+        "step_time": 0.07194089889526367
+      },
+      {
+        "index": 30,
+        "step": "lemma zero_add: \"zero +R x = x\"",
+        "output": "",
+        "step_time": 0.017456769943237305
+      },
+      {
+        "index": 31,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014136791229248047
+      },
+      {
+        "index": 32,
+        "step": "lemma add_opp_comm: \"opp x +R x = zero\"",
+        "output": "",
+        "step_time": 0.014622926712036133
+      },
+      {
+        "index": 33,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01430964469909668
+      },
+      {
+        "index": 34,
+        "step": "lemma sub_of_eq: \"a = b +R c \\<Longrightarrow> c = a +R opp b\"",
+        "output": "",
+        "step_time": 0.014106273651123047
+      },
+      {
+        "index": 35,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01281285285949707
+      },
+      {
+        "index": 36,
+        "step": "definition indep :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"indep A B \\<equiv> prob (ev_inter A B) = prob A *R prob B\"",
+        "output": "",
+        "step_time": 0.022673606872558594
+      },
+      {
+        "index": 37,
+        "step": "lemma prob_union_comm:\n  \"prob (ev_union A B) = prob (ev_union B A)\"",
+        "output": "",
+        "step_time": 0.01647639274597168
+      },
+      {
+        "index": 38,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013686895370483398
+      },
+      {
+        "index": 39,
+        "step": "lemma prob_union_idem:\n  \"prob (ev_union A A) = prob A\"",
+        "output": "",
+        "step_time": 0.016263484954833984
+      },
+      {
+        "index": 40,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01229095458984375
+      },
+      {
+        "index": 41,
+        "step": "lemma prob_diff:\n  \"prob (ev_diff A B) = prob A +R opp (prob (ev_inter A B))\"",
+        "output": "",
+        "step_time": 0.012213706970214844
+      },
+      {
+        "index": 42,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012842893600463867
+      },
+      {
+        "index": 43,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.011845111846923828
+      },
+      {
+        "index": 44,
+        "step": "lemma bayes_symm:\n  \"cprob A B *R prob B = cprob B A *R prob A\"",
+        "output": "",
+        "step_time": 0.015521049499511719
+      }
+    ],
+    "final_state": "default_44",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory probability\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023285432951524854
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017331812996417284
+    },
+    {
+      "mode": "search",
+      "command": "datatype 'a mylist = NilL | ConsL 'a \"'a mylist\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.3394441209966317
+    },
+    {
+      "mode": "search",
+      "command": "primrec mapL :: \"('a \\<Rightarrow> 'b) \\<Rightarrow> 'a mylist \\<Rightarrow> 'b mylist\" where\n  \"mapL f NilL        = NilL\"\n| \"mapL f (ConsL x xs) = ConsL (f x) (mapL f xs)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03205517493188381
+    },
+    {
+      "mode": "search",
+      "command": "primrec fold_addL :: \"('a \\<Rightarrow> 'a \\<Rightarrow> 'a) \\<Rightarrow> 'a \\<Rightarrow> 'a mylist \\<Rightarrow> 'a\" where\n  \"fold_addL add z NilL        = z\"\n| \"fold_addL add z (ConsL x xs) = add x (fold_addL add z xs)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.033602693933062255
+    },
+    {
+      "mode": "search",
+      "command": "inductive InL :: \"'a \\<Rightarrow> 'a mylist \\<Rightarrow> bool\" where\n  In_head : \"InL x (ConsL x xs)\"\n| In_tail : \"InL x xs \\<Longrightarrow> InL x (ConsL y xs)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.038027296075597405
+    },
+    {
+      "mode": "search",
+      "command": "inductive NoDupL :: \"'a mylist \\<Rightarrow> bool\" where\n  ND_nil  : \"NoDupL NilL\"\n| ND_cons : \"\\<lbrakk>\\<not> InL x xs; NoDupL xs\\<rbrakk> \\<Longrightarrow> NoDupL (ConsL x xs)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.044748491956852376
+    },
+    {
+      "mode": "search",
+      "command": "type_synonym 'a event = \"'a \\<Rightarrow> bool\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.022718030959367752
+    },
+    {
+      "mode": "search",
+      "command": "definition ev_false :: \"'a event\" where \"ev_false \\<equiv> \\<lambda>_. False\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.027078370098024607
+    },
+    {
+      "mode": "search",
+      "command": "definition ev_true  :: \"'a event\" where \"ev_true  \\<equiv> \\<lambda>_. True\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.026843692059628665
+    },
+    {
+      "mode": "search",
+      "command": "definition ev_inter :: \"'a event \\<Rightarrow> 'a event \\<Rightarrow> 'a event\"\n  where \"ev_inter A B \\<equiv> \\<lambda>\\<omega>. A \\<omega> \\<and> B \\<omega>\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.027077572070993483
+    },
+    {
+      "mode": "search",
+      "command": "definition ev_union :: \"'a event \\<Rightarrow> 'a event \\<Rightarrow> 'a event\"\n  where \"ev_union A B \\<equiv> \\<lambda>\\<omega>. A \\<omega> \\<or> B \\<omega>\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.027532233973033726
+    },
+    {
+      "mode": "search",
+      "command": "definition ev_compl :: \"'a event \\<Rightarrow> 'a event\"\n  where \"ev_compl A \\<equiv> \\<lambda>\\<omega>. \\<not> A \\<omega>\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02693130704574287
+    },
+    {
+      "mode": "search",
+      "command": "definition ev_diff  :: \"'a event \\<Rightarrow> 'a event \\<Rightarrow> 'a event\"\n  where \"ev_diff A B \\<equiv> \\<lambda>\\<omega>. A \\<omega> \\<and> \\<not> B \\<omega>\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02749703300651163
+    },
+    {
+      "mode": "search",
+      "command": "definition disjoint :: \"'a event \\<Rightarrow> 'a event \\<Rightarrow> bool\"\n  where \"disjoint A B \\<equiv> \\<forall>\\<omega>. \\<not> (A \\<omega> \\<and> B \\<omega>)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02424891898408532
+    },
+    {
+      "mode": "search",
+      "command": "fun pairwise_disjoint :: \"('a event) mylist \\<Rightarrow> bool\" where\n  \"pairwise_disjoint NilL = True\"\n| \"pairwise_disjoint (ConsL _ NilL) = True\"\n| \"pairwise_disjoint (ConsL A (ConsL B xs)) =\n     (disjoint A B \\<and>\n      (\\<forall>C. InL C (ConsL B xs) \\<longrightarrow> disjoint A C) \\<and>\n      pairwise_disjoint (ConsL B xs))\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.1277604140341282
+    },
+    {
+      "mode": "search",
+      "command": "primrec bigUnion :: \"('a event) mylist \\<Rightarrow> 'a event\" where\n  \"bigUnion NilL         = ev_false\"\n| \"bigUnion (ConsL A xs) = ev_union A (bigUnion xs)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.057450742926448584
+    },
+    {
+      "mode": "search",
+      "command": "lemma ev_inter_comm:\n  \"\\<forall>\\<omega>. ev_inter A B \\<omega> \\<longleftrightarrow> ev_inter B A \\<omega>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>\\<omega>. ev_inter A B \\<omega> = ev_inter B A \\<omega>",
+      "duration_seconds": 0.01727894099894911
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015263838926330209
+    },
+    {
+      "mode": "search",
+      "command": "lemma ev_union_comm:\n  \"\\<forall>\\<omega>. ev_union A B \\<omega> \\<longleftrightarrow> ev_union B A \\<omega>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>\\<omega>. ev_union A B \\<omega> = ev_union B A \\<omega>",
+      "duration_seconds": 0.01693098503164947
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01453688892070204
+    },
+    {
+      "mode": "search",
+      "command": "lemma ev_inter_assoc:\n  \"\\<forall>\\<omega>. ev_inter (ev_inter A B) C \\<omega> \\<longleftrightarrow> ev_inter A (ev_inter B C) \\<omega>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>\\<omega>.\n       ev_inter (ev_inter A B) C \\<omega> =\n       ev_inter A (ev_inter B C) \\<omega>",
+      "duration_seconds": 0.017078722012229264
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01367147103883326
+    },
+    {
+      "mode": "search",
+      "command": "lemma ev_union_assoc:\n  \"\\<forall>\\<omega>. ev_union (ev_union A B) C \\<omega> \\<longleftrightarrow> ev_union A (ev_union B C) \\<omega>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>\\<omega>.\n       ev_union (ev_union A B) C \\<omega> =\n       ev_union A (ev_union B C) \\<omega>",
+      "duration_seconds": 0.01749769295565784
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014096203027293086
+    },
+    {
+      "mode": "search",
+      "command": "lemma ev_inter_distrib_left:\n  \"\\<forall>\\<omega>. ev_inter A (ev_union B C) \\<omega> \\<longleftrightarrow> ev_union (ev_inter A B) (ev_inter A C) \\<omega>\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>\\<omega>.\n       ev_inter A (ev_union B C) \\<omega> =\n       ev_union (ev_inter A B) (ev_inter A C) \\<omega>",
+      "duration_seconds": 0.017116089002229273
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01344336208421737
+    },
+    {
+      "mode": "search",
+      "command": "lemma disjoint_bigUnion:\n  \"(\\<forall>C. InL C xs \\<longrightarrow> disjoint A C) \\<Longrightarrow> disjoint A (bigUnion xs)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>C. InL C xs \\<longrightarrow> disjoint A C \\<Longrightarrow>\n    disjoint A (bigUnion xs)",
+      "duration_seconds": 0.016287907026708126
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011680686031468213
+    },
+    {
+      "mode": "search",
+      "command": "locale probability_setup =\n  fixes zero one :: \"'r\"\n    and add       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"+R\" 65)\n    and opp       :: \"'r \\<Rightarrow> 'r\"\n    and mul       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"*R\" 70)\n    and prob      :: \"('a \\<Rightarrow> bool) \\<Rightarrow> 'r\"\n    and cprob     :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> 'r\"\n\n  assumes\n    add_comm      : \"\\<And>x y.   x +R y = y +R x\"\n    and add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and add_zero  : \"\\<And>x.     x +R zero = x\"\n    and add_opp   : \"\\<And>x.     x +R opp x = zero\"\n    and mul_comm  : \"\\<And>x y.   x *R y = y *R x\"\n    and mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and mul_one   : \"\\<And>x.     x *R one = x\"\n    and dist_l    : \"\\<And>x y z. x *R (y +R z) = (x *R y) +R (x *R z)\"\n    and mul_zero  : \"\\<And>x.     x *R zero = zero\"\n    and opp_zero  : \"opp zero = zero\"\n    and opp_opp   : \"\\<And>x.     opp (opp x) = x\"\n    and opp_mul_right : \"\\<And>x y. x *R opp y = opp (x *R y)\"\n    and opp_mul_left  : \"\\<And>x y. opp x *R y = opp (x *R y)\"\n\n    and prob_ext  : \"\\<And>A B. (\\<forall>\\<omega>. A \\<omega> \\<longleftrightarrow> B \\<omega>) \\<Longrightarrow> prob A = prob B\"\n    and prob_false_ax : \"prob ev_false = zero\"\n    and prob_true_ax  : \"prob ev_true  = one\"\n    and prob_union_ax :\n          \"\\<And>A B. prob (ev_union A B) =\n           prob A +R (prob B +R opp (prob (ev_inter A B)))\"\n    and prob_compl_ax : \"\\<And>A. prob (ev_compl A) = one +R opp (prob A)\"\n    and cprob_mul     : \"\\<And>A B. prob (ev_inter A B) = cprob A B *R prob B\"\n    and prob_union_disjoint :\n          \"\\<And>A B. disjoint A B \\<Longrightarrow>\n           prob (ev_union A B) = prob A +R prob B\"\n    and disjoint_head_tail :\n          \"\\<And>A xs. pairwise_disjoint (ConsL A xs) \\<Longrightarrow>\n           disjoint A (bigUnion xs)\"\n    and indep_compl_both_ax :\n          \"\\<And>A B. prob (ev_inter A B) = prob A *R prob B \\<Longrightarrow>\n           prob (ev_inter (ev_compl A) (ev_compl B)) =\n           prob (ev_compl A) *R prob (ev_compl B)\"\n    and inclusion_exclusion_three :\n          \"\\<And>A B C.\n           prob (ev_union (ev_union A B) C) =\n           prob A +R (prob B +R (prob C +R\n             opp (prob (ev_inter A B) +R\n                  (prob (ev_inter A C) +R\n                   (prob (ev_inter B C) +R\n                    opp (prob (ev_inter (ev_inter A B) C)))))))\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.07192638609558344
+    },
+    {
+      "mode": "search",
+      "command": "lemma zero_add: \"zero +R x = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. zero +R x = x",
+      "duration_seconds": 0.01744563307147473
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014130680006928742
+    },
+    {
+      "mode": "search",
+      "command": "lemma add_opp_comm: \"opp x +R x = zero\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. opp x +R x = zero",
+      "duration_seconds": 0.014613912091590464
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014303000993095338
+    },
+    {
+      "mode": "search",
+      "command": "lemma sub_of_eq: \"a = b +R c \\<Longrightarrow> c = a +R opp b\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. a = b +R c \\<Longrightarrow> c = a +R opp b",
+      "duration_seconds": 0.014098433079198003
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012806996004655957
+    },
+    {
+      "mode": "search",
+      "command": "definition indep :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"indep A B \\<equiv> prob (ev_inter A B) = prob A *R prob B\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.022662683972157538
+    },
+    {
+      "mode": "search",
+      "command": "lemma prob_union_comm:\n  \"prob (ev_union A B) = prob (ev_union B A)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. prob (ev_union A B) = prob (ev_union B A)",
+      "duration_seconds": 0.016465204069390893
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01368041499517858
+    },
+    {
+      "mode": "search",
+      "command": "lemma prob_union_idem:\n  \"prob (ev_union A A) = prob A\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. prob (ev_union A A) = prob A",
+      "duration_seconds": 0.01625837793108076
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012285635923035443
+    },
+    {
+      "mode": "search",
+      "command": "lemma prob_diff:\n  \"prob (ev_diff A B) = prob A +R opp (prob (ev_inter A B))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. prob (ev_diff A B) = prob A +R opp (prob (ev_inter A B))",
+      "duration_seconds": 0.012208632891997695
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012835356057621539
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011838885024189949
+    },
+    {
+      "mode": "search",
+      "command": "lemma bayes_symm:\n  \"cprob A B *R prob B = cprob B A *R prob A\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. cprob A B *R prob B = cprob B A *R prob A",
+      "duration_seconds": 0.015515553997829556
+    }
+  ],
+  "failure_category": null,
+  "request_id": "0295bfcc0ca7422ab3c358e66748db69",
+  "input_sha256": "b5bea989a3dd1dac6f49505865f377bd2db6261887272d1afcc36b7ff9edc96f",
+  "duration_seconds": 8.245943151996471
+}

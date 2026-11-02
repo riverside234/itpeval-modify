@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory zero_le_one_elem\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\nlocale zero_le_one_setup =\n  fixes decEq      :: \"'m \\<Rightarrow> 'm \\<Rightarrow> bool\"\n    and zero       :: \"'a\"\n    and one        :: \"'a\"\n    and le         :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"   (infix \"\\<preceq>\" 50)\n    and le_antisym :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  assumes le_refl      : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans     : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   zero_le_one  : \"zero \\<preceq> one\"\n    and   zero_le_zero : \"zero \\<preceq> zero\"\n    and   le_antisym   : \"\\<And>x y. x \\<preceq> y \\<Longrightarrow> y \\<preceq> x \\<Longrightarrow> x = y\"\nbegin\n\ndefinition One_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"One_matrix i j \\<equiv> if decEq i j then one else zero\"\n\ndefinition Zero_matrix :: \"'m \\<Rightarrow> 'm \\<Rightarrow> 'a\"\n  where \"Zero_matrix \\<equiv> \\<lambda>_ _. zero\"\n\ndefinition matrix_le :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_le A B \\<equiv> \\<forall>i j. A i j \\<preceq> B i j\"\n\ndefinition matrix_eq :: \"('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> ('m \\<Rightarrow> 'm \\<Rightarrow> 'a) \\<Rightarrow> bool\"\n  where \"matrix_eq A B \\<equiv> \\<forall>i j. A i j = B i j\"\n\nlemma zero_le_one_elem: \"zero \\<preceq> One_matrix i j\"\n  sorry\nlemma Zero_le_One_matrix: \"matrix_le Zero_matrix One_matrix\"\n  sorry\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma matrix_le_refl: \"matrix_le A A\"\n  ",
+    "theory_name": "zero_le_one_elem",
+    "request_id": "a3e4f15e2da44fa5a363ced690e67cce",
+    "input_sha256": "dbf014cc7020af9a166b2317d365df2d9f12ffd561128ad991ca3e830027b7ad"
+  }
+}

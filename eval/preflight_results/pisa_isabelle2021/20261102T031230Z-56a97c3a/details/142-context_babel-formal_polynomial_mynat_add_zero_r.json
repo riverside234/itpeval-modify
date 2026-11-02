@@ -1,0 +1,278 @@
+{
+  "name": "context_babel-formal_polynomial_mynat_add_zero_r",
+  "domain": "context",
+  "status": "pass",
+  "duration_seconds": 11.514,
+  "details": "details/142-context_babel-formal_polynomial_mynat_add_zero_r.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "payload": {
+    "ok": true,
+    "target": [
+      "babel-formal",
+      12,
+      "polynomial",
+      "mynat_add_zero_r"
+    ],
+    "result": {
+      "baseline_ok": true,
+      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-591u2u6s",
+      "backend_metadata": {
+        "backend": "dsp-pisa",
+        "isabelle_version": "Isabelle2021",
+        "isabelle_version_raw": "Isabelle2021: February 2021",
+        "pisa_commit": "690eed41fa03fe04ec015bb375c668cd6fd94261",
+        "dsp_commit": "647aa65ca7b89f4e0f7a65dc15b4e64a81af5e80",
+        "itpeval_commit": "43cd12524b5948471be994d91f41d86a2b801955",
+        "config": {
+          "backend": "dsp-pisa",
+          "expected_isabelle_version": "Isabelle2021",
+          "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+          "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+          "java_bin": "java",
+          "port": 9000,
+          "startup_timeout_s": 600,
+          "step_timeout_s": 60,
+          "hammer_timeout_s": 60,
+          "target_timeout_s": 1800,
+          "theory_imports": {
+            "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+            "Tagged_Division": "HOL-Analysis.Tagged_Division"
+          }
+        },
+        "java_version": "openjdk version \"11.0.30-internal\" 2026-01-20\nOpenJDK Runtime Environment (build 11.0.30-internal+0-adhoc.conda.src)\nOpenJDK 64-Bit Server VM (build 11.0.30-internal+0-adhoc.conda.src, mixed mode)",
+        "settings": {
+          "ISABELLE_HOME_USER": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/user_home/.isabelle/Isabelle2021",
+          "ISABELLE_HEAPS": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/heaps",
+          "ISABELLE_TMP_PREFIX": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/tmp/isabelle"
+        },
+        "pisa_jar_sha256": "e5ffdcba4e5030445d905862100647f67939bea41be475c7de87c5c33d14ddc9",
+        "generated_client_sha256": {
+          "server_pb2.py": "042bdec4a5037139edd0663d6e9a799ae1cda2d4b03266330d29ca58ae32c1be",
+          "server_pb2_grpc.py": "8545f68a3bad2cc52e7c099db8d6e5cd08037f49ea6f6477325e16a7a4fe3e71"
+        },
+        "dsp_checker_sha256": "48665c5b4f8d4f99f39310ace83a7161cbf9391048954c118b33c25c739db7cf",
+        "adapter_sha256": {
+          "checker.py": "10972fe91256d63de624c55466487292ce4f7f4a33457c5c545c5c0b55d1f2ab",
+          "runtime.py": "1b94e57a493fd575998241d8c36b3c508c1795e4861cdc8918b434456891396f",
+          "pisa_worker.py": "dc5f663ca5ccc3689105303c755812093769ba36015886972e17ac55a914588a",
+          "pisa_context.py": "cc90618f858bc43355cce53a675826696e595a8d365b89b39f1beb1433a5efc5",
+          "input_contract.py": "089ac776a5eae25bb655ef6ecdd1a8aef9f6df088df3a947df1034bd8dafee56"
+        },
+        "replay_enabled": false,
+        "server_limits": "Original PISA: 10s transitions; 40s normalhammer",
+        "backend_fingerprint": "5803aeb1ffaf08d200d7cf8966ec42571a62b83e9a81cfbbe3b06f2efae0903e"
+      },
+      "pisa_result": {
+        "success": true,
+        "error": "",
+        "dsp_result": {
+          "success": true,
+          "reason": "",
+          "num_steps": 13,
+          "last_step": 13,
+          "step_results": [
+            {
+              "index": 0,
+              "step": "theory polynomial\n  imports Main\nbegin",
+              "output": "",
+              "step_time": 0.02783942222595215
+            },
+            {
+              "index": 1,
+              "step": "declare [[quick_and_dirty = true]]",
+              "output": "",
+              "step_time": 0.01789069175720215
+            },
+            {
+              "index": 2,
+              "step": "datatype mynat = Nat_O | Nat_S mynat",
+              "output": "",
+              "step_time": 0.3368387222290039
+            },
+            {
+              "index": 3,
+              "step": "fun mynat_add :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> mynat\" where\n  \"mynat_add Nat_O m = m\"\n| \"mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)\"",
+              "output": "",
+              "step_time": 0.09329581260681152
+            },
+            {
+              "index": 4,
+              "step": "lemma mynat_add_O_left: \"mynat_add Nat_O m = m\"",
+              "output": "",
+              "step_time": 0.018236160278320312
+            },
+            {
+              "index": 5,
+              "step": "sorry",
+              "output": "",
+              "step_time": 0.01785135269165039
+            },
+            {
+              "index": 6,
+              "step": "lemma mynat_add_S_left: \"mynat_add (Nat_S n) m = Nat_S (mynat_add n m)\"",
+              "output": "",
+              "step_time": 0.02506875991821289
+            },
+            {
+              "index": 7,
+              "step": "sorry",
+              "output": "",
+              "step_time": 0.019707918167114258
+            },
+            {
+              "index": 8,
+              "step": "inductive mynat_le :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> bool\" where\n  le_n : \"mynat_le n n\"\n| le_S : \"mynat_le n m \\<Longrightarrow> mynat_le n (Nat_S m)\"",
+              "output": "",
+              "step_time": 0.03844618797302246
+            },
+            {
+              "index": 9,
+              "step": "lemma mynat_zero_le: \"mynat_le Nat_O n\"",
+              "output": "",
+              "step_time": 0.016843318939208984
+            },
+            {
+              "index": 10,
+              "step": "sorry",
+              "output": "",
+              "step_time": 0.016660690307617188
+            },
+            {
+              "index": 11,
+              "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+              "output": "",
+              "step_time": 0.01624774932861328
+            },
+            {
+              "index": 12,
+              "step": "lemma mynat_add_zero_r: \"mynat_add n Nat_O = n\"",
+              "output": "",
+              "step_time": 0.018500804901123047
+            }
+          ],
+          "final_state": "default_12",
+          "context_ready": true,
+          "proof_level": "1"
+        },
+        "step_results": [
+          {
+            "mode": "search",
+            "command": "theory polynomial\n  imports Main\nbegin",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.027827698970213532
+          },
+          {
+            "mode": "search",
+            "command": "declare [[quick_and_dirty = true]]",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.017885266919620335
+          },
+          {
+            "mode": "search",
+            "command": "datatype mynat = Nat_O | Nat_S mynat",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.3368309180950746
+          },
+          {
+            "mode": "search",
+            "command": "fun mynat_add :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> mynat\" where\n  \"mynat_add Nat_O m = m\"\n| \"mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)\"",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.09328799496870488
+          },
+          {
+            "mode": "search",
+            "command": "lemma mynat_add_O_left: \"mynat_add Nat_O m = m\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add Nat_O m = m",
+            "duration_seconds": 0.018228622036986053
+          },
+          {
+            "mode": "search",
+            "command": "sorry",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.01784459303598851
+          },
+          {
+            "mode": "search",
+            "command": "lemma mynat_add_S_left: \"mynat_add (Nat_S n) m = Nat_S (mynat_add n m)\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add (Nat_S n) m = Nat_S (mynat_add n m)",
+            "duration_seconds": 0.025062141939997673
+          },
+          {
+            "mode": "search",
+            "command": "sorry",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.019703383091837168
+          },
+          {
+            "mode": "search",
+            "command": "inductive mynat_le :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> bool\" where\n  le_n : \"mynat_le n n\"\n| le_S : \"mynat_le n m \\<Longrightarrow> mynat_le n (Nat_S m)\"",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.03843992797192186
+          },
+          {
+            "mode": "search",
+            "command": "lemma mynat_zero_le: \"mynat_le Nat_O n\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_le Nat_O n",
+            "duration_seconds": 0.016836568946018815
+          },
+          {
+            "mode": "search",
+            "command": "sorry",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.016652574064210057
+          },
+          {
+            "mode": "search",
+            "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.016237508039921522
+          },
+          {
+            "mode": "search",
+            "command": "lemma mynat_add_zero_r: \"mynat_add n Nat_O = n\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add n Nat_O = n",
+            "duration_seconds": 0.01849412394221872
+          }
+        ],
+        "failure_category": null,
+        "request_id": "6cba4bfdc3954427aeeaa445fa84aaf5",
+        "input_sha256": "a9c4a6a73432d0aea54c1dbb85bb3cf6df2104ec32b80f742161bb7c217bd2b2",
+        "duration_seconds": 11.400795613997616
+      },
+      "import_resolution": {
+        "original_imports": [
+          "Main"
+        ],
+        "resolved_imports": [
+          "Main"
+        ],
+        "session_dependencies": []
+      },
+      "draft_context_policy": "original_masked_prefix",
+      "context_sha256": "81a196d27ad7d888329c2f3df483583493752fafa34f5f0e456e20ebf1600c7b",
+      "statement_sha256": "f75261a6b57d714a305ffe385e6c6c0a67615aee25ac9bfc048116546e7080b3",
+      "template_sha256": "413af1270f7c139e9b6fc921f520bcfc3c5b8d7bde6c0479c4a329c095cea773",
+      "background_policy": "earlier_masked_helpers_admitted",
+      "admitted_background_names": [
+        "mynat_add_O_left",
+        "mynat_add_S_left",
+        "mynat_zero_le"
+      ],
+      "admitted_background_count": 3
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "(*\n  File:     Bertrand.thy\n  Authors:  Julian Biendarra, Manuel Eberl <manuel@pruvisto.org>, Larry Paulson\n\n  A proof of Bertrand's postulate (based on John Harrison's HOL Light proof).\n  Uses reflection and the approximation tactic.\n*)\ntheory Bertrand\n  imports \n    Complex_Main\n    \"HOL-Number_Theory.Number_Theory\"\n    \"HOL-Library.Discrete_Functions\"\n    \"HOL-Decision_Procs.Approximation_Bounds\"\n    \"HOL-Library.Code_Target_Numeral\"\n    Pratt_Certificate.Pratt_Certificate\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\nsubsection \\<open>Auxiliary facts\\<close>\n \nlemma ln_2_le: \"ln 2 \\<le> 355 / (512 :: real)\"\n  \n  sorry\n\n\nlemma ln_2_ge: \"ln 2 \\<ge> (5677 / 8192 :: real)\"\n  \n  sorry\n\n\nlemma ln_2_ge': \"ln (2 :: real) \\<ge> 2/3\" and ln_2_le': \"ln (2 :: real) \\<le> 16/23\"\n  \n  sorry\n\n\nlemma of_nat_ge_1_iff: \"(of_nat x :: 'a :: linordered_semidom) \\<ge> 1 \\<longleftrightarrow> x \\<ge> 1\"\n  \n  sorry\n\n  \nlemma floor_conv_div_nat:\n  \"of_int (floor (real m / real n)) = real (m div n)\"\n  \n  sorry\n\n\nlemma frac_conv_mod_nat:\n  \"frac (real m / real n) = real (m mod n) / real n\"\n  \n  sorry\n\n\nlemma of_nat_prod_mset: \"prod_mset (image_mset of_nat A) = of_nat (prod_mset A)\"\n  \n  sorry\n\n\nlemma prod_mset_pos: \"(\\<And>x :: 'a :: linordered_semidom. x \\<in># A \\<Longrightarrow> x > 0) \\<Longrightarrow> prod_mset A > 0\"\n  \n  sorry\n\n\nlemma ln_msetprod:\n  assumes \"\\<And>x. x \\<in>#I \\<Longrightarrow> x > 0\"\n  shows \"(\\<Sum>p::nat\\<in>#I. ln p) = ln (\\<Prod>p\\<in>#I. p)\"\n  \n  sorry\n\n\nlemma ln_fact: \"ln (fact n) = (\\<Sum>d=1..n. ln d)\"\n  \n  sorry\n\n\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma overpower_lemma:\n  fixes f g :: \"real \\<Rightarrow> real\"\n  assumes \"f a \\<le> g a\"\n  assumes \"\\<And>x. a \\<le> x \\<Longrightarrow> ((\\<lambda>x. g x - f x) has_real_derivative (d x)) (at x)\"\n  assumes \"\\<And>x. a \\<le> x \\<Longrightarrow> d x \\<ge> 0\"\n  assumes \"a \\<le> x\"\n  shows   \"f x \\<le> g x\"\n  \n  ",
+    "theory_name": "Bertrand",
+    "request_id": "7b982ce2466c44b3902f0c7c72995f42",
+    "input_sha256": "d57a9e1fb095951e1200961f228ae7166c0500f2b5219953b03f4ee466b24916"
+  }
+}

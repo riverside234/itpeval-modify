@@ -1,0 +1,164 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 11,
+    "last_step": 11,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory limits_uniqueness\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.024104833602905273
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.017163753509521484
+      },
+      {
+        "index": 2,
+        "step": "locale abs_field =\n  fixes zero    :: \"'r\"\n    and one     :: \"'r\"\n    and add     :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"+R\" 65)\n    and mul     :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"*R\" 70)\n    and opp     :: \"'r \\<Rightarrow> 'r\"\n    and absV    :: \"'r \\<Rightarrow> 'r\"\n    and le      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<preceq>\" 50)\n    and lt      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<prec>\" 50)\n\n    and natLe   :: \"'n \\<Rightarrow> 'n \\<Rightarrow> bool\"\n    and natMax  :: \"'n \\<Rightarrow> 'n \\<Rightarrow> 'n\"\n  assumes le_max_left    : \"\\<And>x y. natLe x (natMax x y)\"\n    and   le_max_right   : \"\\<And>x y. natLe y (natMax x y)\"\n    and   add_comm       : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc      : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero       : \"\\<And>x. x +R zero = x\"\n    and   add_opp        : \"\\<And>x. x +R opp x = zero\"\n    and   opp_add        : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\n    and   le_refl        : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans       : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   add_le_add     : \"\\<And>a b c d. a \\<preceq> b \\<Longrightarrow> c \\<preceq> d \\<Longrightarrow> a +R c \\<preceq> b +R d\"\n    and   abs_nonneg     : \"\\<And>x. zero \\<preceq> absV x\"\n    and   abs_triangle   : \"\\<And>x y. absV (x +R y) \\<preceq> absV x +R absV y\"\n    and   abs_sub_symm   : \"\\<And>x y. absV (x +R opp y) = absV (y +R opp x)\"\n    and   sub_decomp     : \"\\<And>x y z. x +R opp z = (x +R opp y) +R (y +R opp z)\"\n    and   sub_eq_zero    : \"\\<And>x y. x +R opp y = zero \\<Longrightarrow> x = y\"\n    and   eq_of_forall_eps2 :\n            \"\\<And>x. (\\<forall>eps. zero \\<prec> eps \\<longrightarrow> absV x \\<preceq> eps +R eps) \\<Longrightarrow> x = zero\"\nbegin",
+        "output": "",
+        "step_time": 0.05977272987365723
+      },
+      {
+        "index": 3,
+        "step": "definition sub :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"sub x y \\<equiv> x +R opp y\"",
+        "output": "",
+        "step_time": 0.03197646141052246
+      },
+      {
+        "index": 4,
+        "step": "definition limit :: \"('n \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"limit u l \\<equiv>\n    \\<forall>eps. zero \\<prec> eps \\<longrightarrow>\n      (\\<exists>N. \\<forall>n. natLe N n \\<longrightarrow> absV (sub (u n) l) \\<preceq> eps)\"",
+        "output": "",
+        "step_time": 0.0353245735168457
+      },
+      {
+        "index": 5,
+        "step": "lemma sub_self_zero: \"sub x x = zero\"",
+        "output": "",
+        "step_time": 0.024319887161254883
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.020180463790893555
+      },
+      {
+        "index": 7,
+        "step": "lemma sub_decomp_lem: \"sub x z = (sub x y) +R (sub y z)\"",
+        "output": "",
+        "step_time": 0.02298283576965332
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.020421981811523438
+      },
+      {
+        "index": 9,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.015806913375854492
+      },
+      {
+        "index": 10,
+        "step": "lemma abs_sub_triangle:\n  \"absV (sub x z) \\<preceq> absV (sub x y) +R absV (sub y z)\"",
+        "output": "",
+        "step_time": 0.022492170333862305
+      }
+    ],
+    "final_state": "default_10",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory limits_uniqueness\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024094580090604722
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017159924027509987
+    },
+    {
+      "mode": "search",
+      "command": "locale abs_field =\n  fixes zero    :: \"'r\"\n    and one     :: \"'r\"\n    and add     :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"+R\" 65)\n    and mul     :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"*R\" 70)\n    and opp     :: \"'r \\<Rightarrow> 'r\"\n    and absV    :: \"'r \\<Rightarrow> 'r\"\n    and le      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<preceq>\" 50)\n    and lt      :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<prec>\" 50)\n\n    and natLe   :: \"'n \\<Rightarrow> 'n \\<Rightarrow> bool\"\n    and natMax  :: \"'n \\<Rightarrow> 'n \\<Rightarrow> 'n\"\n  assumes le_max_left    : \"\\<And>x y. natLe x (natMax x y)\"\n    and   le_max_right   : \"\\<And>x y. natLe y (natMax x y)\"\n    and   add_comm       : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc      : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero       : \"\\<And>x. x +R zero = x\"\n    and   add_opp        : \"\\<And>x. x +R opp x = zero\"\n    and   opp_add        : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\n    and   le_refl        : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans       : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   add_le_add     : \"\\<And>a b c d. a \\<preceq> b \\<Longrightarrow> c \\<preceq> d \\<Longrightarrow> a +R c \\<preceq> b +R d\"\n    and   abs_nonneg     : \"\\<And>x. zero \\<preceq> absV x\"\n    and   abs_triangle   : \"\\<And>x y. absV (x +R y) \\<preceq> absV x +R absV y\"\n    and   abs_sub_symm   : \"\\<And>x y. absV (x +R opp y) = absV (y +R opp x)\"\n    and   sub_decomp     : \"\\<And>x y z. x +R opp z = (x +R opp y) +R (y +R opp z)\"\n    and   sub_eq_zero    : \"\\<And>x y. x +R opp y = zero \\<Longrightarrow> x = y\"\n    and   eq_of_forall_eps2 :\n            \"\\<And>x. (\\<forall>eps. zero \\<prec> eps \\<longrightarrow> absV x \\<preceq> eps +R eps) \\<Longrightarrow> x = zero\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.05976449907757342
+    },
+    {
+      "mode": "search",
+      "command": "definition sub :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  where \"sub x y \\<equiv> x +R opp y\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.031967785907909274
+    },
+    {
+      "mode": "search",
+      "command": "definition limit :: \"('n \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"limit u l \\<equiv>\n    \\<forall>eps. zero \\<prec> eps \\<longrightarrow>\n      (\\<exists>N. \\<forall>n. natLe N n \\<longrightarrow> absV (sub (u n) l) \\<preceq> eps)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03531726298388094
+    },
+    {
+      "mode": "search",
+      "command": "lemma sub_self_zero: \"sub x x = zero\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. sub x x = zero",
+      "duration_seconds": 0.02431573497597128
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020177135011181235
+    },
+    {
+      "mode": "search",
+      "command": "lemma sub_decomp_lem: \"sub x z = (sub x y) +R (sub y z)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. sub x z = sub x y +R sub y z",
+      "duration_seconds": 0.02297948009800166
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020418088999576867
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0158034359337762
+    },
+    {
+      "mode": "search",
+      "command": "lemma abs_sub_triangle:\n  \"absV (sub x z) \\<preceq> absV (sub x y) +R absV (sub y z)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. absV (sub x z) \\<preceq> absV (sub x y) +R absV (sub y z)",
+      "duration_seconds": 0.022489097085781395
+    }
+  ],
+  "failure_category": null,
+  "request_id": "3c7163010f844940a6b0a16bc67bf8d8",
+  "input_sha256": "261c65e526057fad68696b4d85dc9d841506ec4fd864fce7a3ceaf35a8ff2067",
+  "duration_seconds": 9.092295040958561
+}

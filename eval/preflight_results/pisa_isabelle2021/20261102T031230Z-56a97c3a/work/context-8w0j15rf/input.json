@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory polynomial\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\n\n\n\n\n\ndatatype mynat = Nat_O | Nat_S mynat\n\nfun mynat_add :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> mynat\" where\n  \"mynat_add Nat_O m = m\"\n| \"mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)\"\n\nlemma mynat_add_O_left: \"mynat_add Nat_O m = m\"\n  sorry\nlemma mynat_add_S_left: \"mynat_add (Nat_S n) m = Nat_S (mynat_add n m)\"\n  sorry\ninductive mynat_le :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> bool\" where\n  le_n : \"mynat_le n n\"\n| le_S : \"mynat_le n m \\<Longrightarrow> mynat_le n (Nat_S m)\"\n\nlemma mynat_zero_le: \"mynat_le Nat_O n\"\n  sorry\nlemma mynat_add_zero_r: \"mynat_add n Nat_O = n\"\n  sorry\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma mynat_succ_le_succ: \"mynat_le n m \\<Longrightarrow> mynat_le (Nat_S n) (Nat_S m)\"\n  ",
+    "theory_name": "polynomial",
+    "request_id": "dfde6ed9ddc749afbc81463c1f39c9ab",
+    "input_sha256": "e1676bdc590fe5da8096ae79b522c10f95b37d2af3f85d2e7859acb02761ff1e"
+  }
+}

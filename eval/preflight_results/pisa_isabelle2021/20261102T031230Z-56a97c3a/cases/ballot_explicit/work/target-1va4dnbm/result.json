@@ -1,0 +1,435 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 32,
+    "last_step": 32,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "(*   Title: HOL/ex/Ballot.thy\n     Author: Lukas Bulwahn <lukas.bulwahn-at-gmail.com>\n     Author: Johannes H?lzl <hoelzl@in.tum.de>\n*)\n\n",
+        "output": "",
+        "step_time": 0.023153066635131836
+      },
+      {
+        "index": 1,
+        "step": "section \\<open>Bertrand's Ballot Theorem\\<close>",
+        "output": "",
+        "step_time": 0.01565861701965332
+      },
+      {
+        "index": 2,
+        "step": "theory Ballot\nimports\n  Complex_Main\n  \"HOL-Library.FuncSet\"\nbegin",
+        "output": "",
+        "step_time": 0.016086339950561523
+      },
+      {
+        "index": 3,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01658773422241211
+      },
+      {
+        "index": 4,
+        "step": "subsection \\<open>Preliminaries\\<close>",
+        "output": "",
+        "step_time": 0.015537500381469727
+      },
+      {
+        "index": 5,
+        "step": "lemma card_bij':\n  assumes \"f \\<in> A \\<rightarrow> B\" \"\\<And>x. x \\<in> A \\<Longrightarrow> g (f x) = x\"\n    and \"g \\<in> B \\<rightarrow> A\" \"\\<And>x. x \\<in> B \\<Longrightarrow> f (g x) = x\"\n  shows \"card A = card B\"",
+        "output": "",
+        "step_time": 0.026390552520751953
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.021497488021850586
+      },
+      {
+        "index": 7,
+        "step": "subsection \\<open>Formalization of Problem Statement\\<close>",
+        "output": "",
+        "step_time": 0.0194547176361084
+      },
+      {
+        "index": 8,
+        "step": "subsubsection \\<open>Basic Definitions\\<close>",
+        "output": "",
+        "step_time": 0.01650834083557129
+      },
+      {
+        "index": 9,
+        "step": "datatype vote = A | B",
+        "output": "",
+        "step_time": 0.2047102451324463
+      },
+      {
+        "index": 10,
+        "step": "definition\n  \"all_countings a b = card {f \\<in> {1 .. a + b} \\<rightarrow>\\<^sub>E {A, B}.\n      card {x \\<in> {1 .. a + b}. f x = A} = a \\<and> card {x \\<in> {1 .. a + b}. f x = B} = b}\"",
+        "output": "",
+        "step_time": 0.026073455810546875
+      },
+      {
+        "index": 11,
+        "step": "definition\n  \"valid_countings a b =\n    card {f\\<in>{1..a+b} \\<rightarrow>\\<^sub>E {A, B}.\n      card {x\\<in>{1..a+b}. f x = A} = a \\<and> card {x\\<in>{1..a+b}. f x = B} = b \\<and>\n      (\\<forall>m\\<in>{1..a+b}. card {x\\<in>{1..m}. f x = A} > card {x\\<in>{1..m}. f x = B})}\"",
+        "output": "",
+        "step_time": 0.029143571853637695
+      },
+      {
+        "index": 12,
+        "step": "subsubsection \\<open>Equivalence with Set Cardinality\\<close>",
+        "output": "",
+        "step_time": 0.015674829483032227
+      },
+      {
+        "index": 13,
+        "step": "lemma Collect_on_transfer:\n  assumes \"rel_set R X Y\"\n  shows \"rel_fun (rel_fun R (=)) (rel_set R) (\\<lambda>P. {x\\<in>X. P x}) (\\<lambda>P. {y\\<in>Y. P y})\"",
+        "output": "",
+        "step_time": 0.0211789608001709
+      },
+      {
+        "index": 14,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01626753807067871
+      },
+      {
+        "index": 15,
+        "step": "lemma rel_fun_trans:\n  \"rel_fun P Q g g' \\<Longrightarrow> rel_fun R P f f' \\<Longrightarrow> rel_fun R Q (\\<lambda>x. g (f x)) (\\<lambda>y. g' (f' y))\"",
+        "output": "",
+        "step_time": 0.020092487335205078
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.015826940536499023
+      },
+      {
+        "index": 17,
+        "step": "lemma rel_fun_trans2:\n  \"rel_fun P1 (rel_fun P2 Q) g g' \\<Longrightarrow> rel_fun R P1 f1 f1' \\<Longrightarrow> rel_fun R P2 f2 f2' \\<Longrightarrow>\n    rel_fun R Q (\\<lambda>x. g (f1 x) (f2 x)) (\\<lambda>y. g' (f1' y) (f2' y))\"",
+        "output": "",
+        "step_time": 0.02205204963684082
+      },
+      {
+        "index": 18,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.03373980522155762
+      },
+      {
+        "index": 19,
+        "step": "lemma rel_fun_trans2':\n  \"rel_fun R (=) f1 f1' \\<Longrightarrow> rel_fun R (=) f2 f2' \\<Longrightarrow>\n    rel_fun R (=) (\\<lambda>x. g (f1 x) (f2 x)) (\\<lambda>y. g (f1' y) (f2' y))\"",
+        "output": "",
+        "step_time": 0.019764423370361328
+      },
+      {
+        "index": 20,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013017892837524414
+      },
+      {
+        "index": 21,
+        "step": "lemma rel_fun_const: \"rel_fun R (=) (\\<lambda>x. a) (\\<lambda>y. a)\"",
+        "output": "",
+        "step_time": 0.016423463821411133
+      },
+      {
+        "index": 22,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01106572151184082
+      },
+      {
+        "index": 23,
+        "step": "lemma rel_fun_conj:\n  \"rel_fun R (=) f f' \\<Longrightarrow> rel_fun R (=) g g' \\<Longrightarrow> rel_fun R (=) (\\<lambda>x. f x \\<and> g x) (\\<lambda>y. f' y \\<and> g' y)\"",
+        "output": "",
+        "step_time": 0.01843571662902832
+      },
+      {
+        "index": 24,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013440132141113281
+      },
+      {
+        "index": 25,
+        "step": "lemma rel_fun_ball:\n  \"(\\<And>i. i \\<in> I \\<Longrightarrow> rel_fun R (=) (f i) (f' i)) \\<Longrightarrow> rel_fun R (=) (\\<lambda>x. \\<forall>i\\<in>I. f i x) (\\<lambda>y. \\<forall>i\\<in>I. f' i y)\"",
+        "output": "",
+        "step_time": 0.017016172409057617
+      },
+      {
+        "index": 26,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01447749137878418
+      },
+      {
+        "index": 27,
+        "step": "lemma\n  shows all_countings_set: \"all_countings a b = card {V\\<in>Pow {0..<a+b}. card V = a}\"\n      (is \"_ = card ?A\")\n    and valid_countings_set: \"valid_countings a b =\n      card {V\\<in>Pow {0..<a+b}. card V = a \\<and> (\\<forall>m\\<in>{1..a+b}. card ({0..<m} \\<inter> V) > m - card ({0..<m} \\<inter> V))}\"\n      (is \"_ = card ?V\")",
+        "output": "",
+        "step_time": 0.022935152053833008
+      },
+      {
+        "index": 28,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016873836517333984
+      },
+      {
+        "index": 29,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.01328277587890625
+      },
+      {
+        "index": 30,
+        "step": "lemma all_countings [code]: \"all_countings a b = (a + b) choose a\"",
+        "output": "",
+        "step_time": 0.01433563232421875
+      },
+      {
+        "index": 31,
+        "step": "by (simp add: all_countings_set n_subsets)",
+        "output": "",
+        "step_time": 0.02032017707824707
+      }
+    ],
+    "final_state": "default_31"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "(*   Title: HOL/ex/Ballot.thy\n     Author: Lukas Bulwahn <lukas.bulwahn-at-gmail.com>\n     Author: Johannes H?lzl <hoelzl@in.tum.de>\n*)\n\n",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02314254397060722
+    },
+    {
+      "mode": "search",
+      "command": "section \\<open>Bertrand's Ballot Theorem\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015654291957616806
+    },
+    {
+      "mode": "search",
+      "command": "theory Ballot\nimports\n  Complex_Main\n  \"HOL-Library.FuncSet\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016082130023278296
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016583863995037973
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Preliminaries\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015533305937424302
+    },
+    {
+      "mode": "search",
+      "command": "lemma card_bij':\n  assumes \"f \\<in> A \\<rightarrow> B\" \"\\<And>x. x \\<in> A \\<Longrightarrow> g (f x) = x\"\n    and \"g \\<in> B \\<rightarrow> A\" \"\\<And>x. x \\<in> B \\<Longrightarrow> f (g x) = x\"\n  shows \"card A = card B\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. card A = card B",
+      "duration_seconds": 0.026385426055639982
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02149259694851935
+    },
+    {
+      "mode": "search",
+      "command": "subsection \\<open>Formalization of Problem Statement\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019450380001217127
+    },
+    {
+      "mode": "search",
+      "command": "subsubsection \\<open>Basic Definitions\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01650346803944558
+    },
+    {
+      "mode": "search",
+      "command": "datatype vote = A | B",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.20470384298823774
+    },
+    {
+      "mode": "search",
+      "command": "definition\n  \"all_countings a b = card {f \\<in> {1 .. a + b} \\<rightarrow>\\<^sub>E {A, B}.\n      card {x \\<in> {1 .. a + b}. f x = A} = a \\<and> card {x \\<in> {1 .. a + b}. f x = B} = b}\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.026067677070386708
+    },
+    {
+      "mode": "search",
+      "command": "definition\n  \"valid_countings a b =\n    card {f\\<in>{1..a+b} \\<rightarrow>\\<^sub>E {A, B}.\n      card {x\\<in>{1..a+b}. f x = A} = a \\<and> card {x\\<in>{1..a+b}. f x = B} = b \\<and>\n      (\\<forall>m\\<in>{1..a+b}. card {x\\<in>{1..m}. f x = A} > card {x\\<in>{1..m}. f x = B})}\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.029138923971913755
+    },
+    {
+      "mode": "search",
+      "command": "subsubsection \\<open>Equivalence with Set Cardinality\\<close>",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01566891500260681
+    },
+    {
+      "mode": "search",
+      "command": "lemma Collect_on_transfer:\n  assumes \"rel_set R X Y\"\n  shows \"rel_fun (rel_fun R (=)) (rel_set R) (\\<lambda>P. {x\\<in>X. P x}) (\\<lambda>P. {y\\<in>Y. P y})\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. rel_fun (rel_fun R (=)) (rel_set R) (\\<lambda>P. {x \\<in> X. P x})\n     (\\<lambda>P. {y \\<in> Y. P y})",
+      "duration_seconds": 0.021174415946006775
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01626348902937025
+    },
+    {
+      "mode": "search",
+      "command": "lemma rel_fun_trans:\n  \"rel_fun P Q g g' \\<Longrightarrow> rel_fun R P f f' \\<Longrightarrow> rel_fun R Q (\\<lambda>x. g (f x)) (\\<lambda>y. g' (f' y))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>rel_fun P Q g g'; rel_fun R P f f'\\<rbrakk>\n    \\<Longrightarrow> rel_fun R Q (\\<lambda>x. g (f x))\n                       (\\<lambda>y. g' (f' y))",
+      "duration_seconds": 0.020087272976525128
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01582250406499952
+    },
+    {
+      "mode": "search",
+      "command": "lemma rel_fun_trans2:\n  \"rel_fun P1 (rel_fun P2 Q) g g' \\<Longrightarrow> rel_fun R P1 f1 f1' \\<Longrightarrow> rel_fun R P2 f2 f2' \\<Longrightarrow>\n    rel_fun R Q (\\<lambda>x. g (f1 x) (f2 x)) (\\<lambda>y. g' (f1' y) (f2' y))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>rel_fun P1 (rel_fun P2 Q) g g'; rel_fun R P1 f1 f1';\n     rel_fun R P2 f2 f2'\\<rbrakk>\n    \\<Longrightarrow> rel_fun R Q (\\<lambda>x. g (f1 x) (f2 x))\n                       (\\<lambda>y. g' (f1' y) (f2' y))",
+      "duration_seconds": 0.02204682899173349
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03373477794229984
+    },
+    {
+      "mode": "search",
+      "command": "lemma rel_fun_trans2':\n  \"rel_fun R (=) f1 f1' \\<Longrightarrow> rel_fun R (=) f2 f2' \\<Longrightarrow>\n    rel_fun R (=) (\\<lambda>x. g (f1 x) (f2 x)) (\\<lambda>y. g (f1' y) (f2' y))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>rel_fun R (=) f1 f1'; rel_fun R (=) f2 f2'\\<rbrakk>\n    \\<Longrightarrow> rel_fun R (=) (\\<lambda>x. g (f1 x) (f2 x))\n                       (\\<lambda>y. g (f1' y) (f2' y))",
+      "duration_seconds": 0.019759504008106887
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013012549956329167
+    },
+    {
+      "mode": "search",
+      "command": "lemma rel_fun_const: \"rel_fun R (=) (\\<lambda>x. a) (\\<lambda>y. a)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. rel_fun R (=) (\\<lambda>x. a) (\\<lambda>y. a)",
+      "duration_seconds": 0.01641828694846481
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011061466066166759
+    },
+    {
+      "mode": "search",
+      "command": "lemma rel_fun_conj:\n  \"rel_fun R (=) f f' \\<Longrightarrow> rel_fun R (=) g g' \\<Longrightarrow> rel_fun R (=) (\\<lambda>x. f x \\<and> g x) (\\<lambda>y. f' y \\<and> g' y)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>rel_fun R (=) f f'; rel_fun R (=) g g'\\<rbrakk>\n    \\<Longrightarrow> rel_fun R (=) (\\<lambda>x. f x \\<and> g x)\n                       (\\<lambda>y. f' y \\<and> g' y)",
+      "duration_seconds": 0.01842714997474104
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013433137093670666
+    },
+    {
+      "mode": "search",
+      "command": "lemma rel_fun_ball:\n  \"(\\<And>i. i \\<in> I \\<Longrightarrow> rel_fun R (=) (f i) (f' i)) \\<Longrightarrow> rel_fun R (=) (\\<lambda>x. \\<forall>i\\<in>I. f i x) (\\<lambda>y. \\<forall>i\\<in>I. f' i y)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. (\\<And>i.\n        i \\<in> I \\<Longrightarrow>\n        rel_fun R (=) (f i) (f' i)) \\<Longrightarrow>\n    rel_fun R (=) (\\<lambda>x. \\<forall>i\\<in>I. f i x)\n     (\\<lambda>y. \\<forall>i\\<in>I. f' i y)",
+      "duration_seconds": 0.017006720998324454
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014471835107542574
+    },
+    {
+      "mode": "search",
+      "command": "lemma\n  shows all_countings_set: \"all_countings a b = card {V\\<in>Pow {0..<a+b}. card V = a}\"\n      (is \"_ = card ?A\")\n    and valid_countings_set: \"valid_countings a b =\n      card {V\\<in>Pow {0..<a+b}. card V = a \\<and> (\\<forall>m\\<in>{1..a+b}. card ({0..<m} \\<inter> V) > m - card ({0..<m} \\<inter> V))}\"\n      (is \"_ = card ?V\")",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. all_countings a b = card {V \\<in> Pow {0..<a + b}. card V = a} &&&\n    valid_countings a b =\n    card\n     {V \\<in> Pow {0..<a + b}.\n      card V = a \\<and>\n      (\\<forall>m\\<in>{1..a + b}.\n          m - card ({0..<m} \\<inter> V) < card ({0..<m} \\<inter> V))}",
+      "duration_seconds": 0.02292579202912748
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01686533901374787
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013276831014081836
+    },
+    {
+      "mode": "search",
+      "command": "lemma all_countings [code]: \"all_countings a b = (a + b) choose a\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. all_countings a b = a + b choose a",
+      "duration_seconds": 0.01433078502304852
+    },
+    {
+      "mode": "search",
+      "command": "by (simp add: all_countings_set n_subsets)",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020311831030994654
+    }
+  ],
+  "failure_category": null,
+  "request_id": "ef716dcb801c4f86a8c83e9f52d20b88",
+  "input_sha256": "1fc918fa1bb506ac3dc3f8b08ffc0c3064f022893d52d30b3cbd59242df57b30",
+  "duration_seconds": 9.726733011077158
+}

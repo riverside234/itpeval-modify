@@ -1,0 +1,164 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 11,
+    "last_step": 11,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory galois\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.02441716194152832
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.016635894775390625
+      },
+      {
+        "index": 2,
+        "step": "locale field_like =\n  fixes zero_F one_F :: \"'f\"\n    and add_F :: \"'f \\<Rightarrow> 'f \\<Rightarrow> 'f\"  (infixl \"+F\" 65)\n    and mul_F :: \"'f \\<Rightarrow> 'f \\<Rightarrow> 'f\"  (infixl \"*F\" 70)\n    and opp_F :: \"'f \\<Rightarrow> 'f\"\n    and inv_F :: \"'f \\<Rightarrow> 'f\"\n  assumes add_comm    : \"\\<And>x y. x +F y = y +F x\"\n    and   add_assoc   : \"\\<And>x y z. (x +F y) +F z = x +F (y +F z)\"\n    and   add_zero    : \"\\<And>x. x +F zero_F = x\"\n    and   add_inv_l   : \"\\<And>x. opp_F x +F x = zero_F\"\n    and   mul_comm    : \"\\<And>x y. x *F y = y *F x\"\n    and   mul_assoc   : \"\\<And>x y z. (x *F y) *F z = x *F (y *F z)\"\n    and   mul_one_l   : \"\\<And>x. one_F *F x = x\"\n    and   mul_inv_l   : \"\\<And>x. x \\<noteq> zero_F \\<Longrightarrow> inv_F x *F x = one_F\"\n    and   distrib_l   : \"\\<And>x y z. x *F (y +F z) = (x *F y) +F (x *F z)\"\n    and   zero_neq_one: \"zero_F \\<noteq> one_F\"\n    and   inv_nonzero : \"\\<And>x. x \\<noteq> zero_F \\<Longrightarrow> inv_F x \\<noteq> zero_F\"\nbegin",
+        "output": "",
+        "step_time": 0.04397273063659668
+      },
+      {
+        "index": 3,
+        "step": "lemma zero_add: \"zero_F +F x = x\"",
+        "output": "",
+        "step_time": 0.02395009994506836
+      },
+      {
+        "index": 4,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01839923858642578
+      },
+      {
+        "index": 5,
+        "step": "lemma mul_one_r: \"x *F one_F = x\"",
+        "output": "",
+        "step_time": 0.0226590633392334
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.022044897079467773
+      },
+      {
+        "index": 7,
+        "step": "lemma mul_inv_r: \"x \\<noteq> zero_F \\<Longrightarrow> x *F inv_F x = one_F\"",
+        "output": "",
+        "step_time": 0.02185535430908203
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0176389217376709
+      },
+      {
+        "index": 9,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.016808509826660156
+      },
+      {
+        "index": 10,
+        "step": "lemma add_cancel_l: \"x +F y = x +F z \\<Longrightarrow> y = z\"",
+        "output": "",
+        "step_time": 0.018090486526489258
+      }
+    ],
+    "final_state": "default_10",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory galois\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02441044303122908
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01663166203070432
+    },
+    {
+      "mode": "search",
+      "command": "locale field_like =\n  fixes zero_F one_F :: \"'f\"\n    and add_F :: \"'f \\<Rightarrow> 'f \\<Rightarrow> 'f\"  (infixl \"+F\" 65)\n    and mul_F :: \"'f \\<Rightarrow> 'f \\<Rightarrow> 'f\"  (infixl \"*F\" 70)\n    and opp_F :: \"'f \\<Rightarrow> 'f\"\n    and inv_F :: \"'f \\<Rightarrow> 'f\"\n  assumes add_comm    : \"\\<And>x y. x +F y = y +F x\"\n    and   add_assoc   : \"\\<And>x y z. (x +F y) +F z = x +F (y +F z)\"\n    and   add_zero    : \"\\<And>x. x +F zero_F = x\"\n    and   add_inv_l   : \"\\<And>x. opp_F x +F x = zero_F\"\n    and   mul_comm    : \"\\<And>x y. x *F y = y *F x\"\n    and   mul_assoc   : \"\\<And>x y z. (x *F y) *F z = x *F (y *F z)\"\n    and   mul_one_l   : \"\\<And>x. one_F *F x = x\"\n    and   mul_inv_l   : \"\\<And>x. x \\<noteq> zero_F \\<Longrightarrow> inv_F x *F x = one_F\"\n    and   distrib_l   : \"\\<And>x y z. x *F (y +F z) = (x *F y) +F (x *F z)\"\n    and   zero_neq_one: \"zero_F \\<noteq> one_F\"\n    and   inv_nonzero : \"\\<And>x. x \\<noteq> zero_F \\<Longrightarrow> inv_F x \\<noteq> zero_F\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.04396762000396848
+    },
+    {
+      "mode": "search",
+      "command": "lemma zero_add: \"zero_F +F x = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. zero_F +F x = x",
+      "duration_seconds": 0.023946094093844295
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018395110964775085
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_one_r: \"x *F one_F = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x *F one_F = x",
+      "duration_seconds": 0.022654842003248632
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.022041607997380197
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_inv_r: \"x \\<noteq> zero_F \\<Longrightarrow> x *F inv_F x = one_F\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x \\<noteq> zero_F \\<Longrightarrow> x *F inv_F x = one_F",
+      "duration_seconds": 0.021852327976375818
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017633236944675446
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016803264967165887
+    },
+    {
+      "mode": "search",
+      "command": "lemma add_cancel_l: \"x +F y = x +F z \\<Longrightarrow> y = z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x +F y = x +F z \\<Longrightarrow> y = z",
+      "duration_seconds": 0.01808595599140972
+    }
+  ],
+  "failure_category": null,
+  "request_id": "f7088d5a039447a99680683ae69a5a7b",
+  "input_sha256": "265a46e89cdc85ee6b4917c86064bddfb4bdc70cb4b9d16acb13b5a34b30464c",
+  "duration_seconds": 10.208206853014417
+}

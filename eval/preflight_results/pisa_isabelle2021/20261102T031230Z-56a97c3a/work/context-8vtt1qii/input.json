@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory inner_product\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\nlocale inner_product =\n  fixes zero_R one_R :: \"'r\"\n    and add_R :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"+R\" 65)\n    and mul_R :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"*R\" 70)\n    and opp_R :: \"'r \\<Rightarrow> 'r\"\n    and zeroV :: \"'v\"\n    and addV  :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'v\"  (infixl \"+V\" 65)\n    and oppV  :: \"'v \\<Rightarrow> 'v\"\n    and smul  :: \"'r \\<Rightarrow> 'v \\<Rightarrow> 'v\"\n    and ip    :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'r\"\n\n  assumes add_R_comm    : \"\\<And>x y. x +R y = y +R x\"\n    and   add_R_assoc   : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_R_zero    : \"\\<And>x. x +R zero_R = x\"\n    and   zero_R_add    : \"\\<And>x. zero_R +R x = x\"\n    and   add_R_opp     : \"\\<And>x. x +R opp_R x = zero_R\"\n    and   mul_R_comm    : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_R_assoc   : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_R_one     : \"\\<And>x. x *R one_R = x\"\n    and   mul_opp_one   : \"\\<And>x. opp_R one_R *R x = opp_R x\"\n    and   opp_R_opp     : \"\\<And>x. opp_R (opp_R x) = x\"\n\n    and   addV_comm     : \"\\<And>u v. u +V v = v +V u\"\n    and   addV_assoc    : \"\\<And>u v w. (u +V v) +V w = u +V (v +V w)\"\n    and   addV_zero     : \"\\<And>u. u +V zeroV = u\"\n    and   smul_addV     : \"\\<And>a u v. smul a (u +V v) = smul a u +V smul a v\"\n    and   one_smul      : \"\\<And>u. smul one_R u = u\"\n    and   opp_smul_one  : \"\\<And>u. oppV u = smul (opp_R one_R) u\"\n\n    and   lin_left_add  : \"\\<And>u v w. ip (u +V v) w = ip u w +R ip v w\"\n    and   lin_left_smul : \"\\<And>a u v. ip (smul a u) v = a *R ip u v\"\n    and   lin_right_add : \"\\<And>u v w. ip u (v +V w) = ip u v +R ip u w\"\n    and   lin_right_smul: \"\\<And>a u v. ip u (smul a v) = a *R ip u v\"\n    and   ip_symm       : \"\\<And>u v. ip u v = ip v u\"\nbegin\n\n\n\n\n\ndefinition subV :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'v\"  (infixl \"-V\" 65)\n  where \"u -V v \\<equiv> u +V oppV v\"\n\nlemma add_R_left_comm: \"x +R (y +R z) = y +R (x +R z)\"\n  sorry\n\n\n\n\nlemma ip_neg_left: \"ip (oppV u) v = opp_R (ip u v)\"\n  sorry\nlemma ip_neg_right: \"ip u (oppV v) = opp_R (ip u v)\"\n  sorry\n\n\n\n\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma ip_add_add:\n  \"ip (u +V v) (u +V v) =\n    (ip u u +R ip v u) +R (ip u v +R ip v v)\"\n  ",
+    "theory_name": "inner_product",
+    "request_id": "cd65b794bff444289c892c3269d6c612",
+    "input_sha256": "60c8cab06ba88994710b106cb220624f7afc0e04871e54088daf2793b2d3ee70"
+  }
+}

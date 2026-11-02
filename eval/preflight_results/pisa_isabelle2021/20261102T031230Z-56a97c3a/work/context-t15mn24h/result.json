@@ -1,0 +1,658 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 49,
+    "last_step": 49,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory galois\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.02256941795349121
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.018195152282714844
+      },
+      {
+        "index": 2,
+        "step": "locale field_like =\n  fixes zero_F one_F :: \"'f\"\n    and add_F :: \"'f \\<Rightarrow> 'f \\<Rightarrow> 'f\"  (infixl \"+F\" 65)\n    and mul_F :: \"'f \\<Rightarrow> 'f \\<Rightarrow> 'f\"  (infixl \"*F\" 70)\n    and opp_F :: \"'f \\<Rightarrow> 'f\"\n    and inv_F :: \"'f \\<Rightarrow> 'f\"\n  assumes add_comm    : \"\\<And>x y. x +F y = y +F x\"\n    and   add_assoc   : \"\\<And>x y z. (x +F y) +F z = x +F (y +F z)\"\n    and   add_zero    : \"\\<And>x. x +F zero_F = x\"\n    and   add_inv_l   : \"\\<And>x. opp_F x +F x = zero_F\"\n    and   mul_comm    : \"\\<And>x y. x *F y = y *F x\"\n    and   mul_assoc   : \"\\<And>x y z. (x *F y) *F z = x *F (y *F z)\"\n    and   mul_one_l   : \"\\<And>x. one_F *F x = x\"\n    and   mul_inv_l   : \"\\<And>x. x \\<noteq> zero_F \\<Longrightarrow> inv_F x *F x = one_F\"\n    and   distrib_l   : \"\\<And>x y z. x *F (y +F z) = (x *F y) +F (x *F z)\"\n    and   zero_neq_one: \"zero_F \\<noteq> one_F\"\n    and   inv_nonzero : \"\\<And>x. x \\<noteq> zero_F \\<Longrightarrow> inv_F x \\<noteq> zero_F\"\nbegin",
+        "output": "",
+        "step_time": 0.04220771789550781
+      },
+      {
+        "index": 3,
+        "step": "lemma zero_add: \"zero_F +F x = x\"",
+        "output": "",
+        "step_time": 0.02143406867980957
+      },
+      {
+        "index": 4,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01797652244567871
+      },
+      {
+        "index": 5,
+        "step": "lemma mul_one_r: \"x *F one_F = x\"",
+        "output": "",
+        "step_time": 0.02204298973083496
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01909804344177246
+      },
+      {
+        "index": 7,
+        "step": "lemma mul_inv_r: \"x \\<noteq> zero_F \\<Longrightarrow> x *F inv_F x = one_F\"",
+        "output": "",
+        "step_time": 0.020577192306518555
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017084836959838867
+      },
+      {
+        "index": 9,
+        "step": "lemma add_cancel_l: \"x +F y = x +F z \\<Longrightarrow> y = z\"",
+        "output": "",
+        "step_time": 0.017281055450439453
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.018746614456176758
+      },
+      {
+        "index": 11,
+        "step": "lemma add_cancel_r: \"y +F x = z +F x \\<Longrightarrow> y = z\"",
+        "output": "",
+        "step_time": 0.017052650451660156
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01562190055847168
+      },
+      {
+        "index": 13,
+        "step": "lemma mul_cancel_l: \"x \\<noteq> zero_F \\<Longrightarrow> x *F y = x *F z \\<Longrightarrow> y = z\"",
+        "output": "",
+        "step_time": 0.01656055450439453
+      },
+      {
+        "index": 14,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01699995994567871
+      },
+      {
+        "index": 15,
+        "step": "lemma mul_cancel_r: \"x \\<noteq> zero_F \\<Longrightarrow> y *F x = z *F x \\<Longrightarrow> y = z\"",
+        "output": "",
+        "step_time": 0.019434213638305664
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.018106698989868164
+      },
+      {
+        "index": 17,
+        "step": "lemma inv_unique: \"x \\<noteq> zero_F \\<Longrightarrow> x *F y = one_F \\<Longrightarrow> y = inv_F x\"",
+        "output": "",
+        "step_time": 0.030953168869018555
+      },
+      {
+        "index": 18,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012482166290283203
+      },
+      {
+        "index": 19,
+        "step": "lemma inv_involutive: \"x \\<noteq> zero_F \\<Longrightarrow> inv_F (inv_F x) = x\"",
+        "output": "",
+        "step_time": 0.012746095657348633
+      },
+      {
+        "index": 20,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012950420379638672
+      },
+      {
+        "index": 21,
+        "step": "end",
+        "output": "",
+        "step_time": 0.010896444320678711
+      },
+      {
+        "index": 22,
+        "step": "locale tower =\n  fixes S    :: \"'p \\<Rightarrow> bool\"\n    and mp   :: \"'p \\<Rightarrow> 'p\"\n    and splt :: \"'p \\<Rightarrow> bool\"\n  assumes scalar_tower : \"\\<And>p q. S p \\<Longrightarrow> S (mp q) \\<Longrightarrow> S q\"\n    and   map_solv     : \"\\<And>p. S p \\<Longrightarrow> S (mp p)\"\n    and   splits_solv  : \"\\<And>p. splt p \\<Longrightarrow> S p\"\nbegin",
+        "output": "",
+        "step_time": 0.024226665496826172
+      },
+      {
+        "index": 23,
+        "step": "lemma gal_isSolvable_tower:\n  \"S p \\<Longrightarrow> S (mp q) \\<Longrightarrow> S q\"",
+        "output": "",
+        "step_time": 0.012831449508666992
+      },
+      {
+        "index": 24,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014701366424560547
+      },
+      {
+        "index": 25,
+        "step": "lemma gal_isSolvable_double_tower:\n  \"S p \\<Longrightarrow> S (mp q) \\<Longrightarrow> S (mp r) \\<Longrightarrow> S r\"",
+        "output": "",
+        "step_time": 0.013260602951049805
+      },
+      {
+        "index": 26,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013406515121459961
+      },
+      {
+        "index": 27,
+        "step": "lemma gal_isSolvable_triple_tower:\n  \"S p \\<Longrightarrow> S (mp q) \\<Longrightarrow> S (mp r) \\<Longrightarrow> S (mp s) \\<Longrightarrow> S s\"",
+        "output": "",
+        "step_time": 0.016570568084716797
+      },
+      {
+        "index": 28,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013735055923461914
+      },
+      {
+        "index": 29,
+        "step": "lemma gal_isSolvable_quadruple_tower:\n  \"S p \\<Longrightarrow> S (mp q) \\<Longrightarrow> S (mp r) \\<Longrightarrow> S (mp s) \\<Longrightarrow> S (mp t) \\<Longrightarrow> S t\"",
+        "output": "",
+        "step_time": 0.01642298698425293
+      },
+      {
+        "index": 30,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012396574020385742
+      },
+      {
+        "index": 31,
+        "step": "lemma gal_isSolvable_map_poly:\n  \"S p \\<Longrightarrow> S (mp p)\"",
+        "output": "",
+        "step_time": 0.01097869873046875
+      },
+      {
+        "index": 32,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01266932487487793
+      },
+      {
+        "index": 33,
+        "step": "lemma gal_isSolvable_of_split:\n  \"splt p \\<Longrightarrow> S p\"",
+        "output": "",
+        "step_time": 0.013237953186035156
+      },
+      {
+        "index": 34,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.010849237442016602
+      },
+      {
+        "index": 35,
+        "step": "lemma gal_isSolvable_split_tower:\n  \"splt q \\<Longrightarrow> S q\"",
+        "output": "",
+        "step_time": 0.013727664947509766
+      },
+      {
+        "index": 36,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013290882110595703
+      },
+      {
+        "index": 37,
+        "step": "lemma gal_isSolvable_two_step_map:\n  \"S p \\<Longrightarrow> S (mp (mp p))\"",
+        "output": "",
+        "step_time": 0.0132598876953125
+      },
+      {
+        "index": 38,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011919260025024414
+      },
+      {
+        "index": 39,
+        "step": "lemma gal_isSolvable_three_step_map:\n  \"S p \\<Longrightarrow> S (mp (mp (mp p)))\"",
+        "output": "",
+        "step_time": 0.013092041015625
+      },
+      {
+        "index": 40,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012646913528442383
+      },
+      {
+        "index": 41,
+        "step": "lemma gal_isSolvable_map_poly_comp:\n  \"S p \\<Longrightarrow> S (mp (mp p))\"",
+        "output": "",
+        "step_time": 0.012511730194091797
+      },
+      {
+        "index": 42,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014126062393188477
+      },
+      {
+        "index": 43,
+        "step": "lemma gal_isSolvable_mutual_split:\n  \"splt p \\<Longrightarrow> splt q \\<Longrightarrow> S p \\<and> S q\"",
+        "output": "",
+        "step_time": 0.015432596206665039
+      },
+      {
+        "index": 44,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013394594192504883
+      },
+      {
+        "index": 45,
+        "step": "lemma gal_isSolvable_map_after_split:\n  \"splt p \\<Longrightarrow> S (mp p)\"",
+        "output": "",
+        "step_time": 0.011674642562866211
+      },
+      {
+        "index": 46,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012012243270874023
+      },
+      {
+        "index": 47,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.010445117950439453
+      },
+      {
+        "index": 48,
+        "step": "lemma gal_isSolvable_tower_split:\n  \"splt q \\<Longrightarrow> S (mp r) \\<Longrightarrow> S r\"",
+        "output": "",
+        "step_time": 0.014936447143554688
+      }
+    ],
+    "final_state": "default_48",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory galois\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02255977492313832
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01818895502947271
+    },
+    {
+      "mode": "search",
+      "command": "locale field_like =\n  fixes zero_F one_F :: \"'f\"\n    and add_F :: \"'f \\<Rightarrow> 'f \\<Rightarrow> 'f\"  (infixl \"+F\" 65)\n    and mul_F :: \"'f \\<Rightarrow> 'f \\<Rightarrow> 'f\"  (infixl \"*F\" 70)\n    and opp_F :: \"'f \\<Rightarrow> 'f\"\n    and inv_F :: \"'f \\<Rightarrow> 'f\"\n  assumes add_comm    : \"\\<And>x y. x +F y = y +F x\"\n    and   add_assoc   : \"\\<And>x y z. (x +F y) +F z = x +F (y +F z)\"\n    and   add_zero    : \"\\<And>x. x +F zero_F = x\"\n    and   add_inv_l   : \"\\<And>x. opp_F x +F x = zero_F\"\n    and   mul_comm    : \"\\<And>x y. x *F y = y *F x\"\n    and   mul_assoc   : \"\\<And>x y z. (x *F y) *F z = x *F (y *F z)\"\n    and   mul_one_l   : \"\\<And>x. one_F *F x = x\"\n    and   mul_inv_l   : \"\\<And>x. x \\<noteq> zero_F \\<Longrightarrow> inv_F x *F x = one_F\"\n    and   distrib_l   : \"\\<And>x y z. x *F (y +F z) = (x *F y) +F (x *F z)\"\n    and   zero_neq_one: \"zero_F \\<noteq> one_F\"\n    and   inv_nonzero : \"\\<And>x. x \\<noteq> zero_F \\<Longrightarrow> inv_F x \\<noteq> zero_F\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.04220082494430244
+    },
+    {
+      "mode": "search",
+      "command": "lemma zero_add: \"zero_F +F x = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. zero_F +F x = x",
+      "duration_seconds": 0.021427772007882595
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01797198795247823
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_one_r: \"x *F one_F = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x *F one_F = x",
+      "duration_seconds": 0.022040104027837515
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01909343001898378
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_inv_r: \"x \\<noteq> zero_F \\<Longrightarrow> x *F inv_F x = one_F\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x \\<noteq> zero_F \\<Longrightarrow> x *F inv_F x = one_F",
+      "duration_seconds": 0.020571361063048244
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017080380930565298
+    },
+    {
+      "mode": "search",
+      "command": "lemma add_cancel_l: \"x +F y = x +F z \\<Longrightarrow> y = z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x +F y = x +F z \\<Longrightarrow> y = z",
+      "duration_seconds": 0.01727586693596095
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018741152016445994
+    },
+    {
+      "mode": "search",
+      "command": "lemma add_cancel_r: \"y +F x = z +F x \\<Longrightarrow> y = z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. y +F x = z +F x \\<Longrightarrow> y = z",
+      "duration_seconds": 0.01704800210427493
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015617039985954762
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_cancel_l: \"x \\<noteq> zero_F \\<Longrightarrow> x *F y = x *F z \\<Longrightarrow> y = z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>x \\<noteq> zero_F; x *F y = x *F z\\<rbrakk>\n    \\<Longrightarrow> y = z",
+      "duration_seconds": 0.016555316979065537
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016996175982058048
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_cancel_r: \"x \\<noteq> zero_F \\<Longrightarrow> y *F x = z *F x \\<Longrightarrow> y = z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>x \\<noteq> zero_F; y *F x = z *F x\\<rbrakk>\n    \\<Longrightarrow> y = z",
+      "duration_seconds": 0.01942978100851178
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018103551003150642
+    },
+    {
+      "mode": "search",
+      "command": "lemma inv_unique: \"x \\<noteq> zero_F \\<Longrightarrow> x *F y = one_F \\<Longrightarrow> y = inv_F x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>x \\<noteq> zero_F; x *F y = one_F\\<rbrakk>\n    \\<Longrightarrow> y = inv_F x",
+      "duration_seconds": 0.03094537800643593
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012477401993237436
+    },
+    {
+      "mode": "search",
+      "command": "lemma inv_involutive: \"x \\<noteq> zero_F \\<Longrightarrow> inv_F (inv_F x) = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x \\<noteq> zero_F \\<Longrightarrow> inv_F (inv_F x) = x",
+      "duration_seconds": 0.012740457081235945
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012945215101353824
+    },
+    {
+      "mode": "search",
+      "command": "end",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01089226093608886
+    },
+    {
+      "mode": "search",
+      "command": "locale tower =\n  fixes S    :: \"'p \\<Rightarrow> bool\"\n    and mp   :: \"'p \\<Rightarrow> 'p\"\n    and splt :: \"'p \\<Rightarrow> bool\"\n  assumes scalar_tower : \"\\<And>p q. S p \\<Longrightarrow> S (mp q) \\<Longrightarrow> S q\"\n    and   map_solv     : \"\\<And>p. S p \\<Longrightarrow> S (mp p)\"\n    and   splits_solv  : \"\\<And>p. splt p \\<Longrightarrow> S p\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024217913975007832
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_tower:\n  \"S p \\<Longrightarrow> S (mp q) \\<Longrightarrow> S q\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>S p; S (mp q)\\<rbrakk> \\<Longrightarrow> S q",
+      "duration_seconds": 0.012825255980715156
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01469659700524062
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_double_tower:\n  \"S p \\<Longrightarrow> S (mp q) \\<Longrightarrow> S (mp r) \\<Longrightarrow> S r\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>S p; S (mp q); S (mp r)\\<rbrakk> \\<Longrightarrow> S r",
+      "duration_seconds": 0.01325597905088216
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01340300205629319
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_triple_tower:\n  \"S p \\<Longrightarrow> S (mp q) \\<Longrightarrow> S (mp r) \\<Longrightarrow> S (mp s) \\<Longrightarrow> S s\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>S p; S (mp q); S (mp r); S (mp s)\\<rbrakk>\n    \\<Longrightarrow> S s",
+      "duration_seconds": 0.01656486897263676
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013726960052736104
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_quadruple_tower:\n  \"S p \\<Longrightarrow> S (mp q) \\<Longrightarrow> S (mp r) \\<Longrightarrow> S (mp s) \\<Longrightarrow> S (mp t) \\<Longrightarrow> S t\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>S p; S (mp q); S (mp r); S (mp s); S (mp t)\\<rbrakk>\n    \\<Longrightarrow> S t",
+      "duration_seconds": 0.016413839999586344
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012391109019517899
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_map_poly:\n  \"S p \\<Longrightarrow> S (mp p)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. S p \\<Longrightarrow> S (mp p)",
+      "duration_seconds": 0.010973296011798084
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012664212961681187
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_of_split:\n  \"splt p \\<Longrightarrow> S p\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. splt p \\<Longrightarrow> S p",
+      "duration_seconds": 0.013232209952548146
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010842072078958154
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_split_tower:\n  \"splt q \\<Longrightarrow> S q\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. splt q \\<Longrightarrow> S q",
+      "duration_seconds": 0.013718919944949448
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013282516971230507
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_two_step_map:\n  \"S p \\<Longrightarrow> S (mp (mp p))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. S p \\<Longrightarrow> S (mp (mp p))",
+      "duration_seconds": 0.013252497999928892
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011913209920749068
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_three_step_map:\n  \"S p \\<Longrightarrow> S (mp (mp (mp p)))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. S p \\<Longrightarrow> S (mp (mp (mp p)))",
+      "duration_seconds": 0.013087169965729117
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012643139925785363
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_map_poly_comp:\n  \"S p \\<Longrightarrow> S (mp (mp p))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. S p \\<Longrightarrow> S (mp (mp p))",
+      "duration_seconds": 0.012504267040640116
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014119529980234802
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_mutual_split:\n  \"splt p \\<Longrightarrow> splt q \\<Longrightarrow> S p \\<and> S q\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>splt p; splt q\\<rbrakk> \\<Longrightarrow> S p \\<and> S q",
+      "duration_seconds": 0.015423452947288752
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013388209044933319
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_map_after_split:\n  \"splt p \\<Longrightarrow> S (mp p)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. splt p \\<Longrightarrow> S (mp p)",
+      "duration_seconds": 0.01166972506325692
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012008273042738438
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.010441482998430729
+    },
+    {
+      "mode": "search",
+      "command": "lemma gal_isSolvable_tower_split:\n  \"splt q \\<Longrightarrow> S (mp r) \\<Longrightarrow> S r\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>splt q; S (mp r)\\<rbrakk> \\<Longrightarrow> S r",
+      "duration_seconds": 0.014931587036699057
+    }
+  ],
+  "failure_category": null,
+  "request_id": "4e4e9c3e40f34fce9345572bc8245e47",
+  "input_sha256": "b743a64819becd6400e9579e1ae7888b859fcd68c83779937b6ffbb12da88724",
+  "duration_seconds": 10.477291950955987
+}

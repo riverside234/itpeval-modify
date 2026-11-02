@@ -1,0 +1,207 @@
+Server is running. Press Ctrl-C to stop.
+Checkpoint 1
+Checkpoint 2
+Checkpoint 3
+Checkpoint 4
+Checkpoint 4
+Checkpoint 5
+Checkpoint 6
+Checkpoint 7
+Checkpoint 8
+Checkpoint 9
+Checkpoint 9_1
+Checkpoint 9_2
+Checkpoint 9_3
+Checkpoint 9_4
+Checkpoint 9_5
+/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/cases/partial_goal/work/target-czwnlg8l/miniF2F
+de.unruh.isabelle.pure.TheoryHeader@509a55cf
+List(Main)
+Checkpoint 10
+Checkpoint 11
+Checkpoint 12
+Checkpoint 13
+Checkpoint 14
+Intialising the problem...
+Intialised...
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by auto
+IsabelleException: Failed to finish proof (line 1):
+goal (1 subgoal):
+ 1. False
+At command "by" (line 1)
+
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by simp
+IsabelleException: Failed to finish proof (line 1):
+goal (1 subgoal):
+ 1. False
+At command "by" (line 1)
+
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by blast
+IsabelleException: Failed to finish proof (line 1):
+goal (1 subgoal):
+ 1. False
+At command "by" (line 1)
+
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by fastforce
+IsabelleException: Failed to finish proof (line 1):
+goal (1 subgoal):
+ 1. False
+At command "by" (line 1)
+
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by force
+IsabelleException: Failed to finish proof (line 1):
+goal (1 subgoal):
+ 1. False
+At command "by" (line 1)
+
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by eval
+IsabelleException: Failed to finish proof (line 1):
+goal (1 subgoal):
+ 1. False
+At command "by" (line 1)
+
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by presburger
+IsabelleException: Failed to finish proof (line 1):
+goal (1 subgoal):
+ 1. False
+At command "by" (line 1)
+
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by sos
+IsabelleException: Undefined method: "sos" (line 1)
+At command "by" (line 1)
+
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by arith
+IsabelleException: Failed to finish proof (line 1):
+goal (1 subgoal):
+ 1. False
+At command "by" (line 1)
+
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by linarith
+IsabelleException: Failed to apply initial proof method (line 1):
+goal (2 subgoals):
+ 1. True
+ 2. False
+At command "by" (line 1)
+
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: by (auto simp: field_simps)
+IsabelleException: Failed to finish proof (line 1):
+goal (1 subgoal):
+ 1. False
+At command "by" (line 1)
+
+Start dealing
+(true,List(Try this: apply simp (0.6 ms), Try this: apply simp (0.7 ms), Try this: apply simp (0.4 ms), Try this: apply simp (1 ms)))
+Hammer string list: Try this: apply simp (0.6 ms) ||| Try this: apply simp (0.7 ms) ||| Try this: apply simp (0.4 ms) ||| Try this: apply simp (1 ms)
+actual_step: apply simp
+Begin step
+Starting to step
+inter
+start parsing
+Future(Success(success))
+Start dealing
+Begin step
+Starting to step
+inter
+start parsing
+Action: then
+IsabelleException: Illegal application of proof command in "prove" mode
+At command "then" (line 1)
+
+Exception in thread "main" 

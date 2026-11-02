@@ -1,0 +1,216 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 15,
+    "last_step": 15,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory polynomial\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.020295381546020508
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.018141984939575195
+      },
+      {
+        "index": 2,
+        "step": "datatype mynat = Nat_O | Nat_S mynat",
+        "output": "",
+        "step_time": 0.33426523208618164
+      },
+      {
+        "index": 3,
+        "step": "fun mynat_add :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> mynat\" where\n  \"mynat_add Nat_O m = m\"\n| \"mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)\"",
+        "output": "",
+        "step_time": 0.09235548973083496
+      },
+      {
+        "index": 4,
+        "step": "lemma mynat_add_O_left: \"mynat_add Nat_O m = m\"",
+        "output": "",
+        "step_time": 0.019679546356201172
+      },
+      {
+        "index": 5,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.018606185913085938
+      },
+      {
+        "index": 6,
+        "step": "lemma mynat_add_S_left: \"mynat_add (Nat_S n) m = Nat_S (mynat_add n m)\"",
+        "output": "",
+        "step_time": 0.0209503173828125
+      },
+      {
+        "index": 7,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01841902732849121
+      },
+      {
+        "index": 8,
+        "step": "inductive mynat_le :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> bool\" where\n  le_n : \"mynat_le n n\"\n| le_S : \"mynat_le n m \\<Longrightarrow> mynat_le n (Nat_S m)\"",
+        "output": "",
+        "step_time": 0.03787851333618164
+      },
+      {
+        "index": 9,
+        "step": "lemma mynat_zero_le: \"mynat_le Nat_O n\"",
+        "output": "",
+        "step_time": 0.01867842674255371
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017420291900634766
+      },
+      {
+        "index": 11,
+        "step": "lemma mynat_add_zero_r: \"mynat_add n Nat_O = n\"",
+        "output": "",
+        "step_time": 0.01761770248413086
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017447471618652344
+      },
+      {
+        "index": 13,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.014891624450683594
+      },
+      {
+        "index": 14,
+        "step": "lemma mynat_succ_le_succ: \"mynat_le n m \\<Longrightarrow> mynat_le (Nat_S n) (Nat_S m)\"",
+        "output": "",
+        "step_time": 0.01865696907043457
+      }
+    ],
+    "final_state": "default_14",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory polynomial\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020288077066652477
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018136224010959268
+    },
+    {
+      "mode": "search",
+      "command": "datatype mynat = Nat_O | Nat_S mynat",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.33425924193579704
+    },
+    {
+      "mode": "search",
+      "command": "fun mynat_add :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> mynat\" where\n  \"mynat_add Nat_O m = m\"\n| \"mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0923504369566217
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_add_O_left: \"mynat_add Nat_O m = m\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add Nat_O m = m",
+      "duration_seconds": 0.019674033974297345
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01860051101539284
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_add_S_left: \"mynat_add (Nat_S n) m = Nat_S (mynat_add n m)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add (Nat_S n) m = Nat_S (mynat_add n m)",
+      "duration_seconds": 0.02094539301469922
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01841472403611988
+    },
+    {
+      "mode": "search",
+      "command": "inductive mynat_le :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> bool\" where\n  le_n : \"mynat_le n n\"\n| le_S : \"mynat_le n m \\<Longrightarrow> mynat_le n (Nat_S m)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03787234099581838
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_zero_le: \"mynat_le Nat_O n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_le Nat_O n",
+      "duration_seconds": 0.018673402024433017
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01741637894883752
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_add_zero_r: \"mynat_add n Nat_O = n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add n Nat_O = n",
+      "duration_seconds": 0.01761369197629392
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01744185504503548
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014886851073242724
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_succ_le_succ: \"mynat_le n m \\<Longrightarrow> mynat_le (Nat_S n) (Nat_S m)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_le n m \\<Longrightarrow> mynat_le (Nat_S n) (Nat_S m)",
+      "duration_seconds": 0.018651123973540962
+    }
+  ],
+  "failure_category": null,
+  "request_id": "dfde6ed9ddc749afbc81463c1f39c9ab",
+  "input_sha256": "e1676bdc590fe5da8096ae79b522c10f95b37d2af3f85d2e7859acb02761ff1e",
+  "duration_seconds": 9.126626000041142
+}

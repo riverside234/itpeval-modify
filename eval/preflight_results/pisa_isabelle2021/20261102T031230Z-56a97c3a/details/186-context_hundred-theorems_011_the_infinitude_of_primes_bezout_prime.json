@@ -1,0 +1,34 @@
+{
+  "name": "context_hundred-theorems_011_the_infinitude_of_primes_bezout_prime",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 10.349,
+  "details": "details/186-context_hundred-theorems_011_the_infinitude_of_primes_bezout_prime.json",
+  "failure_category": "context_error",
+  "expected_failure": null,
+  "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+  "payload": {
+    "ok": false,
+    "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+    "failure_category": "context_error",
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-2m_nlsft",
+    "pisa_result": {
+      "success": false,
+      "error": "RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+      "failure_category": "context_error",
+      "step_results": [],
+      "request_id": "2f77e0dfa31b4f46a830bb61ea6b7302",
+      "input_sha256": "02b9ed80abd37b206d30242c1ca44520b7dded37ac26425523ec15c67d264b98",
+      "duration_seconds": 10.21699444798287
+    },
+    "import_resolution": {
+      "original_imports": [
+        "Euclidean_Algorithm"
+      ],
+      "resolved_imports": [
+        "Euclidean_Algorithm"
+      ],
+      "session_dependencies": []
+    }
+  }
+}

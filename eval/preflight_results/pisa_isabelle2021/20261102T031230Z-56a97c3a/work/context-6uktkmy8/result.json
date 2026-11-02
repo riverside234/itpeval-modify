@@ -1,0 +1,437 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 32,
+    "last_step": 32,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory supinf\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.02382636070251465
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01764535903930664
+      },
+      {
+        "index": 2,
+        "step": "locale complete_ordered_field =\n  fixes zero_nat  :: \"'n\"\n    and succ      :: \"'n \\<Rightarrow> 'n\"\n    and nat_le    :: \"'n \\<Rightarrow> 'n \\<Rightarrow> bool\"\n    and zero one  :: \"'r\"\n    and add       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"+R\" 65)\n    and mul       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"*R\" 70)\n    and opp inv   :: \"'r \\<Rightarrow> 'r\"\n    and rle       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<le>R\" 50)\n    and rlt       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"<R\" 50)\n    and rabs      :: \"'r \\<Rightarrow> 'r\"\n    and inr       :: \"'n \\<Rightarrow> 'r\"\n  assumes nat_le_refl   : \"\\<And>n. nat_le n n\"\n    and   le_succ_of_le : \"\\<And>n m. nat_le n m \\<Longrightarrow> nat_le n (succ m)\"\n    and   le_succ       : \"\\<And>n. nat_le n (succ n)\"\n    and   add_comm      : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc     : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero      : \"\\<And>x. x +R zero = x\"\n    and   add_opp       : \"\\<And>x. opp x +R x = zero\"\n    and   mul_comm      : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_assoc     : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_one       : \"\\<And>x. x *R one = x\"\n    and   dist_l        : \"\\<And>x y z. x *R (y +R z) = (x *R y) +R (x *R z)\"\n    and   sub_zero      : \"\\<And>x. x +R opp zero = x\"\n    and   rle_refl      : \"\\<And>x. x \\<le>R x\"\n    and   rle_trans     : \"\\<And>x y z. x \\<le>R y \\<Longrightarrow> y \\<le>R z \\<Longrightarrow> x \\<le>R z\"\n    and   rle_antisym   : \"\\<And>x y. x \\<le>R y \\<Longrightarrow> y \\<le>R x \\<Longrightarrow> x = y\"\n    and   rlt_def       : \"\\<And>x y. (x <R y) \\<longleftrightarrow> (x \\<le>R y \\<and> x \\<noteq> y)\"\n    and   rle_abs       : \"\\<And>x. x +R opp zero \\<le>R rabs x\"\n    and   rinv_pos      : \"\\<And>x. zero <R x \\<Longrightarrow> zero <R inv x\"\n    and   rplus_le_compat_l : \"\\<And>x y z. y \\<le>R z \\<Longrightarrow> x +R y \\<le>R x +R z\"\n    and   rinv_involutive    : \"\\<And>x. zero <R x \\<Longrightarrow> inv (inv x) = x\"\n    and   inr_pos       : \"\\<And>n. zero <R inr (succ n)\"\n    and   inr_le        : \"\\<And>m n. nat_le m n \\<Longrightarrow> inr m \\<le>R inr n\"\n    and   inr_zero      : \"inr zero_nat = zero\"\n    and   inr_succ      : \"\\<And>n. inr (succ n) = inr n +R one\"\n    and   rtotal_order  : \"\\<And>x y. (x <R y) \\<or> x = y \\<or> (y <R x)\"\n    and   rle_inv_contravar :\n            \"\\<And>a b. zero <R a \\<Longrightarrow> zero <R b \\<Longrightarrow> a \\<le>R b \\<Longrightarrow> inv b \\<le>R inv a\"\n    and   eps_between   :\n            \"\\<And>x y. x <R y \\<Longrightarrow> \\<exists>eps. zero <R eps \\<and> x +R eps <R y\"\n    and   archimedean   : \"\\<And>x. \\<exists>n. x \\<le>R inr n\"\n    and   completeness  :\n            \"\\<And>A. (\\<exists>ub. \\<forall>a. A a \\<longrightarrow> ub \\<le>R a) \\<Longrightarrow>\n              \\<exists>sup. (\\<forall>a. A a \\<longrightarrow> a \\<le>R sup) \\<and>\n                    (\\<forall>y. (\\<forall>a. A a \\<longrightarrow> a \\<le>R y) \\<longrightarrow> sup \\<le>R y)\"\nbegin",
+        "output": "",
+        "step_time": 0.08174514770507812
+      },
+      {
+        "index": 3,
+        "step": "lemma add_opp_r: \"x +R opp x = zero\"",
+        "output": "",
+        "step_time": 0.02514362335205078
+      },
+      {
+        "index": 4,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019257545471191406
+      },
+      {
+        "index": 5,
+        "step": "lemma rlt_le: \"x <R y \\<Longrightarrow> x \\<le>R y\"",
+        "output": "",
+        "step_time": 0.022845029830932617
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.023445844650268555
+      },
+      {
+        "index": 7,
+        "step": "lemma rlt_ne: \"x <R y \\<Longrightarrow> x \\<noteq> y\"",
+        "output": "",
+        "step_time": 0.02003788948059082
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01930975914001465
+      },
+      {
+        "index": 9,
+        "step": "lemma rlt_intro: \"x \\<le>R y \\<Longrightarrow> x \\<noteq> y \\<Longrightarrow> x <R y\"",
+        "output": "",
+        "step_time": 0.019480228424072266
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.018780231475830078
+      },
+      {
+        "index": 11,
+        "step": "definition up_bounds :: \"('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"up_bounds A x \\<equiv> \\<forall>a. A a \\<longrightarrow> a \\<le>R x\"",
+        "output": "",
+        "step_time": 0.026891708374023438
+      },
+      {
+        "index": 12,
+        "step": "definition is_maximum :: \"'r \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"is_maximum a A \\<equiv> A a \\<and> up_bounds A a\"",
+        "output": "",
+        "step_time": 0.029246807098388672
+      },
+      {
+        "index": 13,
+        "step": "definition low_bounds :: \"('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"low_bounds A x \\<equiv> \\<forall>a. A a \\<longrightarrow> x \\<le>R a\"",
+        "output": "",
+        "step_time": 0.027904272079467773
+      },
+      {
+        "index": 14,
+        "step": "definition is_inf :: \"'r \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"is_inf x A \\<equiv> is_maximum x (low_bounds A)\"",
+        "output": "",
+        "step_time": 0.03110361099243164
+      },
+      {
+        "index": 15,
+        "step": "definition limit :: \"('n \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"limit u l \\<equiv>\n    \\<forall>eps. zero <R eps \\<longrightarrow>\n      (\\<exists>N. \\<forall>n. nat_le N n \\<longrightarrow> rabs (u n +R opp l) \\<le>R eps)\"",
+        "output": "",
+        "step_time": 0.03163480758666992
+      },
+      {
+        "index": 16,
+        "step": "lemma add_sub_cancel_r: \"a +R (b +R opp a) = b\"",
+        "output": "",
+        "step_time": 0.02561664581298828
+      },
+      {
+        "index": 17,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0153350830078125
+      },
+      {
+        "index": 18,
+        "step": "lemma rabs_pos: \"t \\<le>R rabs t\"",
+        "output": "",
+        "step_time": 0.030045032501220703
+      },
+      {
+        "index": 19,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011855363845825195
+      },
+      {
+        "index": 20,
+        "step": "lemma unique_max:\n  assumes \"is_maximum x A\" \"is_maximum y A\"\n  shows \"x = y\"",
+        "output": "",
+        "step_time": 0.01448369026184082
+      },
+      {
+        "index": 21,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01708817481994629
+      },
+      {
+        "index": 22,
+        "step": "lemma inf_lt:\n  assumes hinf: \"is_inf x A\" and hlt: \"x <R y\"\n  shows \"\\<exists>a. A a \\<and> a <R y\"",
+        "output": "",
+        "step_time": 0.017068862915039062
+      },
+      {
+        "index": 23,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016209125518798828
+      },
+      {
+        "index": 24,
+        "step": "lemma le_of_le_add_eps:\n  assumes H: \"\\<forall>eps. zero <R eps \\<longrightarrow> y \\<le>R x +R eps\"\n  shows \"y \\<le>R x\"",
+        "output": "",
+        "step_time": 0.015060663223266602
+      },
+      {
+        "index": 25,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.015492677688598633
+      },
+      {
+        "index": 26,
+        "step": "lemma le_lim:\n  assumes hlim : \"limit u x\"\n      and hle  : \"\\<forall>n. y \\<le>R u n\"\n  shows \"y \\<le>R x\"",
+        "output": "",
+        "step_time": 0.018250226974487305
+      },
+      {
+        "index": 27,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.015897274017333984
+      },
+      {
+        "index": 28,
+        "step": "lemma inv_succ_pos: \"zero <R inv (inr (succ n))\"",
+        "output": "",
+        "step_time": 0.017215728759765625
+      },
+      {
+        "index": 29,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014634847640991211
+      },
+      {
+        "index": 30,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.013352632522583008
+      },
+      {
+        "index": 31,
+        "step": "lemma limit_inv_succ:\n  assumes heps: \"zero <R eps\"\n  shows \"\\<exists>N. \\<forall>n. nat_le N n \\<longrightarrow> inv (inr (succ n)) \\<le>R eps\"",
+        "output": "",
+        "step_time": 0.01749730110168457
+      }
+    ],
+    "final_state": "default_31",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory supinf\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02381883899215609
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01764062501024455
+    },
+    {
+      "mode": "search",
+      "command": "locale complete_ordered_field =\n  fixes zero_nat  :: \"'n\"\n    and succ      :: \"'n \\<Rightarrow> 'n\"\n    and nat_le    :: \"'n \\<Rightarrow> 'n \\<Rightarrow> bool\"\n    and zero one  :: \"'r\"\n    and add       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"+R\" 65)\n    and mul       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"*R\" 70)\n    and opp inv   :: \"'r \\<Rightarrow> 'r\"\n    and rle       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<le>R\" 50)\n    and rlt       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"<R\" 50)\n    and rabs      :: \"'r \\<Rightarrow> 'r\"\n    and inr       :: \"'n \\<Rightarrow> 'r\"\n  assumes nat_le_refl   : \"\\<And>n. nat_le n n\"\n    and   le_succ_of_le : \"\\<And>n m. nat_le n m \\<Longrightarrow> nat_le n (succ m)\"\n    and   le_succ       : \"\\<And>n. nat_le n (succ n)\"\n    and   add_comm      : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc     : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero      : \"\\<And>x. x +R zero = x\"\n    and   add_opp       : \"\\<And>x. opp x +R x = zero\"\n    and   mul_comm      : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_assoc     : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_one       : \"\\<And>x. x *R one = x\"\n    and   dist_l        : \"\\<And>x y z. x *R (y +R z) = (x *R y) +R (x *R z)\"\n    and   sub_zero      : \"\\<And>x. x +R opp zero = x\"\n    and   rle_refl      : \"\\<And>x. x \\<le>R x\"\n    and   rle_trans     : \"\\<And>x y z. x \\<le>R y \\<Longrightarrow> y \\<le>R z \\<Longrightarrow> x \\<le>R z\"\n    and   rle_antisym   : \"\\<And>x y. x \\<le>R y \\<Longrightarrow> y \\<le>R x \\<Longrightarrow> x = y\"\n    and   rlt_def       : \"\\<And>x y. (x <R y) \\<longleftrightarrow> (x \\<le>R y \\<and> x \\<noteq> y)\"\n    and   rle_abs       : \"\\<And>x. x +R opp zero \\<le>R rabs x\"\n    and   rinv_pos      : \"\\<And>x. zero <R x \\<Longrightarrow> zero <R inv x\"\n    and   rplus_le_compat_l : \"\\<And>x y z. y \\<le>R z \\<Longrightarrow> x +R y \\<le>R x +R z\"\n    and   rinv_involutive    : \"\\<And>x. zero <R x \\<Longrightarrow> inv (inv x) = x\"\n    and   inr_pos       : \"\\<And>n. zero <R inr (succ n)\"\n    and   inr_le        : \"\\<And>m n. nat_le m n \\<Longrightarrow> inr m \\<le>R inr n\"\n    and   inr_zero      : \"inr zero_nat = zero\"\n    and   inr_succ      : \"\\<And>n. inr (succ n) = inr n +R one\"\n    and   rtotal_order  : \"\\<And>x y. (x <R y) \\<or> x = y \\<or> (y <R x)\"\n    and   rle_inv_contravar :\n            \"\\<And>a b. zero <R a \\<Longrightarrow> zero <R b \\<Longrightarrow> a \\<le>R b \\<Longrightarrow> inv b \\<le>R inv a\"\n    and   eps_between   :\n            \"\\<And>x y. x <R y \\<Longrightarrow> \\<exists>eps. zero <R eps \\<and> x +R eps <R y\"\n    and   archimedean   : \"\\<And>x. \\<exists>n. x \\<le>R inr n\"\n    and   completeness  :\n            \"\\<And>A. (\\<exists>ub. \\<forall>a. A a \\<longrightarrow> ub \\<le>R a) \\<Longrightarrow>\n              \\<exists>sup. (\\<forall>a. A a \\<longrightarrow> a \\<le>R sup) \\<and>\n                    (\\<forall>y. (\\<forall>a. A a \\<longrightarrow> a \\<le>R y) \\<longrightarrow> sup \\<le>R y)\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.08173716207966208
+    },
+    {
+      "mode": "search",
+      "command": "lemma add_opp_r: \"x +R opp x = zero\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x +R opp x = zero",
+      "duration_seconds": 0.02513689501211047
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019248562981374562
+    },
+    {
+      "mode": "search",
+      "command": "lemma rlt_le: \"x <R y \\<Longrightarrow> x \\<le>R y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x <R y \\<Longrightarrow> x \\<le>R y",
+      "duration_seconds": 0.02283570996951312
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023441135068424046
+    },
+    {
+      "mode": "search",
+      "command": "lemma rlt_ne: \"x <R y \\<Longrightarrow> x \\<noteq> y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x <R y \\<Longrightarrow> x \\<noteq> y",
+      "duration_seconds": 0.020033036940731108
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019305077963508666
+    },
+    {
+      "mode": "search",
+      "command": "lemma rlt_intro: \"x \\<le>R y \\<Longrightarrow> x \\<noteq> y \\<Longrightarrow> x <R y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>x \\<le>R y; x \\<noteq> y\\<rbrakk> \\<Longrightarrow> x <R y",
+      "duration_seconds": 0.01947507495060563
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018776722950860858
+    },
+    {
+      "mode": "search",
+      "command": "definition up_bounds :: \"('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"up_bounds A x \\<equiv> \\<forall>a. A a \\<longrightarrow> a \\<le>R x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.026886916952207685
+    },
+    {
+      "mode": "search",
+      "command": "definition is_maximum :: \"'r \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"is_maximum a A \\<equiv> A a \\<and> up_bounds A a\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.029241690994240344
+    },
+    {
+      "mode": "search",
+      "command": "definition low_bounds :: \"('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"low_bounds A x \\<equiv> \\<forall>a. A a \\<longrightarrow> x \\<le>R a\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.027900412096641958
+    },
+    {
+      "mode": "search",
+      "command": "definition is_inf :: \"'r \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"is_inf x A \\<equiv> is_maximum x (low_bounds A)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.031099698040634394
+    },
+    {
+      "mode": "search",
+      "command": "definition limit :: \"('n \\<Rightarrow> 'r) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"limit u l \\<equiv>\n    \\<forall>eps. zero <R eps \\<longrightarrow>\n      (\\<exists>N. \\<forall>n. nat_le N n \\<longrightarrow> rabs (u n +R opp l) \\<le>R eps)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.031626070966012776
+    },
+    {
+      "mode": "search",
+      "command": "lemma add_sub_cancel_r: \"a +R (b +R opp a) = b\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. a +R (b +R opp a) = b",
+      "duration_seconds": 0.02561029908247292
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015330558060668409
+    },
+    {
+      "mode": "search",
+      "command": "lemma rabs_pos: \"t \\<le>R rabs t\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. t \\<le>R rabs t",
+      "duration_seconds": 0.030040178913623095
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011850205017253757
+    },
+    {
+      "mode": "search",
+      "command": "lemma unique_max:\n  assumes \"is_maximum x A\" \"is_maximum y A\"\n  shows \"x = y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x = y",
+      "duration_seconds": 0.014474628958851099
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017081576981581748
+    },
+    {
+      "mode": "search",
+      "command": "lemma inf_lt:\n  assumes hinf: \"is_inf x A\" and hlt: \"x <R y\"\n  shows \"\\<exists>a. A a \\<and> a <R y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<exists>a. A a \\<and> a <R y",
+      "duration_seconds": 0.017063839943148196
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01619897596538067
+    },
+    {
+      "mode": "search",
+      "command": "lemma le_of_le_add_eps:\n  assumes H: \"\\<forall>eps. zero <R eps \\<longrightarrow> y \\<le>R x +R eps\"\n  shows \"y \\<le>R x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. y \\<le>R x",
+      "duration_seconds": 0.015049063949845731
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015482799033634365
+    },
+    {
+      "mode": "search",
+      "command": "lemma le_lim:\n  assumes hlim : \"limit u x\"\n      and hle  : \"\\<forall>n. y \\<le>R u n\"\n  shows \"y \\<le>R x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. y \\<le>R x",
+      "duration_seconds": 0.018243729951791465
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01589302101638168
+    },
+    {
+      "mode": "search",
+      "command": "lemma inv_succ_pos: \"zero <R inv (inr (succ n))\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. zero <R inv (inr (succ n))",
+      "duration_seconds": 0.017211030004546046
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014625475043430924
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01334541302639991
+    },
+    {
+      "mode": "search",
+      "command": "lemma limit_inv_succ:\n  assumes heps: \"zero <R eps\"\n  shows \"\\<exists>N. \\<forall>n. nat_le N n \\<longrightarrow> inv (inr (succ n)) \\<le>R eps\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<exists>N.\n       \\<forall>n.\n          nat_le N n \\<longrightarrow> inv (inr (succ n)) \\<le>R eps",
+      "duration_seconds": 0.01748946704901755
+    }
+  ],
+  "failure_category": null,
+  "request_id": "2d4cf6f7f55d4616a00c22d1de0fb2d9",
+  "input_sha256": "6f346afff98cdf8d36e04d478a80efdea353e8235a767f1ccd6ce16e5eb24b65",
+  "duration_seconds": 7.829219116945751
+}

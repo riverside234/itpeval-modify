@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "(*  \n  File:       Bernoulli.thy\n  Author:     Lukas Bulwahn <lukas.bulwahn-at-gmail.com> \n  Author:     Manuel Eberl <manuel@pruvisto.org> \n*)\nsection \\<open>Bernoulli numbers\\<close>\n\ntheory Bernoulli\nimports Complex_Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\nsubsection \\<open>Preliminaries\\<close>\n  \nlemma power_numeral_reduce: \"a ^ numeral n = a * a ^ pred_numeral n\"\n  \n  sorry\n\n\nlemma fact_diff_Suc: \"n < Suc m \\<Longrightarrow> fact (Suc m - n) = of_nat (Suc m - n) * fact (m - n)\"\n  \n  sorry\n\n\nlemma of_nat_binomial_Suc:\n  assumes \"k \\<le> n\"\n  shows   \"(of_nat (Suc n choose k) :: 'a :: field_char_0) = \n             of_nat (Suc n) / of_nat (Suc n - k) * of_nat (n choose k)\"\n  \n  sorry\n\n\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma integrals_eq:\n  assumes \"f 0 = g 0\"\n  assumes \"\\<And> x. ((\\<lambda>x. f x - g x) has_real_derivative 0) (at x)\"\n  shows \"f x = g x\"\n  \n  ",
+    "theory_name": "Bernoulli",
+    "request_id": "d17c708045944601b059e82ad2850217",
+    "input_sha256": "869ac9cc31c3bbcec79a0dad96fc9ad30220d76521d162084031325825cdc004"
+  }
+}

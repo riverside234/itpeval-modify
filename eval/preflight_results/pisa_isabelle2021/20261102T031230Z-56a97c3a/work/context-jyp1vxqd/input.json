@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory lattice_like\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\nlocale lattice_like =\n  fixes le  :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"  (infix \"\\<preceq>\" 50)\n    and inf :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a\"   (infixl \"\\<sqinter>\" 60)\n    and sup :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a\"   (infixl \"\\<squnion>\" 65)\n  assumes le_refl   : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans  : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   le_antisym: \"\\<And>x y. x \\<preceq> y \\<Longrightarrow> y \\<preceq> x \\<Longrightarrow> x = y\"\n    and   le_inf_left  : \"\\<And>a b. inf a b \\<preceq> a\"\n    and   le_inf_right : \"\\<And>a b. inf a b \\<preceq> b\"\n    and   le_inf_intro : \"\\<And>c a b. c \\<preceq> a \\<Longrightarrow> c \\<preceq> b \\<Longrightarrow> c \\<preceq> inf a b\"\n    and   le_sup_left  : \"\\<And>a b. a \\<preceq> sup a b\"\n    and   le_sup_right : \"\\<And>a b. b \\<preceq> sup a b\"\n    and   sup_le_intro : \"\\<And>a b c. a \\<preceq> c \\<Longrightarrow> b \\<preceq> c \\<Longrightarrow> sup a b \\<preceq> c\"\nbegin\n\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma inf_comm: \"a \\<sqinter> b = b \\<sqinter> a\"\n  ",
+    "theory_name": "lattice_like",
+    "request_id": "3f39e744afa744fbbebb4cca2e0e3371",
+    "input_sha256": "d6288e8ab0ec7ec214efd90f16876efd2f574237fbf29651dbd2d183580d5f88"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "name": "context_hundred-theorems_098_bertrand_s_postulate_fact_psi_bound_2_3",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 47.453,
+  "details": "details/259-context_hundred-theorems_098_bertrand_s_postulate_fact_psi_bound_2_3.json",
+  "failure_category": "context_error",
+  "expected_failure": null,
+  "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+  "payload": {
+    "ok": false,
+    "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+    "failure_category": "context_error",
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-_aohqawb",
+    "pisa_result": {
+      "success": false,
+      "error": "RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+      "failure_category": "context_error",
+      "step_results": [],
+      "request_id": "ad1d3bcbaa5b4443aa8d86b87294a3df",
+      "input_sha256": "8795c8b694d7b5bc447304ab22318c01af32e93447c195d4345841a0b4782b04",
+      "duration_seconds": 47.32616381498519
+    },
+    "import_resolution": {
+      "original_imports": [
+        "Complex_Main",
+        "HOL-Number_Theory.Number_Theory",
+        "HOL-Library.Discrete_Functions",
+        "HOL-Decision_Procs.Approximation_Bounds",
+        "HOL-Library.Code_Target_Numeral",
+        "Pratt_Certificate.Pratt_Certificate"
+      ],
+      "resolved_imports": [
+        "Complex_Main",
+        "HOL-Number_Theory.Number_Theory",
+        "HOL-Library.Discrete_Functions",
+        "HOL-Decision_Procs.Approximation_Bounds",
+        "HOL-Library.Code_Target_Numeral",
+        "Pratt_Certificate.Pratt_Certificate"
+      ],
+      "session_dependencies": [
+        "HOL-Number_Theory",
+        "HOL-Library",
+        "HOL-Decision_Procs",
+        "Pratt_Certificate"
+      ]
+    }
+  }
+}

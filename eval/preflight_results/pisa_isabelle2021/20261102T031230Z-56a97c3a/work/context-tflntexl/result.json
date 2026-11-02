@@ -1,0 +1,814 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 61,
+    "last_step": 61,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory polynomial\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.022753477096557617
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.016734600067138672
+      },
+      {
+        "index": 2,
+        "step": "datatype mynat = Nat_O | Nat_S mynat",
+        "output": "",
+        "step_time": 0.34024643898010254
+      },
+      {
+        "index": 3,
+        "step": "fun mynat_add :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> mynat\" where\n  \"mynat_add Nat_O m = m\"\n| \"mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)\"",
+        "output": "",
+        "step_time": 0.06571125984191895
+      },
+      {
+        "index": 4,
+        "step": "lemma mynat_add_O_left: \"mynat_add Nat_O m = m\"",
+        "output": "",
+        "step_time": 0.018743515014648438
+      },
+      {
+        "index": 5,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01784372329711914
+      },
+      {
+        "index": 6,
+        "step": "lemma mynat_add_S_left: \"mynat_add (Nat_S n) m = Nat_S (mynat_add n m)\"",
+        "output": "",
+        "step_time": 0.02173590660095215
+      },
+      {
+        "index": 7,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01838397979736328
+      },
+      {
+        "index": 8,
+        "step": "inductive mynat_le :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> bool\" where\n  le_n : \"mynat_le n n\"\n| le_S : \"mynat_le n m \\<Longrightarrow> mynat_le n (Nat_S m)\"",
+        "output": "",
+        "step_time": 0.036330461502075195
+      },
+      {
+        "index": 9,
+        "step": "lemma mynat_zero_le: \"mynat_le Nat_O n\"",
+        "output": "",
+        "step_time": 0.020360708236694336
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016808271408081055
+      },
+      {
+        "index": 11,
+        "step": "lemma mynat_add_zero_r: \"mynat_add n Nat_O = n\"",
+        "output": "",
+        "step_time": 0.01772594451904297
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0157015323638916
+      },
+      {
+        "index": 13,
+        "step": "lemma mynat_succ_le_succ: \"mynat_le n m \\<Longrightarrow> mynat_le (Nat_S n) (Nat_S m)\"",
+        "output": "",
+        "step_time": 0.018369197845458984
+      },
+      {
+        "index": 14,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01726508140563965
+      },
+      {
+        "index": 15,
+        "step": "lemma mynat_add_S_r: \"mynat_add m (Nat_S n) = Nat_S (mynat_add m n)\"",
+        "output": "",
+        "step_time": 0.020295381546020508
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.03936147689819336
+      },
+      {
+        "index": 17,
+        "step": "lemma mynat_add_comm: \"mynat_add n m = mynat_add m n\"",
+        "output": "",
+        "step_time": 0.015775203704833984
+      },
+      {
+        "index": 18,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012798070907592773
+      },
+      {
+        "index": 19,
+        "step": "datatype 'a mylist = NilL | ConsL 'a \"'a mylist\"",
+        "output": "",
+        "step_time": 0.5186617374420166
+      },
+      {
+        "index": 20,
+        "step": "inductive InL :: \"'a \\<Rightarrow> 'a mylist \\<Rightarrow> bool\" where\n  In_head : \"InL x (ConsL x xs)\"\n| In_tail : \"InL x xs \\<Longrightarrow> InL x (ConsL y xs)\"",
+        "output": "",
+        "step_time": 0.03309488296508789
+      },
+      {
+        "index": 21,
+        "step": "inductive NoDupL :: \"'a mylist \\<Rightarrow> bool\" where\n  ND_nil  : \"NoDupL NilL\"\n| ND_cons : \"\\<not> InL x xs \\<Longrightarrow> NoDupL xs \\<Longrightarrow> NoDupL (ConsL x xs)\"",
+        "output": "",
+        "step_time": 0.026285409927368164
+      },
+      {
+        "index": 22,
+        "step": "fun lengthL :: \"'a mylist \\<Rightarrow> mynat\" where\n  \"lengthL NilL = Nat_O\"\n| \"lengthL (ConsL _ rest) = Nat_S (lengthL rest)\"",
+        "output": "",
+        "step_time": 0.07021713256835938
+      },
+      {
+        "index": 23,
+        "step": "locale polynomial_setup =\n  fixes zero_r :: \"'r\"\n    and one_r  :: \"'r\"\n    and opp_r  :: \"'r \\<Rightarrow> 'r\"\n    and add_r  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \\<open>+R\\<close> 65)\n    and mul_r  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \\<open>*R\\<close> 70)\n    and zero_p :: \"'p\"\n    and one_p  :: \"'p\"\n    and opp_p  :: \"'p \\<Rightarrow> 'p\"\n    and add_p  :: \"'p \\<Rightarrow> 'p \\<Rightarrow> 'p\"  (infixl \\<open>+P\\<close> 65)\n    and mul_p  :: \"'p \\<Rightarrow> 'p \\<Rightarrow> 'p\"  (infixl \\<open>*P\\<close> 70)\n    and degree   :: \"'p \\<Rightarrow> mynat\"\n    and monomial :: \"mynat \\<Rightarrow> 'r \\<Rightarrow> 'p\"\n    and eval     :: \"'p \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  assumes\n    r_one_neq_zero  : \"one_r \\<noteq> zero_r\"\n  and r_add_comm    : \"\\<And>x y.   x +R y = y +R x\"\n  and r_add_assoc   : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n  and r_add_zero    : \"\\<And>x.     x +R zero_r = x\"\n  and r_add_opp     : \"\\<And>x.     x +R opp_r x = zero_r\"\n  and r_mul_comm    : \"\\<And>x y.   x *R y = y *R x\"\n  and r_mul_assoc   : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n  and r_mul_one     : \"\\<And>x.     x *R one_r = x\"\n  and r_dist_l      : \"\\<And>x y z. x *R (y +R z) = (x *R y) +R (x *R z)\"\n  and r_mul_zero    : \"\\<And>x.     x *R zero_r = zero_r\"\n  and r_no_zero_div : \"\\<And>x y.   x *R y = zero_r \\<Longrightarrow> x = zero_r \\<or> y = zero_r\"\n  and p_one_neq_zero : \"one_p \\<noteq> zero_p\"\n  and p_add_comm    : \"\\<And>x y.   x +P y = y +P x\"\n  and p_add_assoc   : \"\\<And>x y z. (x +P y) +P z = x +P (y +P z)\"\n  and p_add_zero    : \"\\<And>x.     x +P zero_p = x\"\n  and p_add_opp     : \"\\<And>x.     x +P opp_p x = zero_p\"\n  and p_mul_comm    : \"\\<And>x y.   x *P y = y *P x\"\n  and p_mul_assoc   : \"\\<And>x y z. (x *P y) *P z = x *P (y *P z)\"\n  and p_mul_one     : \"\\<And>x.     x *P one_p = x\"\n  and p_dist_l      : \"\\<And>x y z. x *P (y +P z) = (x *P y) +P (x *P z)\"\n  and p_mul_zero    : \"\\<And>x.     x *P zero_p = zero_p\"\n  and p_no_zero_div : \"\\<And>x y.   x *P y = zero_p \\<Longrightarrow> x = zero_p \\<or> y = zero_p\"\n  and deg_zero      : \"degree zero_p = Nat_O\"\n  and eval_add      : \"\\<And>p q x. eval (p +P q) x = eval p x +R eval q x\"\n  and eval_mul      : \"\\<And>p q x. eval (p *P q) x = eval p x *R eval q x\"\n  and eval_C_ax     : \"\\<And>c x.   eval (monomial Nat_O c) x = c\"\n  and eval_X_ax     : \"\\<And>x.     eval (monomial (Nat_S Nat_O) one_r) x = x\"\n  and deg_C_ax      : \"\\<And>c.     c \\<noteq> zero_r \\<Longrightarrow> degree (monomial Nat_O c) = Nat_O\"\n  and deg_constant  : \"\\<And>p.     (degree p = Nat_O) \\<longleftrightarrow> (\\<exists>c. p = monomial Nat_O c)\"\n  and deg_X_minus_ax : \"\\<And>a.    degree (monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)) = Nat_S Nat_O\"\n  and deg_mul       : \"\\<And>p q.   p \\<noteq> zero_p \\<Longrightarrow> q \\<noteq> zero_p \\<Longrightarrow>\n                                 degree (p *P q) = mynat_add (degree p) (degree q)\"\n  and C_zero_ax     : \"monomial Nat_O zero_r = zero_p\"\n  and C_one_ax      : \"monomial Nat_O one_r = one_p\"\n  and euclid_X_minus_ax :\n       \"\\<And>p a. \\<exists>q r.\n          p = q *P (monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)) +P r\n          \\<and> degree r = Nat_O\"\nbegin",
+        "output": "",
+        "step_time": 0.0572514533996582
+      },
+      {
+        "index": 24,
+        "step": "definition X :: \"'p\" where\n  \"X = monomial (Nat_S Nat_O) one_r\"",
+        "output": "",
+        "step_time": 0.025101423263549805
+      },
+      {
+        "index": 25,
+        "step": "definition C :: \"'r \\<Rightarrow> 'p\" where\n  \"C c = monomial Nat_O c\"",
+        "output": "",
+        "step_time": 0.024672746658325195
+      },
+      {
+        "index": 26,
+        "step": "definition X_minus :: \"'r \\<Rightarrow> 'p\" where\n  \"X_minus a = X +P C (opp_r a)\"",
+        "output": "",
+        "step_time": 0.026913881301879883
+      },
+      {
+        "index": 27,
+        "step": "fun poly_of_roots :: \"'r mylist \\<Rightarrow> 'p\" where\n  \"poly_of_roots NilL = one_p\"\n| \"poly_of_roots (ConsL a xs) = X_minus a *P poly_of_roots xs\"",
+        "output": "",
+        "step_time": 0.10186171531677246
+      },
+      {
+        "index": 28,
+        "step": "definition is_root :: \"'r \\<Rightarrow> 'p \\<Rightarrow> bool\" where\n  \"is_root a p \\<longleftrightarrow> eval p a = zero_r\"",
+        "output": "",
+        "step_time": 0.02064657211303711
+      },
+      {
+        "index": 29,
+        "step": "lemma X_minus_unfold:\n  \"X_minus a = monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)\"",
+        "output": "",
+        "step_time": 0.017859220504760742
+      },
+      {
+        "index": 30,
+        "step": "unfolding X_minus_def X_def C_def",
+        "output": "",
+        "step_time": 0.012939929962158203
+      },
+      {
+        "index": 31,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013674020767211914
+      },
+      {
+        "index": 32,
+        "step": "lemma eval_C: \"eval (C c) x = c\"",
+        "output": "",
+        "step_time": 0.013283967971801758
+      },
+      {
+        "index": 33,
+        "step": "unfolding C_def",
+        "output": "",
+        "step_time": 0.013068199157714844
+      },
+      {
+        "index": 34,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013743400573730469
+      },
+      {
+        "index": 35,
+        "step": "lemma eval_X: \"eval X x = x\"",
+        "output": "",
+        "step_time": 0.015480279922485352
+      },
+      {
+        "index": 36,
+        "step": "unfolding X_def",
+        "output": "",
+        "step_time": 0.01170802116394043
+      },
+      {
+        "index": 37,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013875246047973633
+      },
+      {
+        "index": 38,
+        "step": "lemma deg_X_minus: \"degree (X_minus a) = Nat_S Nat_O\"",
+        "output": "",
+        "step_time": 0.013721704483032227
+      },
+      {
+        "index": 39,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01364898681640625
+      },
+      {
+        "index": 40,
+        "step": "lemma C_zero: \"C zero_r = zero_p\"",
+        "output": "",
+        "step_time": 0.012343883514404297
+      },
+      {
+        "index": 41,
+        "step": "unfolding C_def",
+        "output": "",
+        "step_time": 0.011007070541381836
+      },
+      {
+        "index": 42,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013749361038208008
+      },
+      {
+        "index": 43,
+        "step": "lemma C_one: \"C one_r = one_p\"",
+        "output": "",
+        "step_time": 0.013274908065795898
+      },
+      {
+        "index": 44,
+        "step": "unfolding C_def",
+        "output": "",
+        "step_time": 0.010909318923950195
+      },
+      {
+        "index": 45,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.009903907775878906
+      },
+      {
+        "index": 46,
+        "step": "lemma deg_C: \"c \\<noteq> zero_r \\<Longrightarrow> degree (C c) = Nat_O\"",
+        "output": "",
+        "step_time": 0.013266801834106445
+      },
+      {
+        "index": 47,
+        "step": "unfolding C_def",
+        "output": "",
+        "step_time": 0.013071775436401367
+      },
+      {
+        "index": 48,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016409635543823242
+      },
+      {
+        "index": 49,
+        "step": "lemma euclid_X_minus: \"\\<exists>q r. p = q *P X_minus a +P r \\<and> degree r = Nat_O\"",
+        "output": "",
+        "step_time": 0.01460719108581543
+      },
+      {
+        "index": 50,
+        "step": "using euclid_X_minus_ax[of p a]",
+        "output": "",
+        "step_time": 0.012215852737426758
+      },
+      {
+        "index": 51,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011930704116821289
+      },
+      {
+        "index": 52,
+        "step": "lemma r_opp_add: \"opp_r x +R x = zero_r\"",
+        "output": "",
+        "step_time": 0.011450529098510742
+      },
+      {
+        "index": 53,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013341188430786133
+      },
+      {
+        "index": 54,
+        "step": "lemma r_add_zero_l: \"zero_r +R x = x\"",
+        "output": "",
+        "step_time": 0.010739803314208984
+      },
+      {
+        "index": 55,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.00896143913269043
+      },
+      {
+        "index": 56,
+        "step": "lemma sub_eq_zero_l: \"x +R opp_r y = zero_r \\<Longrightarrow> x = y\"",
+        "output": "",
+        "step_time": 0.01615309715270996
+      },
+      {
+        "index": 57,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012125253677368164
+      },
+      {
+        "index": 58,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.012821674346923828
+      },
+      {
+        "index": 59,
+        "step": "lemma eval_X_minus: \"eval (X_minus a) b = b +R opp_r a\"",
+        "output": "",
+        "step_time": 0.014349222183227539
+      },
+      {
+        "index": 60,
+        "step": "unfolding X_minus_def",
+        "output": "",
+        "step_time": 0.012165069580078125
+      }
+    ],
+    "final_state": "default_60",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory polynomial\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02274660801049322
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01672977802809328
+    },
+    {
+      "mode": "search",
+      "command": "datatype mynat = Nat_O | Nat_S mynat",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.3402416310273111
+    },
+    {
+      "mode": "search",
+      "command": "fun mynat_add :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> mynat\" where\n  \"mynat_add Nat_O m = m\"\n| \"mynat_add (Nat_S n') m = Nat_S (mynat_add n' m)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.06570676900446415
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_add_O_left: \"mynat_add Nat_O m = m\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add Nat_O m = m",
+      "duration_seconds": 0.01874012197367847
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017839686013758183
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_add_S_left: \"mynat_add (Nat_S n) m = Nat_S (mynat_add n m)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add (Nat_S n) m = Nat_S (mynat_add n m)",
+      "duration_seconds": 0.02173201704863459
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01838067697826773
+    },
+    {
+      "mode": "search",
+      "command": "inductive mynat_le :: \"mynat \\<Rightarrow> mynat \\<Rightarrow> bool\" where\n  le_n : \"mynat_le n n\"\n| le_S : \"mynat_le n m \\<Longrightarrow> mynat_le n (Nat_S m)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03632634901441634
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_zero_le: \"mynat_le Nat_O n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_le Nat_O n",
+      "duration_seconds": 0.020358003908768296
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016806264058686793
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_add_zero_r: \"mynat_add n Nat_O = n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add n Nat_O = n",
+      "duration_seconds": 0.017721088021062315
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015696479938924313
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_succ_le_succ: \"mynat_le n m \\<Longrightarrow> mynat_le (Nat_S n) (Nat_S m)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_le n m \\<Longrightarrow> mynat_le (Nat_S n) (Nat_S m)",
+      "duration_seconds": 0.018365456024184823
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01725997100584209
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_add_S_r: \"mynat_add m (Nat_S n) = Nat_S (mynat_add m n)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add m (Nat_S n) = Nat_S (mynat_add m n)",
+      "duration_seconds": 0.020291491993702948
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03935574600473046
+    },
+    {
+      "mode": "search",
+      "command": "lemma mynat_add_comm: \"mynat_add n m = mynat_add m n\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. mynat_add n m = mynat_add m n",
+      "duration_seconds": 0.015770650003105402
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01279370707925409
+    },
+    {
+      "mode": "search",
+      "command": "datatype 'a mylist = NilL | ConsL 'a \"'a mylist\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.5186573010869324
+    },
+    {
+      "mode": "search",
+      "command": "inductive InL :: \"'a \\<Rightarrow> 'a mylist \\<Rightarrow> bool\" where\n  In_head : \"InL x (ConsL x xs)\"\n| In_tail : \"InL x xs \\<Longrightarrow> InL x (ConsL y xs)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.033089693053625524
+    },
+    {
+      "mode": "search",
+      "command": "inductive NoDupL :: \"'a mylist \\<Rightarrow> bool\" where\n  ND_nil  : \"NoDupL NilL\"\n| ND_cons : \"\\<not> InL x xs \\<Longrightarrow> NoDupL xs \\<Longrightarrow> NoDupL (ConsL x xs)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02627871895674616
+    },
+    {
+      "mode": "search",
+      "command": "fun lengthL :: \"'a mylist \\<Rightarrow> mynat\" where\n  \"lengthL NilL = Nat_O\"\n| \"lengthL (ConsL _ rest) = Nat_S (lengthL rest)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.07020878908224404
+    },
+    {
+      "mode": "search",
+      "command": "locale polynomial_setup =\n  fixes zero_r :: \"'r\"\n    and one_r  :: \"'r\"\n    and opp_r  :: \"'r \\<Rightarrow> 'r\"\n    and add_r  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \\<open>+R\\<close> 65)\n    and mul_r  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \\<open>*R\\<close> 70)\n    and zero_p :: \"'p\"\n    and one_p  :: \"'p\"\n    and opp_p  :: \"'p \\<Rightarrow> 'p\"\n    and add_p  :: \"'p \\<Rightarrow> 'p \\<Rightarrow> 'p\"  (infixl \\<open>+P\\<close> 65)\n    and mul_p  :: \"'p \\<Rightarrow> 'p \\<Rightarrow> 'p\"  (infixl \\<open>*P\\<close> 70)\n    and degree   :: \"'p \\<Rightarrow> mynat\"\n    and monomial :: \"mynat \\<Rightarrow> 'r \\<Rightarrow> 'p\"\n    and eval     :: \"'p \\<Rightarrow> 'r \\<Rightarrow> 'r\"\n  assumes\n    r_one_neq_zero  : \"one_r \\<noteq> zero_r\"\n  and r_add_comm    : \"\\<And>x y.   x +R y = y +R x\"\n  and r_add_assoc   : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n  and r_add_zero    : \"\\<And>x.     x +R zero_r = x\"\n  and r_add_opp     : \"\\<And>x.     x +R opp_r x = zero_r\"\n  and r_mul_comm    : \"\\<And>x y.   x *R y = y *R x\"\n  and r_mul_assoc   : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n  and r_mul_one     : \"\\<And>x.     x *R one_r = x\"\n  and r_dist_l      : \"\\<And>x y z. x *R (y +R z) = (x *R y) +R (x *R z)\"\n  and r_mul_zero    : \"\\<And>x.     x *R zero_r = zero_r\"\n  and r_no_zero_div : \"\\<And>x y.   x *R y = zero_r \\<Longrightarrow> x = zero_r \\<or> y = zero_r\"\n  and p_one_neq_zero : \"one_p \\<noteq> zero_p\"\n  and p_add_comm    : \"\\<And>x y.   x +P y = y +P x\"\n  and p_add_assoc   : \"\\<And>x y z. (x +P y) +P z = x +P (y +P z)\"\n  and p_add_zero    : \"\\<And>x.     x +P zero_p = x\"\n  and p_add_opp     : \"\\<And>x.     x +P opp_p x = zero_p\"\n  and p_mul_comm    : \"\\<And>x y.   x *P y = y *P x\"\n  and p_mul_assoc   : \"\\<And>x y z. (x *P y) *P z = x *P (y *P z)\"\n  and p_mul_one     : \"\\<And>x.     x *P one_p = x\"\n  and p_dist_l      : \"\\<And>x y z. x *P (y +P z) = (x *P y) +P (x *P z)\"\n  and p_mul_zero    : \"\\<And>x.     x *P zero_p = zero_p\"\n  and p_no_zero_div : \"\\<And>x y.   x *P y = zero_p \\<Longrightarrow> x = zero_p \\<or> y = zero_p\"\n  and deg_zero      : \"degree zero_p = Nat_O\"\n  and eval_add      : \"\\<And>p q x. eval (p +P q) x = eval p x +R eval q x\"\n  and eval_mul      : \"\\<And>p q x. eval (p *P q) x = eval p x *R eval q x\"\n  and eval_C_ax     : \"\\<And>c x.   eval (monomial Nat_O c) x = c\"\n  and eval_X_ax     : \"\\<And>x.     eval (monomial (Nat_S Nat_O) one_r) x = x\"\n  and deg_C_ax      : \"\\<And>c.     c \\<noteq> zero_r \\<Longrightarrow> degree (monomial Nat_O c) = Nat_O\"\n  and deg_constant  : \"\\<And>p.     (degree p = Nat_O) \\<longleftrightarrow> (\\<exists>c. p = monomial Nat_O c)\"\n  and deg_X_minus_ax : \"\\<And>a.    degree (monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)) = Nat_S Nat_O\"\n  and deg_mul       : \"\\<And>p q.   p \\<noteq> zero_p \\<Longrightarrow> q \\<noteq> zero_p \\<Longrightarrow>\n                                 degree (p *P q) = mynat_add (degree p) (degree q)\"\n  and C_zero_ax     : \"monomial Nat_O zero_r = zero_p\"\n  and C_one_ax      : \"monomial Nat_O one_r = one_p\"\n  and euclid_X_minus_ax :\n       \"\\<And>p a. \\<exists>q r.\n          p = q *P (monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)) +P r\n          \\<and> degree r = Nat_O\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.05723638704512268
+    },
+    {
+      "mode": "search",
+      "command": "definition X :: \"'p\" where\n  \"X = monomial (Nat_S Nat_O) one_r\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025091135990805924
+    },
+    {
+      "mode": "search",
+      "command": "definition C :: \"'r \\<Rightarrow> 'p\" where\n  \"C c = monomial Nat_O c\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024663034011609852
+    },
+    {
+      "mode": "search",
+      "command": "definition X_minus :: \"'r \\<Rightarrow> 'p\" where\n  \"X_minus a = X +P C (opp_r a)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0269044489832595
+    },
+    {
+      "mode": "search",
+      "command": "fun poly_of_roots :: \"'r mylist \\<Rightarrow> 'p\" where\n  \"poly_of_roots NilL = one_p\"\n| \"poly_of_roots (ConsL a xs) = X_minus a *P poly_of_roots xs\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.10185205400921404
+    },
+    {
+      "mode": "search",
+      "command": "definition is_root :: \"'r \\<Rightarrow> 'p \\<Rightarrow> bool\" where\n  \"is_root a p \\<longleftrightarrow> eval p a = zero_r\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020636489032767713
+    },
+    {
+      "mode": "search",
+      "command": "lemma X_minus_unfold:\n  \"X_minus a = monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. X_minus a = monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)",
+      "duration_seconds": 0.017852524993941188
+    },
+    {
+      "mode": "search",
+      "command": "unfolding X_minus_def X_def C_def",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a) =\n    monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)",
+      "duration_seconds": 0.0129345019813627
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013669610023498535
+    },
+    {
+      "mode": "search",
+      "command": "lemma eval_C: \"eval (C c) x = c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. eval (C c) x = c",
+      "duration_seconds": 0.013279119040817022
+    },
+    {
+      "mode": "search",
+      "command": "unfolding C_def",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. eval (monomial Nat_O c) x = c",
+      "duration_seconds": 0.013064514030702412
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01374061603564769
+    },
+    {
+      "mode": "search",
+      "command": "lemma eval_X: \"eval X x = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. eval X x = x",
+      "duration_seconds": 0.015475397929549217
+    },
+    {
+      "mode": "search",
+      "command": "unfolding X_def",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. eval (monomial (Nat_S Nat_O) one_r) x = x",
+      "duration_seconds": 0.011704500997439027
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013871867908164859
+    },
+    {
+      "mode": "search",
+      "command": "lemma deg_X_minus: \"degree (X_minus a) = Nat_S Nat_O\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. degree (X_minus a) = Nat_S Nat_O",
+      "duration_seconds": 0.013718130066990852
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013642151956446469
+    },
+    {
+      "mode": "search",
+      "command": "lemma C_zero: \"C zero_r = zero_p\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. C zero_r = zero_p",
+      "duration_seconds": 0.012336274958215654
+    },
+    {
+      "mode": "search",
+      "command": "unfolding C_def",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. monomial Nat_O zero_r = zero_p",
+      "duration_seconds": 0.011002003913745284
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013746617012657225
+    },
+    {
+      "mode": "search",
+      "command": "lemma C_one: \"C one_r = one_p\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. C one_r = one_p",
+      "duration_seconds": 0.013271711999550462
+    },
+    {
+      "mode": "search",
+      "command": "unfolding C_def",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. monomial Nat_O one_r = one_p",
+      "duration_seconds": 0.010906529030762613
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.009900424047373235
+    },
+    {
+      "mode": "search",
+      "command": "lemma deg_C: \"c \\<noteq> zero_r \\<Longrightarrow> degree (C c) = Nat_O\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. c \\<noteq> zero_r \\<Longrightarrow> degree (C c) = Nat_O",
+      "duration_seconds": 0.013258338905870914
+    },
+    {
+      "mode": "search",
+      "command": "unfolding C_def",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. c \\<noteq> zero_r \\<Longrightarrow> degree (monomial Nat_O c) = Nat_O",
+      "duration_seconds": 0.013062559068202972
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016400741995312274
+    },
+    {
+      "mode": "search",
+      "command": "lemma euclid_X_minus: \"\\<exists>q r. p = q *P X_minus a +P r \\<and> degree r = Nat_O\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<exists>q r. p = q *P X_minus a +P r \\<and> degree r = Nat_O",
+      "duration_seconds": 0.014597653993405402
+    },
+    {
+      "mode": "search",
+      "command": "using euclid_X_minus_ax[of p a]",
+      "success": true,
+      "observation": "proof (prove)\nusing this:\n  \\<exists>q r.\n     p =\n     q *P (monomial (Nat_S Nat_O) one_r +P monomial Nat_O (opp_r a)) +P\n     r \\<and>\n     degree r = Nat_O\n\ngoal (1 subgoal):\n 1. \\<exists>q r. p = q *P X_minus a +P r \\<and> degree r = Nat_O",
+      "duration_seconds": 0.012210480985231698
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011922399047762156
+    },
+    {
+      "mode": "search",
+      "command": "lemma r_opp_add: \"opp_r x +R x = zero_r\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. opp_r x +R x = zero_r",
+      "duration_seconds": 0.011442904942668974
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013332723989151418
+    },
+    {
+      "mode": "search",
+      "command": "lemma r_add_zero_l: \"zero_r +R x = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. zero_r +R x = x",
+      "duration_seconds": 0.010733410017564893
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.00895777007099241
+    },
+    {
+      "mode": "search",
+      "command": "lemma sub_eq_zero_l: \"x +R opp_r y = zero_r \\<Longrightarrow> x = y\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x +R opp_r y = zero_r \\<Longrightarrow> x = y",
+      "duration_seconds": 0.016148546943441033
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012120786006562412
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012817426002584398
+    },
+    {
+      "mode": "search",
+      "command": "lemma eval_X_minus: \"eval (X_minus a) b = b +R opp_r a\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. eval (X_minus a) b = b +R opp_r a",
+      "duration_seconds": 0.014340661000460386
+    },
+    {
+      "mode": "search",
+      "command": "unfolding X_minus_def",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. eval (X +P C (opp_r a)) b = b +R opp_r a",
+      "duration_seconds": 0.01215797197073698
+    }
+  ],
+  "failure_category": null,
+  "request_id": "c693af76d34b4abe81047bc60f0066c0",
+  "input_sha256": "f884204861e146d06629190acc817d84f29ca256072dc3698a9be460212b3a6d",
+  "duration_seconds": 9.500156156020239
+}

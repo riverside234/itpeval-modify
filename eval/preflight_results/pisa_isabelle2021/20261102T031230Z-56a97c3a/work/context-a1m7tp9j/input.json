@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory graph_paths\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\ninductive Path :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  for E :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\nwhere\n  Pnil:  \"Path E v v\"\n| Pstep: \"Path E u v \\<Longrightarrow> E v w \\<Longrightarrow> Path E u w\"\n\ndefinition undirected :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"undirected E \\<equiv> \\<forall>x y. E x y \\<longrightarrow> E y x\"\n\ndefinition Erev :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  where \"Erev E x y \\<equiv> E y x\"\n\nlemma path_refl: \"Path E v v\"\n  sorry\n\nlemma path_trans:\n  assumes \"Path E u v\" \"Path E v w\" shows \"Path E u w\"\n  sorry\n\nlemma trans: \"Path E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E u w\"\n  sorry\n\n\nlemma edge_path: \"E u v \\<Longrightarrow> Path E u v\"\n  sorry\n\nlemma concat_edge_right: \"Path E u v \\<Longrightarrow> E v w \\<Longrightarrow> Path E u w\"\n  sorry\n\nlemma concat: \"Path E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E u w\"\n  sorry\n\nlemma concat_edge_left: \"E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E u w\"\n  sorry\n\nlemma concat3:\n  \"Path E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E w t \\<Longrightarrow> Path E u t\"\n  sorry\n\n\nlemma reverse_cons:\n  assumes hE: \"undirected E\" and e: \"E m v\" and ih: \"Path E m u\"\n  shows \"Path E v u\"\n  sorry\n\nlemma reverse_path:\n  assumes hE: \"undirected E\" and p: \"Path E u v\"\n  shows \"Path E v u\"\n  sorry\n\n\nlemma reverse_cons_Erev:\n  assumes e: \"E m v\" and ih: \"Path (Erev E) m u\"\n  shows \"Path (Erev E) v u\"\n  sorry\n\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma reverse_in_Erev:\n  assumes p: \"Path E u v\"\n  shows \"Path (Erev E) v u\"\n  ",
+    "theory_name": "graph_paths",
+    "request_id": "636ac6cf403441f8872338c689fa756e",
+    "input_sha256": "1133b16cbf3af221c7ffec47d058776564abd9142dcde5840ffe5164f8d913cc"
+  }
+}

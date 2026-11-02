@@ -1,0 +1,138 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 9,
+    "last_step": 9,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory linear_map\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.025781631469726562
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.02003169059753418
+      },
+      {
+        "index": 2,
+        "step": "locale linear_map_setup =\n  fixes zeroV :: \"'v\"\n    and addV  :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'v\"         (infixl \"+V\" 65)\n    and smul  :: \"'r \\<Rightarrow> 'v \\<Rightarrow> 'v\"           (infixr \"\\<cdot>V\" 70)\n    and zeroW :: \"'w\"\n    and addW  :: \"'w \\<Rightarrow> 'w \\<Rightarrow> 'w\"         (infixl \"+W\" 65)\n    and smulW :: \"'r \\<Rightarrow> 'w \\<Rightarrow> 'w\"           (infixr \"\\<cdot>W\" 70)\n    and toFun :: \"'v \\<Rightarrow> 'w\"\n\n  assumes addV_comm  : \"\\<And>u v. u +V v = v +V u\"\n    and   addV_assoc : \"\\<And>u v w. (u +V v) +V w = u +V (v +V w)\"\n    and   addV_zero  : \"\\<And>u. u +V zeroV = u\"\n    and   smul_zeroV : \"\\<And>a. a \\<cdot>V zeroV = zeroV\"\n\n    and   addW_comm  : \"\\<And>u v. u +W v = v +W u\"\n    and   addW_assoc : \"\\<And>u v w. (u +W v) +W w = u +W (v +W w)\"\n    and   addW_zero  : \"\\<And>u. u +W zeroW = u\"\n    and   smulW_zero : \"\\<And>a. a \\<cdot>W zeroW = zeroW\"\n\n    and   map_add    : \"\\<And>u v. toFun (u +V v) = toFun u +W toFun v\"\n    and   map_smul   : \"\\<And>a u. toFun (a \\<cdot>V u) = a \\<cdot>W toFun u\"\nbegin",
+        "output": "",
+        "step_time": 0.04958987236022949
+      },
+      {
+        "index": 3,
+        "step": "definition ker :: \"'v \\<Rightarrow> bool\"\n  where \"ker x \\<equiv> toFun x = zeroW\"",
+        "output": "",
+        "step_time": 0.02557086944580078
+      },
+      {
+        "index": 4,
+        "step": "definition im :: \"'w \\<Rightarrow> bool\"\n  where \"im y \\<equiv> \\<exists>x. toFun x = y\"",
+        "output": "",
+        "step_time": 0.02836751937866211
+      },
+      {
+        "index": 5,
+        "step": "lemma ker_add:\n  assumes \"ker x\" \"ker y\" shows \"ker (x +V y)\"",
+        "output": "",
+        "step_time": 0.028612613677978516
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01902294158935547
+      },
+      {
+        "index": 7,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.020662307739257812
+      },
+      {
+        "index": 8,
+        "step": "lemma ker_smul:\n  assumes \"ker x\" shows \"ker (a \\<cdot>V x)\"",
+        "output": "",
+        "step_time": 0.017846107482910156
+      }
+    ],
+    "final_state": "default_8",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory linear_map\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025772808003239334
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020025353995151818
+    },
+    {
+      "mode": "search",
+      "command": "locale linear_map_setup =\n  fixes zeroV :: \"'v\"\n    and addV  :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'v\"         (infixl \"+V\" 65)\n    and smul  :: \"'r \\<Rightarrow> 'v \\<Rightarrow> 'v\"           (infixr \"\\<cdot>V\" 70)\n    and zeroW :: \"'w\"\n    and addW  :: \"'w \\<Rightarrow> 'w \\<Rightarrow> 'w\"         (infixl \"+W\" 65)\n    and smulW :: \"'r \\<Rightarrow> 'w \\<Rightarrow> 'w\"           (infixr \"\\<cdot>W\" 70)\n    and toFun :: \"'v \\<Rightarrow> 'w\"\n\n  assumes addV_comm  : \"\\<And>u v. u +V v = v +V u\"\n    and   addV_assoc : \"\\<And>u v w. (u +V v) +V w = u +V (v +V w)\"\n    and   addV_zero  : \"\\<And>u. u +V zeroV = u\"\n    and   smul_zeroV : \"\\<And>a. a \\<cdot>V zeroV = zeroV\"\n\n    and   addW_comm  : \"\\<And>u v. u +W v = v +W u\"\n    and   addW_assoc : \"\\<And>u v w. (u +W v) +W w = u +W (v +W w)\"\n    and   addW_zero  : \"\\<And>u. u +W zeroW = u\"\n    and   smulW_zero : \"\\<And>a. a \\<cdot>W zeroW = zeroW\"\n\n    and   map_add    : \"\\<And>u v. toFun (u +V v) = toFun u +W toFun v\"\n    and   map_smul   : \"\\<And>a u. toFun (a \\<cdot>V u) = a \\<cdot>W toFun u\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.04958193690981716
+    },
+    {
+      "mode": "search",
+      "command": "definition ker :: \"'v \\<Rightarrow> bool\"\n  where \"ker x \\<equiv> toFun x = zeroW\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02556380699388683
+    },
+    {
+      "mode": "search",
+      "command": "definition im :: \"'w \\<Rightarrow> bool\"\n  where \"im y \\<equiv> \\<exists>x. toFun x = y\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02836020092945546
+    },
+    {
+      "mode": "search",
+      "command": "lemma ker_add:\n  assumes \"ker x\" \"ker y\" shows \"ker (x +V y)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. ker (x +V y)",
+      "duration_seconds": 0.02860618697013706
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019017287995666265
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020656540989875793
+    },
+    {
+      "mode": "search",
+      "command": "lemma ker_smul:\n  assumes \"ker x\" shows \"ker (a \\<cdot>V x)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. ker (a \\<cdot>V x)",
+      "duration_seconds": 0.01783841394353658
+    }
+  ],
+  "failure_category": null,
+  "request_id": "6333340952824dae81eb737be8c2aa2d",
+  "input_sha256": "39b292513ba8cdc0b622d63af53beeadf06db413c7bf0da0136fbc8d9912a06b",
+  "duration_seconds": 9.434481435921043
+}

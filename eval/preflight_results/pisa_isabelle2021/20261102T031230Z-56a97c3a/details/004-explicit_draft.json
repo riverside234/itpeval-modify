@@ -1,0 +1,273 @@
+{
+  "name": "explicit_draft",
+  "domain": "backend",
+  "status": "pass",
+  "duration_seconds": 10.614,
+  "details": "details/004-explicit_draft.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "payload": {
+    "ok": true,
+    "expected_failure": null,
+    "expectation_errors": [],
+    "result": {
+      "source": "babel-formal",
+      "theorem_id": 0,
+      "topic": "preflight",
+      "target_key": "v2_control",
+      "isabelle_target_name": "v2_control",
+      "isabelle_statement": "lemma v2_control: \"True\"",
+      "isabelle_proof_prefix": "",
+      "isabelle_theory_template": "theory V2Control imports Main begin\nlemma v2_control: \"True\"\n  sorry\nend\n",
+      "isabelle_context_before_target": "theory V2Control imports Main begin\n",
+      "isabelle_target_proof_span": [
+        63,
+        68
+      ],
+      "sample_idx": 0,
+      "isabelle_sketch": "by simp",
+      "draft": "Establish the supplied conclusion.",
+      "draft_context_policy": "original_masked_prefix",
+      "context_sha256": "410191a8b82725df3a2f4c4554c34eab5703d36c03d161fe7dcc94e8eee78be2",
+      "statement_sha256": "905fe07d7ccbf200cc086e1a4d206c63a9badc9f8502893e96ae5f155cd680eb",
+      "template_sha256": "0bdd1a16a59088606d1e45617a20a54d1e00d266e109e4decc42fe97bee56cff",
+      "background_policy": "earlier_masked_helpers_admitted",
+      "admitted_background_names": [],
+      "admitted_background_count": 0,
+      "schema_version": "hol_light_to_isabelle_dsp_pisa_v1",
+      "pipeline": "v2-dsp",
+      "sketch_source": "draft",
+      "draft_used": true,
+      "expected_isabelle_version": "Isabelle2021",
+      "draft_sha256": "755ad52be53e346a27d4b41bbd9984719ead2f012692da763effa2a869ca19b9",
+      "input_fingerprint": "49112baf2a725ad5df48a4eacd65ae6bbd2b2ce3f8f229a42a043ab9006a4e6b",
+      "name": "babel-formal/0/preflight/v2_control",
+      "formal_statement": "lemma v2_control: \"True\"",
+      "input_error": null,
+      "informal_proof": "Establish the supplied conclusion.",
+      "checker_version": "dsp_pisa_isabelle2021_p1",
+      "verified": true,
+      "prove_success": true,
+      "verification_method": "dsp_pisa_completion",
+      "verify_error": "",
+      "failure_category": null,
+      "step_results": [
+        {
+          "mode": "search",
+          "command": "theory V2Control imports Main begin",
+          "success": true,
+          "observation": "",
+          "duration_seconds": 0.024449590011499822
+        },
+        {
+          "mode": "search",
+          "command": "declare [[quick_and_dirty = true]]",
+          "success": true,
+          "observation": "",
+          "duration_seconds": 0.02182608493603766
+        },
+        {
+          "mode": "search",
+          "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+          "success": true,
+          "observation": "",
+          "duration_seconds": 0.02064368105493486
+        },
+        {
+          "mode": "search",
+          "command": "lemma v2_control: \"True\"",
+          "success": true,
+          "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+          "duration_seconds": 0.018301739008165896
+        },
+        {
+          "mode": "search",
+          "command": "by simp",
+          "success": true,
+          "observation": "",
+          "duration_seconds": 0.020729816053062677
+        }
+      ],
+      "backend_metadata": {
+        "backend": "dsp-pisa",
+        "isabelle_version": "Isabelle2021",
+        "isabelle_version_raw": "Isabelle2021: February 2021",
+        "pisa_commit": "690eed41fa03fe04ec015bb375c668cd6fd94261",
+        "dsp_commit": "647aa65ca7b89f4e0f7a65dc15b4e64a81af5e80",
+        "itpeval_commit": "43cd12524b5948471be994d91f41d86a2b801955",
+        "config": {
+          "backend": "dsp-pisa",
+          "expected_isabelle_version": "Isabelle2021",
+          "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+          "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+          "java_bin": "java",
+          "port": 9000,
+          "startup_timeout_s": 600,
+          "step_timeout_s": 60,
+          "hammer_timeout_s": 60,
+          "target_timeout_s": 1800,
+          "theory_imports": {
+            "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+            "Tagged_Division": "HOL-Analysis.Tagged_Division"
+          }
+        },
+        "java_version": "openjdk version \"11.0.30-internal\" 2026-01-20\nOpenJDK Runtime Environment (build 11.0.30-internal+0-adhoc.conda.src)\nOpenJDK 64-Bit Server VM (build 11.0.30-internal+0-adhoc.conda.src, mixed mode)",
+        "settings": {
+          "ISABELLE_HOME_USER": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/user_home/.isabelle/Isabelle2021",
+          "ISABELLE_HEAPS": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/heaps",
+          "ISABELLE_TMP_PREFIX": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/tmp/isabelle"
+        },
+        "pisa_jar_sha256": "e5ffdcba4e5030445d905862100647f67939bea41be475c7de87c5c33d14ddc9",
+        "generated_client_sha256": {
+          "server_pb2.py": "042bdec4a5037139edd0663d6e9a799ae1cda2d4b03266330d29ca58ae32c1be",
+          "server_pb2_grpc.py": "8545f68a3bad2cc52e7c099db8d6e5cd08037f49ea6f6477325e16a7a4fe3e71"
+        },
+        "dsp_checker_sha256": "48665c5b4f8d4f99f39310ace83a7161cbf9391048954c118b33c25c739db7cf",
+        "adapter_sha256": {
+          "checker.py": "10972fe91256d63de624c55466487292ce4f7f4a33457c5c545c5c0b55d1f2ab",
+          "runtime.py": "1b94e57a493fd575998241d8c36b3c508c1795e4861cdc8918b434456891396f",
+          "pisa_worker.py": "dc5f663ca5ccc3689105303c755812093769ba36015886972e17ac55a914588a",
+          "pisa_context.py": "cc90618f858bc43355cce53a675826696e595a8d365b89b39f1beb1433a5efc5",
+          "input_contract.py": "089ac776a5eae25bb655ef6ecdd1a8aef9f6df088df3a947df1034bd8dafee56"
+        },
+        "replay_enabled": false,
+        "server_limits": "Original PISA: 10s transitions; 40s normalhammer",
+        "backend_fingerprint": "5803aeb1ffaf08d200d7cf8966ec42571a62b83e9a81cfbbe3b06f2efae0903e"
+      },
+      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/cases/explicit_draft/work/target-zohyx4it",
+      "import_resolution": {
+        "original_imports": [
+          "Main"
+        ],
+        "resolved_imports": [
+          "Main"
+        ],
+        "session_dependencies": []
+      },
+      "pisa_result": {
+        "success": true,
+        "error": "",
+        "dsp_result": {
+          "success": true,
+          "reason": "",
+          "num_steps": 5,
+          "last_step": 5,
+          "step_results": [
+            {
+              "index": 0,
+              "step": "theory V2Control imports Main begin",
+              "output": "",
+              "step_time": 0.024460792541503906
+            },
+            {
+              "index": 1,
+              "step": "declare [[quick_and_dirty = true]]",
+              "output": "",
+              "step_time": 0.021831750869750977
+            },
+            {
+              "index": 2,
+              "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+              "output": "",
+              "step_time": 0.020649194717407227
+            },
+            {
+              "index": 3,
+              "step": "lemma v2_control: \"True\"",
+              "output": "",
+              "step_time": 0.018306255340576172
+            },
+            {
+              "index": 4,
+              "step": "by simp",
+              "output": "",
+              "step_time": 0.020734548568725586
+            }
+          ],
+          "final_state": "default_4"
+        },
+        "step_results": [
+          {
+            "mode": "search",
+            "command": "theory V2Control imports Main begin",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.024449590011499822
+          },
+          {
+            "mode": "search",
+            "command": "declare [[quick_and_dirty = true]]",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.02182608493603766
+          },
+          {
+            "mode": "search",
+            "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.02064368105493486
+          },
+          {
+            "mode": "search",
+            "command": "lemma v2_control: \"True\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+            "duration_seconds": 0.018301739008165896
+          },
+          {
+            "mode": "search",
+            "command": "by simp",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.020729816053062677
+          }
+        ],
+        "failure_category": null,
+        "request_id": "b45ba2e6498348e4b2977d139af57740",
+        "input_sha256": "067a1eddc8bfd0bd05020edd16359dd4fb30890bf9909ca70888f6b2059a40fe",
+        "duration_seconds": 10.497662918060087
+      },
+      "dsp_result": {
+        "success": true,
+        "reason": "",
+        "num_steps": 5,
+        "last_step": 5,
+        "step_results": [
+          {
+            "index": 0,
+            "step": "theory V2Control imports Main begin",
+            "output": "",
+            "step_time": 0.024460792541503906
+          },
+          {
+            "index": 1,
+            "step": "declare [[quick_and_dirty = true]]",
+            "output": "",
+            "step_time": 0.021831750869750977
+          },
+          {
+            "index": 2,
+            "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+            "output": "",
+            "step_time": 0.020649194717407227
+          },
+          {
+            "index": 3,
+            "step": "lemma v2_control: \"True\"",
+            "output": "",
+            "step_time": 0.018306255340576172
+          },
+          {
+            "index": 4,
+            "step": "by simp",
+            "output": "",
+            "step_time": 0.020734548568725586
+          }
+        ],
+        "final_state": "default_4"
+      },
+      "verify_duration_seconds": 10.614
+    }
+  }
+}

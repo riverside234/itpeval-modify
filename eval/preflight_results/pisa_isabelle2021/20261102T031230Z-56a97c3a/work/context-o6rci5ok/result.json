@@ -1,0 +1,190 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 13,
+    "last_step": 13,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory set_algebra\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.020979881286621094
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.015767574310302734
+      },
+      {
+        "index": 2,
+        "step": "definition sUnion :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sUnion A B \\<equiv> \\<lambda>x. A x \\<or> B x\"",
+        "output": "",
+        "step_time": 0.021472454071044922
+      },
+      {
+        "index": 3,
+        "step": "definition sInter :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sInter A B \\<equiv> \\<lambda>x. A x \\<and> B x\"",
+        "output": "",
+        "step_time": 0.023500680923461914
+      },
+      {
+        "index": 4,
+        "step": "definition sCompl :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sCompl A \\<equiv> \\<lambda>x. \\<not> A x\"",
+        "output": "",
+        "step_time": 0.025629520416259766
+      },
+      {
+        "index": 5,
+        "step": "lemma inter_distrib_left:\n  \"\\<forall>x. sInter A (sUnion B C) x \\<longleftrightarrow> sUnion (sInter A B) (sInter A C) x\"",
+        "output": "",
+        "step_time": 0.01984095573425293
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01944422721862793
+      },
+      {
+        "index": 7,
+        "step": "lemma inter_distrib_right:\n  \"\\<forall>x. sInter (sUnion A B) C x \\<longleftrightarrow> sUnion (sInter A C) (sInter B C) x\"",
+        "output": "",
+        "step_time": 0.021928071975708008
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019070863723754883
+      },
+      {
+        "index": 9,
+        "step": "lemma de_morgan_union:\n  \"\\<forall>x. sCompl (sUnion A B) x \\<longleftrightarrow> sInter (sCompl A) (sCompl B) x\"",
+        "output": "",
+        "step_time": 0.018494606018066406
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017418384552001953
+      },
+      {
+        "index": 11,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.014841794967651367
+      },
+      {
+        "index": 12,
+        "step": "lemma de_morgan_inter:\n  \"\\<forall>x. sCompl (sInter A B) x \\<longleftrightarrow> sUnion (sCompl A) (sCompl B) x\"",
+        "output": "",
+        "step_time": 0.020443201065063477
+      }
+    ],
+    "final_state": "default_12",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory set_algebra\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020971615915186703
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01576255599502474
+    },
+    {
+      "mode": "search",
+      "command": "definition sUnion :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sUnion A B \\<equiv> \\<lambda>x. A x \\<or> B x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.021467783022671938
+    },
+    {
+      "mode": "search",
+      "command": "definition sInter :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sInter A B \\<equiv> \\<lambda>x. A x \\<and> B x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023496208945289254
+    },
+    {
+      "mode": "search",
+      "command": "definition sCompl :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sCompl A \\<equiv> \\<lambda>x. \\<not> A x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025624425034038723
+    },
+    {
+      "mode": "search",
+      "command": "lemma inter_distrib_left:\n  \"\\<forall>x. sInter A (sUnion B C) x \\<longleftrightarrow> sUnion (sInter A B) (sInter A C) x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>x. sInter A (sUnion B C) x = sUnion (sInter A B) (sInter A C) x",
+      "duration_seconds": 0.01983700809068978
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01944083406124264
+    },
+    {
+      "mode": "search",
+      "command": "lemma inter_distrib_right:\n  \"\\<forall>x. sInter (sUnion A B) C x \\<longleftrightarrow> sUnion (sInter A C) (sInter B C) x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>x. sInter (sUnion A B) C x = sUnion (sInter A C) (sInter B C) x",
+      "duration_seconds": 0.021920281928032637
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019063433981500566
+    },
+    {
+      "mode": "search",
+      "command": "lemma de_morgan_union:\n  \"\\<forall>x. sCompl (sUnion A B) x \\<longleftrightarrow> sInter (sCompl A) (sCompl B) x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>x. sCompl (sUnion A B) x = sInter (sCompl A) (sCompl B) x",
+      "duration_seconds": 0.018489826004952192
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017410641070455313
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014836010988801718
+    },
+    {
+      "mode": "search",
+      "command": "lemma de_morgan_inter:\n  \"\\<forall>x. sCompl (sInter A B) x \\<longleftrightarrow> sUnion (sCompl A) (sCompl B) x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>x. sCompl (sInter A B) x = sUnion (sCompl A) (sCompl B) x",
+      "duration_seconds": 0.020437977043911815
+    }
+  ],
+  "failure_category": null,
+  "request_id": "6c79143bf45049c9a7910ab2e7a7f270",
+  "input_sha256": "c91aa99dfeba57d0f52cb1fdd9f135a82c4971798c8a51a3d05da01c627cad36",
+  "duration_seconds": 7.604553448967636
+}

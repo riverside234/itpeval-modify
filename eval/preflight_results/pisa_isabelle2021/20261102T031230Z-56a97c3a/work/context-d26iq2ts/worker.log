@@ -1,0 +1,10 @@
+Initializing environment
+ISA_PATH: /data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021
+THEORY_FILE: /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-d26iq2ts/miniF2F/galois.thy
+WORKING_DIR: /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-d26iq2ts/miniF2F
+You entered the path to the Isabelle executable: /data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021 
+We have successfully received it.
+You entered the path to the Isabelle working directory: /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-d26iq2ts/miniF2F We have successfully received it.
+You entered the path to the Theory file: /data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-d26iq2ts/miniF2F/galois.thy 
+We have successfully initialised the Isabelle environment.
+Start initialising environment

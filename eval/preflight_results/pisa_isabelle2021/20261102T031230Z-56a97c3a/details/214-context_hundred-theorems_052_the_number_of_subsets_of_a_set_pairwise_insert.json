@@ -1,0 +1,36 @@
+{
+  "name": "context_hundred-theorems_052_the_number_of_subsets_of_a_set_pairwise_insert",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 7.451,
+  "details": "details/214-context_hundred-theorems_052_the_number_of_subsets_of_a_set_pairwise_insert.json",
+  "failure_category": "context_error",
+  "expected_failure": null,
+  "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+  "payload": {
+    "ok": false,
+    "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+    "failure_category": "context_error",
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-6a7h06on",
+    "pisa_result": {
+      "success": false,
+      "error": "RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+      "failure_category": "context_error",
+      "step_results": [],
+      "request_id": "78cabeed9f0e48bb85081237351a5e57",
+      "input_sha256": "10fdfc9dac2f3843cbcb800929038599c1c5072e2c664fc754d867a95588eba4",
+      "duration_seconds": 7.178183507989161
+    },
+    "import_resolution": {
+      "original_imports": [
+        "Lattices",
+        "Boolean_Algebras"
+      ],
+      "resolved_imports": [
+        "Lattices",
+        "Boolean_Algebras"
+      ],
+      "session_dependencies": []
+    }
+  }
+}

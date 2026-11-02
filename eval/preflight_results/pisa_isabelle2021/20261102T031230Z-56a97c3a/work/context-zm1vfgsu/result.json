@@ -1,0 +1,229 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 16,
+    "last_step": 16,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory inner_product\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.02322554588317871
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01855301856994629
+      },
+      {
+        "index": 2,
+        "step": "locale inner_product =\n  fixes zero_R one_R :: \"'r\"\n    and add_R :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"+R\" 65)\n    and mul_R :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"*R\" 70)\n    and opp_R :: \"'r \\<Rightarrow> 'r\"\n    and zeroV :: \"'v\"\n    and addV  :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'v\"  (infixl \"+V\" 65)\n    and oppV  :: \"'v \\<Rightarrow> 'v\"\n    and smul  :: \"'r \\<Rightarrow> 'v \\<Rightarrow> 'v\"\n    and ip    :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'r\"\n\n  assumes add_R_comm    : \"\\<And>x y. x +R y = y +R x\"\n    and   add_R_assoc   : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_R_zero    : \"\\<And>x. x +R zero_R = x\"\n    and   zero_R_add    : \"\\<And>x. zero_R +R x = x\"\n    and   add_R_opp     : \"\\<And>x. x +R opp_R x = zero_R\"\n    and   mul_R_comm    : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_R_assoc   : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_R_one     : \"\\<And>x. x *R one_R = x\"\n    and   mul_opp_one   : \"\\<And>x. opp_R one_R *R x = opp_R x\"\n    and   opp_R_opp     : \"\\<And>x. opp_R (opp_R x) = x\"\n\n    and   addV_comm     : \"\\<And>u v. u +V v = v +V u\"\n    and   addV_assoc    : \"\\<And>u v w. (u +V v) +V w = u +V (v +V w)\"\n    and   addV_zero     : \"\\<And>u. u +V zeroV = u\"\n    and   smul_addV     : \"\\<And>a u v. smul a (u +V v) = smul a u +V smul a v\"\n    and   one_smul      : \"\\<And>u. smul one_R u = u\"\n    and   opp_smul_one  : \"\\<And>u. oppV u = smul (opp_R one_R) u\"\n\n    and   lin_left_add  : \"\\<And>u v w. ip (u +V v) w = ip u w +R ip v w\"\n    and   lin_left_smul : \"\\<And>a u v. ip (smul a u) v = a *R ip u v\"\n    and   lin_right_add : \"\\<And>u v w. ip u (v +V w) = ip u v +R ip u w\"\n    and   lin_right_smul: \"\\<And>a u v. ip u (smul a v) = a *R ip u v\"\n    and   ip_symm       : \"\\<And>u v. ip u v = ip v u\"\nbegin",
+        "output": "",
+        "step_time": 0.04620242118835449
+      },
+      {
+        "index": 3,
+        "step": "definition subV :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'v\"  (infixl \"-V\" 65)\n  where \"u -V v \\<equiv> u +V oppV v\"",
+        "output": "",
+        "step_time": 0.03366589546203613
+      },
+      {
+        "index": 4,
+        "step": "lemma add_R_left_comm: \"x +R (y +R z) = y +R (x +R z)\"",
+        "output": "",
+        "step_time": 0.024284839630126953
+      },
+      {
+        "index": 5,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.02010512351989746
+      },
+      {
+        "index": 6,
+        "step": "lemma ip_neg_left: \"ip (oppV u) v = opp_R (ip u v)\"",
+        "output": "",
+        "step_time": 0.021248340606689453
+      },
+      {
+        "index": 7,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.020393848419189453
+      },
+      {
+        "index": 8,
+        "step": "lemma ip_neg_right: \"ip u (oppV v) = opp_R (ip u v)\"",
+        "output": "",
+        "step_time": 0.01760101318359375
+      },
+      {
+        "index": 9,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01724696159362793
+      },
+      {
+        "index": 10,
+        "step": "lemma ip_add_add:\n  \"ip (u +V v) (u +V v) =\n    (ip u u +R ip v u) +R (ip u v +R ip v v)\"",
+        "output": "",
+        "step_time": 0.02152538299560547
+      },
+      {
+        "index": 11,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017110109329223633
+      },
+      {
+        "index": 12,
+        "step": "lemma ip_neg_neg: \"ip (oppV v) (oppV v) = ip v v\"",
+        "output": "",
+        "step_time": 0.017597436904907227
+      },
+      {
+        "index": 13,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017966747283935547
+      },
+      {
+        "index": 14,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.01598978042602539
+      },
+      {
+        "index": 15,
+        "step": "lemma ip_sub_sub:\n  \"ip (u -V v) (u -V v) =\n    (ip u u +R opp_R (ip v u)) +R (opp_R (ip u v) +R ip v v)\"",
+        "output": "",
+        "step_time": 0.0225222110748291
+      }
+    ],
+    "final_state": "default_15",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory inner_product\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023214887944050133
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018547301064245403
+    },
+    {
+      "mode": "search",
+      "command": "locale inner_product =\n  fixes zero_R one_R :: \"'r\"\n    and add_R :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"+R\" 65)\n    and mul_R :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"*R\" 70)\n    and opp_R :: \"'r \\<Rightarrow> 'r\"\n    and zeroV :: \"'v\"\n    and addV  :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'v\"  (infixl \"+V\" 65)\n    and oppV  :: \"'v \\<Rightarrow> 'v\"\n    and smul  :: \"'r \\<Rightarrow> 'v \\<Rightarrow> 'v\"\n    and ip    :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'r\"\n\n  assumes add_R_comm    : \"\\<And>x y. x +R y = y +R x\"\n    and   add_R_assoc   : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_R_zero    : \"\\<And>x. x +R zero_R = x\"\n    and   zero_R_add    : \"\\<And>x. zero_R +R x = x\"\n    and   add_R_opp     : \"\\<And>x. x +R opp_R x = zero_R\"\n    and   mul_R_comm    : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_R_assoc   : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_R_one     : \"\\<And>x. x *R one_R = x\"\n    and   mul_opp_one   : \"\\<And>x. opp_R one_R *R x = opp_R x\"\n    and   opp_R_opp     : \"\\<And>x. opp_R (opp_R x) = x\"\n\n    and   addV_comm     : \"\\<And>u v. u +V v = v +V u\"\n    and   addV_assoc    : \"\\<And>u v w. (u +V v) +V w = u +V (v +V w)\"\n    and   addV_zero     : \"\\<And>u. u +V zeroV = u\"\n    and   smul_addV     : \"\\<And>a u v. smul a (u +V v) = smul a u +V smul a v\"\n    and   one_smul      : \"\\<And>u. smul one_R u = u\"\n    and   opp_smul_one  : \"\\<And>u. oppV u = smul (opp_R one_R) u\"\n\n    and   lin_left_add  : \"\\<And>u v w. ip (u +V v) w = ip u w +R ip v w\"\n    and   lin_left_smul : \"\\<And>a u v. ip (smul a u) v = a *R ip u v\"\n    and   lin_right_add : \"\\<And>u v w. ip u (v +V w) = ip u v +R ip u w\"\n    and   lin_right_smul: \"\\<And>a u v. ip u (smul a v) = a *R ip u v\"\n    and   ip_symm       : \"\\<And>u v. ip u v = ip v u\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.04619544395245612
+    },
+    {
+      "mode": "search",
+      "command": "definition subV :: \"'v \\<Rightarrow> 'v \\<Rightarrow> 'v\"  (infixl \"-V\" 65)\n  where \"u -V v \\<equiv> u +V oppV v\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0336611729580909
+    },
+    {
+      "mode": "search",
+      "command": "lemma add_R_left_comm: \"x +R (y +R z) = y +R (x +R z)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x +R (y +R z) = y +R (x +R z)",
+      "duration_seconds": 0.024280483019538224
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020102365990169346
+    },
+    {
+      "mode": "search",
+      "command": "lemma ip_neg_left: \"ip (oppV u) v = opp_R (ip u v)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. ip (oppV u) v = opp_R (ip u v)",
+      "duration_seconds": 0.021244811010546982
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020389697048813105
+    },
+    {
+      "mode": "search",
+      "command": "lemma ip_neg_right: \"ip u (oppV v) = opp_R (ip u v)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. ip u (oppV v) = opp_R (ip u v)",
+      "duration_seconds": 0.017596609075553715
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01724238693714142
+    },
+    {
+      "mode": "search",
+      "command": "lemma ip_add_add:\n  \"ip (u +V v) (u +V v) =\n    (ip u u +R ip v u) +R (ip u v +R ip v v)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. ip (u +V v) (u +V v) = ip u u +R ip v u +R (ip u v +R ip v v)",
+      "duration_seconds": 0.021521080983802676
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017105550970882177
+    },
+    {
+      "mode": "search",
+      "command": "lemma ip_neg_neg: \"ip (oppV v) (oppV v) = ip v v\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. ip (oppV v) (oppV v) = ip v v",
+      "duration_seconds": 0.017594104981981218
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017963459016755223
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01598525105509907
+    },
+    {
+      "mode": "search",
+      "command": "lemma ip_sub_sub:\n  \"ip (u -V v) (u -V v) =\n    (ip u u +R opp_R (ip v u)) +R (opp_R (ip u v) +R ip v v)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. ip (u -V v) (u -V v) =\n    ip u u +R opp_R (ip v u) +R (opp_R (ip u v) +R ip v v)",
+      "duration_seconds": 0.02251920197159052
+    }
+  ],
+  "failure_category": null,
+  "request_id": "d0ad53b315bb4f1cbb40f8be23cc24e4",
+  "input_sha256": "f9e7a287b9e56cdcbc9576ffc34e3a8eb202938b09e3b6461d791457577570f4",
+  "duration_seconds": 8.449119888013229
+}

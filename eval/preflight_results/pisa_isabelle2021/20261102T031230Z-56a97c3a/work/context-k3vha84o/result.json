@@ -1,0 +1,164 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 11,
+    "last_step": 11,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory ideals\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.023439884185791016
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01679539680480957
+      },
+      {
+        "index": 2,
+        "step": "locale cring =\n  fixes zero :: \"'r\"\n    and one  :: \"'r\"\n    and add  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"+R\" 65)\n    and mul  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"*R\" 70)\n    and opp  :: \"'r \\<Rightarrow> 'r\"\n  assumes add_comm  : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero  : \"\\<And>x. x +R zero = x\"\n    and   add_opp   : \"\\<And>x. x +R opp x = zero\"\n    and   mul_comm  : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_one   : \"\\<And>x. x *R one = x\"\n    and   dist_l    : \"\\<And>a x y. a *R (x +R y) = (a *R x) +R (a *R y)\"\n    and   opp_add   : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\nbegin",
+        "output": "",
+        "step_time": 0.04192972183227539
+      },
+      {
+        "index": 3,
+        "step": "lemma add_left_comm: \"x +R (y +R z) = y +R (x +R z)\"",
+        "output": "",
+        "step_time": 0.020929813385009766
+      },
+      {
+        "index": 4,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017867326736450195
+      },
+      {
+        "index": 5,
+        "step": "lemma zero_add: \"zero +R x = x\"",
+        "output": "",
+        "step_time": 0.026021718978881836
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.02019333839416504
+      },
+      {
+        "index": 7,
+        "step": "definition IsIdeal :: \"('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"IsIdeal I \\<equiv>\n    I zero \\<and>\n    (\\<forall>x y. I x \\<longrightarrow> I y \\<longrightarrow> I (x +R y)) \\<and>\n    (\\<forall>x.   I x \\<longrightarrow> I (opp x)) \\<and>\n    (\\<forall>a x. I x \\<longrightarrow> I (a *R x))\"",
+        "output": "",
+        "step_time": 0.030569791793823242
+      },
+      {
+        "index": 8,
+        "step": "definition Inter :: \"('i \\<Rightarrow> 'r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"Inter F \\<equiv> \\<lambda>x. \\<forall>i. F i x\"",
+        "output": "",
+        "step_time": 0.02532362937927246
+      },
+      {
+        "index": 9,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.017180204391479492
+      },
+      {
+        "index": 10,
+        "step": "lemma inter_isIdeal:\n  assumes h: \"\\<forall>i. IsIdeal (F i)\"\n  shows \"IsIdeal (Inter F)\"",
+        "output": "",
+        "step_time": 0.02111530303955078
+      }
+    ],
+    "final_state": "default_10",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory ideals\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023433967027813196
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0167912389151752
+    },
+    {
+      "mode": "search",
+      "command": "locale cring =\n  fixes zero :: \"'r\"\n    and one  :: \"'r\"\n    and add  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"+R\" 65)\n    and mul  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"*R\" 70)\n    and opp  :: \"'r \\<Rightarrow> 'r\"\n  assumes add_comm  : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero  : \"\\<And>x. x +R zero = x\"\n    and   add_opp   : \"\\<And>x. x +R opp x = zero\"\n    and   mul_comm  : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_one   : \"\\<And>x. x *R one = x\"\n    and   dist_l    : \"\\<And>a x y. a *R (x +R y) = (a *R x) +R (a *R y)\"\n    and   opp_add   : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.04192074399907142
+    },
+    {
+      "mode": "search",
+      "command": "lemma add_left_comm: \"x +R (y +R z) = y +R (x +R z)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x +R (y +R z) = y +R (x +R z)",
+      "duration_seconds": 0.020923629985190928
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017863705987110734
+    },
+    {
+      "mode": "search",
+      "command": "lemma zero_add: \"zero +R x = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. zero +R x = x",
+      "duration_seconds": 0.02601825399324298
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020188143011182547
+    },
+    {
+      "mode": "search",
+      "command": "definition IsIdeal :: \"('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"IsIdeal I \\<equiv>\n    I zero \\<and>\n    (\\<forall>x y. I x \\<longrightarrow> I y \\<longrightarrow> I (x +R y)) \\<and>\n    (\\<forall>x.   I x \\<longrightarrow> I (opp x)) \\<and>\n    (\\<forall>a x. I x \\<longrightarrow> I (a *R x))\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03056280896998942
+    },
+    {
+      "mode": "search",
+      "command": "definition Inter :: \"('i \\<Rightarrow> 'r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"Inter F \\<equiv> \\<lambda>x. \\<forall>i. F i x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02531744190491736
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017172821913845837
+    },
+    {
+      "mode": "search",
+      "command": "lemma inter_isIdeal:\n  assumes h: \"\\<forall>i. IsIdeal (F i)\"\n  shows \"IsIdeal (Inter F)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. IsIdeal (local.Inter F)",
+      "duration_seconds": 0.021109884954057634
+    }
+  ],
+  "failure_category": null,
+  "request_id": "02719b2f993c4a1a9416fd7f3cafa222",
+  "input_sha256": "fabd1cc22b352ce02124efbd76ebfb052a60201f1c0a3a9f7b06c7a2bc5d1e51",
+  "duration_seconds": 8.574019600986503
+}

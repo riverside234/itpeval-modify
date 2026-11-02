@@ -1,0 +1,84 @@
+{
+  "success": false,
+  "error": "Step error: Undefined fact: \"v2_later_secret\" (line 1)\nAt command \"by\" (line 1)",
+  "dsp_result": {
+    "success": false,
+    "reason": "Step error: Undefined fact: \"v2_later_secret\" (line 1)\nAt command \"by\" (line 1)",
+    "num_steps": 5,
+    "last_step": 5,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory V2Control imports Main begin",
+        "output": "",
+        "step_time": 0.023203611373901367
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.016889095306396484
+      },
+      {
+        "index": 2,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.01820087432861328
+      },
+      {
+        "index": 3,
+        "step": "lemma v2_control: \"False\"",
+        "output": "",
+        "step_time": 0.017653942108154297
+      },
+      {
+        "index": 4,
+        "step": "by (rule v2_later_secret)",
+        "output": "",
+        "step_time": 0.014637947082519531
+      }
+    ],
+    "final_state": "default_3"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory V2Control imports Main begin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023195713059976697
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016884348005987704
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018192765885032713
+    },
+    {
+      "mode": "search",
+      "command": "lemma v2_control: \"False\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. False",
+      "duration_seconds": 0.017647675005719066
+    },
+    {
+      "mode": "search",
+      "command": "by (rule v2_later_secret)",
+      "success": false,
+      "observation": "Step error: Undefined fact: \"v2_later_secret\" (line 1)\nAt command \"by\" (line 1)",
+      "duration_seconds": 0.014633270911872387
+    }
+  ],
+  "failure_category": "proof_failure",
+  "request_id": "408b105119b6449bad22398619f4319f",
+  "input_sha256": "c8d33153efefad1f7fd780be5eb7ac4ab5f299ad8151e18d59a578f35eb7fa55",
+  "duration_seconds": 6.084089031908661
+}

@@ -1,0 +1,86 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 5,
+    "last_step": 5,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory group\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.024149179458618164
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01676201820373535
+      },
+      {
+        "index": 2,
+        "step": "locale group =\n  fixes mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\"\n  assumes mul_assoc : \"a ** (b ** c) = (a ** b) ** c\"\n    and   mul_one   : \"a ** one = a\"\n    and   one_mul   : \"one ** a = a\"\n    and   mul_inv_l : \"inv a ** a = one\"\n    and   mul_inv_r : \"a ** inv a = one\"\nbegin",
+        "output": "",
+        "step_time": 0.032468318939208984
+      },
+      {
+        "index": 3,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.017894506454467773
+      },
+      {
+        "index": 4,
+        "step": "lemma mul_left_cancel:\n  assumes h: \"a ** b = a ** c\"\n  shows \"b = c\"",
+        "output": "",
+        "step_time": 0.020105600357055664
+      }
+    ],
+    "final_state": "default_4",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory group\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02414165309164673
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016757130972109735
+    },
+    {
+      "mode": "search",
+      "command": "locale group =\n  fixes mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\"\n  assumes mul_assoc : \"a ** (b ** c) = (a ** b) ** c\"\n    and   mul_one   : \"a ** one = a\"\n    and   one_mul   : \"one ** a = a\"\n    and   mul_inv_l : \"inv a ** a = one\"\n    and   mul_inv_r : \"a ** inv a = one\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03246274194680154
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017888989998027682
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_left_cancel:\n  assumes h: \"a ** b = a ** c\"\n  shows \"b = c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. b = c",
+      "duration_seconds": 0.020100835012272
+    }
+  ],
+  "failure_category": null,
+  "request_id": "dd0559c5276e43b78deea573b038d257",
+  "input_sha256": "0e7972f209302653e8c6e341356a4fce3bc8fa63f480ffc13383b9a403155541",
+  "duration_seconds": 8.784456981928088
+}

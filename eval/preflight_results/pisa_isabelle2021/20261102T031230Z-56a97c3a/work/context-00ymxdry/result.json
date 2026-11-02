@@ -1,0 +1,112 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 7,
+    "last_step": 7,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory set_algebra\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.024907350540161133
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01799488067626953
+      },
+      {
+        "index": 2,
+        "step": "definition sUnion :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sUnion A B \\<equiv> \\<lambda>x. A x \\<or> B x\"",
+        "output": "",
+        "step_time": 0.022231578826904297
+      },
+      {
+        "index": 3,
+        "step": "definition sInter :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sInter A B \\<equiv> \\<lambda>x. A x \\<and> B x\"",
+        "output": "",
+        "step_time": 0.021926403045654297
+      },
+      {
+        "index": 4,
+        "step": "definition sCompl :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sCompl A \\<equiv> \\<lambda>x. \\<not> A x\"",
+        "output": "",
+        "step_time": 0.021858692169189453
+      },
+      {
+        "index": 5,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.02649068832397461
+      },
+      {
+        "index": 6,
+        "step": "lemma inter_distrib_left:\n  \"\\<forall>x. sInter A (sUnion B C) x \\<longleftrightarrow> sUnion (sInter A B) (sInter A C) x\"",
+        "output": "",
+        "step_time": 0.02172112464904785
+      }
+    ],
+    "final_state": "default_6",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory set_algebra\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.024896110990084708
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01798850006889552
+    },
+    {
+      "mode": "search",
+      "command": "definition sUnion :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sUnion A B \\<equiv> \\<lambda>x. A x \\<or> B x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02222265105228871
+    },
+    {
+      "mode": "search",
+      "command": "definition sInter :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sInter A B \\<equiv> \\<lambda>x. A x \\<and> B x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.021919316961430013
+    },
+    {
+      "mode": "search",
+      "command": "definition sCompl :: \"('a \\<Rightarrow> bool) \\<Rightarrow> ('a \\<Rightarrow> bool)\"\n  where \"sCompl A \\<equiv> \\<lambda>x. \\<not> A x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.021853251033462584
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.026485519018024206
+    },
+    {
+      "mode": "search",
+      "command": "lemma inter_distrib_left:\n  \"\\<forall>x. sInter A (sUnion B C) x \\<longleftrightarrow> sUnion (sInter A B) (sInter A C) x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>x. sInter A (sUnion B C) x = sUnion (sInter A B) (sInter A C) x",
+      "duration_seconds": 0.021715183975175023
+    }
+  ],
+  "failure_category": null,
+  "request_id": "37fd27ba983c433fa27873af0da72c9a",
+  "input_sha256": "d3d8c99904d9a527c0a26ef1dff14564aea5a686eeda0293eb0c587b86685064",
+  "duration_seconds": 10.616123601910658
+}

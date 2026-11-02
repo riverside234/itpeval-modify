@@ -1,0 +1,227 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 16,
+    "last_step": 16,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory V2Control imports Main begin",
+        "output": "",
+        "step_time": 0.025617361068725586
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.017804622650146484
+      },
+      {
+        "index": 2,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.018217086791992188
+      },
+      {
+        "index": 3,
+        "step": "lemma v2_control: \"True\"",
+        "output": "",
+        "step_time": 0.018154144287109375
+      },
+      {
+        "index": 4,
+        "step": "proof -",
+        "output": "",
+        "step_time": 0.018266677856445312
+      },
+      {
+        "index": 5,
+        "step": "have both: \"True \\<and> True\"",
+        "output": "",
+        "step_time": 0.02685236930847168
+      },
+      {
+        "index": 6,
+        "step": "proof",
+        "output": "",
+        "step_time": 0.01835179328918457
+      },
+      {
+        "index": 7,
+        "step": "show True",
+        "output": "",
+        "step_time": 0.018796443939208984
+      },
+      {
+        "index": 8,
+        "step": "by simp",
+        "output": "",
+        "step_time": 0.01582789421081543
+      },
+      {
+        "index": 9,
+        "step": "show True",
+        "output": "",
+        "step_time": 0.01871490478515625
+      },
+      {
+        "index": 10,
+        "step": "by simp",
+        "output": "",
+        "step_time": 0.01696920394897461
+      },
+      {
+        "index": 11,
+        "step": "qed",
+        "output": "",
+        "step_time": 0.019578933715820312
+      },
+      {
+        "index": 12,
+        "step": "show True",
+        "output": "",
+        "step_time": 0.020398616790771484
+      },
+      {
+        "index": 13,
+        "step": "using both",
+        "output": "",
+        "step_time": 0.021230697631835938
+      },
+      {
+        "index": 14,
+        "step": "by simp",
+        "output": "",
+        "step_time": 0.020412206649780273
+      },
+      {
+        "index": 15,
+        "step": "qed",
+        "output": "",
+        "step_time": 0.021731138229370117
+      }
+    ],
+    "final_state": "default_15"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory V2Control imports Main begin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.025607307092286646
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01779898500535637
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.018211238901130855
+    },
+    {
+      "mode": "search",
+      "command": "lemma v2_control: \"True\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.01814734796062112
+    },
+    {
+      "mode": "search",
+      "command": "proof -",
+      "success": true,
+      "observation": "proof (state)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.018262105993926525
+    },
+    {
+      "mode": "search",
+      "command": "have both: \"True \\<and> True\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True \\<and> True",
+      "duration_seconds": 0.026846761000342667
+    },
+    {
+      "mode": "search",
+      "command": "proof",
+      "success": true,
+      "observation": "proof (state)\ngoal (2 subgoals):\n 1. True\n 2. True",
+      "duration_seconds": 0.018347770092077553
+    },
+    {
+      "mode": "search",
+      "command": "show True",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.018791774986311793
+    },
+    {
+      "mode": "search",
+      "command": "by simp",
+      "success": true,
+      "observation": "proof (state)\nthis:\n  True\n\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.01582277298439294
+    },
+    {
+      "mode": "search",
+      "command": "show True",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.018707524985074997
+    },
+    {
+      "mode": "search",
+      "command": "by simp",
+      "success": true,
+      "observation": "proof (state)\nthis:\n  True\n\ngoal:\nNo subgoals!",
+      "duration_seconds": 0.016962749999947846
+    },
+    {
+      "mode": "search",
+      "command": "qed",
+      "success": true,
+      "observation": "proof (state)\nthis:\n  True \\<and> True\n\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.019572415971197188
+    },
+    {
+      "mode": "search",
+      "command": "show True",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.02039292803965509
+    },
+    {
+      "mode": "search",
+      "command": "using both",
+      "success": true,
+      "observation": "proof (prove)\nusing this:\n  True \\<and> True\n\ngoal (1 subgoal):\n 1. True",
+      "duration_seconds": 0.021225486998446286
+    },
+    {
+      "mode": "search",
+      "command": "by simp",
+      "success": true,
+      "observation": "proof (state)\nthis:\n  True\n\ngoal:\nNo subgoals!",
+      "duration_seconds": 0.0204034720081836
+    },
+    {
+      "mode": "search",
+      "command": "qed",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02172204595990479
+    }
+  ],
+  "failure_category": null,
+  "request_id": "33a14becf3b44b2ba76bf9f2caf7bce9",
+  "input_sha256": "158ab59752a13fc9493ea5a36b364192dda17f8e94cc3ef656caeaa51e2819b6",
+  "duration_seconds": 8.497716453974135
+}

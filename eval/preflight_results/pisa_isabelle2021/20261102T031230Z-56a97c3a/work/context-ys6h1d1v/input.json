@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "(* Author: Lukas Bulwahn <lukas.bulwahn-at-gmail.com> *)\n\nsection \\<open>Derangements\\<close>\n\ntheory Derangements\nimports\n  Complex_Main\n  \"HOL-Combinatorics.Permutations\"\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\nsubsection \\<open>Preliminaries\\<close>\n\nsubsubsection \\<open>Additions to @{theory HOL.Finite_Set} Theory\\<close>\n\nlemma card_product_dependent:\n  assumes \"finite S\" \"\\<forall>x \\<in> S. finite (T x)\"\n  shows \"card {(x, y). x \\<in> S \\<and> y \\<in> T x} = (\\<Sum>x \\<in> S. card (T x))\"\n  \n  sorry\n\n\n\nsubsubsection \\<open>Additions to @{theory \"HOL-Combinatorics.Permutations\"} Theory\\<close>\n\nlemma permutes_imp_bij':\n  assumes \"p permutes S\"\n  shows \"bij p\"\n  \n  sorry\n\n\nlemma permutesE:\n  assumes \"p permutes S\"\n  obtains \"bij p\" \"\\<forall>x. x \\<notin> S \\<longrightarrow> p x = x\"\n  \n  sorry\n\n\nlemma bij_imp_permutes':\n  assumes \"bij p\" \"\\<forall>x. x \\<notin> A \\<longrightarrow> p x = x\"\n  shows  \"p permutes A\"\n  \n  sorry\n\n\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma permutes_swap:\n  assumes \"p permutes S\"\n  shows \"Fun.swap x y p permutes (insert x (insert y S))\"\n  \n  ",
+    "theory_name": "Derangements",
+    "request_id": "9602d83392a9479ca5ee516e78dd379c",
+    "input_sha256": "4f30049baf57f78fa0f627eebee7a6bb44c2435c665bae13bbb73b0c84cabc46"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "context_hundred-theorems_089_the_factor_and_remainder_theorems_poly_add",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 10.279,
+  "details": "details/248-context_hundred-theorems_089_the_factor_and_remainder_theorems_poly_add.json",
+  "failure_category": "context_error",
+  "expected_failure": null,
+  "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+  "payload": {
+    "ok": false,
+    "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+    "failure_category": "context_error",
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-z5vkqg8m",
+    "pisa_result": {
+      "success": false,
+      "error": "RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+      "failure_category": "context_error",
+      "step_results": [],
+      "request_id": "a6aa118114a94be6b540df3ddd7ad277",
+      "input_sha256": "701fcd732d0553260273d8b3a99c7145b6d356fe79f3dbd0a984fffaef437b4e",
+      "duration_seconds": 10.13800368795637
+    },
+    "import_resolution": {
+      "original_imports": [
+        "Complex_Main",
+        "HOL-Library.More_List",
+        "HOL-Library.Infinite_Set",
+        "Primes"
+      ],
+      "resolved_imports": [
+        "Complex_Main",
+        "HOL-Library.More_List",
+        "HOL-Library.Infinite_Set",
+        "Primes"
+      ],
+      "session_dependencies": [
+        "HOL-Library"
+      ]
+    }
+  }
+}

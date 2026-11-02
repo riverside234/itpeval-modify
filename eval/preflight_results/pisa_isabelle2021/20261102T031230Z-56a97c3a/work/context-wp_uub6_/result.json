@@ -1,0 +1,554 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 41,
+    "last_step": 41,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory group\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.0258939266204834
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.018895864486694336
+      },
+      {
+        "index": 2,
+        "step": "locale group =\n  fixes mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\"\n  assumes mul_assoc : \"a ** (b ** c) = (a ** b) ** c\"\n    and   mul_one   : \"a ** one = a\"\n    and   one_mul   : \"one ** a = a\"\n    and   mul_inv_l : \"inv a ** a = one\"\n    and   mul_inv_r : \"a ** inv a = one\"\nbegin",
+        "output": "",
+        "step_time": 0.03425860404968262
+      },
+      {
+        "index": 3,
+        "step": "lemma mul_left_cancel:\n  assumes h: \"a ** b = a ** c\"\n  shows \"b = c\"",
+        "output": "",
+        "step_time": 0.022573232650756836
+      },
+      {
+        "index": 4,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019273757934570312
+      },
+      {
+        "index": 5,
+        "step": "lemma mul_right_cancel:\n  assumes h: \"b ** a = c ** a\"\n  shows \"b = c\"",
+        "output": "",
+        "step_time": 0.02549600601196289
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.02801990509033203
+      },
+      {
+        "index": 7,
+        "step": "lemma inv_inv: \"inv (inv a) = a\"",
+        "output": "",
+        "step_time": 0.0202791690826416
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01819753646850586
+      },
+      {
+        "index": 9,
+        "step": "lemma inv_mul: \"inv (a ** b) = inv b ** inv a\"",
+        "output": "",
+        "step_time": 0.021480560302734375
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019620418548583984
+      },
+      {
+        "index": 11,
+        "step": "lemma inv_eq_of_mul_eq_one:\n  assumes h: \"a ** b = one\"\n  shows \"b = inv a\"",
+        "output": "",
+        "step_time": 0.018619775772094727
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017564058303833008
+      },
+      {
+        "index": 13,
+        "step": "end",
+        "output": "",
+        "step_time": 0.014407157897949219
+      },
+      {
+        "index": 14,
+        "step": "locale group_comm = group +\n  assumes mul_comm : \"a ** b = b ** a\"\nbegin",
+        "output": "",
+        "step_time": 0.032196760177612305
+      },
+      {
+        "index": 15,
+        "step": "lemma mul_rotate': \"a ** (b ** c) = b ** (c ** a)\"",
+        "output": "",
+        "step_time": 0.024858474731445312
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.021331787109375
+      },
+      {
+        "index": 17,
+        "step": "end",
+        "output": "",
+        "step_time": 0.028821229934692383
+      },
+      {
+        "index": 18,
+        "step": "locale group_action =\n  group mul one inv\n    for mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\" +\n  fixes act :: \"'a => 'b => 'b\"  (infixr \"acts\" 73)\n  assumes act_one : \"one acts x = x\"\n    and   act_mul : \"(g ** h) acts x = g acts (h acts x)\"\nbegin",
+        "output": "",
+        "step_time": 0.032013654708862305
+      },
+      {
+        "index": 19,
+        "step": "lemma act_inv: \"inv g acts (g acts x) = x\"",
+        "output": "",
+        "step_time": 0.01711130142211914
+      },
+      {
+        "index": 20,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.015014410018920898
+      },
+      {
+        "index": 21,
+        "step": "lemma act_inv_r: \"g acts (inv g acts x) = x\"",
+        "output": "",
+        "step_time": 0.014966487884521484
+      },
+      {
+        "index": 22,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014048337936401367
+      },
+      {
+        "index": 23,
+        "step": "definition orbit :: \"'b => 'b => bool\"\n  where \"orbit x y == (EX g. g acts x = y)\"",
+        "output": "",
+        "step_time": 0.01949334144592285
+      },
+      {
+        "index": 24,
+        "step": "definition stabilizer :: \"'b => 'a => bool\"\n  where \"stabilizer x g == g acts x = x\"",
+        "output": "",
+        "step_time": 0.023352384567260742
+      },
+      {
+        "index": 25,
+        "step": "lemma orbit_refl: \"orbit x x\"",
+        "output": "",
+        "step_time": 0.015308380126953125
+      },
+      {
+        "index": 26,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012970924377441406
+      },
+      {
+        "index": 27,
+        "step": "lemma orbit_sym:\n  assumes \"orbit x y\"\n  shows \"orbit y x\"",
+        "output": "",
+        "step_time": 0.01546025276184082
+      },
+      {
+        "index": 28,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01411890983581543
+      },
+      {
+        "index": 29,
+        "step": "lemma orbit_trans:\n  assumes \"orbit x y\" \"orbit y z\"\n  shows \"orbit x z\"",
+        "output": "",
+        "step_time": 0.014221906661987305
+      },
+      {
+        "index": 30,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013993024826049805
+      },
+      {
+        "index": 31,
+        "step": "lemma orbit_partition:\n  assumes hxy: \"orbit x y\"\n  shows \"orbit x z = orbit y z\"",
+        "output": "",
+        "step_time": 0.015417814254760742
+      },
+      {
+        "index": 32,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014664411544799805
+      },
+      {
+        "index": 33,
+        "step": "lemma stabilizer_mul:\n  assumes \"stabilizer x g\" \"stabilizer x h\"\n  shows \"stabilizer x (g ** h)\"",
+        "output": "",
+        "step_time": 0.014056682586669922
+      },
+      {
+        "index": 34,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.012895345687866211
+      },
+      {
+        "index": 35,
+        "step": "lemma stabilizer_inv:\n  assumes hg: \"stabilizer x g\"\n  shows \"stabilizer x (inv g)\"",
+        "output": "",
+        "step_time": 0.013328075408935547
+      },
+      {
+        "index": 36,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013255834579467773
+      },
+      {
+        "index": 37,
+        "step": "lemma stabilizer_one: \"stabilizer x one\"",
+        "output": "",
+        "step_time": 0.009733915328979492
+      },
+      {
+        "index": 38,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.011305809020996094
+      },
+      {
+        "index": 39,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.013293027877807617
+      },
+      {
+        "index": 40,
+        "step": "lemma stabilizer_conjugate:\n  assumes hh: \"stabilizer x h\"\n  shows \"stabilizer (g acts x) (g ** h ** inv g)\"",
+        "output": "",
+        "step_time": 0.014815330505371094
+      }
+    ],
+    "final_state": "default_40",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory group\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02588233002461493
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01889123790897429
+    },
+    {
+      "mode": "search",
+      "command": "locale group =\n  fixes mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\"\n  assumes mul_assoc : \"a ** (b ** c) = (a ** b) ** c\"\n    and   mul_one   : \"a ** one = a\"\n    and   one_mul   : \"one ** a = a\"\n    and   mul_inv_l : \"inv a ** a = one\"\n    and   mul_inv_r : \"a ** inv a = one\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03424999804701656
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_left_cancel:\n  assumes h: \"a ** b = a ** c\"\n  shows \"b = c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. b = c",
+      "duration_seconds": 0.022566745057702065
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019267823896370828
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_right_cancel:\n  assumes h: \"b ** a = c ** a\"\n  shows \"b = c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. b = c",
+      "duration_seconds": 0.025486756931059062
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02801368897780776
+    },
+    {
+      "mode": "search",
+      "command": "lemma inv_inv: \"inv (inv a) = a\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inv (inv a) = a",
+      "duration_seconds": 0.020275017013773322
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01819198695011437
+    },
+    {
+      "mode": "search",
+      "command": "lemma inv_mul: \"inv (a ** b) = inv b ** inv a\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inv (a ** b) = inv b ** inv a",
+      "duration_seconds": 0.021475687972269952
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01961520395707339
+    },
+    {
+      "mode": "search",
+      "command": "lemma inv_eq_of_mul_eq_one:\n  assumes h: \"a ** b = one\"\n  shows \"b = inv a\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. b = inv a",
+      "duration_seconds": 0.018612648942507803
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01755818200763315
+    },
+    {
+      "mode": "search",
+      "command": "end",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014403103035874665
+    },
+    {
+      "mode": "search",
+      "command": "locale group_comm = group +\n  assumes mul_comm : \"a ** b = b ** a\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03219274594448507
+    },
+    {
+      "mode": "search",
+      "command": "lemma mul_rotate': \"a ** (b ** c) = b ** (c ** a)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. a ** (b ** c) = b ** (c ** a)",
+      "duration_seconds": 0.02485462708864361
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.021327202091924846
+    },
+    {
+      "mode": "search",
+      "command": "end",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02881665399763733
+    },
+    {
+      "mode": "search",
+      "command": "locale group_action =\n  group mul one inv\n    for mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\" +\n  fixes act :: \"'a => 'b => 'b\"  (infixr \"acts\" 73)\n  assumes act_one : \"one acts x = x\"\n    and   act_mul : \"(g ** h) acts x = g acts (h acts x)\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03200760600157082
+    },
+    {
+      "mode": "search",
+      "command": "lemma act_inv: \"inv g acts (g acts x) = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. inv g acts g acts x = x",
+      "duration_seconds": 0.017102512065321207
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015007926966063678
+    },
+    {
+      "mode": "search",
+      "command": "lemma act_inv_r: \"g acts (inv g acts x) = x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. g acts inv g acts x = x",
+      "duration_seconds": 0.014961666078306735
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014044772018678486
+    },
+    {
+      "mode": "search",
+      "command": "definition orbit :: \"'b => 'b => bool\"\n  where \"orbit x y == (EX g. g acts x = y)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019484828924760222
+    },
+    {
+      "mode": "search",
+      "command": "definition stabilizer :: \"'b => 'a => bool\"\n  where \"stabilizer x g == g acts x = x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023341458989307284
+    },
+    {
+      "mode": "search",
+      "command": "lemma orbit_refl: \"orbit x x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. orbit x x",
+      "duration_seconds": 0.015301663079299033
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01296665205154568
+    },
+    {
+      "mode": "search",
+      "command": "lemma orbit_sym:\n  assumes \"orbit x y\"\n  shows \"orbit y x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. orbit y x",
+      "duration_seconds": 0.015454827924259007
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014109816984273493
+    },
+    {
+      "mode": "search",
+      "command": "lemma orbit_trans:\n  assumes \"orbit x y\" \"orbit y z\"\n  shows \"orbit x z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. orbit x z",
+      "duration_seconds": 0.01421365502756089
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013987081008963287
+    },
+    {
+      "mode": "search",
+      "command": "lemma orbit_partition:\n  assumes hxy: \"orbit x y\"\n  shows \"orbit x z = orbit y z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. orbit x z = orbit y z",
+      "duration_seconds": 0.015413227956742048
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014653312973678112
+    },
+    {
+      "mode": "search",
+      "command": "lemma stabilizer_mul:\n  assumes \"stabilizer x g\" \"stabilizer x h\"\n  shows \"stabilizer x (g ** h)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. stabilizer x (g ** h)",
+      "duration_seconds": 0.014047986944206059
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01288636401295662
+    },
+    {
+      "mode": "search",
+      "command": "lemma stabilizer_inv:\n  assumes hg: \"stabilizer x g\"\n  shows \"stabilizer x (inv g)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. stabilizer x (inv g)",
+      "duration_seconds": 0.013321739039383829
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013251645024865866
+    },
+    {
+      "mode": "search",
+      "command": "lemma stabilizer_one: \"stabilizer x one\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. stabilizer x one",
+      "duration_seconds": 0.009728183038532734
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011300796992145479
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013286374043673277
+    },
+    {
+      "mode": "search",
+      "command": "lemma stabilizer_conjugate:\n  assumes hh: \"stabilizer x h\"\n  shows \"stabilizer (g acts x) (g ** h ** inv g)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. stabilizer (g acts x) (g ** h ** inv g)",
+      "duration_seconds": 0.014804768026806414
+    }
+  ],
+  "failure_category": null,
+  "request_id": "6c4e7f3df83a46079156b627c0a527b7",
+  "input_sha256": "1820d08e0c908eeef45fa5ec6f58edfb65ce6e5ca7a1d42608c486b027f5b7cc",
+  "duration_seconds": 11.181047833058983
+}

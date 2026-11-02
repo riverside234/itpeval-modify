@@ -1,0 +1,42 @@
+{
+  "name": "context_hundred-theorems_089_the_factor_and_remainder_theorems_poly_diff",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 14.35,
+  "details": "details/249-context_hundred-theorems_089_the_factor_and_remainder_theorems_poly_diff.json",
+  "failure_category": "context_error",
+  "expected_failure": null,
+  "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+  "payload": {
+    "ok": false,
+    "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+    "failure_category": "context_error",
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-j0al8uiy",
+    "pisa_result": {
+      "success": false,
+      "error": "RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+      "failure_category": "context_error",
+      "step_results": [],
+      "request_id": "c41440fed9e2465caf9d824f88e55f3f",
+      "input_sha256": "96e3b6d4503040f2c819c2082a2130f7f3b5d29bfeba1ac8a3a913a0598bad65",
+      "duration_seconds": 14.206598059041426
+    },
+    "import_resolution": {
+      "original_imports": [
+        "Complex_Main",
+        "HOL-Library.More_List",
+        "HOL-Library.Infinite_Set",
+        "Primes"
+      ],
+      "resolved_imports": [
+        "Complex_Main",
+        "HOL-Library.More_List",
+        "HOL-Library.Infinite_Set",
+        "Primes"
+      ],
+      "session_dependencies": [
+        "HOL-Library"
+      ]
+    }
+  }
+}

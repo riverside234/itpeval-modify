@@ -1,0 +1,291 @@
+{
+  "name": "context_babel-formal_ideals_sum_isIdeal",
+  "domain": "context",
+  "status": "pass",
+  "duration_seconds": 8.241,
+  "details": "details/099-context_babel-formal_ideals_sum_isIdeal.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "payload": {
+    "ok": true,
+    "target": [
+      "babel-formal",
+      6,
+      "ideals",
+      "sum_isIdeal"
+    ],
+    "result": {
+      "baseline_ok": true,
+      "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-60vzmy14",
+      "backend_metadata": {
+        "backend": "dsp-pisa",
+        "isabelle_version": "Isabelle2021",
+        "isabelle_version_raw": "Isabelle2021: February 2021",
+        "pisa_commit": "690eed41fa03fe04ec015bb375c668cd6fd94261",
+        "dsp_commit": "647aa65ca7b89f4e0f7a65dc15b4e64a81af5e80",
+        "itpeval_commit": "43cd12524b5948471be994d91f41d86a2b801955",
+        "config": {
+          "backend": "dsp-pisa",
+          "expected_isabelle_version": "Isabelle2021",
+          "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+          "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+          "java_bin": "java",
+          "port": 9000,
+          "startup_timeout_s": 600,
+          "step_timeout_s": 60,
+          "hammer_timeout_s": 60,
+          "target_timeout_s": 1800,
+          "theory_imports": {
+            "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+            "Tagged_Division": "HOL-Analysis.Tagged_Division"
+          }
+        },
+        "java_version": "openjdk version \"11.0.30-internal\" 2026-01-20\nOpenJDK Runtime Environment (build 11.0.30-internal+0-adhoc.conda.src)\nOpenJDK 64-Bit Server VM (build 11.0.30-internal+0-adhoc.conda.src, mixed mode)",
+        "settings": {
+          "ISABELLE_HOME_USER": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/user_home/.isabelle/Isabelle2021",
+          "ISABELLE_HEAPS": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/heaps",
+          "ISABELLE_TMP_PREFIX": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2021-pisa/tmp/isabelle"
+        },
+        "pisa_jar_sha256": "e5ffdcba4e5030445d905862100647f67939bea41be475c7de87c5c33d14ddc9",
+        "generated_client_sha256": {
+          "server_pb2.py": "042bdec4a5037139edd0663d6e9a799ae1cda2d4b03266330d29ca58ae32c1be",
+          "server_pb2_grpc.py": "8545f68a3bad2cc52e7c099db8d6e5cd08037f49ea6f6477325e16a7a4fe3e71"
+        },
+        "dsp_checker_sha256": "48665c5b4f8d4f99f39310ace83a7161cbf9391048954c118b33c25c739db7cf",
+        "adapter_sha256": {
+          "checker.py": "10972fe91256d63de624c55466487292ce4f7f4a33457c5c545c5c0b55d1f2ab",
+          "runtime.py": "1b94e57a493fd575998241d8c36b3c508c1795e4861cdc8918b434456891396f",
+          "pisa_worker.py": "dc5f663ca5ccc3689105303c755812093769ba36015886972e17ac55a914588a",
+          "pisa_context.py": "cc90618f858bc43355cce53a675826696e595a8d365b89b39f1beb1433a5efc5",
+          "input_contract.py": "089ac776a5eae25bb655ef6ecdd1a8aef9f6df088df3a947df1034bd8dafee56"
+        },
+        "replay_enabled": false,
+        "server_limits": "Original PISA: 10s transitions; 40s normalhammer",
+        "backend_fingerprint": "5803aeb1ffaf08d200d7cf8966ec42571a62b83e9a81cfbbe3b06f2efae0903e"
+      },
+      "pisa_result": {
+        "success": true,
+        "error": "",
+        "dsp_result": {
+          "success": true,
+          "reason": "",
+          "num_steps": 14,
+          "last_step": 14,
+          "step_results": [
+            {
+              "index": 0,
+              "step": "theory ideals\n  imports Main\nbegin",
+              "output": "",
+              "step_time": 0.0225067138671875
+            },
+            {
+              "index": 1,
+              "step": "declare [[quick_and_dirty = true]]",
+              "output": "",
+              "step_time": 0.017982006072998047
+            },
+            {
+              "index": 2,
+              "step": "locale cring =\n  fixes zero :: \"'r\"\n    and one  :: \"'r\"\n    and add  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"+R\" 65)\n    and mul  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"*R\" 70)\n    and opp  :: \"'r \\<Rightarrow> 'r\"\n  assumes add_comm  : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero  : \"\\<And>x. x +R zero = x\"\n    and   add_opp   : \"\\<And>x. x +R opp x = zero\"\n    and   mul_comm  : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_one   : \"\\<And>x. x *R one = x\"\n    and   dist_l    : \"\\<And>a x y. a *R (x +R y) = (a *R x) +R (a *R y)\"\n    and   opp_add   : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\nbegin",
+              "output": "",
+              "step_time": 0.044150590896606445
+            },
+            {
+              "index": 3,
+              "step": "lemma add_left_comm: \"x +R (y +R z) = y +R (x +R z)\"",
+              "output": "",
+              "step_time": 0.020696640014648438
+            },
+            {
+              "index": 4,
+              "step": "sorry",
+              "output": "",
+              "step_time": 0.01812601089477539
+            },
+            {
+              "index": 5,
+              "step": "lemma zero_add: \"zero +R x = x\"",
+              "output": "",
+              "step_time": 0.0235750675201416
+            },
+            {
+              "index": 6,
+              "step": "sorry",
+              "output": "",
+              "step_time": 0.021724462509155273
+            },
+            {
+              "index": 7,
+              "step": "definition IsIdeal :: \"('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"IsIdeal I \\<equiv>\n    I zero \\<and>\n    (\\<forall>x y. I x \\<longrightarrow> I y \\<longrightarrow> I (x +R y)) \\<and>\n    (\\<forall>x.   I x \\<longrightarrow> I (opp x)) \\<and>\n    (\\<forall>a x. I x \\<longrightarrow> I (a *R x))\"",
+              "output": "",
+              "step_time": 0.03097391128540039
+            },
+            {
+              "index": 8,
+              "step": "definition Inter :: \"('i \\<Rightarrow> 'r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"Inter F \\<equiv> \\<lambda>x. \\<forall>i. F i x\"",
+              "output": "",
+              "step_time": 0.026894330978393555
+            },
+            {
+              "index": 9,
+              "step": "lemma inter_isIdeal:\n  assumes h: \"\\<forall>i. IsIdeal (F i)\"\n  shows \"IsIdeal (Inter F)\"",
+              "output": "",
+              "step_time": 0.02111363410949707
+            },
+            {
+              "index": 10,
+              "step": "sorry",
+              "output": "",
+              "step_time": 0.017805814743041992
+            },
+            {
+              "index": 11,
+              "step": "definition isum :: \"('r \\<Rightarrow> bool) \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"isum I J \\<equiv> \\<lambda>x. \\<exists>a b. I a \\<and> J b \\<and> x = a +R b\"",
+              "output": "",
+              "step_time": 0.025704145431518555
+            },
+            {
+              "index": 12,
+              "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+              "output": "",
+              "step_time": 0.01610732078552246
+            },
+            {
+              "index": 13,
+              "step": "lemma sum_isIdeal:\n  assumes hI: \"IsIdeal I\" and hJ: \"IsIdeal J\"\n  shows \"IsIdeal (isum I J)\"",
+              "output": "",
+              "step_time": 0.022451400756835938
+            }
+          ],
+          "final_state": "default_13",
+          "context_ready": true,
+          "proof_level": "1"
+        },
+        "step_results": [
+          {
+            "mode": "search",
+            "command": "theory ideals\n  imports Main\nbegin",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.022499112994410098
+          },
+          {
+            "mode": "search",
+            "command": "declare [[quick_and_dirty = true]]",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.017977030016481876
+          },
+          {
+            "mode": "search",
+            "command": "locale cring =\n  fixes zero :: \"'r\"\n    and one  :: \"'r\"\n    and add  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"+R\" 65)\n    and mul  :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"  (infixl \"*R\" 70)\n    and opp  :: \"'r \\<Rightarrow> 'r\"\n  assumes add_comm  : \"\\<And>x y. x +R y = y +R x\"\n    and   add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and   add_zero  : \"\\<And>x. x +R zero = x\"\n    and   add_opp   : \"\\<And>x. x +R opp x = zero\"\n    and   mul_comm  : \"\\<And>x y. x *R y = y *R x\"\n    and   mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and   mul_one   : \"\\<And>x. x *R one = x\"\n    and   dist_l    : \"\\<And>a x y. a *R (x +R y) = (a *R x) +R (a *R y)\"\n    and   opp_add   : \"\\<And>x y. opp (x +R y) = opp x +R opp y\"\nbegin",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.044144385028630495
+          },
+          {
+            "mode": "search",
+            "command": "lemma add_left_comm: \"x +R (y +R z) = y +R (x +R z)\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x +R (y +R z) = y +R (x +R z)",
+            "duration_seconds": 0.020687956013716757
+          },
+          {
+            "mode": "search",
+            "command": "sorry",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.01811998907942325
+          },
+          {
+            "mode": "search",
+            "command": "lemma zero_add: \"zero +R x = x\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. zero +R x = x",
+            "duration_seconds": 0.02356981800403446
+          },
+          {
+            "mode": "search",
+            "command": "sorry",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.021719372016377747
+          },
+          {
+            "mode": "search",
+            "command": "definition IsIdeal :: \"('r \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"IsIdeal I \\<equiv>\n    I zero \\<and>\n    (\\<forall>x y. I x \\<longrightarrow> I y \\<longrightarrow> I (x +R y)) \\<and>\n    (\\<forall>x.   I x \\<longrightarrow> I (opp x)) \\<and>\n    (\\<forall>a x. I x \\<longrightarrow> I (a *R x))\"",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.030966265010647476
+          },
+          {
+            "mode": "search",
+            "command": "definition Inter :: \"('i \\<Rightarrow> 'r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"Inter F \\<equiv> \\<lambda>x. \\<forall>i. F i x\"",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.026887834072113037
+          },
+          {
+            "mode": "search",
+            "command": "lemma inter_isIdeal:\n  assumes h: \"\\<forall>i. IsIdeal (F i)\"\n  shows \"IsIdeal (Inter F)\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. IsIdeal (local.Inter F)",
+            "duration_seconds": 0.021109132911078632
+          },
+          {
+            "mode": "search",
+            "command": "sorry",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.017801946960389614
+          },
+          {
+            "mode": "search",
+            "command": "definition isum :: \"('r \\<Rightarrow> bool) \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"isum I J \\<equiv> \\<lambda>x. \\<exists>a b. I a \\<and> J b \\<and> x = a +R b\"",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.025696425000205636
+          },
+          {
+            "mode": "search",
+            "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+            "success": true,
+            "observation": "",
+            "duration_seconds": 0.01610201201401651
+          },
+          {
+            "mode": "search",
+            "command": "lemma sum_isIdeal:\n  assumes hI: \"IsIdeal I\" and hJ: \"IsIdeal J\"\n  shows \"IsIdeal (isum I J)\"",
+            "success": true,
+            "observation": "proof (prove)\ngoal (1 subgoal):\n 1. IsIdeal (isum I J)",
+            "duration_seconds": 0.02244715904816985
+          }
+        ],
+        "failure_category": null,
+        "request_id": "40b6c8c9b3154138bff64105377cac47",
+        "input_sha256": "049f959a67a7af9896802f8134dc56b52376219311c6dbe0eab79b89dde4e072",
+        "duration_seconds": 8.131361929001287
+      },
+      "import_resolution": {
+        "original_imports": [
+          "Main"
+        ],
+        "resolved_imports": [
+          "Main"
+        ],
+        "session_dependencies": []
+      },
+      "draft_context_policy": "original_masked_prefix",
+      "context_sha256": "cf416fcc374e1e9c48df9a5755b188038c1b44c8fb73a66291706de534b4258c",
+      "statement_sha256": "5c89f12a8ae952ed1dd907736fc48231d56f89ff3c42d315c04521847247a7e2",
+      "template_sha256": "da94ee4c1dda922a5713f463a5c7edcc5e7b889dd37e408fde4527ab30cc7bd9",
+      "background_policy": "earlier_masked_helpers_admitted",
+      "admitted_background_names": [
+        "add_left_comm",
+        "zero_add",
+        "inter_isIdeal"
+      ],
+      "admitted_background_count": 3
+    }
+  }
+}

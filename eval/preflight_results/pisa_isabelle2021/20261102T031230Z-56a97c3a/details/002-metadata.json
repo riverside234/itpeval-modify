@@ -1,0 +1,13 @@
+{
+  "name": "metadata",
+  "domain": "setup",
+  "status": "pass",
+  "duration_seconds": 0.641,
+  "details": "details/002-metadata.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "payload": {
+    "ok": true,
+    "backend_fingerprint": "5803aeb1ffaf08d200d7cf8966ec42571a62b83e9a81cfbbe3b06f2efae0903e"
+  }
+}

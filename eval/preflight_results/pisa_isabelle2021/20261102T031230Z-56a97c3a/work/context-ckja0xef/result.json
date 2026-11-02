@@ -1,0 +1,528 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 39,
+    "last_step": 39,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory integral_comp_neg_Iic\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.02217698097229004
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01598525047302246
+      },
+      {
+        "index": 2,
+        "step": "locale integrals_setup =\n  fixes zero one  :: \"'r\"\n    and add       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"+R\" 65)\n    and opp       :: \"'r \\<Rightarrow> 'r\"\n    and mul       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"*R\" 70)\n    and leR       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<le>R\" 50)\n    and ltR       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"<R\" 50)\n    and absR      :: \"'r \\<Rightarrow> 'r\"\n    and sigma     :: \"('r \\<Rightarrow> bool) \\<Rightarrow> ('r \\<Rightarrow> 'r) \\<Rightarrow> 'r\"\n\n  assumes\n    add_comm      : \"\\<And>x y.   x +R y = y +R x\"\n    and add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and add_zero  : \"\\<And>x.     x +R zero = x\"\n    and add_opp   : \"\\<And>x.     opp x +R x = zero\"\n    and add_right_cancel : \"\\<And>x y z. x +R z = y +R z \\<Longrightarrow> x = y\"\n    and mul_comm  : \"\\<And>x y.   x *R y = y *R x\"\n    and mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and mul_one   : \"\\<And>x.     x *R one = x\"\n    and dist_l    : \"\\<And>x y z. x *R (y +R z) = (x *R y) +R (x *R z)\"\n    and opp_inv   : \"\\<And>x.     opp (opp x) = x\"\n    and add_le_compat : \"\\<And>x y z. x \\<le>R y \\<Longrightarrow> (x +R z) \\<le>R (y +R z)\"\n    and le_opp    : \"\\<And>x y.   x \\<le>R y \\<Longrightarrow> opp y \\<le>R opp x\"\n    and le_antisymm : \"\\<And>x y. x \\<le>R y \\<Longrightarrow> y \\<le>R x \\<Longrightarrow> x = y\"\n    and lt_opp    : \"\\<And>x y.   x <R y \\<Longrightarrow> opp y <R opp x\"\n    and le_refl   : \"\\<And>x.     x \\<le>R x\"\n    and le_trans  : \"\\<And>x y z. x \\<le>R y \\<Longrightarrow> y \\<le>R z \\<Longrightarrow> x \\<le>R z\"\n    and le_total  : \"\\<And>x y.   x \\<le>R y \\<or> y \\<le>R x\"\n    and lt_def    : \"\\<And>x y.   (x <R y) \\<longleftrightarrow> (x \\<le>R y \\<and> x \\<noteq> y)\"\n    and abs_pos   : \"\\<And>x.     zero \\<le>R x \\<Longrightarrow> absR x = x\"\n    and abs_neg   : \"\\<And>x.     x \\<le>R zero \\<Longrightarrow> absR x = opp x\"\n    and abs_nonneg : \"\\<And>x.    zero \\<le>R absR x\"\n    and abs_opp   : \"\\<And>x.     absR (opp x) = absR x\"\n    and abs_triangle : \"\\<And>x y. absR (x +R y) \\<le>R (absR x +R absR y)\"\n\n    and sigma_mul_const : \"\\<And>D f c. sigma D (\\<lambda>x. c *R f x) = c *R sigma D f\"\n    and sigma_congr : \"\\<And>D f g. (\\<forall>x. D x \\<longrightarrow> f x = g x) \\<Longrightarrow> sigma D f = sigma D g\"\n    and sigma_zero  : \"\\<And>D.     sigma D (\\<lambda>_. zero) = zero\"\n    and sigma_add   : \"\\<And>D f g. sigma D (\\<lambda>x. f x +R g x) = sigma D f +R sigma D g\"\n    and sigma_union_disjoint :\n          \"\\<And>D E f. (\\<forall>x. D x \\<longrightarrow> E x \\<longrightarrow> False) \\<Longrightarrow>\n            sigma (\\<lambda>x. D x \\<or> E x) f = sigma D f +R sigma E f\"\n    and sigma_le    : \"\\<And>D f g. (\\<forall>x. D x \\<longrightarrow> f x \\<le>R g x) \\<Longrightarrow> sigma D f \\<le>R sigma D g\"\n    and sigma_dom_congr :\n          \"\\<And>D E f. (\\<forall>x. D x \\<longleftrightarrow> E x) \\<Longrightarrow> sigma D f = sigma E f\"\nbegin",
+        "output": "",
+        "step_time": 0.06334853172302246
+      },
+      {
+        "index": 3,
+        "step": "definition Iic :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\" where \"Iic c x \\<equiv> x \\<le>R c\"",
+        "output": "",
+        "step_time": 0.025522947311401367
+      },
+      {
+        "index": 4,
+        "step": "definition Ioi :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\" where \"Ioi c x \\<equiv> c <R x\"",
+        "output": "",
+        "step_time": 0.030393123626708984
+      },
+      {
+        "index": 5,
+        "step": "definition Iio :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\" where \"Iio c x \\<equiv> x <R c\"",
+        "output": "",
+        "step_time": 0.033255577087402344
+      },
+      {
+        "index": 6,
+        "step": "definition preimage :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"preimage g D x \\<equiv> D (g x)\"",
+        "output": "",
+        "step_time": 0.03314566612243652
+      },
+      {
+        "index": 7,
+        "step": "lemma add_opp_r: \"x +R opp x = zero\"",
+        "output": "",
+        "step_time": 0.022581100463867188
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01681685447692871
+      },
+      {
+        "index": 9,
+        "step": "lemma lt_irrefl: \"\\<not> (x <R x)\"",
+        "output": "",
+        "step_time": 0.017348527908325195
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017757415771484375
+      },
+      {
+        "index": 11,
+        "step": "lemma lt_trans_strict: \"x <R y \\<Longrightarrow> y <R z \\<Longrightarrow> x <R z\"",
+        "output": "",
+        "step_time": 0.016121864318847656
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016751766204833984
+      },
+      {
+        "index": 13,
+        "step": "lemma preimage_union:\n  \"preimage g (\\<lambda>x. D x \\<or> E x) x \\<longleftrightarrow> preimage g D x \\<or> preimage g E x\"",
+        "output": "",
+        "step_time": 0.017662525177001953
+      },
+      {
+        "index": 14,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01769852638244629
+      },
+      {
+        "index": 15,
+        "step": "lemma preimage_inter:\n  \"preimage g (\\<lambda>x. D x \\<and> E x) x \\<longleftrightarrow> preimage g D x \\<and> preimage g E x\"",
+        "output": "",
+        "step_time": 0.03334856033325195
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0172269344329834
+      },
+      {
+        "index": 17,
+        "step": "lemma preimage_neg_Ioi: \"preimage opp (Ioi c) x \\<longleftrightarrow> x <R opp c\"",
+        "output": "",
+        "step_time": 0.012953996658325195
+      },
+      {
+        "index": 18,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01328134536743164
+      },
+      {
+        "index": 19,
+        "step": "lemma preimage_neg_Iic: \"preimage opp (Iic c) x \\<longleftrightarrow> opp c \\<le>R x\"",
+        "output": "",
+        "step_time": 0.015035152435302734
+      },
+      {
+        "index": 20,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013902425765991211
+      },
+      {
+        "index": 21,
+        "step": "lemma preimage_comp:\n  \"preimage g (preimage h D) x \\<longleftrightarrow> preimage (\\<lambda>x. h (g x)) D x\"",
+        "output": "",
+        "step_time": 0.016168832778930664
+      },
+      {
+        "index": 22,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01492762565612793
+      },
+      {
+        "index": 23,
+        "step": "lemma integral_neg: \"sigma D (\\<lambda>x. opp (f x)) = opp (sigma D f)\"",
+        "output": "",
+        "step_time": 0.014306306838989258
+      },
+      {
+        "index": 24,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01395726203918457
+      },
+      {
+        "index": 25,
+        "step": "lemma integral_sub:\n  \"sigma D (\\<lambda>x. f x +R opp (g x)) = sigma D f +R opp (sigma D g)\"",
+        "output": "",
+        "step_time": 0.017093896865844727
+      },
+      {
+        "index": 26,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013967037200927734
+      },
+      {
+        "index": 27,
+        "step": "lemma sigma_empty: \"sigma (\\<lambda>_. False) f = zero\"",
+        "output": "",
+        "step_time": 0.01442861557006836
+      },
+      {
+        "index": 28,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013820886611938477
+      },
+      {
+        "index": 29,
+        "step": "lemma sigma_bilinear:\n  \"sigma D (\\<lambda>x. (c *R f x) +R (d *R g x)) =\n   (c *R sigma D f) +R (d *R sigma D g)\"",
+        "output": "",
+        "step_time": 0.01926255226135254
+      },
+      {
+        "index": 30,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013828277587890625
+      },
+      {
+        "index": 31,
+        "step": "lemma sigma_le_monotone:\n  \"(\\<forall>x. D x \\<longrightarrow> f x \\<le>R g x) \\<Longrightarrow> sigma D f \\<le>R sigma D g\"",
+        "output": "",
+        "step_time": 0.016277313232421875
+      },
+      {
+        "index": 32,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013919830322265625
+      },
+      {
+        "index": 33,
+        "step": "lemma sigma_nonneg:\n  \"(\\<forall>x. D x \\<longrightarrow> zero \\<le>R f x) \\<Longrightarrow> zero \\<le>R sigma D f\"",
+        "output": "",
+        "step_time": 0.014911890029907227
+      },
+      {
+        "index": 34,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01222372055053711
+      },
+      {
+        "index": 35,
+        "step": "lemma sigma_split:\n  \"sigma D f =\n   sigma (\\<lambda>x. D x \\<and> P x) f +R sigma (\\<lambda>x. D x \\<and> \\<not> P x) f\"",
+        "output": "",
+        "step_time": 0.017030715942382812
+      },
+      {
+        "index": 36,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.0160830020904541
+      },
+      {
+        "index": 37,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.011988162994384766
+      },
+      {
+        "index": 38,
+        "step": "lemma sigma_preimage_neg_Ioi:\n  \"sigma (preimage opp (Ioi c)) f = sigma (Iio (opp c)) f\"",
+        "output": "",
+        "step_time": 0.014475345611572266
+      }
+    ],
+    "final_state": "default_38",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory integral_comp_neg_Iic\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.022169459029100835
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015980249037966132
+    },
+    {
+      "mode": "search",
+      "command": "locale integrals_setup =\n  fixes zero one  :: \"'r\"\n    and add       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"+R\" 65)\n    and opp       :: \"'r \\<Rightarrow> 'r\"\n    and mul       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> 'r\"   (infixl \"*R\" 70)\n    and leR       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"\\<le>R\" 50)\n    and ltR       :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\"  (infix \"<R\" 50)\n    and absR      :: \"'r \\<Rightarrow> 'r\"\n    and sigma     :: \"('r \\<Rightarrow> bool) \\<Rightarrow> ('r \\<Rightarrow> 'r) \\<Rightarrow> 'r\"\n\n  assumes\n    add_comm      : \"\\<And>x y.   x +R y = y +R x\"\n    and add_assoc : \"\\<And>x y z. (x +R y) +R z = x +R (y +R z)\"\n    and add_zero  : \"\\<And>x.     x +R zero = x\"\n    and add_opp   : \"\\<And>x.     opp x +R x = zero\"\n    and add_right_cancel : \"\\<And>x y z. x +R z = y +R z \\<Longrightarrow> x = y\"\n    and mul_comm  : \"\\<And>x y.   x *R y = y *R x\"\n    and mul_assoc : \"\\<And>x y z. (x *R y) *R z = x *R (y *R z)\"\n    and mul_one   : \"\\<And>x.     x *R one = x\"\n    and dist_l    : \"\\<And>x y z. x *R (y +R z) = (x *R y) +R (x *R z)\"\n    and opp_inv   : \"\\<And>x.     opp (opp x) = x\"\n    and add_le_compat : \"\\<And>x y z. x \\<le>R y \\<Longrightarrow> (x +R z) \\<le>R (y +R z)\"\n    and le_opp    : \"\\<And>x y.   x \\<le>R y \\<Longrightarrow> opp y \\<le>R opp x\"\n    and le_antisymm : \"\\<And>x y. x \\<le>R y \\<Longrightarrow> y \\<le>R x \\<Longrightarrow> x = y\"\n    and lt_opp    : \"\\<And>x y.   x <R y \\<Longrightarrow> opp y <R opp x\"\n    and le_refl   : \"\\<And>x.     x \\<le>R x\"\n    and le_trans  : \"\\<And>x y z. x \\<le>R y \\<Longrightarrow> y \\<le>R z \\<Longrightarrow> x \\<le>R z\"\n    and le_total  : \"\\<And>x y.   x \\<le>R y \\<or> y \\<le>R x\"\n    and lt_def    : \"\\<And>x y.   (x <R y) \\<longleftrightarrow> (x \\<le>R y \\<and> x \\<noteq> y)\"\n    and abs_pos   : \"\\<And>x.     zero \\<le>R x \\<Longrightarrow> absR x = x\"\n    and abs_neg   : \"\\<And>x.     x \\<le>R zero \\<Longrightarrow> absR x = opp x\"\n    and abs_nonneg : \"\\<And>x.    zero \\<le>R absR x\"\n    and abs_opp   : \"\\<And>x.     absR (opp x) = absR x\"\n    and abs_triangle : \"\\<And>x y. absR (x +R y) \\<le>R (absR x +R absR y)\"\n\n    and sigma_mul_const : \"\\<And>D f c. sigma D (\\<lambda>x. c *R f x) = c *R sigma D f\"\n    and sigma_congr : \"\\<And>D f g. (\\<forall>x. D x \\<longrightarrow> f x = g x) \\<Longrightarrow> sigma D f = sigma D g\"\n    and sigma_zero  : \"\\<And>D.     sigma D (\\<lambda>_. zero) = zero\"\n    and sigma_add   : \"\\<And>D f g. sigma D (\\<lambda>x. f x +R g x) = sigma D f +R sigma D g\"\n    and sigma_union_disjoint :\n          \"\\<And>D E f. (\\<forall>x. D x \\<longrightarrow> E x \\<longrightarrow> False) \\<Longrightarrow>\n            sigma (\\<lambda>x. D x \\<or> E x) f = sigma D f +R sigma E f\"\n    and sigma_le    : \"\\<And>D f g. (\\<forall>x. D x \\<longrightarrow> f x \\<le>R g x) \\<Longrightarrow> sigma D f \\<le>R sigma D g\"\n    and sigma_dom_congr :\n          \"\\<And>D E f. (\\<forall>x. D x \\<longleftrightarrow> E x) \\<Longrightarrow> sigma D f = sigma E f\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.06333243299741298
+    },
+    {
+      "mode": "search",
+      "command": "definition Iic :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\" where \"Iic c x \\<equiv> x \\<le>R c\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02551519393455237
+    },
+    {
+      "mode": "search",
+      "command": "definition Ioi :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\" where \"Ioi c x \\<equiv> c <R x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.03038598597049713
+    },
+    {
+      "mode": "search",
+      "command": "definition Iio :: \"'r \\<Rightarrow> 'r \\<Rightarrow> bool\" where \"Iio c x \\<equiv> x <R c\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.033247219980694354
+    },
+    {
+      "mode": "search",
+      "command": "definition preimage :: \"('r \\<Rightarrow> 'r) \\<Rightarrow> ('r \\<Rightarrow> bool) \\<Rightarrow> 'r \\<Rightarrow> bool\"\n  where \"preimage g D x \\<equiv> D (g x)\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.033136703073978424
+    },
+    {
+      "mode": "search",
+      "command": "lemma add_opp_r: \"x +R opp x = zero\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. x +R opp x = zero",
+      "duration_seconds": 0.022574348957277834
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016811273992061615
+    },
+    {
+      "mode": "search",
+      "command": "lemma lt_irrefl: \"\\<not> (x <R x)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<not> x <R x",
+      "duration_seconds": 0.017342773033306003
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01775339408777654
+    },
+    {
+      "mode": "search",
+      "command": "lemma lt_trans_strict: \"x <R y \\<Longrightarrow> y <R z \\<Longrightarrow> x <R z\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>x <R y; y <R z\\<rbrakk> \\<Longrightarrow> x <R z",
+      "duration_seconds": 0.01611743902321905
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.016747715999372303
+    },
+    {
+      "mode": "search",
+      "command": "lemma preimage_union:\n  \"preimage g (\\<lambda>x. D x \\<or> E x) x \\<longleftrightarrow> preimage g D x \\<or> preimage g E x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. preimage g (\\<lambda>x. D x \\<or> E x) x =\n    (preimage g D x \\<or> preimage g E x)",
+      "duration_seconds": 0.017658016993664205
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017694898997433484
+    },
+    {
+      "mode": "search",
+      "command": "lemma preimage_inter:\n  \"preimage g (\\<lambda>x. D x \\<and> E x) x \\<longleftrightarrow> preimage g D x \\<and> preimage g E x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. preimage g (\\<lambda>x. D x \\<and> E x) x =\n    (preimage g D x \\<and> preimage g E x)",
+      "duration_seconds": 0.03334194899071008
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01721996790729463
+    },
+    {
+      "mode": "search",
+      "command": "lemma preimage_neg_Ioi: \"preimage opp (Ioi c) x \\<longleftrightarrow> x <R opp c\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. preimage opp (Ioi c) x = (x <R opp c)",
+      "duration_seconds": 0.012947868905030191
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013272305019199848
+    },
+    {
+      "mode": "search",
+      "command": "lemma preimage_neg_Iic: \"preimage opp (Iic c) x \\<longleftrightarrow> opp c \\<le>R x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. preimage opp (Iic c) x = (opp c \\<le>R x)",
+      "duration_seconds": 0.015024128020741045
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013893219060264528
+    },
+    {
+      "mode": "search",
+      "command": "lemma preimage_comp:\n  \"preimage g (preimage h D) x \\<longleftrightarrow> preimage (\\<lambda>x. h (g x)) D x\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. preimage g (preimage h D) x = preimage (\\<lambda>x. h (g x)) D x",
+      "duration_seconds": 0.016159153077751398
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014919209061190486
+    },
+    {
+      "mode": "search",
+      "command": "lemma integral_neg: \"sigma D (\\<lambda>x. opp (f x)) = opp (sigma D f)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. sigma D (\\<lambda>x. opp (f x)) = opp (sigma D f)",
+      "duration_seconds": 0.0142964250408113
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013946947059594095
+    },
+    {
+      "mode": "search",
+      "command": "lemma integral_sub:\n  \"sigma D (\\<lambda>x. f x +R opp (g x)) = sigma D f +R opp (sigma D g)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. sigma D (\\<lambda>x. f x +R opp (g x)) = sigma D f +R opp (sigma D g)",
+      "duration_seconds": 0.017087141051888466
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013958623050712049
+    },
+    {
+      "mode": "search",
+      "command": "lemma sigma_empty: \"sigma (\\<lambda>_. False) f = zero\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. sigma (\\<lambda>_. False) f = zero",
+      "duration_seconds": 0.014419105951674283
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013811215059831738
+    },
+    {
+      "mode": "search",
+      "command": "lemma sigma_bilinear:\n  \"sigma D (\\<lambda>x. (c *R f x) +R (d *R g x)) =\n   (c *R sigma D f) +R (d *R sigma D g)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. sigma D (\\<lambda>x. c *R f x +R d *R g x) =\n    c *R sigma D f +R d *R sigma D g",
+      "duration_seconds": 0.019255946041084826
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013819408020935953
+    },
+    {
+      "mode": "search",
+      "command": "lemma sigma_le_monotone:\n  \"(\\<forall>x. D x \\<longrightarrow> f x \\<le>R g x) \\<Longrightarrow> sigma D f \\<le>R sigma D g\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>x. D x \\<longrightarrow> f x \\<le>R g x \\<Longrightarrow>\n    sigma D f \\<le>R sigma D g",
+      "duration_seconds": 0.016270483029074967
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013905744068324566
+    },
+    {
+      "mode": "search",
+      "command": "lemma sigma_nonneg:\n  \"(\\<forall>x. D x \\<longrightarrow> zero \\<le>R f x) \\<Longrightarrow> zero \\<le>R sigma D f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<forall>x. D x \\<longrightarrow> zero \\<le>R f x \\<Longrightarrow>\n    zero \\<le>R sigma D f",
+      "duration_seconds": 0.014905996969901025
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.012220081058330834
+    },
+    {
+      "mode": "search",
+      "command": "lemma sigma_split:\n  \"sigma D f =\n   sigma (\\<lambda>x. D x \\<and> P x) f +R sigma (\\<lambda>x. D x \\<and> \\<not> P x) f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. sigma D f =\n    sigma (\\<lambda>x. D x \\<and> P x) f +R\n    sigma (\\<lambda>x. D x \\<and> \\<not> P x) f",
+      "duration_seconds": 0.01702213194221258
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.0160733979428187
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.011981333023868501
+    },
+    {
+      "mode": "search",
+      "command": "lemma sigma_preimage_neg_Ioi:\n  \"sigma (preimage opp (Ioi c)) f = sigma (Iio (opp c)) f\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. sigma (preimage opp (Ioi c)) f = sigma (Iio (opp c)) f",
+      "duration_seconds": 0.014470624970272183
+    }
+  ],
+  "failure_category": null,
+  "request_id": "a9618154165a4d69bfbdc0577ad0fb7d",
+  "input_sha256": "e96df9e1a39f829d3d956ece5ed93e4546f36902cb9b8bcf6c60d08762913ec7",
+  "duration_seconds": 8.856890954077244
+}

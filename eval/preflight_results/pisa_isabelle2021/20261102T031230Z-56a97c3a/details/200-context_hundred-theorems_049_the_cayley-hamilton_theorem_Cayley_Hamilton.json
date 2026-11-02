@@ -1,0 +1,38 @@
+{
+  "name": "context_hundred-theorems_049_the_cayley-hamilton_theorem_Cayley_Hamilton",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 7.433,
+  "details": "details/200-context_hundred-theorems_049_the_cayley-hamilton_theorem_Cayley_Hamilton.json",
+  "failure_category": "context_error",
+  "expected_failure": null,
+  "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+  "payload": {
+    "ok": false,
+    "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+    "failure_category": "context_error",
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-bexdqvf5",
+    "pisa_result": {
+      "success": false,
+      "error": "RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+      "failure_category": "context_error",
+      "step_results": [],
+      "request_id": "5f221a0a0e554fea8faeb4e2b5e99ea8",
+      "input_sha256": "7f8fe97b35750264ca4539b2f21638f16b36e1b839bd3108d81d5f72c5e15210",
+      "duration_seconds": 7.3128181990468875
+    },
+    "import_resolution": {
+      "original_imports": [
+        "Square_Matrix",
+        "HOL-Computational_Algebra.Polynomial"
+      ],
+      "resolved_imports": [
+        "Square_Matrix",
+        "HOL-Computational_Algebra.Polynomial"
+      ],
+      "session_dependencies": [
+        "HOL-Computational_Algebra"
+      ]
+    }
+  }
+}

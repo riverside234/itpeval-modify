@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory comp_commute\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\ndefinition myComp :: \"('b \\<Rightarrow> 'c) \\<Rightarrow> ('a \\<Rightarrow> 'b) \\<Rightarrow> ('a \\<Rightarrow> 'c)\"\n  where \"myComp g f \\<equiv> \\<lambda>x. g (f x)\"\n\ndefinition myId :: \"'a \\<Rightarrow> 'a\"\n  where \"myId \\<equiv> \\<lambda>x. x\"\n\n\n\nlemma comp_assoc:\n  \"myComp h (myComp g f) = myComp (myComp h g) f\"\n  sorry\nlemma comp_id_l:\n  \"myComp myId f = f\"\n  sorry\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma comp_id_r:\n  \"myComp f myId = f\"\n  ",
+    "theory_name": "comp_commute",
+    "request_id": "7da1a87ccd764accafa353406da6e2ba",
+    "input_sha256": "d4b69e35408f010e3ffecd05766bd3477458ca68c8eda6265339d86bf55abf40"
+  }
+}

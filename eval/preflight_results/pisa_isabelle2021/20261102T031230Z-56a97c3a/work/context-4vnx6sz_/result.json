@@ -1,0 +1,424 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 31,
+    "last_step": 31,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory graph_paths\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.021573781967163086
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.01578068733215332
+      },
+      {
+        "index": 2,
+        "step": "inductive Path :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  for E :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\nwhere\n  Pnil:  \"Path E v v\"\n| Pstep: \"Path E u v \\<Longrightarrow> E v w \\<Longrightarrow> Path E u w\"",
+        "output": "",
+        "step_time": 0.041957855224609375
+      },
+      {
+        "index": 3,
+        "step": "definition undirected :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"undirected E \\<equiv> \\<forall>x y. E x y \\<longrightarrow> E y x\"",
+        "output": "",
+        "step_time": 0.02240753173828125
+      },
+      {
+        "index": 4,
+        "step": "definition Erev :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  where \"Erev E x y \\<equiv> E y x\"",
+        "output": "",
+        "step_time": 0.027119874954223633
+      },
+      {
+        "index": 5,
+        "step": "lemma path_refl: \"Path E v v\"",
+        "output": "",
+        "step_time": 0.021370410919189453
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019786357879638672
+      },
+      {
+        "index": 7,
+        "step": "lemma path_trans:\n  assumes \"Path E u v\" \"Path E v w\" shows \"Path E u w\"",
+        "output": "",
+        "step_time": 0.020962953567504883
+      },
+      {
+        "index": 8,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.020121097564697266
+      },
+      {
+        "index": 9,
+        "step": "lemma trans: \"Path E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E u w\"",
+        "output": "",
+        "step_time": 0.01887345314025879
+      },
+      {
+        "index": 10,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.016911983489990234
+      },
+      {
+        "index": 11,
+        "step": "lemma edge_path: \"E u v \\<Longrightarrow> Path E u v\"",
+        "output": "",
+        "step_time": 0.018567800521850586
+      },
+      {
+        "index": 12,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.017364978790283203
+      },
+      {
+        "index": 13,
+        "step": "lemma concat_edge_right: \"Path E u v \\<Longrightarrow> E v w \\<Longrightarrow> Path E u w\"",
+        "output": "",
+        "step_time": 0.018790721893310547
+      },
+      {
+        "index": 14,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01660442352294922
+      },
+      {
+        "index": 15,
+        "step": "lemma concat: \"Path E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E u w\"",
+        "output": "",
+        "step_time": 0.021815776824951172
+      },
+      {
+        "index": 16,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.023909330368041992
+      },
+      {
+        "index": 17,
+        "step": "lemma concat_edge_left: \"E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E u w\"",
+        "output": "",
+        "step_time": 0.02872467041015625
+      },
+      {
+        "index": 18,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.015834808349609375
+      },
+      {
+        "index": 19,
+        "step": "lemma concat3:\n  \"Path E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E w t \\<Longrightarrow> Path E u t\"",
+        "output": "",
+        "step_time": 0.014823436737060547
+      },
+      {
+        "index": 20,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01307058334350586
+      },
+      {
+        "index": 21,
+        "step": "lemma reverse_cons:\n  assumes hE: \"undirected E\" and e: \"E m v\" and ih: \"Path E m u\"\n  shows \"Path E v u\"",
+        "output": "",
+        "step_time": 0.017499446868896484
+      },
+      {
+        "index": 22,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01548910140991211
+      },
+      {
+        "index": 23,
+        "step": "lemma reverse_path:\n  assumes hE: \"undirected E\" and p: \"Path E u v\"\n  shows \"Path E v u\"",
+        "output": "",
+        "step_time": 0.014538764953613281
+      },
+      {
+        "index": 24,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.014982461929321289
+      },
+      {
+        "index": 25,
+        "step": "lemma reverse_cons_Erev:\n  assumes e: \"E m v\" and ih: \"Path (Erev E) m u\"\n  shows \"Path (Erev E) v u\"",
+        "output": "",
+        "step_time": 0.015143394470214844
+      },
+      {
+        "index": 26,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.013487100601196289
+      },
+      {
+        "index": 27,
+        "step": "lemma reverse_in_Erev:\n  assumes p: \"Path E u v\"\n  shows \"Path (Erev E) v u\"",
+        "output": "",
+        "step_time": 0.014736175537109375
+      },
+      {
+        "index": 28,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.01401376724243164
+      },
+      {
+        "index": 29,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.011925220489501953
+      },
+      {
+        "index": 30,
+        "step": "lemma cycle_refl:\n  \"Path E v w \\<Longrightarrow> Path E w v \\<Longrightarrow> Path E v v\"",
+        "output": "",
+        "step_time": 0.014347076416015625
+      }
+    ],
+    "final_state": "default_30",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory graph_paths\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.021566975046880543
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015773703926242888
+    },
+    {
+      "mode": "search",
+      "command": "inductive Path :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  for E :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\nwhere\n  Pnil:  \"Path E v v\"\n| Pstep: \"Path E u v \\<Longrightarrow> E v w \\<Longrightarrow> Path E u w\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.041950125945732
+    },
+    {
+      "mode": "search",
+      "command": "definition undirected :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> bool\"\n  where \"undirected E \\<equiv> \\<forall>x y. E x y \\<longrightarrow> E y x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.022402815986424685
+    },
+    {
+      "mode": "search",
+      "command": "definition Erev :: \"('a \\<Rightarrow> 'a \\<Rightarrow> bool) \\<Rightarrow> 'a \\<Rightarrow> 'a \\<Rightarrow> bool\"\n  where \"Erev E x y \\<equiv> E y x\"",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.027112190960906446
+    },
+    {
+      "mode": "search",
+      "command": "lemma path_refl: \"Path E v v\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. Path E v v",
+      "duration_seconds": 0.02136556396726519
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.019781637005507946
+    },
+    {
+      "mode": "search",
+      "command": "lemma path_trans:\n  assumes \"Path E u v\" \"Path E v w\" shows \"Path E u w\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. Path E u w",
+      "duration_seconds": 0.02095753699541092
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.020116338040679693
+    },
+    {
+      "mode": "search",
+      "command": "lemma trans: \"Path E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E u w\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>Path E u v; Path E v w\\<rbrakk> \\<Longrightarrow> Path E u w",
+      "duration_seconds": 0.018869400024414062
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01690833200700581
+    },
+    {
+      "mode": "search",
+      "command": "lemma edge_path: \"E u v \\<Longrightarrow> Path E u v\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. E u v \\<Longrightarrow> Path E u v",
+      "duration_seconds": 0.018563268007710576
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.017360829981043935
+    },
+    {
+      "mode": "search",
+      "command": "lemma concat_edge_right: \"Path E u v \\<Longrightarrow> E v w \\<Longrightarrow> Path E u w\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>Path E u v; E v w\\<rbrakk> \\<Longrightarrow> Path E u w",
+      "duration_seconds": 0.018786886939778924
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01659995096269995
+    },
+    {
+      "mode": "search",
+      "command": "lemma concat: \"Path E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E u w\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>Path E u v; Path E v w\\<rbrakk> \\<Longrightarrow> Path E u w",
+      "duration_seconds": 0.021812304039485753
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.023906250949949026
+    },
+    {
+      "mode": "search",
+      "command": "lemma concat_edge_left: \"E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E u w\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>E u v; Path E v w\\<rbrakk> \\<Longrightarrow> Path E u w",
+      "duration_seconds": 0.02871980401687324
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015831719967536628
+    },
+    {
+      "mode": "search",
+      "command": "lemma concat3:\n  \"Path E u v \\<Longrightarrow> Path E v w \\<Longrightarrow> Path E w t \\<Longrightarrow> Path E u t\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>Path E u v; Path E v w; Path E w t\\<rbrakk>\n    \\<Longrightarrow> Path E u t",
+      "duration_seconds": 0.014815356931649148
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013064400991424918
+    },
+    {
+      "mode": "search",
+      "command": "lemma reverse_cons:\n  assumes hE: \"undirected E\" and e: \"E m v\" and ih: \"Path E m u\"\n  shows \"Path E v u\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. Path E v u",
+      "duration_seconds": 0.017489988007582724
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015478912042453885
+    },
+    {
+      "mode": "search",
+      "command": "lemma reverse_path:\n  assumes hE: \"undirected E\" and p: \"Path E u v\"\n  shows \"Path E v u\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. Path E v u",
+      "duration_seconds": 0.014532554079778492
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014972993987612426
+    },
+    {
+      "mode": "search",
+      "command": "lemma reverse_cons_Erev:\n  assumes e: \"E m v\" and ih: \"Path (Erev E) m u\"\n  shows \"Path (Erev E) v u\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. Path (Erev E) v u",
+      "duration_seconds": 0.01513208495453
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.013477068045176566
+    },
+    {
+      "mode": "search",
+      "command": "lemma reverse_in_Erev:\n  assumes p: \"Path E u v\"\n  shows \"Path (Erev E) v u\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. Path (Erev E) v u",
+      "duration_seconds": 0.014729722985066473
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.014004249009303749
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01191881694830954
+    },
+    {
+      "mode": "search",
+      "command": "lemma cycle_refl:\n  \"Path E v w \\<Longrightarrow> Path E w v \\<Longrightarrow> Path E v v\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. \\<lbrakk>Path E v w; Path E w v\\<rbrakk> \\<Longrightarrow> Path E v v",
+      "duration_seconds": 0.014337699976749718
+    }
+  ],
+  "failure_category": null,
+  "request_id": "04a9fd0c881849fa85e974e8e1ce4e86",
+  "input_sha256": "3b5a2eb16c58201a1c311d9254bd41b4bb5cf7c0b86f9320e12106750c5a1888",
+  "duration_seconds": 12.846915263100527
+}

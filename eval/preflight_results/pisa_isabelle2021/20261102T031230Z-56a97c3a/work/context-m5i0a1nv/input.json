@@ -1,0 +1,25 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "context",
+    "formal": "theory group\n  imports Main\nbegin\ndeclare [[quick_and_dirty = true]]\n\n\n\n\nlocale group =\n  fixes mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\"\n  assumes mul_assoc : \"a ** (b ** c) = (a ** b) ** c\"\n    and   mul_one   : \"a ** one = a\"\n    and   one_mul   : \"one ** a = a\"\n    and   mul_inv_l : \"inv a ** a = one\"\n    and   mul_inv_r : \"a ** inv a = one\"\nbegin\n\n\n\nlemma mul_left_cancel:\n  assumes h: \"a ** b = a ** c\"\n  shows \"b = c\"\n  sorry\nlemma mul_right_cancel:\n  assumes h: \"b ** a = c ** a\"\n  shows \"b = c\"\n  sorry\nlemma inv_inv: \"inv (inv a) = a\"\n  sorry\nlemma inv_mul: \"inv (a ** b) = inv b ** inv a\"\n  sorry\nlemma inv_eq_of_mul_eq_one:\n  assumes h: \"a ** b = one\"\n  shows \"b = inv a\"\n  sorry\nend\n\n\n\n\nlocale group_comm = group +\n  assumes mul_comm : \"a ** b = b ** a\"\nbegin\n\nlemma mul_rotate': \"a ** (b ** c) = b ** (c ** a)\"\n  sorry\nend\n\n\n\n\nlocale group_action =\n  group mul one inv\n    for mul :: \"'a => 'a => 'a\"  (infixl \"**\" 70)\n    and one :: \"'a\"\n    and inv :: \"'a => 'a\" +\n  fixes act :: \"'a => 'b => 'b\"  (infixr \"acts\" 73)\n  assumes act_one : \"one acts x = x\"\n    and   act_mul : \"(g ** h) acts x = g acts (h acts x)\"\nbegin\n\n\n\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma act_inv: \"inv g acts (g acts x) = x\"\n  ",
+    "theory_name": "group",
+    "request_id": "01837433196a4c7c82b97bb0b511857f",
+    "input_sha256": "294dd54723b043454f2375a1f4612e3f4dc106c28c025e47caf008d9fcff9d80"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "config": {
+    "backend": "dsp-pisa",
+    "expected_isabelle_version": "Isabelle2021",
+    "isabelle_home": "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2021",
+    "pisa_root": "/data/not_backed_up/yxu209/itpeval-modify/external/Portal-to-ISAbelle",
+    "java_bin": "java",
+    "port": 9000,
+    "startup_timeout_s": 600,
+    "step_timeout_s": 60,
+    "hammer_timeout_s": 60,
+    "target_timeout_s": 1800,
+    "theory_imports": {
+      "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",
+      "Tagged_Division": "HOL-Analysis.Tagged_Division"
+    }
+  },
+  "request": {
+    "action": "prove",
+    "theory_name": "V2Control",
+    "formal": "theory V2Control imports Main begin\ndeclare [[quick_and_dirty = true]]\n\n\ndeclare [[quick_and_dirty = false, smt_oracle = false]]\nlemma v2_control: \"True\"\n  \nby dsp_nonexistent_method",
+    "force_hammer": false,
+    "request_id": "e3c1be6cf63b481a8afe750bb2063883",
+    "input_sha256": "fa9e5c4c89135df4089e5ece674693b2993f80b797500a07d62d9b118695e059"
+  }
+}

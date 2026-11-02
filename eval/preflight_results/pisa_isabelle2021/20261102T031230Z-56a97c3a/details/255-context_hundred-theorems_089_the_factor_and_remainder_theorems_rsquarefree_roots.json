@@ -1,0 +1,42 @@
+{
+  "name": "context_hundred-theorems_089_the_factor_and_remainder_theorems_rsquarefree_roots",
+  "domain": "context",
+  "status": "fail",
+  "duration_seconds": 8.723,
+  "details": "details/255-context_hundred-theorems_089_the_factor_and_remainder_theorems_rsquarefree_roots.json",
+  "failure_category": "context_error",
+  "expected_failure": null,
+  "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+  "payload": {
+    "ok": false,
+    "error": "PisaFailure: RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+    "failure_category": "context_error",
+    "workdir": "/data/not_backed_up/yxu209/itpeval-modify/eval/preflight_results/pisa_isabelle2021/20261102T031230Z-56a97c3a/work/context-5tc6nb4k",
+    "pisa_result": {
+      "success": false,
+      "error": "RuntimeError: PISA failed to initialize; inspect rpc.jsonl and pisa-server.log: _InactiveRpcError: <_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INTERNAL\n\tdetails = \"\"\n\tdebug_error_string = \"INTERNAL\"\n>",
+      "failure_category": "context_error",
+      "step_results": [],
+      "request_id": "f02a6f148d9943fe8266f05441a1bf34",
+      "input_sha256": "71ef4ffad897a0930374f45a4f99f8d7b072de8e0fd3b5724878f04abca0c436",
+      "duration_seconds": 8.487209922983311
+    },
+    "import_resolution": {
+      "original_imports": [
+        "Complex_Main",
+        "HOL-Library.More_List",
+        "HOL-Library.Infinite_Set",
+        "Primes"
+      ],
+      "resolved_imports": [
+        "Complex_Main",
+        "HOL-Library.More_List",
+        "HOL-Library.Infinite_Set",
+        "Primes"
+      ],
+      "session_dependencies": [
+        "HOL-Library"
+      ]
+    }
+  }
+}

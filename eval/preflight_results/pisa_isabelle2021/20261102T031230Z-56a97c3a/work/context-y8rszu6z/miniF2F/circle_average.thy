@@ -1,0 +1,46 @@
+theory circle_average
+  imports Main
+begin
+declare [[quick_and_dirty = true]]
+
+
+locale circle_average_setup =
+  fixes zero     :: "'r"
+    and add      :: "'r \<Rightarrow> 'r \<Rightarrow> 'r"     (infixl "+C" 65)
+    and integral :: "('r \<Rightarrow> 'r) \<Rightarrow> 'r"
+  assumes add_zero      : "\<And>x. x +C zero = x"
+    and   add_comm      : "\<And>x y. x +C y = y +C x"
+    and   add_assoc     : "\<And>x y z. (x +C y) +C z = x +C (y +C z)"
+    and   integral_ext  : "\<And>g h. (\<forall>\<theta>. g \<theta> = h \<theta>) \<Longrightarrow> integral g = integral h"
+    and   integral_const: "\<And>c. integral (\<lambda>_. c) = c"
+    and   integral_add  : "\<And>f g. integral (\<lambda>\<theta>. f \<theta> +C g \<theta>) = integral f +C integral g"
+    and   integral_shift: "\<And>f c. integral (\<lambda>\<theta>. f (\<theta> +C c)) = integral f"
+begin
+
+
+
+
+
+definition circleMap :: "'r \<Rightarrow> 'r \<Rightarrow> 'r"
+  where "circleMap c \<theta> \<equiv> \<theta> +C c"
+
+definition circleAverage :: "('r \<Rightarrow> 'r) \<Rightarrow> 'r \<Rightarrow> 'r"
+  where "circleAverage f c \<equiv> integral (\<lambda>\<theta>. f (circleMap c \<theta>))"
+
+
+
+
+
+lemma circleMap_zero: "circleMap zero \<theta> = \<theta>"
+  sorry
+lemma circleAverage_zero: "circleAverage f zero = integral f"
+  sorry
+lemma circleAverage_add:
+  "circleAverage (\<lambda>z. f z +C g z) c =
+   circleAverage f c +C circleAverage g c"
+  sorry
+
+declare [[quick_and_dirty = false, smt_oracle = false]]
+lemma circleAverage_fun_add:
+  "circleAverage (\<lambda>z. f (z +C c)) zero = circleAverage f c"
+  

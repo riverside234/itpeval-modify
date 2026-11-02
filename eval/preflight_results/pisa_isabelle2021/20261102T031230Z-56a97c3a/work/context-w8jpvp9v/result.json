@@ -1,0 +1,138 @@
+{
+  "success": true,
+  "error": "",
+  "dsp_result": {
+    "success": true,
+    "reason": "",
+    "num_steps": 9,
+    "last_step": 9,
+    "step_results": [
+      {
+        "index": 0,
+        "step": "theory lattice_like\n  imports Main\nbegin",
+        "output": "",
+        "step_time": 0.020291566848754883
+      },
+      {
+        "index": 1,
+        "step": "declare [[quick_and_dirty = true]]",
+        "output": "",
+        "step_time": 0.015405893325805664
+      },
+      {
+        "index": 2,
+        "step": "locale lattice_like =\n  fixes le  :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"  (infix \"\\<preceq>\" 50)\n    and inf :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a\"   (infixl \"\\<sqinter>\" 60)\n    and sup :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a\"   (infixl \"\\<squnion>\" 65)\n  assumes le_refl   : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans  : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   le_antisym: \"\\<And>x y. x \\<preceq> y \\<Longrightarrow> y \\<preceq> x \\<Longrightarrow> x = y\"\n    and   le_inf_left  : \"\\<And>a b. inf a b \\<preceq> a\"\n    and   le_inf_right : \"\\<And>a b. inf a b \\<preceq> b\"\n    and   le_inf_intro : \"\\<And>c a b. c \\<preceq> a \\<Longrightarrow> c \\<preceq> b \\<Longrightarrow> c \\<preceq> inf a b\"\n    and   le_sup_left  : \"\\<And>a b. a \\<preceq> sup a b\"\n    and   le_sup_right : \"\\<And>a b. b \\<preceq> sup a b\"\n    and   sup_le_intro : \"\\<And>a b c. a \\<preceq> c \\<Longrightarrow> b \\<preceq> c \\<Longrightarrow> sup a b \\<preceq> c\"\nbegin",
+        "output": "",
+        "step_time": 0.04028177261352539
+      },
+      {
+        "index": 3,
+        "step": "lemma inf_comm: \"a \\<sqinter> b = b \\<sqinter> a\"",
+        "output": "",
+        "step_time": 0.022151708602905273
+      },
+      {
+        "index": 4,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.019163846969604492
+      },
+      {
+        "index": 5,
+        "step": "lemma sup_comm: \"a \\<squnion> b = b \\<squnion> a\"",
+        "output": "",
+        "step_time": 0.02249884605407715
+      },
+      {
+        "index": 6,
+        "step": "sorry",
+        "output": "",
+        "step_time": 0.018467426300048828
+      },
+      {
+        "index": 7,
+        "step": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+        "output": "",
+        "step_time": 0.01845073699951172
+      },
+      {
+        "index": 8,
+        "step": "lemma inf_assoc: \"(a \\<sqinter> b) \\<sqinter> c = a \\<sqinter> (b \\<sqinter> c)\"",
+        "output": "",
+        "step_time": 0.016164779663085938
+      }
+    ],
+    "final_state": "default_8",
+    "context_ready": true,
+    "proof_level": "1"
+  },
+  "step_results": [
+    {
+      "mode": "search",
+      "command": "theory lattice_like\n  imports Main\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.02028531103860587
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = true]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.015402421006001532
+    },
+    {
+      "mode": "search",
+      "command": "locale lattice_like =\n  fixes le  :: \"'a \\<Rightarrow> 'a \\<Rightarrow> bool\"  (infix \"\\<preceq>\" 50)\n    and inf :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a\"   (infixl \"\\<sqinter>\" 60)\n    and sup :: \"'a \\<Rightarrow> 'a \\<Rightarrow> 'a\"   (infixl \"\\<squnion>\" 65)\n  assumes le_refl   : \"\\<And>x. x \\<preceq> x\"\n    and   le_trans  : \"\\<And>x y z. x \\<preceq> y \\<Longrightarrow> y \\<preceq> z \\<Longrightarrow> x \\<preceq> z\"\n    and   le_antisym: \"\\<And>x y. x \\<preceq> y \\<Longrightarrow> y \\<preceq> x \\<Longrightarrow> x = y\"\n    and   le_inf_left  : \"\\<And>a b. inf a b \\<preceq> a\"\n    and   le_inf_right : \"\\<And>a b. inf a b \\<preceq> b\"\n    and   le_inf_intro : \"\\<And>c a b. c \\<preceq> a \\<Longrightarrow> c \\<preceq> b \\<Longrightarrow> c \\<preceq> inf a b\"\n    and   le_sup_left  : \"\\<And>a b. a \\<preceq> sup a b\"\n    and   le_sup_right : \"\\<And>a b. b \\<preceq> sup a b\"\n    and   sup_le_intro : \"\\<And>a b c. a \\<preceq> c \\<Longrightarrow> b \\<preceq> c \\<Longrightarrow> sup a b \\<preceq> c\"\nbegin",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.04027219396084547
+    },
+    {
+      "mode": "search",
+      "command": "lemma inf_comm: \"a \\<sqinter> b = b \\<sqinter> a\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. a \\<sqinter> b = b \\<sqinter> a",
+      "duration_seconds": 0.022144535090774298
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01915983494836837
+    },
+    {
+      "mode": "search",
+      "command": "lemma sup_comm: \"a \\<squnion> b = b \\<squnion> a\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. a \\<squnion> b = b \\<squnion> a",
+      "duration_seconds": 0.022490991046652198
+    },
+    {
+      "mode": "search",
+      "command": "sorry",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01846102997660637
+    },
+    {
+      "mode": "search",
+      "command": "declare [[quick_and_dirty = false, smt_oracle = false]]",
+      "success": true,
+      "observation": "",
+      "duration_seconds": 0.01844536594580859
+    },
+    {
+      "mode": "search",
+      "command": "lemma inf_assoc: \"(a \\<sqinter> b) \\<sqinter> c = a \\<sqinter> (b \\<sqinter> c)\"",
+      "success": true,
+      "observation": "proof (prove)\ngoal (1 subgoal):\n 1. a \\<sqinter> b \\<sqinter> c = a \\<sqinter> (b \\<sqinter> c)",
+      "duration_seconds": 0.016160005936399102
+    }
+  ],
+  "failure_category": null,
+  "request_id": "0847ed6d8cbe4b929cad3085f57837f5",
+  "input_sha256": "e84be07079be726de81ce0dae4c95c1dcfec4f0038993e4a48ed5283df74517f",
+  "duration_seconds": 8.714048863970675
+}
