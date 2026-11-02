@@ -12,11 +12,11 @@ python -m "${PIPE}.lab_preflight" \
 
 No LLM calls. Omit `--all-targets` for representative contexts, or add `--plan-only`
 to inspect coverage without running Isabelle. Each unique run directory contains
-reports, summaries, check details, inputs, RPC/JVM/worker logs and `diagnostics.zip`,
-also on ordinary failure or a caught interruption. The entire folder is not
-Git-ignored. After completion, stage the complete run with
-`git add eval/preflight_results/pisa_isabelle2021/<run-id>` and push using your
-normal Git workflow. Keep the original files alongside the ZIP.
+five compact files: `report.json`, `summary.md`, `checks.jsonl`, `metadata.json`,
+and `logs.jsonl`. Each exported file is capped at 32 MiB. Complete inputs and
+RPC/JVM/worker logs stay in ignored `itpeval/.runs/preflight/`; no ZIP is created.
+Stage the compact run directory using your normal Git workflow. See
+[storage and rejected-push recovery](../README.md) for older runs.
 
 Success means original DSP/PISA completion. There is no separate replay stage.
 The default native Isabelle2026 backend and reports stay in their separate folders.

@@ -86,6 +86,16 @@ dist/
 /vllm/*.local.json
 /eval/configs/inference/*.local.json
 
-# Commit-ready Isabelle lab preflight reports, logs and diagnostic ZIPs.
-!/eval/preflight_results/
-!/eval/preflight_results/**
+# Compact preflight reports only. Full logs/artifacts stay in itpeval/.runs/.
+# Ignore legacy ZIPs and per-check/runtime trees even when `git add .` is used.
+/eval/preflight_results/**
+!/eval/preflight_results/**/
+!/eval/preflight_results/**/README.md
+!/eval/preflight_results/*/*/report.json
+!/eval/preflight_results/*/*/summary.md
+!/eval/preflight_results/*/*/checks.jsonl
+!/eval/preflight_results/*/*/metadata.json
+!/eval/preflight_results/*/*/logs.jsonl
+!/eval/preflight_results/*/*/unavailable_contexts.json
+/eval/preflight_results/**/*.zip
+/eval/preflight_results/**/*.tmp

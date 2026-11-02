@@ -4,7 +4,6 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-import zipfile
 
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import RESULTS_DIR, repo_path
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp import lab_preflight as lab
@@ -155,7 +154,7 @@ class LabReportTests(unittest.TestCase):
         return lab.run_lab_preflight(config_path="fixture.json", records=self.records, scope=self.scope,
                                       output_root=str(self.path / "reports"), **options)
 
-    def test_success_has_single_setup_and_complete_portable_bundle(self):
+    def test_success_has_single_setup_and_compact_portable_report(self):
         def proof(case, *, directory, **options):
             directory.mkdir(parents=True, exist_ok=True)
             (directory / "input.json").write_text('{"request_id":"fixture"}', encoding="utf-8")
@@ -170,13 +169,15 @@ class LabReportTests(unittest.TestCase):
         self.assertEqual(len(result["planned_checks"]), len(result["checks"]))
         directory = Path(result["report_directory"])
         self.assertEqual(result, json.loads((directory / "report.json").read_text(encoding="utf-8")))
-        with zipfile.ZipFile(directory / "diagnostics.zip") as bundle:
-            names = set(bundle.namelist())
-            self.assertTrue({"summary.md", "report.json", "config.json", "backend.json", "events.jsonl",
-                             "release_sources.json", "infrastructure/ROOT", "infrastructure/build.log"} <= names)
-            self.assertIn("cases/using_reconstruction/input.json", names)
-            self.assertIn("cases/using_reconstruction/build.log", names)
-            self.assertFalse(any("huge.heap" in name for name in names))
+        names = {p.name for p in directory.iterdir()}
+        self.assertTrue({"report.json", "summary.md", "checks.jsonl", "metadata.json", "logs.jsonl"} <= names)
+        self.assertNotIn("diagnostics.zip", names)
+        self.assertLessEqual(len(names), 6)
+        logs = [json.loads(line) for line in (directory / "logs.jsonl").read_text().splitlines()]
+        self.assertTrue(logs)
+        self.assertTrue(Path(result["local_artifacts"]).is_dir())
+        details = [json.loads(line) for line in (directory / "checks.jsonl").read_text().splitlines()]
+        self.assertEqual(len(result["checks"]), len(details))
 
     def test_setup_failure_is_reported_once_and_all_dependents_are_blocked(self):
         self.infrastructure.side_effect = NativeFailure("capability_error", "fixture compile failure",
@@ -188,14 +189,14 @@ class LabReportTests(unittest.TestCase):
         self.context.assert_not_called()
         self.assertEqual(1, result["counts"]["fail"])
         self.assertEqual(25, result["counts"]["blocked"])
-        self.assertTrue((Path(result["report_directory"]) / "infrastructure/build.log").is_file())
+        self.assertTrue((Path(result["local_artifacts"]) / "infrastructure/build.log").is_file())
 
-    def test_bad_configuration_still_produces_a_report_and_bundle(self):
+    def test_bad_configuration_still_produces_a_compact_report(self):
         self.load.side_effect = ValueError("obsolete config")
         result = self.run_lab()
         self.assertFalse(result["backend_ok"])
         self.infrastructure.assert_not_called()
-        self.assertTrue((Path(result["report_directory"]) / "diagnostics.zip").is_file())
+        self.assertTrue((Path(result["report_directory"]) / "checks.jsonl").is_file())
 
     def test_failed_control_does_not_skip_remaining_controls_or_contexts(self):
         self.fixture.return_value = {"ok": False, "error": "fixture failed"}
@@ -222,7 +223,7 @@ class LabReportTests(unittest.TestCase):
         self.assertTrue(result["backend_ok"])
         self.context.assert_called_once()
         first = Path(result["report_directory"]) / result["checks"][0]["details"]
-        payload = json.loads(first.read_text(encoding="utf-8"))["payload"]
+        payload = json.loads(first.read_text(encoding="utf-8").splitlines()[0])["payload"]
         self.assertEqual(2, len(payload["issues"]))
 
     def test_interrupt_checkpoints_results_and_marks_unrun_checks_blocked(self):
@@ -232,20 +233,20 @@ class LabReportTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertEqual(23, result["counts"]["blocked"])
         self.assertEqual(len(result["planned_checks"]), len(result["checks"]))
-        self.assertTrue((Path(result["report_directory"]) / "diagnostics.zip").is_file())
+        self.assertTrue((Path(result["report_directory"]) / "checks.jsonl").is_file())
 
     def test_orchestration_exception_is_finalized_instead_of_losing_the_report(self):
         with patch.object(lab, "proof_cases", side_effect=ValueError("bad catalog")):
             result = self.run_lab()
         self.assertFalse(result["ok"])
         self.assertEqual("orchestration_error", result["checks"][0]["name"])
-        self.assertTrue((Path(result["report_directory"]) / "diagnostics.zip").is_file())
+        self.assertTrue((Path(result["report_directory"]) / "checks.jsonl").is_file())
 
-    def test_archive_failure_is_not_reported_as_success(self):
-        with patch.object(lab.zipfile, "ZipFile", side_effect=OSError("disk full")):
+    def test_report_export_failure_is_not_reported_as_success(self):
+        with patch.object(lab.ReportStorage, "finish", side_effect=OSError("disk full")):
             result = self.run_lab()
         self.assertFalse(result["ok"])
-        self.assertIn("disk full", result["bundle_error"])
+        self.assertIn("disk full", result["report_error"])
         self.assertTrue((Path(result["report_directory"]) / "report.json").is_file())
 
     def test_output_paths_stay_under_the_repository(self):

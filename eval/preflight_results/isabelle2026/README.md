@@ -34,8 +34,12 @@ proofs, and four setup/fixture/selection checks), without model calls or separat
 replay. `--plan-only` prints scope without running Isabelle. Default representative
 selection remains available by omitting `--all-targets --expected-contexts 262`.
 
-Each timestamped run saves `report.json`, `summary.md`, `dependencies.json`,
-configuration/source identity, check details, native requests/results, logs and
-`diagnostics.zip`. All files here are Git-trackable. Commit and push the entire
-new run directory, leaving historical results unchanged. Ordinary failures and
-caught interruptions preserve completed results and mark unexecuted checks.
+Each timestamped run saves at most six compact, Git-trackable files:
+`report.json`, `summary.md`, `checks.jsonl`, `metadata.json`, `logs.jsonl`, and
+`unavailable_contexts.json`. Each exported file is capped at 32 MiB. Full native
+inputs/results and runtime logs stay in ignored `itpeval/.runs/preflight/`;
+no `diagnostics.zip` is created. Ordinary failures and caught interruptions
+preserve completed checks and mark unexecuted checks.
+
+See [report storage and rejected-push recovery](../README.md) to compact an old
+run without losing its original diagnostics, then repair an unpushed commit.

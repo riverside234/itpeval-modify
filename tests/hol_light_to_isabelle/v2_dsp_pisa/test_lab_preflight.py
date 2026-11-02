@@ -4,7 +4,6 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-import zipfile
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import RESULTS_DIR, repo_path
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa import lab_preflight as lab
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp_pisa.acceptance import case_problems, proof_cases
@@ -86,7 +85,7 @@ class LabReportTests(unittest.TestCase):
         return lab.run_lab_preflight(config_path="fixture.json",records=self.records,scope=self.scope,
                                      output_root=str(self.path/"reports"),**kwargs)
 
-    def test_success_has_one_setup_and_portable_bundle(self):
+    def test_success_has_one_setup_and_compact_report(self):
         def proof(case,*,directory,**options):
             directory.mkdir(parents=True,exist_ok=True)
             (directory/"input.json").write_text("{}",encoding="utf-8")
@@ -100,12 +99,15 @@ class LabReportTests(unittest.TestCase):
         self.assertEqual(len(result["planned_checks"]),len(result["checks"]))
         directory=Path(result["report_directory"])
         self.assertEqual(result,json.loads((directory/"report.json").read_text()))
-        with zipfile.ZipFile(directory/"diagnostics.zip") as bundle:
-            names=set(bundle.namelist())
-            self.assertTrue({"report.json","summary.md","config.json","backend.json","events.jsonl"}<=names)
-            self.assertIn("cases/normalhammer/pisa-server.log",names)
-            self.assertIn("transport/input.json",names)
-            self.assertFalse(any("replay" in name for name in names))
+        names = {p.name for p in directory.iterdir()}
+        self.assertTrue({"report.json", "summary.md", "checks.jsonl", "metadata.json", "logs.jsonl"} <= names)
+        self.assertNotIn("diagnostics.zip", names)
+        self.assertLessEqual(len(names), 6)
+        logs = [json.loads(line) for line in (directory / "logs.jsonl").read_text().splitlines()]
+        self.assertTrue(logs)
+        self.assertTrue(Path(result["local_artifacts"]).is_dir())
+        details = [json.loads(line) for line in (directory / "checks.jsonl").read_text().splitlines()]
+        self.assertEqual(len(result["checks"]), len(details))
 
     def test_failed_transport_blocks_dependents_without_repeated_startup(self):
         self.proof.return_value={"ok":False,"error":"startup failed"}
@@ -115,12 +117,12 @@ class LabReportTests(unittest.TestCase):
         self.context.assert_not_called()
         self.assertEqual(17,result["counts"]["blocked"])
 
-    def test_bad_configuration_still_saves_a_report_and_bundle(self):
+    def test_bad_configuration_still_saves_a_compact_report(self):
         self.load.side_effect=ValueError("native config retired")
         result=self.run_lab()
         self.assertFalse(result["backend_ok"])
         self.proof.assert_not_called()
-        self.assertTrue((Path(result["report_directory"])/"diagnostics.zip").is_file())
+        self.assertTrue((Path(result["report_directory"])/"checks.jsonl").is_file())
 
     def test_failed_control_does_not_skip_other_controls_or_dataset_contexts(self):
         self.proof.side_effect=[{"ok":True},RuntimeError("control failed")]+[{"ok":True}]*15
@@ -144,18 +146,18 @@ class LabReportTests(unittest.TestCase):
         self.assertEqual("interrupted",result["status"])
         self.assertFalse(result["ok"])
         self.assertEqual(len(result["planned_checks"]),len(result["checks"]))
-        self.assertTrue((Path(result["report_directory"])/"diagnostics.zip").is_file())
+        self.assertTrue((Path(result["report_directory"])/"checks.jsonl").is_file())
 
     def test_selection_error_is_not_hidden_by_successful_contexts(self):
         result=self.run_lab(selection_issues=[{"error":"incomplete input"}])
         self.assertFalse(result["ok"])
         self.assertTrue(result["backend_ok"])
 
-    def test_archive_failure_cannot_report_success(self):
-        with patch.object(lab.zipfile,"ZipFile",side_effect=OSError("disk full")):
+    def test_report_export_failure_cannot_report_success(self):
+        with patch.object(lab.ReportStorage,"finish",side_effect=OSError("disk full")):
             result=self.run_lab()
         self.assertFalse(result["ok"])
-        self.assertIn("disk full",result["bundle_error"])
+        self.assertIn("disk full",result["report_error"])
 
     def test_output_cannot_escape_repository(self):
         with self.assertRaisesRegex(ValueError,"path must be under"):

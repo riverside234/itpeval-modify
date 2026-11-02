@@ -1,4 +1,4 @@
-"""One recorded Isabelle2026 acceptance run: setup, controls, datasets and diagnostic ZIP."""
+"""One recorded Isabelle2026 acceptance run: setup, controls, datasets and compact diagnostics."""
 from __future__ import annotations
 
 import argparse
@@ -7,12 +7,11 @@ from dataclasses import replace
 from datetime import datetime, timezone
 import json
 from pathlib import Path
-import re
 import shutil
 import time
 import uuid
-import zipfile
 
+from ..preflight_storage import ReportStorage, excerpt, write_json, write_bytes
 from ..common import fingerprint, key, latest_records, repo_path, validate_layout
 from .acceptance import (FIXTURE, PreparedNative, dataset_cases, proof_cases, run_fixture, run_proof_case)
 from .checker import CHECKER_VERSION, Checker
@@ -20,7 +19,7 @@ from .native_search import NativeFailure, NativeSearch, resolve_imports
 from ..theory_context import validate_context
 from .runtime import DspConfig, NATIVE_DIR, hash_file
 
-REPORT_VERSION = "isabelle2026_lab_preflight_v3"
+REPORT_VERSION = "isabelle2026_lab_preflight_v4"
 DEFAULT_REPORT_ROOT = "eval/preflight_results/isabelle2026"
 SENTINELS = {
     ("babel-formal", "circle_average"): "circleAverage_center_independent",
@@ -32,12 +31,6 @@ SENTINELS = {
 def utc_now():
     return datetime.now(timezone.utc).isoformat()
 
-
-def write_json(path: Path, value):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(path.name + ".tmp")
-    temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    temporary.replace(path)
 
 
 def discover_records(*, dataset="both", inputs=(), topic=None, target_key=None, all_targets=False):
@@ -145,10 +138,13 @@ class Report:
         parent = repo_path(root)
         self.path = parent / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8])
         self.path.mkdir(parents=True)
+        self.storage = ReportStorage(self.path)
+        self.work_path = self.storage.work_path
         self.data = {"schema_version": REPORT_VERSION, "checker_version": CHECKER_VERSION,
                      "started_at": utc_now(), "status": "running", "ok": False, "replay_enabled": False,
                      "scope": scope, "checks": [], "active_check": None,
-                     "diagnostic_bundle": "diagnostics.zip", "report_directory": str(self.path),
+                     "diagnostic_bundle": None, "report_format": "compact_v1",
+                     "local_artifacts": str(self.work_path), "report_directory": str(self.path),
                      "acceptance_sha256": {p.name: hash_file(p) for p in
                          (Path(__file__), Path(__file__).with_name("acceptance.py"), FIXTURE)}}
         self.checkpoint()
@@ -175,7 +171,7 @@ class Report:
             backend_ok=bool(backend) and all(r["status"] == "pass" for r in backend),
             contexts_ok=bool(available) and all(r["status"] == "pass" for r in data))
         self.data["ok"] = (self.data["status"] == "complete" and self.data["backend_ok"]
-                           and self.data["contexts_ok"] and not self.data.get("bundle_error"))
+                           and self.data["contexts_ok"] and not self.data.get("report_error"))
         write_json(self.path / "report.json", self.data)
         lines = ["# Isabelle2026 lab preflight", "", f"Status: **{self.data['status']}**; overall OK: **{self.data['ok']}**.",
                  f"Backend OK: **{self.data['backend_ok']}**; available dataset checks OK: **{self.data['contexts_ok']}**.",
@@ -183,20 +179,20 @@ class Report:
                  "", "| Check | Domain | Status | Failure | Details |", "| --- | --- | --- | --- | --- |"]
         for row in [r for r in checks if r["status"] != "unavailable_context"]:
             reason = " ".join(row.get("error", "").split()).replace("|", "&#124;")[:240]
-            lines.append(f"| {row['name']} | {row['domain']} | {row['status']} | {reason} | [JSON]({row['details']}) |")
+            lines.append(f"| {row['name']} | {row['domain']} | {row['status']} | {reason} | [Line {row['details_line']}]({row['details']}) |")
         lines += ["", "## Unavailable context", "",
                   f"{len(unavailable)} selected contexts are unavailable; they remain in the candidate count.",
                   "", "| Target | Reason | Details |", "| --- | --- | --- |"]
         for row in unavailable:
             reason = " ".join(row.get("error", "").split()).replace("|", "&#124;")
-            lines.append(f"| {row['name']} | {reason} | [JSON]({row['details']}) |")
+            lines.append(f"| {row['name']} | {reason} | [Line {row['details_line']}]({row['details']}) |")
         lines += ["", "Overall OK evaluates the backend and available contexts; it does not claim unavailable contexts passed.",
                   "An entirely unavailable selection cannot pass."]
         lines += ["", "Expected negative controls pass only for their specific expected rejection.",
                   "Dataset failures do not turn into backend successes or disappear from the denominator.",
                   "Representative contexts do not establish readiness for every target; use --all-targets for that scope.",
-                  "", "Push this complete run directory, including diagnostics.zip, after the command finishes."]
-        (self.path / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+                  "", "Push the compact report files in this directory. Full runtime artifacts are retained locally at: " + str(self.work_path)]
+        write_bytes(self.path / "summary.md", ("\n".join(lines) + "\n").encode("utf-8"))
 
     def start(self, name, domain):
         self.data["active_check"] = {"name": name, "domain": domain, "started_at": utc_now()}
@@ -204,12 +200,12 @@ class Report:
         print(f"RUN   {domain}: {name}", flush=True)
 
     def record(self, name, domain, payload, *, duration=0, blocked=False):
-        slug = re.sub(r"[^A-Za-z0-9_-]+", "_", name)[:100]
-        details = f"details/{len(self.data['checks']) + 1:03d}-{slug}.json"
+        details = "checks.jsonl"
         result = payload.get("result") or {}
         row = {"name": name, "domain": domain, "status": "unavailable_context" if domain == "context" and payload.get("unavailable_context")
                    else "blocked" if blocked else "pass" if payload.get("ok") else "fail",
                "duration_seconds": round(duration, 3), "details": details,
+               "details_line": len(self.data["checks"]) + 1,
                "failure_category": payload.get("failure_category") or result.get("failure_category"),
                "expected_failure": payload.get("expected_failure")}
         if payload.get("target") is not None:
@@ -220,37 +216,31 @@ class Report:
             row["error"] = (payload.get("error") or result.get("verify_error")
                 or "; ".join(payload.get("expectation_errors", []))
                 or "; ".join(issue.get("error", str(issue)) for issue in payload.get("issues", [])))
-        write_json(self.path / details, {**row, "payload": payload})
+        if row.get("error"):
+            row["error"] = excerpt(row["error"])
+        self.storage.record(row, payload)
         self.data["checks"].append(row)
         self.data["active_check"] = None
-        with (self.path / "events.jsonl").open("a", encoding="utf-8") as stream:
-            stream.write(json.dumps({"at": utc_now(), **row}) + "\n")
         self.checkpoint()
         print(f"{row['status'].upper():5} {domain}: {name} [{details}]", flush=True)
 
     def finish(self, *, interrupted=False):
         self.data.update(status="interrupted" if interrupted else "complete", finished_at=utc_now(), active_check=None)
         self.checkpoint()
-        archive = self.path / "diagnostics.zip"
-        temporary = self.path / "diagnostics.zip.tmp"
         try:
-            with zipfile.ZipFile(temporary, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
-                for path in sorted(self.path.rglob("*")):
-                    if path.is_file() and path not in {archive, temporary}:
-                        bundle.write(path, str(path.relative_to(self.path)))
-            temporary.replace(archive)
+            self.data["log_export"] = self.storage.finish()
         except Exception as exc:
-            self.data["bundle_error"] = f"{type(exc).__name__}: {exc}"
-            self.checkpoint()
+            self.data["report_error"] = f"{type(exc).__name__}: {exc}"
+        self.checkpoint()
         print(f"{'PASS' if self.data['ok'] else 'FAIL'}: backend_ok={self.data['backend_ok']}, "
               f"contexts_ok={self.data['contexts_ok']}, checks={self.data['counts']}", flush=True)
         print("Report: " + str(self.path / "report.json"), flush=True)
-        print("Bundle: " + str(archive), flush=True)
+        print("Local artifacts (not for Git): " + str(self.work_path), flush=True)
         return self.data
 
 
 def snapshot_infrastructure(parent: Path, report: Report):
-    destination = report.path / "infrastructure"
+    destination = report.work_path / "infrastructure"
     destination.mkdir(exist_ok=True)
     for path in parent.iterdir():
         if path.is_file() and (path.name in {"ROOT", "build.log", "build.processes.json", "command.json"}
@@ -300,12 +290,12 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
                 config = replace(config, session_roots=tuple(dict.fromkeys((*config.session_roots, root))))
             dependencies = dependency_plan(records, config)
             unavailable_targets = {tuple(target) for target in dependencies.get("known_inherited_targets", [])}
-            write_json(report.path / "dependencies.json", dependencies)
-            write_json(report.path / "config.json", config.__dict__)
+            write_json(report.work_path / "dependencies.json", dependencies)
+            write_json(report.work_path / "config.json", config.__dict__)
             backend = config.metadata()
-            write_json(report.path / "backend.json", backend)
-            shutil.copyfile(NATIVE_DIR / "release_sources.json", report.path / "release_sources.json")
-            return {"ok": True, "backend_fingerprint": backend["backend_fingerprint"], "backend_file": "backend.json"}
+            write_json(report.work_path / "backend.json", backend)
+            shutil.copyfile(NATIVE_DIR / "release_sources.json", report.work_path / "release_sources.json")
+            return {"ok": True, "backend_fingerprint": backend["backend_fingerprint"], "backend_file": "metadata.json", "backend_key": "backend.json"}
         setup = run("metadata", "setup", metadata)
         def infrastructure():
             nonlocal parent
@@ -320,10 +310,10 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
             return {"ok": True, "session": parent[1], "snapshot": "infrastructure"}
         infra = run("infrastructure", "setup", infrastructure, blocked=None if setup["ok"] else "metadata/setup failed")
         blocked = None if infra["ok"] else "native infrastructure unavailable; see setup diagnostics"
-        run("native_fixture", "backend", lambda: run_fixture(config, parent, report.path / "fixture"), blocked=blocked)
+        run("native_fixture", "backend", lambda: run_fixture(config, parent, report.work_path / "fixture"), blocked=blocked)
         for case, domain in [(c, "backend") for c in controls] + [(c, "dataset_proof") for c in proofs]:
             run(case.name, domain, lambda case=case: run_proof_case(case, config=config, backend=backend, parent=parent,
-                directory=report.path / "cases" / case.name), blocked=blocked)
+                directory=report.work_path / "cases" / case.name), blocked=blocked)
         for name, row in context_jobs:
             if key(row) in unavailable_targets:
                 run(name, "context", lambda row=row: {"ok": False, "unavailable_context": True,
@@ -332,7 +322,7 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
                              "is unavailable. Installing AFP does not change this restriction."})
                 continue
             def context_check(row=row):
-                checked = Checker(config, results_dir=str(report.path), native_factory=lambda cfg: PreparedNative(cfg, parent)).check_context(
+                checked = Checker(config, results_dir=str(report.work_path), native_factory=lambda cfg: PreparedNative(cfg, parent)).check_context(
                     row, backend_metadata=backend)
                 return {"ok": checked["baseline_ok"], "target": key(row), "result": checked}
             run(name, "context", context_check, blocked=blocked)

@@ -6,7 +6,7 @@ eleven heuristic methods, then PISA's `normalhammer`, and accepts the original
 PISA completion result. **There is no separate replay stage.** The Isabelle2024
 baseline remains in `v2_itpeval/`.
 
-[Copied checker](upstream/checker.py) · [Provenance and patch](upstream/ORIGIN.md) ·
+[Copied checker](upstream/checker.py) Â· [Provenance and patch](upstream/ORIGIN.md) Â·
 [Review of the pulled reports](PROVER_REVIEW.md)
 
 The default native Isabelle2026 implementation is preserved in
@@ -98,11 +98,11 @@ Each run creates a unique folder:
 
 ```text
 eval/preflight_results/pisa_isabelle2021/<UTC-time>-<run-id>/
-├── report.json, summary.md, events.jsonl
-├── config.json, backend.json       # when setup reaches these stages
-├── details/                       # exact result of each check
-├── transport/, cases/, work/       # input, RPC, JVM and worker logs
-└── diagnostics.zip                # portable copy of the run
+â”œâ”€â”€ report.json, summary.md, events.jsonl
+â”œâ”€â”€ config.json, backend.json       # when setup reaches these stages
+â”œâ”€â”€ details/                       # exact result of each check
+â”œâ”€â”€ transport/, cases/, work/       # input, RPC, JVM and worker logs
+â””â”€â”€ diagnostics.zip                # portable copy of the run
 ```
 
 The **entire directory is not Git-ignored**, including logs, JSON and ZIP files.
@@ -158,8 +158,8 @@ New schema: `hol_light_to_isabelle_dsp_pisa_v1`. Default result directories:
 
 ```text
 eval/results/hol_light_to_isabelle_v2/
-├── v2-dsp-pisa-isabelle2021/{draft,direct}/<inference-profile>/
-└── hundred-theorems/v2-dsp-pisa-isabelle2021/{draft,direct}/<inference-profile>/
+â”œâ”€â”€ v2-dsp-pisa-isabelle2021/{draft,direct}/<inference-profile>/
+â””â”€â”€ hundred-theorems/v2-dsp-pisa-isabelle2021/{draft,direct}/<inference-profile>/
 ```
 
 Runs save `inputs.jsonl`, `sketches.jsonl`, `prove.jsonl`, `verified.jsonl`, and
@@ -197,3 +197,7 @@ timeouts, process ownership, and reports. Native Isabelle2021/PISA execution sti
 requires the lab run. The optional integration test uses the same acceptance cases
 and is enabled by `ITPEVAL_PISA_ISABELLE2021_CONFIG="$CFG"`; normally the single
 consolidated lab preflight is sufficient without repeating that test.
+
+Preflight reports now use at most six compact files, each capped at 32 MiB;
+full runtime artifacts stay in ignored `itpeval/.runs/preflight/`. No ZIP is
+created. See [report storage and rejected-push recovery](../../../../preflight_results/README.md).

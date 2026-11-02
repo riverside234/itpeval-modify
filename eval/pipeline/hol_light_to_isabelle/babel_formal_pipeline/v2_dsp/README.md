@@ -129,11 +129,15 @@ Omitting `--all-targets` selects 32 representative contexts across 29 topics.
 Each invocation writes a new directory under
 `eval/preflight_results/isabelle2026/<UTC-timestamp>-<run-id>/`, including:
 
-- `report.json`, `summary.md`, per-check JSON and checkpointed `events.jsonl`;
-- `config.json`, `backend.json`, `dependencies.json` and `unavailable_contexts.json`;
-- the ML fixture, native inputs/results, command/build/process logs and `diagnostics.zip`.
+- `report.json` and `summary.md` with all check outcomes;
+- `checks.jsonl` with one bounded payload per check;
+- `metadata.json`, `logs.jsonl` and `unavailable_contexts.json`.
 
-The whole report folder is Git-trackable. Independent failures do not stop the
+There are at most six tracked files, each capped at 32 MiB. Full inputs, results,
+and runtime logs stay in ignored `itpeval/.runs/preflight/`; no ZIP is generated.
+See [report storage and rejected-push recovery](../../../../preflight_results/README.md)
+for bounds and the command to compact existing runs safely.
+Independent failures do not stop the
 remaining checks; an infrastructure failure blocks dependent checks explicitly.
 Exit status is 0 when backend controls and available dataset checks pass, 1 for
 failures or an entirely unavailable selection, or 130 for interruption.

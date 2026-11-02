@@ -1,4 +1,4 @@
-"""One original DSP/PISA Isabelle2021 acceptance run, saved with portable diagnostics."""
+"""One original DSP/PISA Isabelle2021 acceptance run, saved with compact diagnostics."""
 from __future__ import annotations
 
 import argparse
@@ -6,17 +6,16 @@ from collections import Counter
 from datetime import datetime, timezone
 import json
 from pathlib import Path
-import re
 import time
 import uuid
-import zipfile
 
+from ..preflight_storage import ReportStorage, excerpt, write_json, write_bytes
 from ..common import fingerprint, key, latest_records, repo_path, validate_layout
 from .acceptance import dataset_cases, proof_cases, run_proof_case
 from .checker import CHECKER_VERSION, Checker
 from .runtime import DspConfig, PACKAGE, PisaFailure, hash_file
 
-REPORT_VERSION = "dsp_pisa_isabelle2021_lab_preflight_v1"
+REPORT_VERSION = "dsp_pisa_isabelle2021_lab_preflight_v2"
 DEFAULT_REPORT_ROOT = "eval/preflight_results/pisa_isabelle2021"
 SENTINELS = {
     ("babel-formal", "circle_average"): "circleAverage_center_independent",
@@ -28,12 +27,6 @@ SENTINELS = {
 def utc_now():
     return datetime.now(timezone.utc).isoformat()
 
-
-def write_json(path: Path, value):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(path.name + ".tmp")
-    temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    temporary.replace(path)
 
 
 def discover_records(*, dataset="both", inputs=(), topic=None, target_key=None, all_targets=False):
@@ -115,10 +108,13 @@ class Report:
         parent = repo_path(root)
         self.path = parent / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8])
         self.path.mkdir(parents=True)
+        self.storage = ReportStorage(self.path)
+        self.work_path = self.storage.work_path
         self.data = {"schema_version": REPORT_VERSION, "checker_version": CHECKER_VERSION,
                      "started_at": utc_now(), "status": "running", "ok": False,
                      "scope": scope, "checks": [], "active_check": None,
-                     "diagnostic_bundle": "diagnostics.zip", "report_directory": str(self.path),
+                     "diagnostic_bundle": None, "report_format": "compact_v1",
+                     "local_artifacts": str(self.work_path), "report_directory": str(self.path),
                      "acceptance_sha256": {p.name: hash_file(p) for p in
                          (Path(__file__), Path(__file__).with_name("acceptance.py"), PACKAGE / "upstream/checker.py")}}
         self.checkpoint()
@@ -131,7 +127,7 @@ class Report:
             backend_ok=bool(backend) and all(r["status"] == "pass" for r in backend),
             contexts_ok=bool(data) and all(r["status"] == "pass" for r in data))
         self.data["ok"] = (self.data["status"] == "complete" and self.data["backend_ok"]
-                           and self.data["contexts_ok"] and not self.data.get("bundle_error"))
+                           and self.data["contexts_ok"] and not self.data.get("report_error"))
         write_json(self.path / "report.json", self.data)
         lines = ["# DSP/PISA Isabelle2021 lab preflight", "", f"Status: **{self.data['status']}**; overall OK: **{self.data['ok']}**.",
                  f"Backend OK: **{self.data['backend_ok']}**; selected dataset checks OK: **{self.data['contexts_ok']}**.",
@@ -139,12 +135,12 @@ class Report:
                  "", "| Check | Domain | Status | Failure | Details |", "| --- | --- | --- | --- | --- |"]
         for row in checks:
             reason = " ".join(row.get("error", "").split()).replace("|", "&#124;")[:240]
-            lines.append(f"| {row['name']} | {row['domain']} | {row['status']} | {reason} | [JSON]({row['details']}) |")
+            lines.append(f"| {row['name']} | {row['domain']} | {row['status']} | {reason} | [Line {row['details_line']}]({row['details']}) |")
         lines += ["", "Expected negative controls pass only for their specific expected rejection.",
                   "Dataset failures do not turn into backend successes or disappear from the denominator.",
                   "Representative contexts do not establish readiness for every target; use --all-targets for that scope.",
-                  "", "Push this complete run directory, including diagnostics.zip, after the command finishes."]
-        (self.path / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+                  "", "Push the compact report files in this directory. Full runtime artifacts are retained locally at: " + str(self.work_path)]
+        write_bytes(self.path / "summary.md", ("\n".join(lines) + "\n").encode("utf-8"))
 
     def start(self, name, domain):
         self.data["active_check"] = {"name": name, "domain": domain, "started_at": utc_now()}
@@ -152,43 +148,37 @@ class Report:
         print(f"RUN   {domain}: {name}", flush=True)
 
     def record(self, name, domain, payload, *, duration=0, blocked=False):
-        slug = re.sub(r"[^A-Za-z0-9_-]+", "_", name)[:100]
-        details = f"details/{len(self.data['checks']) + 1:03d}-{slug}.json"
+        details = "checks.jsonl"
         result = payload.get("result") or {}
         row = {"name": name, "domain": domain, "status": "blocked" if blocked else "pass" if payload.get("ok") else "fail",
                "duration_seconds": round(duration, 3), "details": details,
+               "details_line": len(self.data["checks"]) + 1,
                "failure_category": payload.get("failure_category") or result.get("failure_category"),
                "expected_failure": payload.get("expected_failure")}
         if row["status"] != "pass":
             row["error"] = (payload.get("error") or result.get("verify_error")
                 or "; ".join(payload.get("expectation_errors", []))
                 or "; ".join(issue.get("error", str(issue)) for issue in payload.get("issues", [])))
-        write_json(self.path / details, {**row, "payload": payload})
+        if row.get("error"):
+            row["error"] = excerpt(row["error"])
+        self.storage.record(row, payload)
         self.data["checks"].append(row)
         self.data["active_check"] = None
-        with (self.path / "events.jsonl").open("a", encoding="utf-8") as stream:
-            stream.write(json.dumps({"at": utc_now(), **row}) + "\n")
         self.checkpoint()
         print(f"{row['status'].upper():5} {domain}: {name} [{details}]", flush=True)
 
     def finish(self, *, interrupted=False):
         self.data.update(status="interrupted" if interrupted else "complete", finished_at=utc_now(), active_check=None)
         self.checkpoint()
-        archive = self.path / "diagnostics.zip"
-        temporary = self.path / "diagnostics.zip.tmp"
         try:
-            with zipfile.ZipFile(temporary, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
-                for path in sorted(self.path.rglob("*")):
-                    if path.is_file() and path not in {archive, temporary}:
-                        bundle.write(path, str(path.relative_to(self.path)))
-            temporary.replace(archive)
+            self.data["log_export"] = self.storage.finish()
         except Exception as exc:
-            self.data["bundle_error"] = f"{type(exc).__name__}: {exc}"
-            self.checkpoint()
+            self.data["report_error"] = f"{type(exc).__name__}: {exc}"
+        self.checkpoint()
         print(f"{'PASS' if self.data['ok'] else 'FAIL'}: backend_ok={self.data['backend_ok']}, "
               f"contexts_ok={self.data['contexts_ok']}, checks={self.data['counts']}", flush=True)
         print("Report: " + str(self.path / "report.json"), flush=True)
-        print("Bundle: " + str(archive), flush=True)
+        print("Local artifacts (not for Git): " + str(self.work_path), flush=True)
         return self.data
 
 
@@ -227,20 +217,20 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
         def metadata():
             nonlocal config, backend
             config = DspConfig.load(str(config_path))
-            write_json(report.path / "config.json", config.__dict__)
+            write_json(report.work_path / "config.json", config.__dict__)
             backend = config.metadata()
-            write_json(report.path / "backend.json", backend)
+            write_json(report.work_path / "backend.json", backend)
             return {"ok": True, "backend_fingerprint": backend["backend_fingerprint"]}
         setup = run("metadata", "setup", metadata)
         transport = run("pisa_transport", "setup", lambda: run_proof_case(controls[0], config=config, backend=backend,
-            directory=report.path / "transport"), blocked=None if setup["ok"] else "metadata/setup failed")
+            directory=report.work_path / "transport"), blocked=None if setup["ok"] else "metadata/setup failed")
         blocked = None if transport["ok"] else "PISA startup/transport unavailable; see setup diagnostics"
         for case, domain in [(c, "backend") for c in controls] + [(c, "dataset_proof") for c in proofs]:
             run(case.name, domain, lambda case=case: run_proof_case(case, config=config, backend=backend,
-                directory=report.path / "cases" / case.name), blocked=blocked)
+                directory=report.work_path / "cases" / case.name), blocked=blocked)
         for name, row in jobs:
             def check(row=row):
-                result = Checker(config, results_dir=str(report.path)).check_context(row, backend_metadata=backend)
+                result = Checker(config, results_dir=str(report.work_path)).check_context(row, backend_metadata=backend)
                 return {"ok": result["baseline_ok"], "target": key(row), "result": result}
             run(name, "context", check, blocked=blocked)
     except KeyboardInterrupt:
