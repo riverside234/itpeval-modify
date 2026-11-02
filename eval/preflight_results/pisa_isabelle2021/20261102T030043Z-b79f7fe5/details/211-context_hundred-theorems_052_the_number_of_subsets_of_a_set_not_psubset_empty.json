@@ -1,0 +1,14 @@
+{
+  "name": "context_hundred-theorems_052_the_number_of_subsets_of_a_set_not_psubset_empty",
+  "domain": "context",
+  "status": "blocked",
+  "duration_seconds": 0.0,
+  "details": "details/211-context_hundred-theorems_052_the_number_of_subsets_of_a_set_not_psubset_empty.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "error": "PISA startup/transport unavailable; see setup diagnostics",
+  "payload": {
+    "ok": false,
+    "error": "PISA startup/transport unavailable; see setup diagnostics"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "metadata",
+  "domain": "setup",
+  "status": "fail",
+  "duration_seconds": 0.184,
+  "details": "details/002-metadata.json",
+  "failure_category": "preflight_error",
+  "expected_failure": null,
+  "error": "ValueError: expected Isabelle2021, found 'Isabelle2021: February 2021'",
+  "payload": {
+    "ok": false,
+    "error": "ValueError: expected Isabelle2021, found 'Isabelle2021: February 2021'",
+    "failure_category": "preflight_error"
+  }
+}

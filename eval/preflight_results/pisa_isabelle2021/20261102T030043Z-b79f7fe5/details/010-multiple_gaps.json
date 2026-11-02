@@ -1,0 +1,14 @@
+{
+  "name": "multiple_gaps",
+  "domain": "backend",
+  "status": "blocked",
+  "duration_seconds": 0.0,
+  "details": "details/010-multiple_gaps.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "error": "PISA startup/transport unavailable; see setup diagnostics",
+  "payload": {
+    "ok": false,
+    "error": "PISA startup/transport unavailable; see setup diagnostics"
+  }
+}

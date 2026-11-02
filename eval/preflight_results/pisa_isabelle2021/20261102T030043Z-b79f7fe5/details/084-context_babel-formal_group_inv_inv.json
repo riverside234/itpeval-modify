@@ -1,0 +1,14 @@
+{
+  "name": "context_babel-formal_group_inv_inv",
+  "domain": "context",
+  "status": "blocked",
+  "duration_seconds": 0.0,
+  "details": "details/084-context_babel-formal_group_inv_inv.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "error": "PISA startup/transport unavailable; see setup diagnostics",
+  "payload": {
+    "ok": false,
+    "error": "PISA startup/transport unavailable; see setup diagnostics"
+  }
+}

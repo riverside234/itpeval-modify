@@ -1,0 +1,14 @@
+{
+  "name": "context_hundred-theorems_015_the_fundamental_theorem_of_integral_calculus_integrable_Cauchy",
+  "domain": "context",
+  "status": "blocked",
+  "duration_seconds": 0.0,
+  "details": "details/190-context_hundred-theorems_015_the_fundamental_theorem_of_integral_calculus_integrable_Cauchy.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "error": "PISA startup/transport unavailable; see setup diagnostics",
+  "payload": {
+    "ok": false,
+    "error": "PISA startup/transport unavailable; see setup diagnostics"
+  }
+}

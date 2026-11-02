@@ -1,0 +1,14 @@
+{
+  "name": "context_babel-formal_inner_product_ip_add_add",
+  "domain": "context",
+  "status": "blocked",
+  "duration_seconds": 0.0,
+  "details": "details/100-context_babel-formal_inner_product_ip_add_add.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "error": "PISA startup/transport unavailable; see setup diagnostics",
+  "payload": {
+    "ok": false,
+    "error": "PISA startup/transport unavailable; see setup diagnostics"
+  }
+}

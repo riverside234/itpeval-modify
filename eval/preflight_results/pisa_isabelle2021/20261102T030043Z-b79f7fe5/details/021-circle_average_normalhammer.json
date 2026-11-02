@@ -1,0 +1,14 @@
+{
+  "name": "circle_average_normalhammer",
+  "domain": "dataset_proof",
+  "status": "blocked",
+  "duration_seconds": 0.0,
+  "details": "details/021-circle_average_normalhammer.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "error": "PISA startup/transport unavailable; see setup diagnostics",
+  "payload": {
+    "ok": false,
+    "error": "PISA startup/transport unavailable; see setup diagnostics"
+  }
+}

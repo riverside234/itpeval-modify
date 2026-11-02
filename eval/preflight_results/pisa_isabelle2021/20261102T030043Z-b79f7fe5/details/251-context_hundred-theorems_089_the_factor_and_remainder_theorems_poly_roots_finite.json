@@ -1,0 +1,14 @@
+{
+  "name": "context_hundred-theorems_089_the_factor_and_remainder_theorems_poly_roots_finite",
+  "domain": "context",
+  "status": "blocked",
+  "duration_seconds": 0.0,
+  "details": "details/251-context_hundred-theorems_089_the_factor_and_remainder_theorems_poly_roots_finite.json",
+  "failure_category": null,
+  "expected_failure": null,
+  "error": "PISA startup/transport unavailable; see setup diagnostics",
+  "payload": {
+    "ok": false,
+    "error": "PISA startup/transport unavailable; see setup diagnostics"
+  }
+}
