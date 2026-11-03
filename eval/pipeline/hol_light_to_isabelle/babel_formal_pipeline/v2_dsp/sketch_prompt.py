@@ -3,7 +3,7 @@ from __future__ import annotations
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import Prompt, _required
 
 
-SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p5"
+SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p6"
 
 # Both input modes use the same target, background, and gap contract.
 ISABELLE_OUTPUT_RULES = (
@@ -48,6 +48,18 @@ ISABELLE_PROOF_REQUIREMENTS = (
     "with show. Retain necessary cases, induction hypotheses, witnesses, substitutions, "
     "and side conditions. Where a needed helper has no available Isabelle counterpart, "
     "state and prove the required instance as a local claim.\n"
+    "- Separate algebraic normalization from inequalities. For a scaled norm, "
+    "first expose the scalar times the norm, then justify multiplication of a "
+    "bound with the scalar's sign and the correct inequality direction. A "
+    "product of two variable quantities is nonlinear: linarith alone does not "
+    "establish multiplication monotonicity. Use an applicable order rule or "
+    "nlinarith after normalization and after supplying the sign facts. Do not "
+    "leave a compound rewrite-and-monotonicity argument as one opaque gap.\n"
+    "- For finite sums, separate the triangle inequality, the pointwise bound, "
+    "sum monotonicity, and algebraic identities such as factoring out a constant. "
+    "Instantiate the summand and index set explicitly when applying a helper; "
+    "for pair-indexed sums, expose the pair components when needed. Prove only "
+    "the finiteness and sign conditions required by the chosen facts.\n"
     "- Use a concrete proof method when its application is clear. Otherwise put "
     "sledgehammer alone on a line after a complete command that opens a proof "
     "obligation, such as have, show, or obtain, with any needed using facts or "

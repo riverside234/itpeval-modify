@@ -166,7 +166,7 @@ class DirectTests(unittest.TestCase):
         self.assertTrue(all(row["failure_category"] == "capability_error" for row in rows))
 
 
-    def test_direct_sketch_search_and_replay_handoff_for_both_datasets(self):
+    def test_direct_sketch_and_native_completion_for_both_datasets(self):
         from v2_dsp.test_checker import BACKEND, CONFIG, FakeNative
         from eval.pipeline.hol_light_to_isabelle.v2_dsp.prove import prove_sketches
         from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.extract_hol_light import extract_records as hundred
@@ -182,7 +182,8 @@ class DirectTests(unittest.TestCase):
                     generate_sketches(input_path=exported, output_path=sketches, sketch_source=MODE,
                                       expected_source=raw["source"], samples=2)
                 with patch(MODULE + "runtime.DspConfig.metadata", return_value=BACKEND), patch(
-                        MODULE + "checker.NativeSearch", FakeNative):
+                        MODULE + "checker.NativeSearch", FakeNative), patch(
+                        MODULE + "prove.prepare_batch", return_value=(CONFIG, BACKEND, FakeNative)):
                     result = prove_sketches(config=CONFIG, input_path=sketches, output_path=verified,
                         prove_output=None, expected=rows, expected_samples=2, sketch_source=MODE,
                         expected_source=raw["source"], results_dir=str(self.path))

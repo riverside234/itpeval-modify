@@ -4,7 +4,7 @@ from ...babel_formal_pipeline.prompt import Prompt
 from ..context import validate_prompt_context
 from ..prompt import CONTEXT_NOTE
 
-DIRECT_PROMPT_VERSION = "most_match_direct_sketch_v1"
+DIRECT_PROMPT_VERSION = "most_match_direct_sketch_v2"
 
 
 def build_direct_sketch_prompt(record):

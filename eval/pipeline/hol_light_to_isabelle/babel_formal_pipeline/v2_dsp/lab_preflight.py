@@ -174,11 +174,15 @@ class Report:
         self.data.update(counts=dict(Counter(r["status"] for r in checks)),
             backend_ok=bool(backend) and all(r["status"] == "pass" for r in backend),
             contexts_ok=bool(available) and all(r["status"] == "pass" for r in data))
+        proof_only = self.data["scope"].get("context_checks_requested") is False
+        proofs = [r for r in data if r["domain"] == "dataset_proof"]
+        self.data["dataset_checks_ok"] = (bool(proofs) and all(r["status"] == "pass" for r in data)
+            if proof_only else self.data["contexts_ok"])
         self.data["ok"] = (self.data["status"] == "complete" and self.data["backend_ok"]
-                           and self.data["contexts_ok"] and not self.data.get("report_error"))
+                           and self.data["dataset_checks_ok"] and not self.data.get("report_error"))
         write_json(self.path / "report.json", self.data)
         lines = ["# Isabelle2026 lab preflight", "", f"Status: **{self.data['status']}**; overall OK: **{self.data['ok']}**.",
-                 f"Backend OK: **{self.data['backend_ok']}**; available dataset checks OK: **{self.data['contexts_ok']}**.",
+                 f"Backend OK: **{self.data['backend_ok']}**; available dataset checks OK: **{self.data['dataset_checks_ok']}**.",
                  "", "Scope: `" + self.data["scope"]["selection"] + "`; " + str(self.data["scope"]["selected_contexts"]) + " contexts.",
                  "", "| Check | Domain | Status | Failure | Details |", "| --- | --- | --- | --- | --- |"]
         for row in [r for r in checks if r["status"] != "unavailable_context"]:
@@ -192,6 +196,9 @@ class Report:
             lines.append(f"| {row['name']} | {reason} | [Line {row['details_line']}]({row['details']}) |")
         lines += ["", "Overall OK evaluates the backend and available contexts; it does not claim unavailable contexts passed.",
                   "An entirely unavailable selection cannot pass."]
+        if proof_only:
+            lines += ["", "Separate context tests were not requested. Each selected proof search still "
+                      "loads and checks its original context before proving the target."]
         if self.data["scope"]["selection"] == "failed_only":
             lines += ["", "Failure-only regression run: previously passed contexts and successful proof controls were not rerun.",
                       "Setup checks are prerequisites. Overall OK applies only to this selected subset; it is not a new full-dataset pass."]
@@ -231,6 +238,8 @@ class Report:
                    or result.get("native_search", {}).get("build_metrics"))
         if metrics:
             row["performance"] = metrics
+        if result.get("failed_obligation"):
+            row["failed_obligation"] = result["failed_obligation"]
         if payload.get("target") is not None:
             row["target"] = list(payload["target"])
         if row["status"] == "unavailable_context":
@@ -269,7 +278,7 @@ class Report:
             self.data["report_error"] = f"{type(exc).__name__}: {exc}"
         self.checkpoint()
         print(f"{'PASS' if self.data['ok'] else 'FAIL'}: backend_ok={self.data['backend_ok']}, "
-              f"contexts_ok={self.data['contexts_ok']}, checks={self.data['counts']}", flush=True)
+              f"dataset_checks_ok={self.data['dataset_checks_ok']}, checks={self.data['counts']}", flush=True)
         print("Report: " + str(self.path / "report.json"), flush=True)
         print("Local artifacts (not for Git): " + str(self.work_path), flush=True)
         return self.data
@@ -288,13 +297,14 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
                       workers=1, threads_per_worker=None, memory_per_worker_gb=4.0,
                       controls_override=None, extra_proof_cases=(), warm_dependencies=False,
                       resume_from=None, dependency_jobs=None, dependency_threads=None,
-                      include_fixture=True, include_dataset_cases=True):
+                      include_fixture=True, include_dataset_cases=True, include_contexts=True):
+    scope = {**scope, "context_checks_requested": include_contexts}
     report = Report(output_root, scope)
     pending = []
     config = backend = parent = plan = None
     unavailable_targets = set()
     import_parents = None
-    cache_imports = any(row.get("source") == "hol-most-match" for row in records)
+    cache_imports = any(row.get("source") in {"hol-most-match", "hundred-theorems"} for row in records)
     reusable = {}
     interrupted = False
     def run(name, domain, fn, *, blocked=None):
@@ -319,7 +329,7 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
                 proofs.extend(dataset_cases([row]))
             except Exception as exc:
                 issues.append({"target": key(row), "error": f"{type(exc).__name__}: {exc}"})
-        context_jobs = [("context_" + row["source"] + "_" + row["topic"] + "_" + row["target_key"], row) for row in records]
+        context_jobs = [("context_" + row["source"] + "_" + row["topic"] + "_" + row["target_key"], row) for row in (records if include_contexts else [])]
         pending = [("input_selection", "selection"), ("metadata", "setup"), ("infrastructure", "setup")]
         if cache_imports:
             pending.append(("import_heaps", "setup"))

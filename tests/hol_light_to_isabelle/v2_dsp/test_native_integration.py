@@ -23,6 +23,28 @@ class NativeIntegrationTests(unittest.TestCase):
         cls.config = DspConfig.load(os.environ["ITPEVAL_NATIVE_ISABELLE2026_CONFIG"])
         cls.backend = cls.config.metadata()
 
+    def test_scaled_norm_heuristics_preserve_required_sign_conditions(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
+        # Disable ATP fallback: the valid obligation must be closed by the native
+        # heuristic portfolio; the invalid variant must never acquire a sign fact.
+        config = replace(self.config, provers=("dsp_nonexistent_prover",))
+        goal = (r"\<And>c::real. \<And>u::'a::real_normed_vector. \<And>b::real. "
+                r"0 \<le> c \<Longrightarrow> norm u \<le> b \<Longrightarrow> "
+                r"norm (c *\<^sub>R u) \<le> b*c")
+        for valid in (True, False):
+            conclusion = goal if valid else goal.replace(r"0 \<le> c \<Longrightarrow> ", "")
+            row = control_record("sledgehammer", conclusion=conclusion)
+            template = row["isabelle_theory_template"].replace("imports Main", "imports Complex_Main")
+            target = sanitize_target(template, row["isabelle_target_name"])
+            row.update(isabelle_theory_template=template, isabelle_statement=target.statement,
+                       isabelle_context_before_target=target.context_before_target,
+                       isabelle_target_proof_span=list(target.proof_span), isabelle_proof_prefix=target.proof_prefix)
+            result = Checker(config).check(row, backend_metadata=self.backend)
+            self.assertEqual(valid, result["verified"], result.get("verify_error"))
+            if valid:
+                self.assertTrue(any(s["mode"] == "heuristic" and s["success"] for s in result["step_results"]))
+                self.assertFalse(any(s["mode"] == "hammer" for s in result["step_results"]))
+
     def test_cached_import_parent_keeps_context_and_ancestor_guard(self):
         from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.import_cache import prepare_import_parents
         from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.parallel import plan_parallel

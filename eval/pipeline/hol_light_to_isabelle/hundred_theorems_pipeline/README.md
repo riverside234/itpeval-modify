@@ -205,6 +205,37 @@ and inference profile. Export/Sketch/prove/final flags match Babel's runner.
 `--skip-sketch` runs the native prover on saved Sketches. `--skip-prove` was removed.
 `verified` reports native checked target completion; there is no second proof verification step.
 
+## rsum_bound failure-only retry (commit 6300569)
+
+Both committed `rsum_bound` sketches loaded their original masked context and
+then timed out at the nonnegative scaling bound. The native prover now adds
+bounded norm/order/nonlinear arithmetic candidates, and both sketch prompts ask
+for explicit normalization and sign conditions. Hundred Theorems batch jobs also
+reuse heaps containing exactly their original imports; the first build prepares
+the heap, and later jobs reuse it. This includes single-worker runs. Batch CLI
+memory admission defaults to 12 GiB per worker (not an OS limit).
+
+Rerun only the two failed searches with their unchanged saved sketches:
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.retry_rsum_bound \
+  --expected-root "$PWD" \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
+```
+
+`--plan-only` previews the two tests. This command makes no LLM calls and skips
+previously successful standalone context and backend-control tests. It performs
+required setup, then executes each failed proof in its original masked context.
+Proof failures still require successful native target closure to turn into passes.
+The command exits nonzero if either search fails.
+
+The six compact report files are pushable under
+`eval/preflight_results/isabelle2026-rsum-bound/<timestamp>/`; full work files
+remain ignored. `failed_obligation` and timing/RSS metrics are retained in the
+compact report. See [diagnosis and limitations](../babel_formal_pipeline/v2_dsp/PROVER_REVIEW.md).
+Native success and the cache speedup must be measured on the lab installation.
+
 ## Batch runs and interpretation
 
 For all targets, use the complete records/Draft JSONL for the selected mode,

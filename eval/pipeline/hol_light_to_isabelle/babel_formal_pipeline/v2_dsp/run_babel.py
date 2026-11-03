@@ -39,7 +39,7 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
     parser.add_argument("--skip-sketch", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     add_parallel_arguments(parser)
-    if expected_source == "hol-most-match":
+    if expected_source in {"hol-most-match", "hundred-theorems"}:
         parser.set_defaults(memory_per_worker_gb=12.0)
     args = parser.parse_args()
     validate_layout(args.expected_root)
@@ -90,7 +90,7 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
     if not args.skip_sketch:
         blocked = {}
         try:
-            if plan.workers > 1 or expected_source == "hol-most-match":
+            if plan.workers > 1 or expected_source in {"hol-most-match", "hundred-theorems"}:
                 blocked = gate_records(exported, config=config, plan=plan, results_dir=run_dir,
                                        sketch_source=mode, fail_fast=args.fail_fast)
             else:

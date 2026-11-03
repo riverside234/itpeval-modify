@@ -11,6 +11,7 @@ DEFAULT_PROVE_OUTPUT = output_path(None, results_dir=RESULTS_DIR, filename="prov
 
 def prove_sketches(*, config, input_path: str = DEFAULT_INPUT, output_path: str | None = None,
                    prove_output=_engine._DEFAULT_PROVE, **options) -> list[dict]:
+    options.setdefault("memory_per_worker_gb", 12.0)
     return _engine.prove_sketches(
         config=config, input_path=input_path, output_path=output_path, prove_output=prove_output,
         results_dir=RESULTS_DIR, expected_source=SOURCE, **options)

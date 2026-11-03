@@ -61,8 +61,8 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
     print("Native parallelism: " + json.dumps(plan.metadata()), flush=True)
     native_factory = None
     try:
-        if plan.workers > 1 or expected_source == "hol-most-match":
-            valid = [r for r in records if not r.get("input_error") and not r.get("sketch_error")]
+        valid = [r for r in records if not r.get("input_error") and not r.get("sketch_error")]
+        if valid and (plan.workers > 1 or expected_source in {"hol-most-match", "hundred-theorems"}):
             config, backend, native_factory = prepare_batch(config, valid, plan)
         else:
             backend = config.metadata()
@@ -126,7 +126,7 @@ def main(*, default_input: str = DEFAULT_INPUT, default_output: str = DEFAULT_OU
     parser.add_argument("--limit", type=int)
     parser.add_argument("--no-resume", action="store_true")
     add_parallel_arguments(parser)
-    if expected_source == "hol-most-match":
+    if expected_source in {"hol-most-match", "hundred-theorems"}:
         parser.set_defaults(memory_per_worker_gb=12.0)
     args = parser.parse_args()
     validate_layout(args.expected_root)

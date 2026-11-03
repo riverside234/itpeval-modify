@@ -1,3 +1,91 @@
+# Review of commit 6300569: rsum_bound proof search
+
+Date: 2026-11-03. Source commit `6300569dde128f9e9ec54e7af1c4e12a66c4efc5`.
+The two historical work directories and their sketches are preserved unchanged.
+
+Both `target-pk0im2_0/search` and `target-3zezl1b1/search` completed all **657
+context commands**, opened the oracle, and then failed at the same scaled-norm
+bound. These are real search failures, not an import, parser or process crash.
+One earlier gap was successfully reconstructed with `metis` in the first run.
+Both Isabelle processes exited 0, but their structured results had
+`success=false`, `target_closed=false`, and `category=timeout`; process success
+must not count as a proof success.
+
+The unresolved mathematics is: from `norm (f x) <= e` and `0 <= content k`,
+normalize `norm (content k *R f x)` and multiply the bound by `content k`.
+The original DSP portfolio simplifies to a product inequality but has no
+nonlinear arithmetic fallback or explicit multiplication-monotonicity strategy.
+`linarith` alone does not infer an inequality between products of variable terms.
+Sledgehammer returned no proof within its 40-second search budget (the recorded
+calls took 45.216 and 48.467 seconds including search/reconstruction overhead).
+This does not establish a Sledgehammer implementation bug or justify marking a
+timeout as success.
+
+Changes:
+
+- Checker **p10** retains the original heuristic ordering and appends bounded
+  scalar-norm normalization plus `metis` with standard order rules, multiplication
+  monotonicity, and nonlinear arithmetic candidates. They execute through the
+  existing kernel-checked candidate path and must close the pending obligation.
+  No target-specific theorem or completed Isabelle proof is supplied.
+- Both Draft-to-Sketch and direct Sketch prompts now separate scalar normalization,
+  sign conditions, multiplication monotonicity, and the stages of a finite-sum
+  bound. `linarith` is not suggested for nonlinear products. Prompt versions are
+  updated for Babel, Hundred Theorems and the most-match adapters.
+- Failure results expose `failed_obligation`, including the preceding source
+  command/line and a goal diagnostic from the same failed state. Compact reports
+  retain this field even if the large context/attempt payload is truncated.
+- Hundred Theorems now uses the exact-original-import heap cache already used for
+  most-match, including single-worker batch runs. Imports are not broadened and
+  the inherited-target guard remains. The two recorded startups took **272.823 s**
+  and **306.492 s**; the change moves reusable import work outside per-target jobs.
+  Its actual speedup still needs a lab measurement. The default batch admission
+  allowance is now 12 GiB per worker; it is not a hard memory limit.
+- There is still no separate replay build. A focused retry runs only the two
+  previously failed proof searches, using the recorded sketches byte-for-byte
+  after normalization and checking the old request hashes and current context.
+  It neither calls an LLM nor reruns passed context/capability controls.
+
+The order and norm facts were checked in the official Isabelle2026 sources:
+[`Real_Vector_Spaces.thy`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/Real_Vector_Spaces.thy)
+and [`Rings.thy`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/Rings.thy).
+Native compilation and complete proof success remain lab acceptance checks;
+offline tests cannot establish them.
+
+Validation: the full suite collected 347 tests (326 passed, 19 native tests
+skipped, and two fake-transport fixtures needed updates for shared preparation).
+After correcting those fixtures and avoiding heap builds for already blocked
+sketches, **all 57 affected tests passed** in the focused rerun. The recorded
+requests match the current extracted target/context; retry selection contains
+exactly two failed searches and zero standalone context/control tests. Python
+3.10 syntax and patch whitespace checks passed. No native Isabelle or LLM call
+was made locally.
+
+## Rerun only the failed searches
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.retry_rsum_bound \
+  --expected-root "$PWD" \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
+```
+
+Append `--plan-only` to preview selection without starting Isabelle. Setup checks
+and one shared original-import heap are prerequisites. Both selected searches
+still execute their masked context as part of proving the target. There are **two
+proof tests**, zero standalone context tests, zero backend proof controls, and no
+native acceptance fixture. This is a prover regression; its direct-input envelope
+provides current source/context validation and is not a new generation experiment.
+
+Push the six compact files under
+`eval/preflight_results/isabelle2026-rsum-bound/<timestamp>/`. Full work artifacts
+stay ignored under `itpeval/.runs/`; there is no diagnostics ZIP. A failure at any
+later sketch step remains a failure with its current goal and source command
+reported. New prompt wording affects newly generated sketches, not these stored
+regression inputs.
+
+---
+
 # Review of committed run fabeacf1: context repairs
 
 Date: 2026-11-02. Source: commit `fabeacf1a89563bee5c9d9cc2d1a810fc31f1e54`,

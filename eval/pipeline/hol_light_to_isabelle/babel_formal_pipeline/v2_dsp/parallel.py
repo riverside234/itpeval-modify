@@ -197,7 +197,7 @@ def prepare_batch(config, records, plan):
     prepare_dependencies(config, records, plan)
     parent = NativeSearch(config).infrastructure(deadline=time.monotonic() + config.target_timeout_s)
     imports = None
-    if any(row.get("source") == "hol-most-match" for row in records):
+    if any(row.get("source") in {"hol-most-match", "hundred-theorems"} for row in records):
         from .import_cache import prepare_import_parents
         imports, _ = prepare_import_parents(config, records, plan, parent)
     return config, backend, lambda cfg: PreparedNative(cfg, parent, import_parents=imports)

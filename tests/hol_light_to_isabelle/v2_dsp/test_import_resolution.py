@@ -128,12 +128,15 @@ class ImportResolutionTests(unittest.TestCase):
                 '--sketch-source', 'hol-light-proof', '--records', str(source), '--samples', '2',
                 '--dsp-output', str(self.path/'inputs.jsonl'), '--sketch-output', str(self.path/'sketches.jsonl'),
                 '--prove-output', str(self.path/'prove.jsonl'), '--output', str(output)]
-        failure = {'ok': False, 'failure_category': 'import_error', 'error': 'Cannot load theory Missing'}
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import key
+        failure = {key(self.record): {'failure_category': 'import_error', 'error': 'Cannot load theory Missing'}}
         with patch.object(sys, 'argv', args), patch.object(DspConfig, 'metadata', return_value=BACKEND), patch(
-                BASE+'run_babel.preflight', return_value=failure), patch(
+                BASE+'run_babel.gate_records', return_value=failure), patch(
+                BASE+'prove.prepare_batch') as prepare, patch(
                 BASE+'generate_sketch.call_draft_model') as model, contextlib.redirect_stdout(io.StringIO()):
             main(expected_source='hundred-theorems', results_dir=str(self.path))
         model.assert_not_called()
+        prepare.assert_not_called()  # No import build when every Sketch is already blocked.
         rows = read_jsonl(output)
         self.assertEqual(2, len(rows))
         self.assertTrue(all(row['failure_category'] == 'import_error' for row in rows))

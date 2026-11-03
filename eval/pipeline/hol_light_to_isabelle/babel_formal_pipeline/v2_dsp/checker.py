@@ -18,10 +18,16 @@ from .runtime import DspConfig
 
 ProofFailure = NativeFailure  # Preserve the old exception import for callers.
 
-CHECKER_VERSION = "dsp_isabelle2026_native_p9"
+CHECKER_VERSION = "dsp_isabelle2026_native_p10"
 HEURISTICS = (
     "by auto", "by simp", "by blast", "by fastforce", "by force", "by eval",
     "by presburger", "by sos", "by arith", "by linarith", "by (auto simp: field_simps)",
+    # Products of two variable terms are nonlinear. Normalize scalar norms while
+    # retaining the chained sign/bound facts for the monotonicity reconstruction.
+    # These are general library rules, not facts from the selected target theory.
+    "by (simp only: norm_scaleR; metis abs_of_nonneg mult_right_mono mult.commute)",
+    "by (auto simp: mult.commute intro: mult_left_mono mult_right_mono)",
+    "by nlinarith", "by (auto; nlinarith)",
 )
 
 
@@ -29,12 +35,45 @@ def verification_input(record: dict, mode: str) -> dict:
     """A new check cannot inherit diagnostics or success artifacts from an old job."""
     result = clean_record(record, mode)
     for name in (
-        "native_search", "native_replay", "native_result", "native_context", "prover_settings", "workdir",
+        "failed_obligation", "native_search", "native_replay", "native_result", "native_context", "prover_settings", "workdir",
         "search_directory", "build_directory", "build_session", "build_log_path",
         "build_log_excerpt", "build_returncode", "build_metrics", "termination_hint", "parent_session", "replay_theory_path", "replay_log_path",
         "replay_verified", "verification_method", "pisa_result", "dsp_result", "import_resolution", "verify_fingerprint", "verify_duration_seconds", "backend_metadata", "isabelle_proof",
     ):
         result.pop(name, None)
+    return result
+
+
+def failure_obligation(steps: list[dict]) -> dict:
+    """Expose the final failed state, without attributing an earlier gap's errors.
+
+    Old workers record synthetic method lines as zero. The preceding source
+    command and a failed candidate's goal provide useful diagnostics even for
+    those historical traces. Never treat these messages as proof evidence.
+    """
+    if not steps or steps[-1].get("success"):
+        return {}
+    last = steps[-1]
+    result = {name: last[name] for name in ("mode", "line", "source_state", "command", "error") if name in last}
+    for field, size in (("command", 2000), ("error", 4000)):
+        if field in result:
+            result[field] = result[field][:size]
+    if last.get("mode") not in {"heuristic", "hammer", "reconstruction"}:
+        return result
+    state = last.get("source_state")
+    if state is None:
+        return result
+    for step in reversed(steps[:-1]):
+        if (step.get("mode") in {"search", "target"} and step.get("success")
+                and step.get("command", "").strip()):
+            result["preceding_command"] = step["command"][:2000]
+            result["preceding_line"] = step.get("line")
+            break
+    for step in steps:
+        if (step.get("source_state") == state and step.get("mode") == "heuristic"
+                and not step.get("success") and "goal (" in step.get("error", "")):
+            result["goal_diagnostic"] = step["error"][-4000:]
+            break
     return result
 
 
@@ -102,6 +141,13 @@ class Checker:
             result["prover_settings"] = search.get("prover_settings", {})
             if not search["success"] or not search.get("target_closed"):
                 message = search.get("error") or "target is open"
+                result["failed_obligation"] = failure_obligation(search["step_results"])
+                obligation = result["failed_obligation"]
+                if obligation.get("preceding_command"):
+                    message += (f"; after sketch line {obligation.get('preceding_line', '?')}: "
+                                + obligation["preceding_command"][:400])
+                if obligation.get("goal_diagnostic"):
+                    message += "\n" + obligation["goal_diagnostic"]
                 last_step = search["step_results"][-1] if search["step_results"] else {}
                 if (not last_step.get("success") and last_step.get("error")
                         and last_step["error"] not in message):

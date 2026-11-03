@@ -216,11 +216,12 @@ class StageTests(unittest.TestCase):
         sketch = control_record("proof -\n  show True\n    sledgehammer\nqed")
         input_path = self.root/"sketches.jsonl"
         write_jsonl(input_path,[sketch])
-        with patch(B+".v2_dsp.runtime.DspConfig.metadata",return_value=BACKEND), patch(
-                B+".v2_dsp.checker.NativeSearch",FakeNative):
+        with patch(B+".v2_dsp.prove.prepare_batch",
+                return_value=(CONFIG, BACKEND, FakeNative)) as prepare:
             results = prove_sketches(
                 config=CONFIG,input_path=input_path,output_path=self.root/"verified.jsonl",
                 prove_output=self.root/"prove.jsonl")
+        prepare.assert_called_once()
         self.assertTrue(results[0]["verified"],results[0]["verify_error"])
         self.assertTrue(Path(results[0]["workdir"]).is_relative_to(repo_path(RESULTS_DIR)))
         # The checker intentionally retains server work artifacts; clean up only this fixture's directory.
