@@ -1,0 +1,21 @@
+[
+  "/data/not_backed_up/yxu209/itpeval-modify/itpeval/_toolchains/Isabelle2026/bin/isabelle",
+  "build",
+  "-j",
+  "1",
+  "-o",
+  "document=false",
+  "-o",
+  "parallel_proofs=0",
+  "-o",
+  "timeout_scale=1.0",
+  "-o",
+  "threads=4",
+  "-d",
+  "/data/not_backed_up/yxu209/itpeval-modify/external/afp-2026/thys",
+  "-d",
+  "/data/not_backed_up/yxu209/itpeval-modify/itpeval/.runs/isabelle2026-native/infrastructure/4087a4fa6e169284",
+  "-d",
+  "/data/not_backed_up/yxu209/itpeval-modify/eval/results/hol_light_to_isabelle_v2/hundred-theorems/work/target-pk0im2_0/search",
+  "DSP_Job_efd0f5a0df0e402fa1fd0f77a36eec67"
+]

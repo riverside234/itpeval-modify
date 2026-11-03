@@ -1,0 +1,1119 @@
+<dsp_request schema="dsp_native_request_v1" request_id="98f3ae1af7af4e21bdcd562f386d135e" input_sha256="7582fbcc8c59b27b919c14d9be0c736b7fa73a12e633a8a31a003ce9e7951bee" action="search"><prefix>(*  Author:     John Harrison
+    Author:     Robert Himmelmann, TU Muenchen (Translation from HOL light)
+                Huge cleanup by LCP
+*)
+
+section \&lt;open&gt;Henstock-Kurzweil Gauge Integration in Many Dimensions\&lt;close&gt;
+
+theory Henstock_Kurzweil_Integration
+imports
+  "HOL-Analysis.Lebesgue_Measure" "HOL-Analysis.Tagged_Division" "HOL-Real_Asymp.Real_Asymp"
+
+begin
+
+lemma norm_diff2: "\&lt;lbrakk&gt;y = y1 + y2; x = x1 + x2; e = e1 + e2; norm(y1 - x1) \&lt;le&gt; e1; norm(y2 - x2) \&lt;le&gt; e2\&lt;rbrakk&gt;
+  \&lt;Longrightarrow&gt; norm(y-x) \&lt;le&gt; e"
+  
+  sorry
+
+
+lemma setcomp_dot1: "{z. P (z \&lt;bullet&gt; (i,0))} = {(x,y). P(x \&lt;bullet&gt; i)}"
+  
+  sorry
+
+
+lemma setcomp_dot2: "{z. P (z \&lt;bullet&gt; (0,i))} = {(x,y). P(y \&lt;bullet&gt; i)}"
+  
+  sorry
+
+
+lemma Sigma_Int_Paircomp1: "(Sigma A B) \&lt;inter&gt; {(x, y). P x} = Sigma (A \&lt;inter&gt; {x. P x}) B"
+  
+  sorry
+
+
+lemma Sigma_Int_Paircomp2: "(Sigma A B) \&lt;inter&gt; {(x, y). P y} = Sigma A (\&lt;lambda&gt;z. B z \&lt;inter&gt; {y. P y})"
+  
+  sorry
+
+
+subsection \&lt;open&gt;Content (length, area, volume, etc.) of an interval\&lt;close&gt;
+
+abbreviation content :: "'a::euclidean_space set \&lt;Rightarrow&gt; real"
+  where "content s \&lt;equiv&gt; measure lborel s"
+
+lemma content_cbox_cases:
+  "content (cbox a b) = (if \&lt;forall&gt;i\&lt;in&gt;Basis. a\&lt;bullet&gt;i \&lt;le&gt; b\&lt;bullet&gt;i then prod (\&lt;lambda&gt;i. b\&lt;bullet&gt;i - a\&lt;bullet&gt;i) Basis else 0)"
+  
+  sorry
+
+
+lemma content_cbox: "\&lt;forall&gt;i\&lt;in&gt;Basis. a\&lt;bullet&gt;i \&lt;le&gt; b\&lt;bullet&gt;i \&lt;Longrightarrow&gt; content (cbox a b) = (\&lt;Prod&gt;i\&lt;in&gt;Basis. b\&lt;bullet&gt;i - a\&lt;bullet&gt;i)"
+  
+  sorry
+
+
+lemma content_cbox': "cbox a b \&lt;noteq&gt; {} \&lt;Longrightarrow&gt; content (cbox a b) = (\&lt;Prod&gt;i\&lt;in&gt;Basis. b\&lt;bullet&gt;i - a\&lt;bullet&gt;i)"
+  
+  sorry
+
+
+lemma content_cbox_if: "content (cbox a b) = (if cbox a b = {} then 0 else \&lt;Prod&gt;i\&lt;in&gt;Basis. b\&lt;bullet&gt;i - a\&lt;bullet&gt;i)"
+  
+  sorry
+
+
+lemma content_cbox_cart:
+   "cbox a b \&lt;noteq&gt; {} \&lt;Longrightarrow&gt; content(cbox a b) = prod (\&lt;lambda&gt;i. b$i - a$i) UNIV"
+  
+  sorry
+
+
+lemma content_cbox_if_cart:
+   "content(cbox a b) = (if cbox a b = {} then 0 else prod (\&lt;lambda&gt;i. b$i - a$i) UNIV)"
+  
+  sorry
+
+
+lemma content_division_of:
+  assumes "K \&lt;in&gt; \&lt;D&gt;" "\&lt;D&gt; division_of S"
+  shows "content K = (\&lt;Prod&gt;i \&lt;in&gt; Basis. interval_upperbound K \&lt;bullet&gt; i - interval_lowerbound K \&lt;bullet&gt; i)"
+  
+  sorry
+
+
+lemma content_real: "a \&lt;le&gt; b \&lt;Longrightarrow&gt; content {a..b} = b - a"
+  
+  sorry
+
+
+lemma abs_eq_content: "\&lt;bar&gt;y - x\&lt;bar&gt; = (if x\&lt;le&gt;y then content {x..y} else content {y..x})"
+  
+  sorry
+
+
+lemma content_singleton: "content {a} = 0"
+  
+  sorry
+
+
+lemma content_unit[iff]: "content (cbox 0 (One::'a::euclidean_space)) = 1"
+  
+  sorry
+
+
+lemma content_pos_le [iff]: "0 \&lt;le&gt; content X"
+  
+  sorry
+
+
+corollary\&lt;^marker&gt;\&lt;open&gt;tag unimportant\&lt;close&gt; content_nonneg [simp]: "\&lt;not&gt; content (cbox a b) &lt; 0"
+  
+  sorry
+
+
+lemma content_pos_lt: "\&lt;forall&gt;i\&lt;in&gt;Basis. a\&lt;bullet&gt;i &lt; b\&lt;bullet&gt;i \&lt;Longrightarrow&gt; 0 &lt; content (cbox a b)"
+  
+  sorry
+
+
+lemma content_eq_0: "content (cbox a b) = 0 \&lt;longleftrightarrow&gt; (\&lt;exists&gt;i\&lt;in&gt;Basis. b\&lt;bullet&gt;i \&lt;le&gt; a\&lt;bullet&gt;i)"
+  
+  sorry
+
+
+lemma content_eq_0_interior: "content (cbox a b) = 0 \&lt;longleftrightarrow&gt; interior(cbox a b) = {}"
+  
+  sorry
+
+
+lemma content_pos_lt_eq: "0 &lt; content (cbox a (b::'a::euclidean_space)) \&lt;longleftrightarrow&gt; (\&lt;forall&gt;i\&lt;in&gt;Basis. a\&lt;bullet&gt;i &lt; b\&lt;bullet&gt;i)"
+  
+  sorry
+
+
+lemma content_empty [simp]: "content {} = 0"
+  
+  sorry
+
+
+lemma content_real_if [simp]: "content {a..b} = (if a \&lt;le&gt; b then b - a else 0)"
+  
+  sorry
+
+
+lemma content_subset: "cbox a b \&lt;subseteq&gt; cbox c d \&lt;Longrightarrow&gt; content (cbox a b) \&lt;le&gt; content (cbox c d)"
+  
+  sorry
+
+
+lemma content_lt_nz: "0 &lt; content (cbox a b) \&lt;longleftrightarrow&gt; content (cbox a b) \&lt;noteq&gt; 0"
+  
+  sorry
+
+
+lemma content_Pair: "content (cbox (a,c) (b,d)) = content (cbox a b) * content (cbox c d)"
+  
+  sorry
+
+
+lemma content_cbox_pair_eq0_D:
+   "content (cbox (a,c) (b,d)) = 0 \&lt;Longrightarrow&gt; content (cbox a b) = 0 \&lt;or&gt; content (cbox c d) = 0"
+  
+  sorry
+
+
+lemma content_cbox_plus:
+  fixes x :: "'a::euclidean_space"
+  shows "content(cbox x (x + h *\&lt;^sub&gt;R One)) = (if h \&lt;ge&gt; 0 then h ^ DIM('a) else 0)"
+  
+  sorry
+
+
+lemma content_0_subset: "content(cbox a b) = 0 \&lt;Longrightarrow&gt; s \&lt;subseteq&gt; cbox a b \&lt;Longrightarrow&gt; content s = 0"
+  
+  sorry
+
+
+lemma content_ball_pos:
+  assumes "r &gt; 0"
+  shows   "content (ball c r) &gt; 0"
+  
+  sorry
+
+
+lemma content_cball_pos:
+  assumes "r &gt; 0"
+  shows   "content (cball c r) &gt; 0"
+  
+  sorry
+
+
+lemma content_split:
+  fixes a :: "'a::euclidean_space"
+  assumes "k \&lt;in&gt; Basis"
+  shows "content (cbox a b) = content(cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c}) + content(cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c})"
+  \&lt;comment&gt; \&lt;open&gt;Prove using measure theory\&lt;close&gt;
+  
+  sorry
+
+
+lemma division_of_content_0:
+  assumes "content (cbox a b) = 0" "d division_of (cbox a b)" "K \&lt;in&gt; d"
+  shows "content K = 0"
+  
+  sorry
+
+
+lemma sum_content_null:
+  assumes "content (cbox a b) = 0"
+    and "p tagged_division_of (cbox a b)"
+  shows "(\&lt;Sum&gt;(x,K)\&lt;in&gt;p. content K *\&lt;^sub&gt;R f x) = (0::'a::real_normed_vector)"
+  
+  sorry
+
+
+global_interpretation sum_content: operative plus 0 content
+  rewrites "comm_monoid_set.F plus 0 = sum"
+
+  sorry
+
+
+lemma additive_content_division: "d division_of (cbox a b) \&lt;Longrightarrow&gt; sum content d = content (cbox a b)"
+  
+  sorry
+
+
+lemma additive_content_tagged_division:
+  "d tagged_division_of (cbox a b) \&lt;Longrightarrow&gt; sum (\&lt;lambda&gt;(x,l). content l) d = content (cbox a b)"
+  
+  sorry
+
+
+lemma subadditive_content_division:
+  assumes "\&lt;D&gt; division_of S" "S \&lt;subseteq&gt; cbox a b"
+  shows "sum content \&lt;D&gt; \&lt;le&gt; content(cbox a b)"
+  
+  sorry
+
+
+lemma content_real_eq_0: "content {a..b::real} = 0 \&lt;longleftrightarrow&gt; a \&lt;ge&gt; b"
+  
+  sorry
+
+
+lemma property_empty_interval: "\&lt;forall&gt;a b. content (cbox a b) = 0 \&lt;longrightarrow&gt; P (cbox a b) \&lt;Longrightarrow&gt; P {}"
+  
+  sorry
+
+
+lemma interval_bounds_nz_content [simp]:
+  assumes "content (cbox a b) \&lt;noteq&gt; 0"
+  shows "interval_upperbound (cbox a b) = b"
+    and "interval_lowerbound (cbox a b) = a"
+  
+  sorry
+
+
+subsection \&lt;open&gt;Gauge integral\&lt;close&gt;
+
+text \&lt;open&gt;Case distinction to define it first on compact intervals first, then use a limit. This is only
+much later unified. In Fremlin: Measure Theory, Volume 4I this is generalized using residual sets.\&lt;close&gt;
+
+definition has_integral :: "('n::euclidean_space \&lt;Rightarrow&gt; 'b::real_normed_vector) \&lt;Rightarrow&gt; 'b \&lt;Rightarrow&gt; 'n set \&lt;Rightarrow&gt; bool"
+  (infixr \&lt;open&gt;has'_integral\&lt;close&gt; 46)
+  where "(f has_integral I) s \&lt;longleftrightarrow&gt;
+    (if \&lt;exists&gt;a b. s = cbox a b
+      then ((\&lt;lambda&gt;p. \&lt;Sum&gt;(x,k)\&lt;in&gt;p. content k *\&lt;^sub&gt;R f x) \&lt;longlongrightarrow&gt; I) (division_filter s)
+      else (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;B&gt;0. \&lt;forall&gt;a b. ball 0 B \&lt;subseteq&gt; cbox a b \&lt;longrightarrow&gt;
+        (\&lt;exists&gt;z. ((\&lt;lambda&gt;p. \&lt;Sum&gt;(x,k)\&lt;in&gt;p. content k *\&lt;^sub&gt;R (if x \&lt;in&gt; s then f x else 0)) \&lt;longlongrightarrow&gt; z) (division_filter (cbox a b)) \&lt;and&gt;
+          norm (z - I) &lt; e)))"
+
+lemma has_integral_cbox:
+  "(f has_integral I) (cbox a b) \&lt;longleftrightarrow&gt; ((\&lt;lambda&gt;p. \&lt;Sum&gt;(x,k)\&lt;in&gt;p. content k *\&lt;^sub&gt;R f x) \&lt;longlongrightarrow&gt; I) (division_filter (cbox a b))"
+  
+  sorry
+
+
+lemma has_integral:
+  "(f has_integral y) (cbox a b) \&lt;longleftrightarrow&gt;
+    (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;\&lt;gamma&gt;. gauge \&lt;gamma&gt; \&lt;and&gt;
+      (\&lt;forall&gt;\&lt;D&gt;. \&lt;D&gt; tagged_division_of (cbox a b) \&lt;and&gt; \&lt;gamma&gt; fine \&lt;D&gt; \&lt;longrightarrow&gt;
+        norm ((\&lt;Sum&gt;(x, k)\&lt;in&gt;\&lt;D&gt;. content k *\&lt;^sub&gt;R f x) - y) &lt; e))"
+  
+  sorry
+
+
+lemma has_integral_real:
+  "(f has_integral y) {a..b::real} \&lt;longleftrightarrow&gt;
+    (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;\&lt;gamma&gt;. gauge \&lt;gamma&gt; \&lt;and&gt;
+      (\&lt;forall&gt;\&lt;D&gt;. \&lt;D&gt; tagged_division_of {a..b} \&lt;and&gt; \&lt;gamma&gt; fine \&lt;D&gt; \&lt;longrightarrow&gt;
+        norm (sum (\&lt;lambda&gt;(x,k). content(k) *\&lt;^sub&gt;R f x) \&lt;D&gt; - y) &lt; e))"
+  
+  sorry
+
+
+lemma has_integralD[dest]:
+  assumes "(f has_integral y) (cbox a b)"
+    and "e &gt; 0"
+  obtains \&lt;gamma&gt;
+    where "gauge \&lt;gamma&gt;"
+      and "\&lt;And&gt;\&lt;D&gt;. \&lt;D&gt; tagged_division_of (cbox a b) \&lt;Longrightarrow&gt; \&lt;gamma&gt; fine \&lt;D&gt; \&lt;Longrightarrow&gt;
+        norm ((\&lt;Sum&gt;(x,k)\&lt;in&gt;\&lt;D&gt;. content k *\&lt;^sub&gt;R f x) - y) &lt; e"
+  
+  sorry
+
+
+lemma has_integral_alt:
+  "(f has_integral y) i \&lt;longleftrightarrow&gt;
+    (if \&lt;exists&gt;a b. i = cbox a b
+     then (f has_integral y) i
+     else (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;B&gt;0. \&lt;forall&gt;a b. ball 0 B \&lt;subseteq&gt; cbox a b \&lt;longrightarrow&gt;
+      (\&lt;exists&gt;z. ((\&lt;lambda&gt;x. if x \&lt;in&gt; i then f x else 0) has_integral z) (cbox a b) \&lt;and&gt; norm (z - y) &lt; e)))"
+  
+  sorry
+
+
+lemma has_integral_altD:
+  assumes "(f has_integral y) i"
+    and "\&lt;not&gt; (\&lt;exists&gt;a b. i = cbox a b)"
+    and "e&gt;0"
+  obtains B where "B &gt; 0"
+    and "\&lt;forall&gt;a b. ball 0 B \&lt;subseteq&gt; cbox a b \&lt;longrightarrow&gt;
+      (\&lt;exists&gt;z. ((\&lt;lambda&gt;x. if x \&lt;in&gt; i then f(x) else 0) has_integral z) (cbox a b) \&lt;and&gt; norm(z - y) &lt; e)"
+  
+  sorry
+
+
+definition integrable_on (infixr \&lt;open&gt;integrable'_on\&lt;close&gt; 46)
+  where "f integrable_on i \&lt;longleftrightarrow&gt; (\&lt;exists&gt;y. (f has_integral y) i)"
+
+definition "integral i f = (SOME y. (f has_integral y) i \&lt;or&gt; \&lt;not&gt; f integrable_on i \&lt;and&gt; y=0)"
+
+lemma integrable_integral[intro]: "f integrable_on i \&lt;Longrightarrow&gt; (f has_integral (integral i f)) i"
+  
+  sorry
+
+
+lemma not_integrable_integral: "\&lt;not&gt; f integrable_on i \&lt;Longrightarrow&gt; integral i f = 0"
+  
+  sorry
+
+
+lemma has_integral_integrable[dest]: "(f has_integral i) s \&lt;Longrightarrow&gt; f integrable_on s"
+  
+  sorry
+
+
+lemma has_integral_integral: "f integrable_on s \&lt;longleftrightarrow&gt; (f has_integral (integral s f)) s"
+  
+  sorry
+
+
+subsection \&lt;open&gt;Basic theorems about integrals\&lt;close&gt;
+
+lemma has_integral_eq_rhs: "(f has_integral j) S \&lt;Longrightarrow&gt; i = j \&lt;Longrightarrow&gt; (f has_integral i) S"
+  
+  sorry
+
+
+lemma has_integral_unique_cbox:
+  fixes f :: "'n::euclidean_space \&lt;Rightarrow&gt; 'a::real_normed_vector"
+  shows "(f has_integral k1) (cbox a b) \&lt;Longrightarrow&gt; (f has_integral k2) (cbox a b) \&lt;Longrightarrow&gt; k1 = k2"
+  
+  sorry
+
+
+lemma has_integral_unique:
+  fixes f :: "'n::euclidean_space \&lt;Rightarrow&gt; 'a::real_normed_vector"
+  assumes "(f has_integral k1) i" "(f has_integral k2) i"
+  shows "k1 = k2"
+  
+  sorry
+
+
+lemma integral_unique [intro]: "(f has_integral y) k \&lt;Longrightarrow&gt; integral k f = y"
+  
+  sorry
+
+
+lemma has_integral_iff: "(f has_integral i) S \&lt;longleftrightarrow&gt; (f integrable_on S \&lt;and&gt; integral S f = i)"
+  
+  sorry
+
+
+lemma eq_integralD: "integral k f = y \&lt;Longrightarrow&gt; (f has_integral y) k \&lt;or&gt; \&lt;not&gt; f integrable_on k \&lt;and&gt; y=0"
+  
+  sorry
+
+
+lemma has_integral_const [intro]:
+  fixes a b :: "'a::euclidean_space"
+  shows "((\&lt;lambda&gt;x. c) has_integral (content (cbox a b) *\&lt;^sub&gt;R c)) (cbox a b)"
+  
+  sorry
+
+
+lemma has_integral_const_real [intro]:
+  fixes a b :: real
+  shows "((\&lt;lambda&gt;x. c) has_integral (content {a..b} *\&lt;^sub&gt;R c)) {a..b}"
+  
+  sorry
+
+
+lemma has_integral_integrable_integral: "(f has_integral i) s \&lt;longleftrightarrow&gt; f integrable_on s \&lt;and&gt; integral s f = i"
+  
+  sorry
+
+
+lemma integral_const [simp]:
+  fixes a b :: "'a::euclidean_space"
+  shows "integral (cbox a b) (\&lt;lambda&gt;x. c) = content (cbox a b) *\&lt;^sub&gt;R c"
+  
+  sorry
+
+
+lemma integral_const_real [simp]:
+  fixes a b :: real
+  shows "integral {a..b} (\&lt;lambda&gt;x. c) = content {a..b} *\&lt;^sub&gt;R c"
+  
+  sorry
+
+
+lemma has_integral_is_0_cbox:
+  fixes f :: "'n::euclidean_space \&lt;Rightarrow&gt; 'a::real_normed_vector"
+  assumes "\&lt;And&gt;x. x \&lt;in&gt; cbox a b \&lt;Longrightarrow&gt; f x = 0"
+  shows "(f has_integral 0) (cbox a b)"
+  
+  sorry
+
+
+lemma has_integral_is_0:
+  fixes f :: "'n::euclidean_space \&lt;Rightarrow&gt; 'a::real_normed_vector"
+  assumes "\&lt;And&gt;x. x \&lt;in&gt; S \&lt;Longrightarrow&gt; f x = 0"
+  shows "(f has_integral 0) S"
+  
+  sorry
+
+
+lemma has_integral_0[simp]: "((\&lt;lambda&gt;x::'n::euclidean_space. 0) has_integral 0) S"
+  
+  sorry
+
+
+lemma has_integral_0_eq[simp]: "((\&lt;lambda&gt;x. 0) has_integral i) S \&lt;longleftrightarrow&gt; i = 0"
+  
+  sorry
+
+
+lemma has_integral_linear_cbox:
+  fixes f :: "'n::euclidean_space \&lt;Rightarrow&gt; 'a::real_normed_vector"
+  assumes f: "(f has_integral y) (cbox a b)"
+    and h: "bounded_linear h"
+  shows "((h \&lt;circ&gt; f) has_integral (h y)) (cbox a b)"
+  
+  sorry
+
+
+lemma has_integral_linear:
+  fixes f :: "'n::euclidean_space \&lt;Rightarrow&gt; 'a::real_normed_vector"
+  assumes f: "(f has_integral y) S"
+    and h: "bounded_linear h"
+  shows "((h \&lt;circ&gt; f) has_integral (h y)) S"
+  
+  sorry
+
+
+lemma has_integral_of_real:
+  "(f has_integral I) A \&lt;Longrightarrow&gt;
+     ((\&lt;lambda&gt;x::'a::euclidean_space. of_real (f x) :: 'b :: {real_normed_vector,real_normed_algebra_1}) 
+        has_integral of_real I) A"
+  
+  sorry
+
+
+lemma has_integral_scaleR_left:
+  "(f has_integral y) S \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. f x *\&lt;^sub&gt;R c) has_integral (y *\&lt;^sub&gt;R c)) S"
+  
+  sorry
+
+
+lemma integrable_on_scaleR_left:
+  assumes "f integrable_on A"
+  shows "(\&lt;lambda&gt;x. f x *\&lt;^sub&gt;R y) integrable_on A"
+  
+  sorry
+
+
+lemma has_integral_mult_left:
+  fixes c :: "_ :: real_normed_algebra"
+  shows "(f has_integral y) S \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. f x * c) has_integral (y * c)) S"
+  
+  sorry
+
+
+lemma integrable_on_mult_left:
+  fixes c :: "'a :: real_normed_algebra"
+  assumes "f integrable_on A"
+  shows   "(\&lt;lambda&gt;x. f x * c) integrable_on A"
+  
+  sorry
+
+
+lemma has_integral_divide:
+  fixes c :: "_ :: real_normed_div_algebra"
+  shows "(f has_integral y) S \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. f x / c) has_integral (y / c)) S"
+  
+  sorry
+
+
+lemma integrable_on_divide:
+  fixes c :: "'a :: real_normed_div_algebra"
+  assumes "f integrable_on A"
+  shows   "(\&lt;lambda&gt;x. f x / c) integrable_on A"
+  
+  sorry
+
+
+text\&lt;open&gt;The case analysis eliminates the condition \&lt;^term&gt;\&lt;open&gt;f integrable_on S\&lt;close&gt; at the cost
+     of the type class constraint \&lt;open&gt;division_ring\&lt;close&gt;\&lt;close&gt;
+corollary integral_mult_left [simp]:
+  fixes c:: "'a::{real_normed_algebra,division_ring}"
+  shows "integral S (\&lt;lambda&gt;x. f x * c) = integral S f * c"
+  
+  sorry
+
+
+corollary integral_mult_right [simp]:
+  fixes c:: "'a::{real_normed_field}"
+  shows "integral S (\&lt;lambda&gt;x. c * f x) = c * integral S f"
+  
+  sorry
+
+
+corollary integral_divide [simp]:
+  fixes z :: "'a::real_normed_field"
+  shows "integral S (\&lt;lambda&gt;x. f x / z) = integral S (\&lt;lambda&gt;x. f x) / z"
+  
+  sorry
+
+
+lemma has_integral_mult_right:
+  fixes c :: "'a :: real_normed_algebra"
+  shows "(f has_integral y) A \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. c * f x) has_integral (c * y)) A"
+  
+  sorry
+
+
+lemma integrable_on_mult_right:
+  fixes c :: "'a :: real_normed_algebra"
+  assumes "f integrable_on A"
+  shows   "(\&lt;lambda&gt;x. c * f x) integrable_on A"
+  
+  sorry
+
+
+lemma has_integral_mult_right_iff:
+  fixes c :: "'a :: real_normed_field"
+  assumes "c \&lt;noteq&gt; 0"
+  shows "((\&lt;lambda&gt;x. c * f x) has_integral y) A \&lt;longleftrightarrow&gt; (f has_integral (y / c)) A"
+  
+  sorry
+
+
+lemma integrable_on_mult_right_iff [simp]:
+  fixes c :: "'a :: real_normed_field"
+  assumes "c \&lt;noteq&gt; 0"
+  shows   "(\&lt;lambda&gt;x. c * f x) integrable_on A \&lt;longleftrightarrow&gt; f integrable_on A"
+  
+  sorry
+
+
+lemma integrable_on_mult_left_iff [simp]:
+  fixes c :: "'a :: real_normed_field"
+  assumes "c \&lt;noteq&gt; 0"
+  shows   "(\&lt;lambda&gt;x. f x * c) integrable_on A \&lt;longleftrightarrow&gt; f integrable_on A"
+  
+  sorry
+
+
+lemma integrable_on_div_iff [simp]:
+  fixes c :: "'a :: real_normed_field"
+  assumes "c \&lt;noteq&gt; 0"
+  shows   "(\&lt;lambda&gt;x. f x / c) integrable_on A \&lt;longleftrightarrow&gt; f integrable_on A"
+  
+  sorry
+
+
+lemma has_integral_cmul: "(f has_integral k) S \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. c *\&lt;^sub&gt;R f x) has_integral (c *\&lt;^sub&gt;R k)) S"
+  
+  sorry
+
+
+lemma has_integral_cmult_real:
+  fixes c :: real
+  assumes "c \&lt;noteq&gt; 0 \&lt;Longrightarrow&gt; (f has_integral x) A"
+  shows "((\&lt;lambda&gt;x. c * f x) has_integral c * x) A"
+  
+  sorry
+
+
+lemma has_integral_neg: "(f has_integral k) S \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. -(f x)) has_integral -k) S"
+  
+  sorry
+
+
+lemma has_integral_neg_iff: "((\&lt;lambda&gt;x. - f x) has_integral k) S \&lt;longleftrightarrow&gt; (f has_integral - k) S"
+  
+  sorry
+
+
+lemma has_integral_add_cbox:
+  fixes f :: "'n::euclidean_space \&lt;Rightarrow&gt; 'a::real_normed_vector"
+  assumes "(f has_integral k) (cbox a b)" "(g has_integral l) (cbox a b)"
+  shows "((\&lt;lambda&gt;x. f x + g x) has_integral (k + l)) (cbox a b)"
+  
+  sorry
+
+
+lemma has_integral_add:
+  fixes f :: "'n::euclidean_space \&lt;Rightarrow&gt; 'a::real_normed_vector"
+  assumes f: "(f has_integral k) S" and g: "(g has_integral l) S"
+  shows "((\&lt;lambda&gt;x. f x + g x) has_integral (k + l)) S"
+  
+  sorry
+
+
+lemma has_integral_diff:
+  "(f has_integral k) S \&lt;Longrightarrow&gt; (g has_integral l) S \&lt;Longrightarrow&gt;
+    ((\&lt;lambda&gt;x. f x - g x) has_integral (k - l)) S"
+  
+  sorry
+
+
+lemma integral_0 [simp]:
+  "integral S (\&lt;lambda&gt;x::'n::euclidean_space. 0::'m::real_normed_vector) = 0"
+  
+  sorry
+
+
+lemma integral_add: "f integrable_on S \&lt;Longrightarrow&gt; g integrable_on S \&lt;Longrightarrow&gt;
+    integral S (\&lt;lambda&gt;x. f x + g x) = integral S f + integral S g"
+  
+  sorry
+
+
+lemma integral_cmul [simp]: "integral S (\&lt;lambda&gt;x. c *\&lt;^sub&gt;R f x) = c *\&lt;^sub&gt;R integral S f"
+  
+  sorry
+
+
+lemma integral_mult:
+  fixes K::real
+  shows "f integrable_on X \&lt;Longrightarrow&gt; K * integral X f = integral X (\&lt;lambda&gt;x. K * f x)"
+  
+  sorry
+
+
+lemma integral_neg [simp]: "integral S (\&lt;lambda&gt;x. - f x) = - integral S f"
+  
+  sorry
+
+
+lemma integral_diff: "f integrable_on S \&lt;Longrightarrow&gt; g integrable_on S \&lt;Longrightarrow&gt;
+    integral S (\&lt;lambda&gt;x. f x - g x) = integral S f - integral S g"
+  
+  sorry
+
+
+lemma integrable_0: "(\&lt;lambda&gt;x. 0) integrable_on S"
+  
+  sorry
+
+
+lemma integrable_add: "f integrable_on S \&lt;Longrightarrow&gt; g integrable_on S \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. f x + g x) integrable_on S"
+  
+  sorry
+
+
+lemma integrable_cmul: "f integrable_on S \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. c *\&lt;^sub&gt;R f(x)) integrable_on S"
+  
+  sorry
+
+
+lemma integrable_on_scaleR_iff [simp]:
+  fixes c :: real
+  assumes "c \&lt;noteq&gt; 0"
+  shows "(\&lt;lambda&gt;x. c *\&lt;^sub&gt;R f x) integrable_on S \&lt;longleftrightarrow&gt; f integrable_on S"
+  
+  sorry
+
+
+lemma integrable_on_cmult_iff [simp]:
+  fixes c :: real
+  assumes "c \&lt;noteq&gt; 0"
+  shows "(\&lt;lambda&gt;x. c * f x) integrable_on S \&lt;longleftrightarrow&gt; f integrable_on S"
+  
+  sorry
+
+
+lemma integrable_on_cmult_left:
+  assumes "f integrable_on S"
+  shows "(\&lt;lambda&gt;x. of_real c * f x) integrable_on S"
+  
+  sorry
+
+
+lemma integrable_neg: "f integrable_on S \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. -f(x)) integrable_on S"
+  
+  sorry
+
+
+lemma integrable_neg_iff: "(\&lt;lambda&gt;x. -f(x)) integrable_on S \&lt;longleftrightarrow&gt; f integrable_on S"
+  
+  sorry
+
+
+lemma integrable_diff:
+  "f integrable_on S \&lt;Longrightarrow&gt; g integrable_on S \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. f x - g x) integrable_on S"
+  
+  sorry
+
+
+lemma integrable_linear:
+  "f integrable_on S \&lt;Longrightarrow&gt; bounded_linear h \&lt;Longrightarrow&gt; (h \&lt;circ&gt; f) integrable_on S"
+  
+  sorry
+
+
+lemma integral_linear:
+  "f integrable_on S \&lt;Longrightarrow&gt; bounded_linear h \&lt;Longrightarrow&gt; integral S (h \&lt;circ&gt; f) = h (integral S f)"
+  
+  sorry
+
+
+lemma integrable_on_cnj_iff:
+  "(\&lt;lambda&gt;x. cnj (f x)) integrable_on A \&lt;longleftrightarrow&gt; f integrable_on A"
+  
+  sorry
+
+
+lemma integral_cnj: "cnj (integral A f) = integral A (\&lt;lambda&gt;x. cnj (f x))"
+  
+  sorry
+
+
+lemma has_integral_cnj: "(cnj \&lt;circ&gt; f has_integral (cnj I)) A  = (f has_integral I) A"
+  
+  sorry
+
+
+lemma integral_component_eq[simp]:
+  fixes f :: "'n::euclidean_space \&lt;Rightarrow&gt; 'm::euclidean_space"
+  assumes "f integrable_on S"
+  shows "integral S (\&lt;lambda&gt;x. f x \&lt;bullet&gt; k) = integral S f \&lt;bullet&gt; k"
+  
+  sorry
+
+
+lemma integral_eq_iff_componentwise:
+  fixes f :: "'a :: euclidean_space \&lt;Rightarrow&gt; 'b :: euclidean_space"
+  assumes "f integrable_on A"
+  shows "integral A f = I \&lt;longleftrightarrow&gt; (\&lt;forall&gt;b\&lt;in&gt;Basis. integral A (\&lt;lambda&gt;x. f x \&lt;bullet&gt; b) = I \&lt;bullet&gt; b)"
+  
+  sorry
+
+
+lemma has_integral_sum:
+  assumes "finite T"
+    and "\&lt;And&gt;a. a \&lt;in&gt; T \&lt;Longrightarrow&gt; ((f a) has_integral (i a)) S"
+  shows "((\&lt;lambda&gt;x. sum (\&lt;lambda&gt;a. f a x) T) has_integral (sum i T)) S"
+  
+  sorry
+
+
+lemma integral_sum:
+  "\&lt;lbrakk&gt;finite I;  \&lt;And&gt;a. a \&lt;in&gt; I \&lt;Longrightarrow&gt; f a integrable_on S\&lt;rbrakk&gt; \&lt;Longrightarrow&gt;
+   integral S (\&lt;lambda&gt;x. \&lt;Sum&gt;a\&lt;in&gt;I. f a x) = (\&lt;Sum&gt;a\&lt;in&gt;I. integral S (f a))"
+  
+  sorry
+
+
+lemma integrable_sum:
+  "\&lt;lbrakk&gt;finite I;  \&lt;And&gt;a. a \&lt;in&gt; I \&lt;Longrightarrow&gt; f a integrable_on S\&lt;rbrakk&gt; \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. \&lt;Sum&gt;a\&lt;in&gt;I. f a x) integrable_on S"
+  
+  sorry
+
+
+lemma has_integral_eq:
+  assumes "\&lt;And&gt;x. x \&lt;in&gt; s \&lt;Longrightarrow&gt; f x = g x"
+    and f: "(f has_integral k) s"
+  shows "(g has_integral k) s"
+  
+  sorry
+
+
+lemma integrable_eq: "\&lt;lbrakk&gt;f integrable_on s; \&lt;And&gt;x. x \&lt;in&gt; s \&lt;Longrightarrow&gt; f x = g x\&lt;rbrakk&gt; \&lt;Longrightarrow&gt; g integrable_on s"
+  
+  sorry
+
+
+lemma has_integral_cong:
+  assumes "\&lt;And&gt;x. x \&lt;in&gt; s \&lt;Longrightarrow&gt; f x = g x"
+  shows "(f has_integral i) s = (g has_integral i) s"
+  
+  sorry
+
+
+lemma integrable_cong:
+  assumes "\&lt;And&gt;x. x \&lt;in&gt; A \&lt;Longrightarrow&gt; f x = g x"
+  shows   "f integrable_on A \&lt;longleftrightarrow&gt; g integrable_on A"
+  
+  sorry
+
+
+lemma integral_cong:
+  assumes "\&lt;And&gt;x. x \&lt;in&gt; s \&lt;Longrightarrow&gt; f x = g x"
+  shows "integral s f = integral s g"
+  
+  sorry
+
+
+lemma integrable_on_cmult_left_iff [simp]:
+  assumes "c \&lt;noteq&gt; 0"
+  shows "(\&lt;lambda&gt;x. of_real c * f x) integrable_on s \&lt;longleftrightarrow&gt; f integrable_on s"
+        (is "?lhs = ?rhs")
+  
+  sorry
+
+
+lemma integrable_on_cmult_right:
+  fixes f :: "_ \&lt;Rightarrow&gt; 'b :: {comm_ring,real_algebra_1,real_normed_vector}"
+  assumes "f integrable_on s"
+  shows "(\&lt;lambda&gt;x. f x * of_real c) integrable_on s"
+  
+  sorry
+
+
+lemma integrable_on_cmult_right_iff [simp]:
+  fixes f :: "_ \&lt;Rightarrow&gt; 'b :: {comm_ring,real_algebra_1,real_normed_vector}"
+  assumes "c \&lt;noteq&gt; 0"
+  shows "(\&lt;lambda&gt;x. f x * of_real c) integrable_on s \&lt;longleftrightarrow&gt; f integrable_on s"
+  
+  sorry
+
+
+lemma integrable_on_cdivide_iff [simp]:
+  fixes f :: "_ \&lt;Rightarrow&gt; 'b :: real_normed_field"
+  assumes "c \&lt;noteq&gt; 0"
+  shows "(\&lt;lambda&gt;x. f x / of_real c) integrable_on s \&lt;longleftrightarrow&gt; f integrable_on s"
+  
+  sorry
+
+
+lemma has_integral_null [intro]: "content(cbox a b) = 0 \&lt;Longrightarrow&gt; (f has_integral 0) (cbox a b)"
+  
+  sorry
+
+
+lemma has_integral_null_real [intro]: "content {a..b::real} = 0 \&lt;Longrightarrow&gt; (f has_integral 0) {a..b}"
+  
+  sorry
+
+
+lemma has_integral_null_eq[simp]: "content (cbox a b) = 0 \&lt;Longrightarrow&gt; (f has_integral i) (cbox a b) \&lt;longleftrightarrow&gt; i = 0"
+  
+  sorry
+
+
+lemma integral_null [simp]: "content (cbox a b) = 0 \&lt;Longrightarrow&gt; integral (cbox a b) f = 0"
+  
+  sorry
+
+
+lemma integrable_on_null [intro]: "content (cbox a b) = 0 \&lt;Longrightarrow&gt; f integrable_on (cbox a b)"
+  
+  sorry
+
+
+lemma has_integral_empty[intro]: "(f has_integral 0) {}"
+  
+  sorry
+
+
+lemma has_integral_empty_eq[simp]: "(f has_integral i) {} \&lt;longleftrightarrow&gt; i = 0"
+  
+  sorry
+
+
+lemma integrable_on_empty[intro]: "f integrable_on {}"
+  
+  sorry
+
+
+lemma integral_empty[simp]: "integral {} f = 0"
+  
+  sorry
+
+
+lemma has_integral_refl[intro]:
+  fixes a :: "'a::euclidean_space"
+  shows "(f has_integral 0) (cbox a a)"
+    and "(f has_integral 0) {a}"
+  
+  sorry
+
+
+lemma integrable_on_refl[intro]: "f integrable_on cbox a a"
+  
+  sorry
+
+
+lemma integral_refl [simp]: "integral (cbox a a) f = 0"
+  
+  sorry
+
+
+lemma integral_singleton [simp]: "integral {a} f = 0"
+  
+  sorry
+
+
+lemma integral_blinfun_apply:
+  assumes "f integrable_on s"
+  shows "integral s (\&lt;lambda&gt;x. blinfun_apply h (f x)) = blinfun_apply h (integral s f)"
+  
+  sorry
+
+
+lemma blinfun_apply_integral:
+  assumes "f integrable_on s"
+  shows "blinfun_apply (integral s f) x = integral s (\&lt;lambda&gt;y. blinfun_apply (f y) x)"
+  
+  sorry
+
+
+lemma has_integral_componentwise_iff:
+  fixes f :: "'a :: euclidean_space \&lt;Rightarrow&gt; 'b :: euclidean_space"
+  shows "(f has_integral y) A \&lt;longleftrightarrow&gt; (\&lt;forall&gt;b\&lt;in&gt;Basis. ((\&lt;lambda&gt;x. f x \&lt;bullet&gt; b) has_integral (y \&lt;bullet&gt; b)) A)"
+  
+  sorry
+
+
+lemma has_integral_componentwise:
+  fixes f :: "'a :: euclidean_space \&lt;Rightarrow&gt; 'b :: euclidean_space"
+  shows "(\&lt;And&gt;b. b \&lt;in&gt; Basis \&lt;Longrightarrow&gt; ((\&lt;lambda&gt;x. f x \&lt;bullet&gt; b) has_integral (y \&lt;bullet&gt; b)) A) \&lt;Longrightarrow&gt; (f has_integral y) A"
+  
+  sorry
+
+
+lemma integrable_componentwise_iff:
+  fixes f :: "'a :: euclidean_space \&lt;Rightarrow&gt; 'b :: euclidean_space"
+  shows "f integrable_on A \&lt;longleftrightarrow&gt; (\&lt;forall&gt;b\&lt;in&gt;Basis. (\&lt;lambda&gt;x. f x \&lt;bullet&gt; b) integrable_on A)"
+  
+  sorry
+
+
+lemma integrable_componentwise:
+  fixes f :: "'a :: euclidean_space \&lt;Rightarrow&gt; 'b :: euclidean_space"
+  shows "(\&lt;And&gt;b. b \&lt;in&gt; Basis \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. f x \&lt;bullet&gt; b) integrable_on A) \&lt;Longrightarrow&gt; f integrable_on A"
+  
+  sorry
+
+
+lemma integral_componentwise:
+  fixes f :: "'a :: euclidean_space \&lt;Rightarrow&gt; 'b :: euclidean_space"
+  assumes "f integrable_on A"
+  shows "integral A f = (\&lt;Sum&gt;b\&lt;in&gt;Basis. integral A (\&lt;lambda&gt;x. (f x \&lt;bullet&gt; b) *\&lt;^sub&gt;R b))"
+  
+  sorry
+
+
+lemma integrable_component:
+  "f integrable_on A \&lt;Longrightarrow&gt; (\&lt;lambda&gt;x. f x \&lt;bullet&gt; (y :: 'b :: euclidean_space)) integrable_on A"
+  
+  sorry
+
+
+lemma
+  assumes "(f has_integral I) A "
+  shows has_integral_Re: "((\&lt;lambda&gt;x. Re (f x)) has_integral (Re I)) A"
+  and   has_integral_Im: "((\&lt;lambda&gt;x. Im (f x)) has_integral (Im I)) A"
+  
+  sorry
+
+
+
+subsection \&lt;open&gt;Cauchy-type criterion for integrability\&lt;close&gt;
+
+proposition integrable_Cauchy:
+  fixes f :: "'n::euclidean_space \&lt;Rightarrow&gt; 'a::{real_normed_vector,complete_space}"
+  shows "f integrable_on cbox a b \&lt;longleftrightarrow&gt;
+        (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;\&lt;gamma&gt;. gauge \&lt;gamma&gt; \&lt;and&gt;
+          (\&lt;forall&gt;\&lt;D&gt;1 \&lt;D&gt;2. \&lt;D&gt;1 tagged_division_of (cbox a b) \&lt;and&gt; \&lt;gamma&gt; fine \&lt;D&gt;1 \&lt;and&gt;
+            \&lt;D&gt;2 tagged_division_of (cbox a b) \&lt;and&gt; \&lt;gamma&gt; fine \&lt;D&gt;2 \&lt;longrightarrow&gt;
+            norm ((\&lt;Sum&gt;(x,K)\&lt;in&gt;\&lt;D&gt;1. content K *\&lt;^sub&gt;R f x) - (\&lt;Sum&gt;(x,K)\&lt;in&gt;\&lt;D&gt;2. content K *\&lt;^sub&gt;R f x)) &lt; e))"
+  (is "?l = (\&lt;forall&gt;e&gt;0. \&lt;exists&gt;\&lt;gamma&gt;. ?P e \&lt;gamma&gt;)")
+  
+  sorry
+
+
+
+subsection \&lt;open&gt;Additivity of integral on abutting intervals\&lt;close&gt;
+
+lemma tagged_division_split_left_inj_content:
+  assumes \&lt;D&gt;: "\&lt;D&gt; tagged_division_of S"
+    and "(x1, K1) \&lt;in&gt; \&lt;D&gt;" "(x2, K2) \&lt;in&gt; \&lt;D&gt;" "K1 \&lt;noteq&gt; K2" "K1 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c} = K2 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c}" "k \&lt;in&gt; Basis"
+  shows "content (K1 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c}) = 0"
+  
+  sorry
+
+
+lemma tagged_division_split_right_inj_content:
+  assumes \&lt;D&gt;: "\&lt;D&gt; tagged_division_of S"
+    and "(x1, K1) \&lt;in&gt; \&lt;D&gt;" "(x2, K2) \&lt;in&gt; \&lt;D&gt;" "K1 \&lt;noteq&gt; K2" "K1 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c} = K2 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c}" "k \&lt;in&gt; Basis"
+  shows "content (K1 \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c}) = 0"
+  
+  sorry
+
+
+
+proposition has_integral_split:
+  fixes f :: "'a::euclidean_space \&lt;Rightarrow&gt; 'b::real_normed_vector"
+  assumes fi: "(f has_integral i) (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c})"
+      and fj: "(f has_integral j) (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c})"
+      and k: "k \&lt;in&gt; Basis"
+shows "(f has_integral (i + j)) (cbox a b)"
+  
+  sorry
+
+
+
+subsection \&lt;open&gt;A sort of converse, integrability on subintervals\&lt;close&gt;
+
+lemma has_integral_separate_sides:
+  fixes f :: "'a::euclidean_space \&lt;Rightarrow&gt; 'b::real_normed_vector"
+  assumes f: "(f has_integral i) (cbox a b)"
+    and "e &gt; 0"
+    and k: "k \&lt;in&gt; Basis"
+  obtains d where "gauge d"
+    "\&lt;forall&gt;p1 p2. p1 tagged_division_of (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c}) \&lt;and&gt; d fine p1 \&lt;and&gt;
+        p2 tagged_division_of (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c}) \&lt;and&gt; d fine p2 \&lt;longrightarrow&gt;
+        norm ((sum (\&lt;lambda&gt;(x,k). content k *\&lt;^sub&gt;R f x) p1 + sum (\&lt;lambda&gt;(x,k). content k *\&lt;^sub&gt;R f x) p2) - i) &lt; e"
+  
+  sorry
+
+
+lemma integrable_split [intro]:
+  fixes f :: "'a::euclidean_space \&lt;Rightarrow&gt; 'b::{real_normed_vector,complete_space}"
+  assumes f: "f integrable_on cbox a b"
+      and k: "k \&lt;in&gt; Basis"
+    shows "f integrable_on (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;le&gt; c})"   (is ?thesis1)
+    and   "f integrable_on (cbox a b \&lt;inter&gt; {x. x\&lt;bullet&gt;k \&lt;ge&gt; c})"   (is ?thesis2)
+  
+  sorry
+
+
+lemma operative_integralI:
+  fixes f :: "'a::euclidean_space \&lt;Rightarrow&gt; 'b::banach"
+  shows "operative (lift_option (+)) (Some 0)
+    (\&lt;lambda&gt;i. if f integrable_on i then Some (integral i f) else None)"
+  
+  sorry
+
+
+subsection \&lt;open&gt;Bounds on the norm of Riemann sums and the integral itself\&lt;close&gt;
+
+lemma dsum_bound:
+  assumes p: "p division_of (cbox a b)"
+    and "norm c \&lt;le&gt; e"
+  shows "norm (\&lt;Sum&gt;l\&lt;in&gt;p. content l *\&lt;^sub&gt;R c) \&lt;le&gt; e * content(cbox a b)"
+  
+  sorry
+
+
+</prefix><statement>lemma rsum_bound:
+  assumes p: "p tagged_division_of (cbox a b)"
+      and "\&lt;forall&gt;x\&lt;in&gt;cbox a b. norm (f x) \&lt;le&gt; e"
+    shows "norm (\&lt;Sum&gt;(x, k)\&lt;in&gt;p. content k *\&lt;^sub&gt;R f x) \&lt;le&gt; e * content (cbox a b)"</statement><proof_prefix /><sketch>proof -
+  have fin: "finite p"
+    using p
+    sledgehammer
+
+  have tag_in: "\&lt;And&gt;x k. (x,k) \&lt;in&gt; p \&lt;Longrightarrow&gt; x \&lt;in&gt; cbox a b"
+    using p
+    sledgehammer
+
+  have term_bound:
+    "\&lt;And&gt;x k. (x,k) \&lt;in&gt; p \&lt;Longrightarrow&gt;
+      norm (content k *\&lt;^sub&gt;R f x) \&lt;le&gt; e * content k"
+  proof -
+    fix x k
+    assume xk: "(x,k) \&lt;in&gt; p"
+    have "norm (f x) \&lt;le&gt; e"
+      using assms(2) tag_in[OF xk] by blast
+    then show "norm (content k *\&lt;^sub&gt;R f x) \&lt;le&gt; e * content k"
+      using content_pos_le[of k]
+      sledgehammer
+  qed
+
+  have triangle:
+    "norm (\&lt;Sum&gt;(x,k)\&lt;in&gt;p. content k *\&lt;^sub&gt;R f x) \&lt;le&gt;
+      (\&lt;Sum&gt;(x,k)\&lt;in&gt;p. norm (content k *\&lt;^sub&gt;R f x))"
+    using fin
+    sledgehammer
+
+  have sum_bound:
+    "(\&lt;Sum&gt;(x,k)\&lt;in&gt;p. norm (content k *\&lt;^sub&gt;R f x)) \&lt;le&gt;
+      (\&lt;Sum&gt;(x,k)\&lt;in&gt;p. e * content k)"
+    using term_bound
+    sledgehammer
+
+  have total:
+    "(\&lt;Sum&gt;(x,k)\&lt;in&gt;p. e * content k) = e * content (cbox a b)"
+    using additive_content_tagged_division[OF p]
+    sledgehammer
+
+  show ?thesis
+    using triangle sum_bound total by linarith
+qed</sketch><depth>1</depth><target_name>rsum_bound</target_name><forbidden_names><item>rsum_bound</item><item>rsum_diff_bound</item><item>has_integral_bound</item><item>integrable_bound</item><item>rsum_component_le</item><item>has_integral_component_le</item><item>integral_component_le</item><item>has_integral_component_nonneg</item><item>integral_component_nonneg</item><item>has_integral_component_neg</item><item>has_integral_component_lbound</item><item>has_integral_component_ubound</item><item>integral_component_lbound</item><item>integral_component_lbound_real</item><item>integral_component_ubound</item><item>integral_component_ubound_real</item><item>real_arch_invD</item><item>integrable_uniform_limit</item><item>content_doublesplit</item><item>negligible_standard_hyperplane</item><item>negligible_standard_hyperplane_cart</item><item>has_integral_negligible_cbox</item><item>has_integral_negligible</item><item>has_integral_spike</item><item>has_integral_spike_eq</item><item>integrable_spike</item><item>integral_spike</item><item>negligible_subset</item><item>negligible_diff</item><item>negligible_Int</item><item>negligible_Un</item><item>negligible_Un_eq</item><item>negligible_sing</item><item>negligible_insert</item><item>negligible_empty</item><item>empty_imp_negligible</item><item>negligible_finite</item><item>negligible_Union</item><item>negligible</item><item>has_integral_spike_finite</item><item>has_integral_spike_finite_eq</item><item>integrable_spike_finite</item><item>integrable_spike_finite_eq</item><item>has_integral_bound_spike_finite</item><item>has_integral_bound_real</item><item>negligible_frontier_interval</item><item>has_integral_spike_interior</item><item>has_integral_spike_interior_eq</item><item>integrable_spike_interior</item><item>operative_approximableI</item><item>comm_monoid_set_F_and</item><item>approximable_on_division</item><item>integrable_continuous</item><item>integrable_continuous_interval</item><item>integrable_continuous_closed_segment</item><item>has_integral_factor_content</item><item>has_integral_factor_content_real</item><item>interval_bounds_real</item><item>fundamental_theorem_of_calculus</item><item>has_complex_derivative_imp_has_vector_derivative</item><item>ident_has_integral</item><item>integral_ident</item><item>ident_integrable_on</item><item>integral_sin</item><item>integral_cos</item><item>integral_exp</item><item>has_integral_sin_nx</item><item>integral_sin_nx</item><item>has_integral_cos_nx</item><item>integral_cos_nx</item><item>mvt_integral</item><item>sum_prod_derivatives_has_vector_derivative</item><item>division_of_nontrivial</item><item>operative_integrableI</item></forbidden_names><heuristics><item>by auto</item><item>by simp</item><item>by blast</item><item>by fastforce</item><item>by force</item><item>by eval</item><item>by presburger</item><item>by sos</item><item>by arith</item><item>by linarith</item><item>by (auto simp: field_simps)</item></heuristics><provers /><auxiliary_sources /><context_step_timeout_s>120</context_step_timeout_s><step_timeout_s>10</step_timeout_s><hammer_timeout_s>40</hammer_timeout_s><preplay_timeout_s>10</preplay_timeout_s><remaining_s>1193.6670921430923</remaining_s></dsp_request>
