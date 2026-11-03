@@ -19,8 +19,9 @@ from .native_search import NativeFailure, NativeSearch, resolve_imports
 from .parallel import (add_parallel_arguments, parallel_options, plan_parallel, completed_jobs, prepare_dependencies)
 from ..theory_context import validate_context
 from .runtime import DspConfig, NATIVE_DIR, hash_file
+from .preflight_resume import backend_identity, context_identity, load_reusable, preview_resume
 
-REPORT_VERSION = "isabelle2026_lab_preflight_v4"
+REPORT_VERSION = "isabelle2026_lab_preflight_v5"
 DEFAULT_REPORT_ROOT = "eval/preflight_results/isabelle2026"
 SENTINELS = {
     ("babel-formal", "circle_average"): "circleAverage_center_independent",
@@ -189,6 +190,18 @@ class Report:
             lines.append(f"| {row['name']} | {reason} | [Line {row['details_line']}]({row['details']}) |")
         lines += ["", "Overall OK evaluates the backend and available contexts; it does not claim unavailable contexts passed.",
                   "An entirely unavailable selection cannot pass."]
+        if self.data.get("resume"):
+            resumed = [r for r in contexts if r.get("resumed_from")]
+            lines += ["", "## Resumed contexts", "",
+                      f"{len(resumed)} context passes were reused from a previous report after identity checks.",
+                      "Setup and backend controls were rerun. Reused rows retain provenance in report.json and checks.jsonl."]
+        if self.data.get("context_execution"):
+            metrics = self.data["context_execution"]
+            lines += ["", "## Context scheduling", "",
+                      f"New checks completed: {metrics['completed_this_run']}/{metrics['scheduled_this_run']}; "
+                      f"batch wall time: {metrics['wall_seconds']} s; "
+                      f"completed checks/minute: {metrics['completed_contexts_per_minute']}.",
+                      metrics["note"]]
         lines += ["", "Expected negative controls pass only for their specific expected rejection.",
                   "Dataset failures do not turn into backend successes or disappear from the denominator.",
                   "Representative contexts do not establish readiness for every target; use --all-targets for that scope.",
@@ -219,6 +232,19 @@ class Report:
                 or "; ".join(issue.get("error", str(issue)) for issue in payload.get("issues", [])))
         if row.get("error"):
             row["error"] = excerpt(row["error"])
+        for field in ("context_fingerprint", "resumed_from"):
+            if field in payload:
+                row[field] = payload[field]
+        # The full installation identity is saved once in work/backend.json.
+        # Repeating its ~2 MB source map in every result hid all useful context
+        # fields behind the compact payload fallback and inflated local logs.
+        if isinstance(result.get("backend_metadata"), dict):
+            identity = result["backend_metadata"]
+            payload = {**payload, "result": {**result, "backend_metadata": {
+                "backend_fingerprint": identity.get("backend_fingerprint"),
+                "base_metadata_file": str(self.work_path / "backend.json"),
+                "config": identity.get("config"),
+            }}}
         self.storage.record(row, payload)
         self.data["checks"].append(row)
         self.data["active_check"] = None
@@ -251,11 +277,13 @@ def snapshot_infrastructure(parent: Path, report: Report):
 
 def run_lab_preflight(*, config_path, records, scope, selection_issues=(), output_root=DEFAULT_REPORT_ROOT, afp_root=None,
                       workers=1, threads_per_worker=None, memory_per_worker_gb=4.0,
-                      controls_override=None, extra_proof_cases=(), warm_dependencies=False):
+                      controls_override=None, extra_proof_cases=(), warm_dependencies=False,
+                      resume_from=None, dependency_jobs=None, dependency_threads=None):
     report = Report(output_root, scope)
     pending = []
     config = backend = parent = plan = None
     unavailable_targets = set()
+    reusable = {}
     interrupted = False
     def run(name, domain, fn, *, blocked=None):
         pending.remove((name, domain))
@@ -288,20 +316,26 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
         report.data["planned_checks"] = [dict(name=n, domain=d) for n, d in pending]
         run("input_selection", "selection", lambda: {"ok": not issues and bool(records), "issues": issues})
         def metadata():
-            nonlocal config, backend, unavailable_targets, plan
+            nonlocal config, backend, unavailable_targets, plan, reusable
             config = DspConfig.load(str(config_path))
             if afp_root:
                 root = str(repo_path(afp_root))
                 config = replace(config, session_roots=tuple(dict.fromkeys((*config.session_roots, root))))
             plan = plan_parallel(config, workers=workers, threads_per_worker=threads_per_worker,
-                                 memory_per_worker_gb=memory_per_worker_gb)
+                                 memory_per_worker_gb=memory_per_worker_gb,
+                                 dependency_jobs=dependency_jobs, dependency_threads=dependency_threads)
             config = replace(config, threads=plan.threads_per_worker)
             report.data["parallelism"] = plan.metadata()
+            print("Native parallelism: " + json.dumps(plan.metadata()), flush=True)
             dependencies = dependency_plan(records, config)
             unavailable_targets = {tuple(target) for target in dependencies.get("known_inherited_targets", [])}
             write_json(report.work_path / "dependencies.json", dependencies)
             write_json(report.work_path / "config.json", config.__dict__)
             backend = config.metadata()
+            report.data["resume_backend_fingerprint"] = backend_identity(backend)
+            if resume_from:
+                reusable, report.data["resume"] = load_reusable(resume_from, records, backend)
+                print("RESUME: " + json.dumps(report.data["resume"]), flush=True)
             write_json(report.work_path / "backend.json", backend)
             shutil.copyfile(NATIVE_DIR / "release_sources.json", report.work_path / "release_sources.json")
             return {"ok": True, "backend_fingerprint": backend["backend_fingerprint"], "backend_file": "metadata.json", "backend_key": "backend.json"}
@@ -344,13 +378,45 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
                     payload = {"ok": checked["baseline_ok"], "target": key(row), "result": checked}
             except Exception as exc:
                 payload = {**error_payload(exc), "target": key(row)}
+            payload["context_fingerprint"] = context_identity(row)
             return payload, time.monotonic() - started
         count = plan.workers if plan is not None else 1
-        for index, (payload, duration) in completed_jobs(context_check, context_jobs, workers=count):
-            name, row = context_jobs[index]
+        # Carry passes into a NEW report with explicit provenance. Setup/controls
+        # always run again; failures and unfinished contexts are always retried.
+        jobs = []
+        for name, row in context_jobs:
+            previous = reusable.get(key(row)) if not blocked else None
+            if previous is None or key(row) in unavailable_targets:
+                jobs.append((name, row))
+            else:
+                pending.remove((name, "context"))
+                report.record(name, "context", {"ok": True, "target": key(row),
+                    "context_fingerprint": context_identity(row), "resumed_from": previous})
+        started_contexts = time.monotonic()
+        completed = 0
+        worker_seconds = 0.0
+        def progress(*, checkpoint=True):
+            elapsed = max(0.001, time.monotonic() - started_contexts)
+            report.data["context_execution"] = {
+                "scheduled_this_run": len(jobs), "reused": len(context_jobs) - len(jobs),
+                "completed_this_run": completed, "wall_seconds": round(elapsed, 3),
+                "completed_worker_seconds": round(worker_seconds, 3),
+                "completed_contexts_per_minute": round(60 * completed / elapsed, 3),
+                "completed_work_overlap": round(worker_seconds / elapsed, 3),
+                "note": "Overlap excludes unfinished jobs; it is not CPU utilization or serial speedup."}
+            print(f"CONTEXT PROGRESS: {completed}/{len(jobs)} new, "
+                  f"{len(context_jobs)-len(jobs)} reused; {elapsed:.1f}s elapsed", flush=True)
+            if checkpoint:
+                report.checkpoint()
+        for index, (payload, duration) in completed_jobs(context_check, jobs, workers=count, on_wait=progress):
+            name, row = jobs[index]
             pending.remove((name, "context"))
+            completed += 1
+            worker_seconds += duration
+            progress(checkpoint=False)
             report.record(name, "context", payload, duration=duration,
                           blocked=bool(blocked) and key(row) not in unavailable_targets)
+        progress()
     except KeyboardInterrupt:
         interrupted = True
     except Exception as exc:
@@ -385,6 +451,7 @@ def main():
     parser.add_argument("--all-targets", action="store_true", help="Check every selected target, not topic representatives")
     parser.add_argument("--output-root", default=DEFAULT_REPORT_ROOT, help="A unique run directory is created here")
     add_parallel_arguments(parser)
+    parser.add_argument("--resume-from", help="Previous report directory or report.json; reuse only matching successful contexts")
     parser.add_argument("--plan-only", action="store_true", help="Print scope/checks without Isabelle, model calls or output writes")
     args = parser.parse_args()
     validate_layout(args.expected_root)
@@ -400,10 +467,12 @@ def main():
         print(json.dumps({"scope": scope, "selection_issues": issues,
                           "backend_cases": [c.name for c in proof_cases()],
                           "dataset_cases": [c.name for c in dataset_cases(records)],
-                          "output_root": str(repo_path(args.output_root))}, indent=2))
+                          "output_root": str(repo_path(args.output_root)),
+                          "resume": preview_resume(args.resume_from) if args.resume_from else None}, indent=2))
         raise SystemExit(1 if issues else 0)
     result = run_lab_preflight(config_path=args.config, records=records, scope=scope,
-                               selection_issues=issues, output_root=args.output_root, afp_root=args.afp_root, **parallel_options(args))
+                               selection_issues=issues, output_root=args.output_root, afp_root=args.afp_root,
+                               resume_from=args.resume_from, **parallel_options(args))
     raise SystemExit(130 if result["status"] == "interrupted" else 0 if result["ok"] else 1)
 
 

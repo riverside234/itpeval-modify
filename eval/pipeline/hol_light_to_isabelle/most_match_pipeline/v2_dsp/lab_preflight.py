@@ -13,6 +13,7 @@ from ...babel_formal_pipeline.v2_dsp.export_dsp import export_record
 from ...babel_formal_pipeline.v2_dsp.lab_preflight import run_lab_preflight
 from ...babel_formal_pipeline.v2_dsp.parallel import add_parallel_arguments, parallel_options, plan_parallel
 from ...babel_formal_pipeline.v2_dsp.runtime import DspConfig
+from ...babel_formal_pipeline.v2_dsp.preflight_resume import preview_resume
 
 DEFAULT_CONFIG = "eval/configs/hol_light_to_isabelle/v2_dsp_most_match_2026.example.json"
 DEFAULT_REPORT_ROOT = "eval/preflight_results/isabelle2026-most-match"
@@ -66,6 +67,7 @@ def main(argv=None):
     parser.add_argument("--all-targets", action="store_true")
     parser.add_argument("--expected-contexts", type=int)
     parser.add_argument("--output-root", default=DEFAULT_REPORT_ROOT)
+    parser.add_argument("--resume-from", help="Previous report directory or report.json; reuse matching successful contexts")
     parser.add_argument("--plan-only", action="store_true")
     args = parser.parse_args(argv)
     validate_layout(args.expected_root)
@@ -105,11 +107,12 @@ def main(argv=None):
         print(json.dumps({"scope": scope, "issues": issues, "parallelism": plan.metadata(),
                           "backend_controls": [c.name for c in controls],
                           "dataset_proofs": [c.name for c in proofs],
-                          "output_root": str(repo_path(args.output_root))}, indent=2))
+                          "output_root": str(repo_path(args.output_root)),
+                          "resume": preview_resume(args.resume_from) if args.resume_from else None}, indent=2))
         raise SystemExit(1 if issues else 0)
     result = run_lab_preflight(config_path=args.config, records=selected, scope=scope,
         selection_issues=issues, output_root=args.output_root, controls_override=controls,
-        extra_proof_cases=proofs, warm_dependencies=True, **parallel_options(args))
+        extra_proof_cases=proofs, warm_dependencies=True, resume_from=args.resume_from, **parallel_options(args))
     raise SystemExit(130 if result["status"] == "interrupted" else 0 if result["ok"] else 1)
 
 

@@ -31,7 +31,8 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
                    expected_samples: int | None = None, results_dir: str = RESULTS_DIR,
                    expected_source: str = "babel-formal", sketch_source: str = "draft",
                    workers: int = 1, threads_per_worker: int | None = None,
-                   memory_per_worker_gb: float = 4.0) -> list[dict]:
+                   memory_per_worker_gb: float = 4.0,
+                   dependency_jobs: int | None = None, dependency_threads: int | None = None) -> list[dict]:
     records = load_inputs(input_path, mode=sketch_source, artifacts=True, samples=True, topic=topic, target_key=target_key, limit=limit)
     records = align_samples(records, expected, expected_samples, mode=sketch_source)
     if not records:
@@ -54,7 +55,8 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
                  if row.get("pipeline") == "v2-dsp" and row.get("verified")
                  and row.get("checker_version") == CHECKER_VERSION}
     plan = plan_parallel(config, workers=workers, threads_per_worker=threads_per_worker,
-                         memory_per_worker_gb=memory_per_worker_gb)
+                         memory_per_worker_gb=memory_per_worker_gb,
+                         dependency_jobs=dependency_jobs, dependency_threads=dependency_threads)
     config = replace(config, threads=plan.threads_per_worker)
     print("Native parallelism: " + json.dumps(plan.metadata()), flush=True)
     native_factory = None

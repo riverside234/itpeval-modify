@@ -45,12 +45,15 @@ class ParallelPlan:
     available_cpus: int
     memory_per_worker_gb: float
     available_memory_gb: float | None
+    dependency_jobs: int = 1
+    dependency_threads: int = 1
 
     def metadata(self):
         return asdict(self)
 
 
-def plan_parallel(config, *, workers=1, threads_per_worker=None, memory_per_worker_gb=4.0):
+def plan_parallel(config, *, workers=1, threads_per_worker=None, memory_per_worker_gb=4.0,
+                  dependency_jobs=None, dependency_threads=None):
     if isinstance(workers, bool) or not isinstance(workers, int) or not 1 <= workers <= MAX_WORKERS:
         raise ValueError("workers must be an integer between 1 and 60")
     threads = threads_per_worker if threads_per_worker is not None else (1 if workers > 1 else config.threads)
@@ -59,6 +62,9 @@ def plan_parallel(config, *, workers=1, threads_per_worker=None, memory_per_work
     if (isinstance(memory_per_worker_gb, bool) or not isinstance(memory_per_worker_gb, (int, float))
             or not math.isfinite(memory_per_worker_gb) or memory_per_worker_gb <= 0):
         raise ValueError("memory_per_worker_gb must be finite and positive")
+    for name, value in (("dependency_jobs", dependency_jobs), ("dependency_threads", dependency_threads)):
+        if value is not None and (isinstance(value, bool) or not isinstance(value, int) or value < 1):
+            raise ValueError(name + " must be a positive integer")
     cpus, memory = available_cpus(), available_memory_bytes()
     effective = min(workers, max(1, cpus // threads))
     if memory is not None and workers > 1:
@@ -66,21 +72,35 @@ def plan_parallel(config, *, workers=1, threads_per_worker=None, memory_per_work
         if capacity < 1:
             raise ValueError("available memory is below the requested per-worker reserve")
         effective = min(effective, capacity)
+    # A few large session builds need internal parallelism. The theorem workers'
+    # single-thread policy must not make HOL-Analysis a single-thread build.
+    dep_threads = min(dependency_threads or 8, cpus)
+    if memory is not None:
+        dep_threads = min(dep_threads, max(1, int(memory // 1024**3)))
+    dep_jobs = min(dependency_jobs or 4, MAX_WORKERS, max(1, cpus // dep_threads))
+    if memory is not None:
+        reserve = max(float(memory_per_worker_gb), float(dep_threads)) * 1024**3
+        if memory < reserve:
+            raise ValueError("available memory is below the dependency build reserve")
+        dep_jobs = min(dep_jobs, max(1, int(memory // reserve)))
     return ParallelPlan(workers, effective, threads, cpus, float(memory_per_worker_gb),
-                        round(memory / 1024**3, 2) if memory is not None else None)
+                        round(memory / 1024**3, 2) if memory is not None else None, dep_jobs, dep_threads)
 
 
 def add_parallel_arguments(parser):
     parser.add_argument("--workers", type=int, default=1, help="Native verification workers, 1..60; effective count is CPU/memory limited")
     parser.add_argument("--threads-per-worker", type=int, help="Default 1 with parallel jobs; otherwise config.threads")
     parser.add_argument("--memory-per-worker-gb", type=float, default=4.0, help="Admission budget per native job, not a hard OS memory limit")
+    parser.add_argument("--dependency-jobs", type=int, help="Concurrent dependency sessions (default up to 4; CPU/memory limited)")
+    parser.add_argument("--dependency-threads", type=int, help="Threads per dependency session (default up to 8; independent of theorem workers)")
 
 
 def parallel_options(args):
-    return {name: getattr(args, name) for name in ("workers", "threads_per_worker", "memory_per_worker_gb")}
+    return {name: getattr(args, name, None) for name in (
+        "workers", "threads_per_worker", "memory_per_worker_gb", "dependency_jobs", "dependency_threads")}
 
 
-def completed_jobs(function, items, *, workers):
+def completed_jobs(function, items, *, workers, on_wait=None):
     """At most workers submissions in flight; only the caller writes shared files.
 
     Threads supervise isolated external Isabelle/ATP process groups, so Python's
@@ -114,11 +134,15 @@ def completed_jobs(function, items, *, workers):
             if not submit():
                 break
         while pending:
-            ready, _ = wait(pending, return_when=FIRST_COMPLETED)
+            ready, _ = wait(pending, timeout=30 if on_wait else None, return_when=FIRST_COMPLETED)
+            if not ready and on_wait:
+                on_wait()
             for future in sorted(ready, key=lambda f: pending[f]):
                 index = pending.pop(future)
-                yield index, future.result()
+                result = future.result()
+                # Refill before coordinator-side checkpoint/serialization work.
                 submit()
+                yield index, result
     finally:
         cancel.set()
         for future in pending:
@@ -146,20 +170,25 @@ def prepare_dependencies(config, records, plan, *, directory=None):
         base.mkdir(parents=True, exist_ok=True)
         directory = Path(tempfile.mkdtemp(prefix="build-", dir=base))
     directory.mkdir(parents=True, exist_ok=True)
-    command = [str(config.executable), "build", "-b", "-j", str(plan.workers),
-               "-o", "document=false", "-o", "parallel_proofs=0", "-o", "timeout_scale=1.0",
-               "-o", "threads=" + str(config.threads)]
+    command = [str(config.executable), "build", "-b", "-j", str(plan.dependency_jobs),
+               "-o", "document=false", "-o", "parallel_proofs=1", "-o", "timeout_scale=1.0",
+               "-o", "threads=" + str(plan.dependency_threads)]
     for root in config.session_roots:
         command += ["-d", str(repo_path(root))]
     command += sorted(sessions)
     (directory / "command.json").write_text(json.dumps(command, indent=2) + "\n", encoding="utf-8")
+    print(f"DEPENDENCIES: jobs={plan.dependency_jobs}, threads/session={plan.dependency_threads}; "
+          "Isabelle will reuse current heaps. Log: " + str(directory / "build.log"), flush=True)
+    started = time.monotonic()
     code = OwnedProcess(command, directory=directory, env=config.environment(),
         log_path=directory / "build.log", timeout_s=config.dependency_timeout_s,
         deadline=time.monotonic() + config.dependency_timeout_s).run()
     diagnostics = build_diagnostics(directory, code)
     if code:
         raise NativeFailure("import_error", build_error("dependency build failed", diagnostics), details=diagnostics)
-    return {"ok": True, "sessions": sorted(sessions), **diagnostics}
+    return {"ok": True, "sessions": sorted(sessions), "jobs": plan.dependency_jobs,
+            "threads_per_session": plan.dependency_threads, "parallel_proofs": 1,
+            "duration_seconds": round(time.monotonic() - started, 3), **diagnostics}
 
 
 def prepare_batch(config, records, plan):

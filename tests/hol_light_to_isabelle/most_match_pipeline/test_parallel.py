@@ -29,6 +29,37 @@ class ParallelTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     parallel.plan_parallel(DspConfig(), workers=2, memory_per_worker_gb=reserve)
 
+    def test_dependency_build_has_independent_thread_and_job_budget(self):
+        with patch.object(parallel, 'available_cpus', return_value=128), patch.object(parallel, 'available_memory_bytes', return_value=450*1024**3):
+            plan = parallel.plan_parallel(DspConfig(), workers=60)
+            self.assertEqual((60, 1, 4, 8), (plan.workers, plan.threads_per_worker, plan.dependency_jobs, plan.dependency_threads))
+            limited = parallel.plan_parallel(DspConfig(), workers=60, dependency_jobs=60, dependency_threads=16)
+            self.assertEqual((8, 16), (limited.dependency_jobs, limited.dependency_threads))
+            for option in ('dependency_jobs', 'dependency_threads'):
+                for value in (0, -1, True, 2.5):
+                    with self.assertRaises(ValueError):
+                        parallel.plan_parallel(DspConfig(), **{option: value})
+        with patch.object(parallel, 'available_cpus', return_value=2), patch.object(parallel, 'available_memory_bytes', return_value=8*1024**3):
+            small = parallel.plan_parallel(DspConfig(), workers=60)
+            self.assertEqual((1, 2), (small.dependency_jobs, small.dependency_threads))
+
+    def test_workers_are_refilled_while_coordinator_handles_result(self):
+        started_next, release = threading.Event(), threading.Event()
+        def work(index):
+            if index == 0:
+                return index
+            if index == 2:
+                started_next.set()
+            release.wait(3)
+            return index
+        iterator = parallel.completed_jobs(work, range(3), workers=2)
+        try:
+            self.assertEqual((0, 0), next(iterator))
+            self.assertTrue(started_next.wait(2))
+        finally:
+            release.set()
+            iterator.close()
+
     def test_jobs_overlap_but_never_exceed_bound(self):
         lock, barrier = threading.Lock(), threading.Barrier(3)
         active = maximum = 0
@@ -71,13 +102,16 @@ class ParallelTests(unittest.TestCase):
         base.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=base) as temp:
             config = DspConfig(session_dependencies=('HOL-Library',), threads=1)
-            plan = parallel.ParallelPlan(60, 4, 1, 4, 4, 16)
+            plan = parallel.ParallelPlan(60, 4, 1, 8, 4, 16, dependency_jobs=4, dependency_threads=2)
             process = Mock()
             process.run.return_value = 0
             with patch.object(parallel, 'OwnedProcess', return_value=process) as factory, patch.object(DspConfig, 'environment', return_value={}):
                 result = parallel.prepare_dependencies(config, [control_record('by simp')], plan, directory=Path(temp))
             command = factory.call_args.args[0]
             self.assertEqual('4', command[command.index('-j')+1])
+            self.assertIn('threads=2', command)
+            self.assertIn('parallel_proofs=1', command)
+            self.assertNotIn('-c', command)  # Keep Isabelle heap freshness/cache checks.
             self.assertEqual(1, command.count('HOL-Library'))
             self.assertTrue(result['ok'])
             process.run.assert_called_once()

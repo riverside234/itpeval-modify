@@ -83,6 +83,29 @@ python -m "$PIPE.v2_dsp.lab_preflight" --expected-root "$PWD" \
 
 Optional `--input "$DATA/records.jsonl"` uses saved records and their saved caps. Reports are written to `eval/preflight_results/isabelle2026-most-match/<run>/`, using at most six compact files allowed by `.gitignore`. Full build artifacts stay under ignored `itpeval/.runs/preflight/`. No diagnostics ZIP or separate replay build is created.
 
+### Resume an interrupted preflight
+
+`--resume-from` accepts a previous report directory or `report.json`. It creates a new report and carries forward only successful context checks with matching target/template hashes and checked backend/config identity. Failed, blocked, missing or changed contexts are retried. Setup, dependency freshness checks and proof controls run again; carried context passes are explicitly marked `resumed_from` and remain in the full denominator. Repository commits containing only report/orchestration changes do not invalidate an otherwise identical backend; checker/source/config changes do.
+
+For the interrupted 353-context run committed as `77cbbe9`:
+
+```bash
+python -m eval.pipeline.hol_light_to_isabelle.v2_dsp.lab_preflight \
+  --expected-root "$PWD" --dataset most-match --all-targets --workers 60 \
+  --dependency-jobs 4 --dependency-threads 8 \
+  --resume-from eval/preflight_results/isabelle2026-most-match/20261103T012707Z-994fa284
+```
+
+With the same inputs/backend this reuses 31 context passes and schedules the other 322. Look for `RESUME` near the start. This old interrupted report truncated its per-context payloads; retain its lab-local `local_artifacts` directory (`backend.json` and `checks.full.jsonl`). Missing legacy evidence produces a clear error rather than trusting theorem names. New reports store small resume fingerprints directly, so future resumes do not require these local full payloads. `--plan-only --resume-from ...` previews prior pass counts without running Isabelle; final eligibility is checked at runtime.
+
+### Dependency build performance
+
+Dependency sessions have separate `--dependency-jobs` (default up to 4) and `--dependency-threads` (default up to 8) limits. They do not inherit the 1-thread-per-theorem policy. Dependency builds use `parallel_proofs=1`; theorem/checker builds retain `parallel_proofs=0`. CPU and memory caps apply (dependency admission reserves at least 1 GiB per thread and at least `--memory-per-worker-gb` per session; these are estimates, not hard limits).
+
+The `77cbbe9` log shows why this matters: HOL-Analysis took 34m44s and its dependent HOL-Complex_Analysis took another 3m21s, under the old `-j 60 -o threads=1 -o parallel_proofs=0` policy. The total 39m dependency build used only 1.35 CPU-seconds per wall-second. More session jobs could not accelerate that dependency chain. Build options are described in the [official Isabelle options](https://github.com/isabelle-prover/mirror-isabelle/blob/master/etc/options).
+
+`isabelle build -b` still checks and reuses current heaps; no clean/rebuild flag or blind success marker is used. A warm rerun should avoid unchanged sessions; actual speedup and cache reuse must be confirmed on the lab. The dependency command and timings are recorded. Context reports also record wall time, completed worker time and throughput, with a progress heartbeat while parallel jobs are pending. Their overlap metric is not a measured speedup or CPU-utilization percentage.
+
 ### Draft, Sketch and Prove
 
 Generate Drafts (append `--limit 1` for a smoke test, or `--dry-run` to inspect the first prompt):
