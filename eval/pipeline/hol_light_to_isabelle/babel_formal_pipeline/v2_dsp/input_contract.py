@@ -76,6 +76,9 @@ def input_metadata(record: dict, sketch_source: str = "draft") -> dict:
         raise ValueError(record["input_error"])
     context = validate_context(record)
     metadata = {**context.metadata, **envelope(mode)}
+    if "isabelle_prompt_context" in record:
+        metadata["draft_context_policy"] = "bounded_retrieved_masked_context"
+        metadata["isabelle_prompt_context_sha256"] = sha256(require_text(record, "isabelle_prompt_context"))
     if mode == "draft":
         draft = require_text(record, "draft")
         if record.get("draft_error"):

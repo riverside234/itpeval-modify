@@ -37,11 +37,11 @@ def control_record(proof: str, *, source: str = "babel-formal", sketch_source="d
 
 def preflight(record: dict, *, config: DspConfig, controls: bool = True,
               backend_metadata: dict | None = None, results_dir: str = RESULTS_DIR,
-              sketch_source: str = "draft") -> dict:
+              sketch_source: str = "draft", native_factory=None) -> dict:
     result = {"pipeline": "v2-dsp", "sketch_source": sketch_source, "target": key(record), "ok": False}
     try:
         backend = backend_metadata or config.metadata()
-        checker = Checker(config, results_dir=results_dir)
+        checker = Checker(config, results_dir=results_dir, native_factory=native_factory)
         result.update(checker.check_context(record, backend_metadata=backend))
         if controls:
             def control(proof, **options):

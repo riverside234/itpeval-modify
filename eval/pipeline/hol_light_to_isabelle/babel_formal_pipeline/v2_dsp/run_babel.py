@@ -5,6 +5,7 @@ import argparse
 import importlib
 import json
 from pathlib import Path
+from dataclasses import replace
 
 from ..common import LAB_REPO_ROOT, RESULTS_DIR, key, repo_path, require_source, validate_layout, read_jsonl
 from .export_dsp import export_inputs, export_record
@@ -13,6 +14,7 @@ from .input_contract import MODES, envelope, load_inputs, output_path, validate_
 from .preflight import preflight
 from .prove import prove_sketches
 from .runtime import DspConfig
+from .parallel import add_parallel_arguments, parallel_options, plan_parallel, gate_records
 from eval.pipeline.proof_transfer.llm import resolve_model_config
 
 
@@ -36,6 +38,7 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
     parser.add_argument("--fail-fast", action="store_true")
     parser.add_argument("--skip-sketch", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    add_parallel_arguments(parser)
     args = parser.parse_args()
     validate_layout(args.expected_root)
     mode = args.sketch_source
@@ -56,7 +59,7 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
                            ("prove_output", "prove.jsonl"), ("output", "verified.jsonl")):
         setattr(args, attr, output_path(getattr(args, attr), results_dir=results_dir,
                                        filename=filename, mode=mode, config=llm, records=expected))
-    dataset = "hundred_theorems_pipeline" if expected_source == "hundred-theorems" else "babel_formal_pipeline"
+    dataset = {"hundred-theorems": "hundred_theorems_pipeline", "hol-most-match": "most_match_pipeline"}.get(expected_source, "babel_formal_pipeline")
     module = importlib.import_module("eval.pipeline.hol_light_to_isabelle." + dataset + ".v2_dsp." +
                                    ("direct_sketch_prompt" if mode == "hol-light-proof" else "sketch_prompt"))
     builder = module.build_direct_sketch_prompt if mode == "hol-light-proof" else module.build_sketch_prompt
@@ -75,6 +78,9 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
         if repo_path(path).is_file():
             validate_artifacts(read_jsonl(path), mode)
     config = DspConfig.load(args.config)
+    plan = plan_parallel(config, **parallel_options(args))
+    config = replace(config, threads=plan.threads_per_worker)
+    print("Native parallelism: " + json.dumps(plan.metadata()), flush=True)
     exported = export_inputs(input_path=source, output_path=args.dsp_output, **filters,
         sketch_source=mode, expected_source=expected_source, results_dir=results_dir,
         continue_on_error=not args.fail_fast)
@@ -82,28 +88,32 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
     if not args.skip_sketch:
         blocked = {}
         try:
-            backend = config.metadata()
-            first = True
-            capability_error = None
-            for record in exported:
-                if record.get("input_error"):
-                    continue
-                check = preflight(record, config=config, controls=first, backend_metadata=backend,
-                                  results_dir=run_dir, sketch_source=mode)
-                if not check["ok"]:
-                    blocked[key(record)] = {
-                        "failure_category": check.get("failure_category") or "context_error",
-                        "error": json.dumps(check),
-                    }
-                    if check.get("baseline_ok"):
-                        capability_error = "native capability controls failed: " + json.dumps(check)
-                        break
-                    if args.fail_fast:
-                        raise RuntimeError("target context preflight failed: " + json.dumps(check))
-                else:
-                    first = False
-            if capability_error:
-                blocked = {key(row): {"failure_category": "capability_error", "error": capability_error} for row in exported}
+            if plan.workers > 1 or expected_source == "hol-most-match":
+                blocked = gate_records(exported, config=config, plan=plan, results_dir=run_dir,
+                                       sketch_source=mode, fail_fast=args.fail_fast)
+            else:
+                backend = config.metadata()
+                first = True
+                capability_error = None
+                for record in exported:
+                    if record.get("input_error"):
+                        continue
+                    check = preflight(record, config=config, controls=first, backend_metadata=backend,
+                                      results_dir=run_dir, sketch_source=mode)
+                    if not check["ok"]:
+                        blocked[key(record)] = {
+                            "failure_category": check.get("failure_category") or "context_error",
+                            "error": json.dumps(check),
+                        }
+                        if check.get("baseline_ok"):
+                            capability_error = "native capability controls failed: " + json.dumps(check)
+                            break
+                        if args.fail_fast:
+                            raise RuntimeError("target context preflight failed: " + json.dumps(check))
+                    else:
+                        first = False
+                if capability_error:
+                    blocked = {key(row): {"failure_category": "capability_error", "error": capability_error} for row in exported}
         except Exception as exc:
             if args.fail_fast:
                 raise
@@ -119,7 +129,8 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
     results = prove_sketches(config=config, input_path=proof_input, output_path=args.output,
         prove_output=args.prove_output, **filters,
         resume=not args.no_resume, expected=exported,
-        expected_samples=args.samples, results_dir=run_dir, sketch_source=mode, expected_source=expected_source)
+        expected_samples=args.samples, results_dir=run_dir, sketch_source=mode, expected_source=expected_source,
+        **parallel_options(args))
     summary_path = repo_path(args.output).with_suffix(".summary.json")
     print(summary_path.read_text(encoding="utf-8"))
 

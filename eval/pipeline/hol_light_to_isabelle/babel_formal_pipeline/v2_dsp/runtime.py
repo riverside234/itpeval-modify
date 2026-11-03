@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+from contextvars import ContextVar
 import json
 import math
 import os
@@ -18,6 +19,7 @@ from ..common import fingerprint, repo_path, repository_commit
 NATIVE_DIR = Path(__file__).resolve().parent / "native"
 RUNTIME_DIR = "itpeval/.runs/isabelle2026-native"
 PROC_ROOT = Path("/proc")
+CANCEL_EVENT = ContextVar("isabelle_batch_cancellation", default=None)
 # Original theory basenames, qualified with their verified owning sessions.
 # Never substitute a complete target theory or broaden the HOL parent.
 DEFAULT_THEORY_IMPORTS = {
@@ -62,6 +64,7 @@ class DspConfig:
     threads: int = 4
     provers: tuple[str, ...] | None = None
     startup_timeout_s: float = 600
+    dependency_timeout_s: float = 3600
     context_step_timeout_s: float = 120
     step_timeout_s: float = 10
     hammer_timeout_s: float = 40
@@ -73,7 +76,7 @@ class DspConfig:
             raise ValueError("v2_dsp uses Isabelle2026; use v2_dsp_pisa for DSP/PISA/Isabelle2021")
         if isinstance(self.threads, bool) or not isinstance(self.threads, int) or self.threads < 1:
             raise ValueError("threads must be a positive integer")
-        for name in ("startup_timeout_s", "context_step_timeout_s", "step_timeout_s", "hammer_timeout_s", "preplay_timeout_s",
+        for name in ("startup_timeout_s", "dependency_timeout_s", "context_step_timeout_s", "step_timeout_s", "hammer_timeout_s", "preplay_timeout_s",
                      "target_timeout_s"):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, (float, int)) or not math.isfinite(value) or value <= 0:
@@ -333,6 +336,9 @@ class OwnedProcess:
                 self.process = subprocess.Popen(self.command, cwd=self.directory, env=self.env,
                                                 stdout=log, stderr=subprocess.STDOUT, **kwargs)
                 while True:
+                    cancellation = CANCEL_EVENT.get()
+                    if cancellation is not None and cancellation.is_set():
+                        raise InterruptedError("native batch cancelled")
                     self.capture_owned()
                     now = time.monotonic()
                     remaining = expires - now

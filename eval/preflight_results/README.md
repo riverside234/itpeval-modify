@@ -14,7 +14,9 @@ Every exported file has a 32 MiB cap. Individual check payloads are compacted to
 up to 1,024 logs. Truncation and omitted-log counts are explicit. Full payloads,
 requests and logs remain in ignored `itpeval/.runs/preflight/<backend>/<run-id>/`.
 There is no generated ZIP and no per-check file tree in the report directory.
-Proof checking, all 262 candidates and unavailable-context accounting are unchanged.
+Proof checking, the original 262 Babel/Hundred candidates and unavailable-context accounting are unchanged.
+The separate most-match cohort uses `isabelle2026-most-match/<run>/` and the same bounded format.
+Select it with `--dataset most-match`; its default is 65 representative contexts, or 353 with `--all-targets`.
 
 Only the compact filenames and these README files are eligible for new Git
 tracking under `eval/preflight_results/`. Existing tracked historical files are

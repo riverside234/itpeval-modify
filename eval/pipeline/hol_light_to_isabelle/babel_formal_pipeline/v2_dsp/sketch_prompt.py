@@ -81,7 +81,8 @@ SYSTEM_PROMPT = (
 )
 
 
-def build_sketch_prompt(record: dict) -> Prompt:
+def build_sketch_prompt(record: dict, *, isabelle_context: str | None = None,
+                        partial_context: bool = False) -> Prompt:
     if record.get("input_error"):
         raise ValueError(record["input_error"])
     draft = _required(record, "informal_proof")
@@ -94,7 +95,7 @@ def build_sketch_prompt(record: dict) -> Prompt:
     user = "\n\n".join([
         f"TARGET: {record['topic']}/{record['isabelle_target_name']}",
         "AVAILABLE ISABELLE CONTEXT BEFORE TARGET\n~~~isabelle\n"
-        + _required(record, "isabelle_context_before_target") + "\n~~~",
+        + (isabelle_context if isabelle_context is not None else _required(record, "isabelle_context_before_target")) + "\n~~~",
         "EXACT ORACLE DECLARATION\n~~~isabelle\n" + statement + "\n~~~",
         "PROOF PREFIX ALREADY PRESENT (continue after it; do not repeat)\n~~~isabelle\n"
         + prefix + "\n~~~",

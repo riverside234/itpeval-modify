@@ -14,7 +14,8 @@ SYSTEM_PROMPT = (
 )
 
 
-def build_direct_sketch_prompt(record: dict) -> Prompt:
+def build_direct_sketch_prompt(record: dict, *, isabelle_context: str | None = None,
+                               partial_context: bool = False) -> Prompt:
     input_metadata(record, "hol-light-proof")
 
     def section(title, field):
@@ -22,13 +23,14 @@ def build_direct_sketch_prompt(record: dict) -> Prompt:
 
     user = "\n\n".join([
         "TARGET: " + record["topic"] + "/" + record["isabelle_target_name"],
-        section("AVAILABLE ISABELLE CONTEXT BEFORE TARGET", "isabelle_context_before_target"),
+        "AVAILABLE ISABELLE CONTEXT BEFORE TARGET\n~~~\n"
+        + (isabelle_context if isabelle_context is not None else require_text(record, "isabelle_context_before_target")) + "\n~~~",
         section("EXACT ORACLE ISABELLE DECLARATION", "isabelle_statement"),
         "PROOF PREFIX ALREADY PRESENT (continue after it; do not repeat)\n~~~\n"
         + (record.get("isabelle_proof_prefix") or "(none)") + "\n~~~",
         section("SELECTED HOL LIGHT STATEMENT", "hol_light_statement"),
         section("SELECTED COMPLETED HOL LIGHT PROOF TO TRANSLATE", "hol_light_proof"),
-        section("COMPLETE PROOF-MASKED HOL LIGHT REFERENCE", "hol_light_reference_context"),
+        section("RETRIEVED PROOF-MASKED HOL LIGHT REFERENCES" if partial_context else "COMPLETE PROOF-MASKED HOL LIGHT REFERENCE", "hol_light_reference_context"),
         "TRANSLATION REQUIREMENTS\n"
         "- Translate only the selected proof. Use the masked source reference for "
         "relevant definitions and helper statements, not as additional proof bodies. "

@@ -42,9 +42,10 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
         raise ValueError("samples must be positive")
     records = load_inputs(input_path, mode=sketch_source, topic=topic, target_key=target_key, limit=limit)
     require_source(records, expected_source)
-    if prompt_builder is None and expected_source == "hundred-theorems":
+    if prompt_builder is None and expected_source in {"hundred-theorems", "hol-most-match"}:
         import importlib
-        module = importlib.import_module("eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp." +
+        dataset = "most_match_pipeline" if expected_source == "hol-most-match" else "hundred_theorems_pipeline"
+        module = importlib.import_module("eval.pipeline.hol_light_to_isabelle." + dataset + ".v2_dsp." +
                                         ("direct_sketch_prompt" if sketch_source == "hol-light-proof" else "sketch_prompt"))
         prompt_builder = module.build_direct_sketch_prompt if sketch_source == "hol-light-proof" else module.build_sketch_prompt
         prompt_version = module.DIRECT_PROMPT_VERSION if sketch_source == "hol-light-proof" else module.SKETCH_PROMPT_VERSION

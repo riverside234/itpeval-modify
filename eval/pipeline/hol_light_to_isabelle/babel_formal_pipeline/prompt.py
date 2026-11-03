@@ -38,21 +38,22 @@ def _section(title: str, content: str) -> str:
 
 
 def build_draft_prompt(record: dict, *, dataset_label: str = "Babel Formal",
-                       version: str = DRAFT_PROMPT_VERSION) -> Prompt:
+                       version: str = DRAFT_PROMPT_VERSION, isabelle_context: str | None = None,
+                       partial_context: bool = False) -> Prompt:
     prefix = record.get("isabelle_proof_prefix") or ""
     user = "\n\n".join([
         f"TARGET: {dataset_label} topic {record['topic']}, theorem {record['target_key']}.",
         _section("EXACT ORACLE ISABELLE DECLARATION (goal and hypotheses)",
                  _required(record, "isabelle_statement")),
         _section("PROOF-MASKED ISABELLE CONTEXT BEFORE TARGET",
-                 _required(record, "isabelle_context_before_target")),
+                 isabelle_context if isabelle_context is not None else _required(record, "isabelle_context_before_target")),
         _section("ISABELLE PROOF PREFIX ALREADY PRESENT (if any)",
                  prefix if prefix else "(none)"),
         _section("HOL LIGHT TARGET STATEMENT",
                  _required(record, "hol_light_statement")),
         _section("HOL LIGHT TARGET PROOF TO TRANSLATE",
                  _required(record, "hol_light_proof")),
-        _section("COMPLETE PROOF-MASKED HOL LIGHT REFERENCE FILE",
+        _section("RETRIEVED PROOF-MASKED HOL LIGHT REFERENCES" if partial_context else "COMPLETE PROOF-MASKED HOL LIGHT REFERENCE FILE",
                  _required(record, "hol_light_reference_context")),
         "DRAFT REQUIREMENTS\n"
         "- Translate only the selected proof. Use the full proof-masked source file "
@@ -116,6 +117,8 @@ def build_draft_prompt(record: dict, *, dataset_label: str = "Babel Formal",
         "prose with inline formulas, not formal proof syntax. The final step must "
         "derive the exact oracle conclusion from the preceding argument.",
     ])
+    if partial_context:
+        user = user.replace("Use the full proof-masked source file", "Use the retrieved proof-masked source excerpts")
     return Prompt(SYSTEM_PROMPT, user, version)
 
 

@@ -188,3 +188,19 @@ reports and model outputs are not rewritten.
 See [review and fixes](PROVER_REVIEW.md). Offline tests use explicit fake
 transports; the updated ML fixture and real dataset dependencies still require
 execution on the Linux lab installation.
+
+
+## Parallel builds and the most-match dataset
+
+The native runner, standalone Prove stage and lab preflight accept `--workers`
+(1–60), `--threads-per-worker` (defaults to 1 with parallel workers) and
+`--memory-per-worker-gb` (default 4). CPU affinity and available memory cap the
+effective worker count. Dependencies and the native parent are prepared before
+parallel jobs; every target/sample gets its own directory, session and process
+group. Shared reports/results are written by the coordinator only.
+
+`--dataset most-match` selects the separate new dataset in the shared lab
+preflight. It routes to its own import config, bounded references and report
+folder; `--dataset both` continues to select only Babel/Hundred. See the
+[most-match instructions](../../most_match_pipeline/README.md) for commands,
+coverage and resource requirements. Existing serial commands remain valid.

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import replace
 
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import (
     LAB_REPO_ROOT, RESULTS_DIR, fingerprint, key, read_jsonl,
@@ -12,6 +13,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import (
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.checker import CHECKER_VERSION, Checker, verification_input
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.generate_sketch import DEFAULT_OUTPUT as DEFAULT_INPUT
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig
+from .parallel import add_parallel_arguments, parallel_options, plan_parallel, prepare_batch, completed_jobs
 from .input_contract import (MODES, align_samples, envelope, load_inputs, output_path as native_output_path,
                              validate_artifacts, save_results)
 
@@ -27,7 +29,9 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
                    limit: int | None = None, resume: bool = True,
                    expected: list[dict] | None = None,
                    expected_samples: int | None = None, results_dir: str = RESULTS_DIR,
-                   expected_source: str = "babel-formal", sketch_source: str = "draft") -> list[dict]:
+                   expected_source: str = "babel-formal", sketch_source: str = "draft",
+                   workers: int = 1, threads_per_worker: int | None = None,
+                   memory_per_worker_gb: float = 4.0) -> list[dict]:
     records = load_inputs(input_path, mode=sketch_source, artifacts=True, samples=True, topic=topic, target_key=target_key, limit=limit)
     records = align_samples(records, expected, expected_samples, mode=sketch_source)
     if not records:
@@ -49,13 +53,21 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
     completed = {row.get("verify_fingerprint"): row for row in previous
                  if row.get("pipeline") == "v2-dsp" and row.get("verified")
                  and row.get("checker_version") == CHECKER_VERSION}
+    plan = plan_parallel(config, workers=workers, threads_per_worker=threads_per_worker,
+                         memory_per_worker_gb=memory_per_worker_gb)
+    config = replace(config, threads=plan.threads_per_worker)
+    print("Native parallelism: " + json.dumps(plan.metadata()), flush=True)
+    native_factory = None
     try:
-        backend = config.metadata()
+        if plan.workers > 1:
+            valid = [r for r in records if not r.get("input_error") and not r.get("sketch_error")]
+            config, backend, native_factory = prepare_batch(config, valid, plan)
+        else:
+            backend = config.metadata()
         backend_error = None
     except Exception as exc:
         backend, backend_error = None, exc
-    results = []
-    for record in records:
+    def check_one(record):
         identity = fingerprint({
             **envelope(sketch_source), "record": record, "backend": backend,
             "config": config.__dict__, "checker_version": CHECKER_VERSION,
@@ -69,12 +81,26 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
                           "failure_category": "toolchain_error",
                           "verify_error": f"{type(backend_error).__name__}: {backend_error}"}
             else:
-                result = Checker(config, results_dir=results_dir).check(
+                result = Checker(config, results_dir=results_dir, native_factory=native_factory).check(
                     record, backend_metadata=backend)
             result["verify_fingerprint"] = identity
-        results.append(result)
-        print(f"DSP {'PASS' if result['verified'] else 'FAIL'} "
-              f"{record['topic']}/{record['target_key']} sample={record['sample_idx']}")
+        return result
+
+    indexed = {}
+    try:
+        for index, result in completed_jobs(check_one, records, workers=plan.workers):
+            indexed[index] = result
+            record = records[index]
+            print(f"DSP {'PASS' if result['verified'] else 'FAIL'} "
+                  f"{record['topic']}/{record['target_key']} sample={record['sample_idx']}", flush=True)
+            if len(indexed) % 10 == 0:
+                save_results(output_path, [indexed[i] for i in sorted(indexed)], expected=expected,
+                    expected_samples=expected_samples, preserve_unselected=resume, mode=sketch_source)
+    finally:
+        results = [indexed[i] for i in sorted(indexed)]
+        if results:
+            save_results(output_path, results, expected=expected, expected_samples=expected_samples,
+                         preserve_unselected=resume, mode=sketch_source)
     if prove_output and repo_path(prove_output) != output:
         save_results(prove_output, results, expected=expected, expected_samples=expected_samples,
                      preserve_unselected=resume, mode=sketch_source)
@@ -97,12 +123,13 @@ def main(*, default_input: str = DEFAULT_INPUT, default_output: str = DEFAULT_OU
     parser.add_argument("--target-key")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--no-resume", action="store_true")
+    add_parallel_arguments(parser)
     args = parser.parse_args()
     validate_layout(args.expected_root)
     records = prove_sketches(
         config=DspConfig.load(args.config), input_path=args.input, output_path=args.output,
         prove_output=args.prove_output, topic=args.topic, target_key=args.target_key,
-        limit=args.limit, resume=not args.no_resume, results_dir=results_dir, expected_source=expected_source, sketch_source=args.sketch_source)
+        limit=args.limit, resume=not args.no_resume, results_dir=results_dir, expected_source=expected_source, sketch_source=args.sketch_source, **parallel_options(args))
     print(json.dumps({"targets": len({key(row) for row in records}),
                       "verified_samples": sum(bool(row["verified"]) for row in records)}, indent=2))
 

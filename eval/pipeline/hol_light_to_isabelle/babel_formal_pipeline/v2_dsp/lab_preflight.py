@@ -16,6 +16,7 @@ from ..common import fingerprint, key, latest_records, repo_path, validate_layou
 from .acceptance import (FIXTURE, PreparedNative, dataset_cases, proof_cases, run_fixture, run_proof_case)
 from .checker import CHECKER_VERSION, Checker
 from .native_search import NativeFailure, NativeSearch, resolve_imports
+from .parallel import (add_parallel_arguments, parallel_options, plan_parallel, completed_jobs, prepare_dependencies)
 from ..theory_context import validate_context
 from .runtime import DspConfig, NATIVE_DIR, hash_file
 
@@ -109,7 +110,7 @@ def dependency_plan(records, config):
         context = validate_context(row)
         _, resolution = resolve_imports(context.prefix, config, theory_name=context.theory_name)
         external = sorted(set(resolution["session_dependencies"]) &
-                          {"Triangle", "Cayley_Hamilton", "Pratt_Certificate"})
+                          {"Triangle", "Cayley_Hamilton", "Pratt_Certificate", "FOL_Compactness"})
         required.update(external)
         identity = row["source"] + "/" + row["topic"]
         topic = topics.setdefault(identity, {"theory_name": context.theory_name, **resolution,
@@ -248,10 +249,12 @@ def snapshot_infrastructure(parent: Path, report: Report):
             shutil.copyfile(path, destination / path.name)
 
 
-def run_lab_preflight(*, config_path, records, scope, selection_issues=(), output_root=DEFAULT_REPORT_ROOT, afp_root=None):
+def run_lab_preflight(*, config_path, records, scope, selection_issues=(), output_root=DEFAULT_REPORT_ROOT, afp_root=None,
+                      workers=1, threads_per_worker=None, memory_per_worker_gb=4.0,
+                      controls_override=None, extra_proof_cases=(), warm_dependencies=False):
     report = Report(output_root, scope)
     pending = []
-    config = backend = parent = None
+    config = backend = parent = plan = None
     unavailable_targets = set()
     interrupted = False
     def run(name, domain, fn, *, blocked=None):
@@ -269,8 +272,8 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
         report.record(name, domain, payload, duration=time.monotonic() - started, blocked=bool(blocked))
         return payload
     try:
-        controls = proof_cases()
-        proofs, issues = [], list(selection_issues)
+        controls = proof_cases() if controls_override is None else controls_override
+        proofs, issues = list(extra_proof_cases), list(selection_issues)
         for row in records:
             try:
                 proofs.extend(dataset_cases([row]))
@@ -278,16 +281,22 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
                 issues.append({"target": key(row), "error": f"{type(exc).__name__}: {exc}"})
         context_jobs = [("context_" + row["source"] + "_" + row["topic"] + "_" + row["target_key"], row) for row in records]
         pending = [("input_selection", "selection"), ("metadata", "setup"), ("infrastructure", "setup"), ("native_fixture", "backend")]
+        if workers > 1 or warm_dependencies:
+            pending.insert(2, ("dependencies", "setup"))
         pending += [(c.name, "backend") for c in controls] + [(c.name, "dataset_proof") for c in proofs]
         pending += [(name, "context") for name, _ in context_jobs]
         report.data["planned_checks"] = [dict(name=n, domain=d) for n, d in pending]
         run("input_selection", "selection", lambda: {"ok": not issues and bool(records), "issues": issues})
         def metadata():
-            nonlocal config, backend, unavailable_targets
+            nonlocal config, backend, unavailable_targets, plan
             config = DspConfig.load(str(config_path))
             if afp_root:
                 root = str(repo_path(afp_root))
                 config = replace(config, session_roots=tuple(dict.fromkeys((*config.session_roots, root))))
+            plan = plan_parallel(config, workers=workers, threads_per_worker=threads_per_worker,
+                                 memory_per_worker_gb=memory_per_worker_gb)
+            config = replace(config, threads=plan.threads_per_worker)
+            report.data["parallelism"] = plan.metadata()
             dependencies = dependency_plan(records, config)
             unavailable_targets = {tuple(target) for target in dependencies.get("known_inherited_targets", [])}
             write_json(report.work_path / "dependencies.json", dependencies)
@@ -297,6 +306,10 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
             shutil.copyfile(NATIVE_DIR / "release_sources.json", report.work_path / "release_sources.json")
             return {"ok": True, "backend_fingerprint": backend["backend_fingerprint"], "backend_file": "metadata.json", "backend_key": "backend.json"}
         setup = run("metadata", "setup", metadata)
+        if workers > 1 or warm_dependencies:
+            dependency_check = run("dependencies", "setup", lambda: prepare_dependencies(config, records, plan,
+                directory=report.work_path / "dependencies"), blocked=None if setup["ok"] else "metadata/setup failed")
+            setup = {"ok": setup["ok"] and dependency_check["ok"]}
         def infrastructure():
             nonlocal parent
             try:
@@ -314,18 +327,30 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
         for case, domain in [(c, "backend") for c in controls] + [(c, "dataset_proof") for c in proofs]:
             run(case.name, domain, lambda case=case: run_proof_case(case, config=config, backend=backend, parent=parent,
                 directory=report.work_path / "cases" / case.name), blocked=blocked)
-        for name, row in context_jobs:
-            if key(row) in unavailable_targets:
-                run(name, "context", lambda row=row: {"ok": False, "unavailable_context": True,
-                    "target": key(row), "failure_category": "inherited_target_theory",
-                    "error": "Core Set is already inherited by the HOL parent; an isolated target context "
-                             "is unavailable. Installing AFP does not change this restriction."})
-                continue
-            def context_check(row=row):
-                checked = Checker(config, results_dir=str(report.work_path), native_factory=lambda cfg: PreparedNative(cfg, parent)).check_context(
-                    row, backend_metadata=backend)
-                return {"ok": checked["baseline_ok"], "target": key(row), "result": checked}
-            run(name, "context", context_check, blocked=blocked)
+        def context_check(job):
+            name, row = job
+            started = time.monotonic()
+            try:
+                if key(row) in unavailable_targets:
+                    payload = {"ok": False, "unavailable_context": True, "target": key(row),
+                        "failure_category": "inherited_target_theory",
+                        "error": "Core Set is already inherited by the HOL parent; an isolated target context "
+                                 "is unavailable. Installing AFP does not change this restriction."}
+                elif blocked:
+                    payload = {"ok": False, "target": key(row), "error": blocked}
+                else:
+                    checked = Checker(config, results_dir=str(report.work_path), native_factory=lambda cfg: PreparedNative(cfg, parent)).check_context(
+                        row, backend_metadata=backend)
+                    payload = {"ok": checked["baseline_ok"], "target": key(row), "result": checked}
+            except Exception as exc:
+                payload = {**error_payload(exc), "target": key(row)}
+            return payload, time.monotonic() - started
+        count = plan.workers if plan is not None else 1
+        for index, (payload, duration) in completed_jobs(context_check, context_jobs, workers=count):
+            name, row = context_jobs[index]
+            pending.remove((name, "context"))
+            report.record(name, "context", payload, duration=duration,
+                          blocked=bool(blocked) and key(row) not in unavailable_targets)
     except KeyboardInterrupt:
         interrupted = True
     except Exception as exc:
@@ -338,17 +363,28 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
 
 
 def main():
+    # Route before the full parser so the isolated dataset keeps its own config,
+    # report directory, context-budget flags and representative coverage policy.
+    selector = argparse.ArgumentParser(add_help=False)
+    selector.add_argument("--dataset", default="both")
+    routing, forwarded = selector.parse_known_args()
+    if routing.dataset == "most-match":
+        from ...most_match_pipeline.v2_dsp.lab_preflight import main as most_match_main
+        most_match_main(argv=forwarded)
+        return
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--expected-root")
     parser.add_argument("--config", default="eval/configs/hol_light_to_isabelle/v2_dsp_2026.example.json")
     parser.add_argument("--afp-root", help="Repository-local thys directory of the AFP release matching Isabelle2026")
     parser.add_argument("--expected-contexts", type=int, help="Fail selection if the selected candidate count differs")
-    parser.add_argument("--dataset", choices=("both", "babel-formal", "hundred-theorems"), default="both")
+    parser.add_argument("--dataset", choices=("both", "babel-formal", "hundred-theorems", "most-match"), default="both",
+                        help="both means Babel Formal + Hundred Theorems; most-match is a separate cohort")
     parser.add_argument("--input", action="append", default=[], help="Optional saved records; repeat for multiple files")
     parser.add_argument("--topic")
     parser.add_argument("--target-key")
     parser.add_argument("--all-targets", action="store_true", help="Check every selected target, not topic representatives")
     parser.add_argument("--output-root", default=DEFAULT_REPORT_ROOT, help="A unique run directory is created here")
+    add_parallel_arguments(parser)
     parser.add_argument("--plan-only", action="store_true", help="Print scope/checks without Isabelle, model calls or output writes")
     args = parser.parse_args()
     validate_layout(args.expected_root)
@@ -367,7 +403,7 @@ def main():
                           "output_root": str(repo_path(args.output_root))}, indent=2))
         raise SystemExit(1 if issues else 0)
     result = run_lab_preflight(config_path=args.config, records=records, scope=scope,
-                               selection_issues=issues, output_root=args.output_root, afp_root=args.afp_root)
+                               selection_issues=issues, output_root=args.output_root, afp_root=args.afp_root, **parallel_options(args))
     raise SystemExit(130 if result["status"] == "interrupted" else 0 if result["ok"] else 1)
 
 

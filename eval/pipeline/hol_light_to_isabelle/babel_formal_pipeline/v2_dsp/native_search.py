@@ -301,7 +301,7 @@ class NativeSearch:
         prefix, resolution = resolve_imports(context.prefix, self.config, theory_name=context.theory_name)
         imports = resolution["resolved_imports"]
         external_sessions = sorted(set(resolution["session_dependencies"]) &
-                                   {"Triangle", "Cayley_Hamilton", "Pratt_Certificate"})
+                                   {"Triangle", "Cayley_Hamilton", "Pratt_Certificate", "FOL_Compactness"})
         if external_sessions and not self.config.session_roots:
             raise NativeFailure("import_error",
                 "Missing AFP session roots for " + ", ".join(external_sessions) +
