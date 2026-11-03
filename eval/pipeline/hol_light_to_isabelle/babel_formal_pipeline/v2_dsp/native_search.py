@@ -156,8 +156,16 @@ def build_diagnostics(directory: Path, returncode: int | None) -> dict:
             stream.seek(0, 2)
             stream.seek(max(0, stream.tell() - 16000))
             excerpt = stream.read().decode("utf-8", errors="replace").strip()
-    return {"build_log_path": str(path), "build_returncode": returncode,
-            "build_log_excerpt": excerpt}
+    details = {"build_log_path": str(path), "build_returncode": returncode, "build_log_excerpt": excerpt}
+    metrics = path.with_suffix(".metrics.json")
+    if metrics.is_file():
+        try:
+            details["build_metrics"] = json.loads(metrics.read_text(encoding="utf-8"))
+        except (ValueError, OSError):
+            pass
+    if returncode in (137, -9):
+        details["termination_hint"] = "SIGKILL: possible memory pressure or external termination; OOM is not proven by exit status alone."
+    return details
 
 
 def build_error(message: str, diagnostics: dict) -> str:
@@ -177,6 +185,10 @@ def read_result(path: Path, request: dict, *, returncode: int) -> dict:
         category = "import_error" if any(marker in log for marker in (
             "Cannot load theory", "Bad import of theory", "Bad imports session",
             "Unknown session", "Undefined session", "need to include sessions")) else "worker_failure"
+        if returncode in (137, -9):
+            category = "resource_error"
+        elif category == "worker_failure" and "Failed to load theory" in log:
+            category = "import_build_error"
         raise NativeFailure(category, build_error("native worker produced no structured result", details),
                             details=details)
     try:
@@ -233,7 +245,8 @@ class NativeSearch:
         for root in self.config.session_roots:
             command += ["-d", str(repo_path(root))]
         if parent_dir is not None:
-            command += ["-d", str(parent_dir)]
+            for root in (parent_dir if isinstance(parent_dir, (tuple, list)) else (parent_dir,)):
+                command += ["-d", str(root)]
         return command + ["-d", str(directory), session]
 
     def run_build(self, directory: Path, session: str, *, timeout_s: float, deadline: float,
@@ -267,7 +280,7 @@ class NativeSearch:
                 if not destination.is_file() or destination.read_bytes() != source.read_bytes():
                     shutil.copyfile(source, destination)
         root = ('session ' + name + ' = ' + quote(self.config.base_session) +
-                ' +\n  options [document = false]\n  theories DSP_Native (global)\n')
+                ' +\n  options [document = false, threads = 1, parallel_proofs = 0, timeout_scale = 1.0]\n  theories DSP_Native (global)\n')
         (directory / "ROOT").write_text(root, encoding="utf-8")
         # isabelle build validates heap freshness; no success marker substitutes for that check.
         code = self.run_build(directory, name, timeout_s=self.config.startup_timeout_s,
@@ -277,6 +290,9 @@ class NativeSearch:
             raise NativeFailure("capability_error", build_error("native infrastructure failed to compile", details),
                                 details=details)
         return directory, name
+
+    def job_parent(self, resolution, *, deadline):
+        return self.infrastructure(deadline=deadline)
 
     def encode_symbols(self, text: str) -> str:
         symbols = repo_path(self.config.isabelle_home) / "etc" / "symbols"
@@ -313,7 +329,7 @@ class NativeSearch:
         (directory / "import_resolution.json").write_text(json.dumps(resolution, indent=2) + "\n", encoding="utf-8")
         auxiliary = stage_auxiliary_files(prefix, context.theory_name, self.config, directory)
         (directory / "auxiliary_sources.json").write_text(json.dumps(auxiliary, indent=2) + "\n", encoding="utf-8")
-        parent_dir, parent_session = self.infrastructure(deadline=deadline)
+        parent_dir, parent_session = self.job_parent(resolution, deadline=deadline)
         forbidden = forbidden_fact_names(context)
         request = {"request_id": uuid.uuid4().hex, "action": action,
                    "prefix": prefix, "statement": context.statement,
@@ -358,13 +374,15 @@ class NativeSearch:
             "sketch_lines": sketch.count("\n") + 1,
             "note": "native attempt line numbers are relative to the recorded source section; offsets count Isabelle symbols",
         }, indent=2) + "\n", encoding="utf-8")
-        code = self.run_build(directory, session, timeout_s=max(0.001, deadline-time.monotonic()),
-                              deadline=deadline, parent_dir=parent_dir, ready_path=directory / ready_name)
         try:
+            code = self.run_build(directory, session, timeout_s=max(0.001, deadline-time.monotonic()),
+                                  deadline=deadline, parent_dir=parent_dir, ready_path=directory / ready_name)
             result = read_result(directory / "result.xml", request, returncode=code)
         except NativeFailure as exc:
-            exc.details.update(search_directory=str(directory), import_resolution=resolution)
+            exc.details.update(search_directory=str(directory), import_resolution=resolution, parent_session=parent_session)
             raise
+        result.update(build_diagnostics(directory, code))
+        result["parent_session"] = parent_session
         result["search_directory"] = str(directory)
         result["import_resolution"] = resolution
         result["auxiliary_sources"] = auxiliary

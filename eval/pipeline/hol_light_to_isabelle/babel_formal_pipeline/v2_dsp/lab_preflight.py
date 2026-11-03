@@ -19,6 +19,7 @@ from .native_search import NativeFailure, NativeSearch, resolve_imports
 from .parallel import (add_parallel_arguments, parallel_options, plan_parallel, completed_jobs, prepare_dependencies)
 from ..theory_context import validate_context
 from .runtime import DspConfig, NATIVE_DIR, hash_file
+from .import_cache import prepare_import_parents
 from .preflight_resume import backend_identity, context_identity, load_reusable, preview_resume
 
 REPORT_VERSION = "isabelle2026_lab_preflight_v5"
@@ -165,10 +166,11 @@ class Report:
             "passed": sum(r["status"] == "pass" for r in contexts),
             "failed": sum(r["status"] == "fail" for r in contexts),
             "blocked": sum(r["status"] == "blocked" for r in contexts)},
-            full_context_coverage=bool(contexts) and not unavailable and
+            full_context_coverage=self.data["scope"]["selection"] != "failed_only" and bool(contexts) and not unavailable and
                 len(contexts) == self.data["scope"]["selected_contexts"] and
                 all(r["status"] in {"pass", "fail"} for r in contexts))
         write_json(self.path / "unavailable_contexts.json", unavailable)
+        self.data["backend_controls_executed"] = sum(r["domain"] == "backend" for r in checks)
         self.data.update(counts=dict(Counter(r["status"] for r in checks)),
             backend_ok=bool(backend) and all(r["status"] == "pass" for r in backend),
             contexts_ok=bool(available) and all(r["status"] == "pass" for r in data))
@@ -190,6 +192,9 @@ class Report:
             lines.append(f"| {row['name']} | {reason} | [Line {row['details_line']}]({row['details']}) |")
         lines += ["", "Overall OK evaluates the backend and available contexts; it does not claim unavailable contexts passed.",
                   "An entirely unavailable selection cannot pass."]
+        if self.data["scope"]["selection"] == "failed_only":
+            lines += ["", "Failure-only regression run: previously passed contexts and successful proof controls were not rerun.",
+                      "Setup checks are prerequisites. Overall OK applies only to this selected subset; it is not a new full-dataset pass."]
         if self.data.get("resume"):
             resumed = [r for r in contexts if r.get("resumed_from")]
             lines += ["", "## Resumed contexts", "",
@@ -222,6 +227,10 @@ class Report:
                "details_line": len(self.data["checks"]) + 1,
                "failure_category": payload.get("failure_category") or result.get("failure_category"),
                "expected_failure": payload.get("expected_failure")}
+        metrics = (payload.get("build_metrics") or result.get("native_result", {}).get("build_metrics")
+                   or result.get("native_search", {}).get("build_metrics"))
+        if metrics:
+            row["performance"] = metrics
         if payload.get("target") is not None:
             row["target"] = list(payload["target"])
         if row["status"] == "unavailable_context":
@@ -278,11 +287,14 @@ def snapshot_infrastructure(parent: Path, report: Report):
 def run_lab_preflight(*, config_path, records, scope, selection_issues=(), output_root=DEFAULT_REPORT_ROOT, afp_root=None,
                       workers=1, threads_per_worker=None, memory_per_worker_gb=4.0,
                       controls_override=None, extra_proof_cases=(), warm_dependencies=False,
-                      resume_from=None, dependency_jobs=None, dependency_threads=None):
+                      resume_from=None, dependency_jobs=None, dependency_threads=None,
+                      include_fixture=True, include_dataset_cases=True):
     report = Report(output_root, scope)
     pending = []
     config = backend = parent = plan = None
     unavailable_targets = set()
+    import_parents = None
+    cache_imports = any(row.get("source") == "hol-most-match" for row in records)
     reusable = {}
     interrupted = False
     def run(name, domain, fn, *, blocked=None):
@@ -302,13 +314,17 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
     try:
         controls = proof_cases() if controls_override is None else controls_override
         proofs, issues = list(extra_proof_cases), list(selection_issues)
-        for row in records:
+        for row in (records if include_dataset_cases else []):
             try:
                 proofs.extend(dataset_cases([row]))
             except Exception as exc:
                 issues.append({"target": key(row), "error": f"{type(exc).__name__}: {exc}"})
         context_jobs = [("context_" + row["source"] + "_" + row["topic"] + "_" + row["target_key"], row) for row in records]
-        pending = [("input_selection", "selection"), ("metadata", "setup"), ("infrastructure", "setup"), ("native_fixture", "backend")]
+        pending = [("input_selection", "selection"), ("metadata", "setup"), ("infrastructure", "setup")]
+        if cache_imports:
+            pending.append(("import_heaps", "setup"))
+        if include_fixture:
+            pending.append(("native_fixture", "backend"))
         if workers > 1 or warm_dependencies:
             pending.insert(2, ("dependencies", "setup"))
         pending += [(c.name, "backend") for c in controls] + [(c.name, "dataset_proof") for c in proofs]
@@ -357,10 +373,23 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
             return {"ok": True, "session": parent[1], "snapshot": "infrastructure"}
         infra = run("infrastructure", "setup", infrastructure, blocked=None if setup["ok"] else "metadata/setup failed")
         blocked = None if infra["ok"] else "native infrastructure unavailable; see setup diagnostics"
-        run("native_fixture", "backend", lambda: run_fixture(config, parent, report.work_path / "fixture"), blocked=blocked)
+        if cache_imports:
+            def imports():
+                nonlocal import_parents
+                import_parents, payload = prepare_import_parents(config,
+                    [*[r for r in records if key(r) not in reusable and key(r) not in unavailable_targets],
+                     *(c.record for c in controls), *(c.record for c in proofs)],
+                    plan, parent, directory=report.work_path / "import_heaps")
+                report.data["import_heaps"] = payload
+                return payload
+            built = run("import_heaps", "setup", imports, blocked=blocked)
+            if not built["ok"]:
+                blocked = "original-import heaps unavailable; see import_heaps diagnostics"
+        if include_fixture:
+            run("native_fixture", "backend", lambda: run_fixture(config, parent, report.work_path / "fixture"), blocked=blocked)
         for case, domain in [(c, "backend") for c in controls] + [(c, "dataset_proof") for c in proofs]:
             run(case.name, domain, lambda case=case: run_proof_case(case, config=config, backend=backend, parent=parent,
-                directory=report.work_path / "cases" / case.name), blocked=blocked)
+                directory=report.work_path / "cases" / case.name, import_parents=import_parents), blocked=blocked)
         def context_check(job):
             name, row = job
             started = time.monotonic()
@@ -373,7 +402,7 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
                 elif blocked:
                     payload = {"ok": False, "target": key(row), "error": blocked}
                 else:
-                    checked = Checker(config, results_dir=str(report.work_path), native_factory=lambda cfg: PreparedNative(cfg, parent)).check_context(
+                    checked = Checker(config, results_dir=str(report.work_path), native_factory=lambda cfg: PreparedNative(cfg, parent, import_parents=import_parents)).check_context(
                         row, backend_metadata=backend)
                     payload = {"ok": checked["baseline_ok"], "target": key(row), "result": checked}
             except Exception as exc:
@@ -395,6 +424,7 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
         started_contexts = time.monotonic()
         completed = 0
         worker_seconds = 0.0
+        successful = 0
         def progress(*, checkpoint=True):
             elapsed = max(0.001, time.monotonic() - started_contexts)
             report.data["context_execution"] = {
@@ -402,6 +432,7 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
                 "completed_this_run": completed, "wall_seconds": round(elapsed, 3),
                 "completed_worker_seconds": round(worker_seconds, 3),
                 "completed_contexts_per_minute": round(60 * completed / elapsed, 3),
+                "successful_this_run": successful, "successful_contexts_per_minute": round(60 * successful / elapsed, 3),
                 "completed_work_overlap": round(worker_seconds / elapsed, 3),
                 "note": "Overlap excludes unfinished jobs; it is not CPU utilization or serial speedup."}
             print(f"CONTEXT PROGRESS: {completed}/{len(jobs)} new, "
@@ -412,6 +443,7 @@ def run_lab_preflight(*, config_path, records, scope, selection_issues=(), outpu
             name, row = jobs[index]
             pending.remove((name, "context"))
             completed += 1
+            successful += int(bool(payload.get("ok")))
             worker_seconds += duration
             progress(checkpoint=False)
             report.record(name, "context", payload, duration=duration,

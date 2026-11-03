@@ -45,7 +45,7 @@ def hash_file(path: Path) -> str:
 def adapter_hashes() -> dict:
     package = Path(__file__).resolve().parent
     paths = list(NATIVE_DIR.iterdir()) + [package / name for name in (
-        "runtime.py", "native_search.py", "checker.py", "input_contract.py")]
+        "runtime.py", "native_search.py", "checker.py", "input_contract.py", "import_cache.py", "acceptance.py")]
     paths += [package.parent / name for name in (
         "theory_context.py", "sanitize_isabelle.py", "isabelle_syntax.py", "prompt.py", "common.py")]
     return {path.name: hash_file(path) for path in paths if path.is_file()}
@@ -321,7 +321,27 @@ class OwnedProcess:
             self.log_path.with_suffix(".processes.json").write_text(
                 json.dumps(self.owned_processes, indent=2) + "\n", encoding="utf-8")
 
+    def sampled_tree_rss_mb(self):
+        """Resident pages summed over owned PIDs; shared pages may be counted twice."""
+        total, found = 0, False
+        for pid, identity in self.owned_processes.items():
+            if self.process_identity(pid) != identity:
+                continue
+            try:
+                for line in (PROC_ROOT / str(pid) / "status").read_text().splitlines():
+                    if line.startswith("VmRSS:"):
+                        total += int(line.split()[1])
+                        found = True
+                        break
+            except (OSError, ValueError, IndexError):
+                continue
+        return round(total / 1024, 3) if found else None
+
     def run(self) -> int:
+        measured_start = time.perf_counter()
+        metrics = {"startup_seconds": None, "worker_ready": False, "peak_tree_rss_mb": None,
+                   "memory_note": "Sampled owned-process RSS sum; shared pages may be counted more than once."}
+        last_sample = 0.0
         started = time.monotonic()
         expires = min(started + self.timeout, self.deadline)
         if expires <= started:
@@ -341,11 +361,17 @@ class OwnedProcess:
                         raise InterruptedError("native batch cancelled")
                     self.capture_owned()
                     now = time.monotonic()
+                    if now - last_sample >= 1.0:
+                        rss = self.sampled_tree_rss_mb()
+                        if rss is not None:
+                            metrics["peak_tree_rss_mb"] = max(metrics["peak_tree_rss_mb"] or 0, rss)
+                        last_sample = now
                     remaining = expires - now
                     if remaining <= 0:
                         raise TimeoutError("native build deadline exceeded; inspect " + str(self.log_path))
                     if startup_expires is not None:
                         if self.ready_path.is_file():
+                            metrics.update(worker_ready=True, startup_seconds=round(time.perf_counter() - measured_start, 3))
                             startup_expires = None
                         elif now >= startup_expires:
                             raise TimeoutError("native worker startup deadline exceeded; inspect " + str(self.log_path))
@@ -356,4 +382,15 @@ class OwnedProcess:
                     except subprocess.TimeoutExpired:
                         continue
         finally:
-            self.close()
+            try:
+                self.close()
+            finally:
+                if self.ready_path is not None and self.ready_path.is_file() and not metrics["worker_ready"]:
+                    # A fast worker may finish between polls. This is an upper bound.
+                    metrics.update(worker_ready=True, startup_seconds=round(time.perf_counter() - measured_start, 3))
+                metrics["wall_seconds"] = round(time.perf_counter() - measured_start, 3)
+                metrics["after_ready_seconds"] = (round(max(0.0, metrics["wall_seconds"] - metrics["startup_seconds"]), 3)
+                                                    if metrics["startup_seconds"] is not None else None)
+                code = getattr(self.process, "returncode", None)
+                metrics["returncode"] = code if isinstance(code, int) else None
+                self.log_path.with_suffix(".metrics.json").write_text(json.dumps(metrics) + "\n", encoding="utf-8")

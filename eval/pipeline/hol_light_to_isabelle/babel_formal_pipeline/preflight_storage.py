@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import time
 from pathlib import Path
 
 from .common import repo_path
@@ -55,13 +56,26 @@ def write_json(path, value):
     write_bytes(path, encode(value))
 
 
+def replace_file(source, destination):
+    # Windows indexers/previewers can briefly deny atomic replacement. Keep the
+    # previous report intact, retry only those Windows errors, then propagate.
+    for attempt in range(7):
+        try:
+            source.replace(destination)
+            return
+        except PermissionError as exc:
+            if getattr(exc, "winerror", None) not in {5, 32, 33} or attempt == 6:
+                raise
+            time.sleep(0.02 * 2**attempt)
+
+
 def write_bytes(path, data):
     if len(data) > MAX_FILE_BYTES:
         raise ValueError(f"Report size limit exceeded: {path}")
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".tmp")
     temporary.write_bytes(data)
-    temporary.replace(path)
+    replace_file(temporary, path)
 
 
 def append_jsonl(path, value, *, bounded=True):
@@ -127,7 +141,7 @@ class ReportStorage:
                     continue
                 stream.write(data)
                 stats["included"] += 1
-        temporary.replace(target)
+        replace_file(temporary, target)
         metadata["log_export"] = stats
         metadata["local_artifacts"] = str(self.work_path)
         write_json(self.path / "metadata.json", metadata)

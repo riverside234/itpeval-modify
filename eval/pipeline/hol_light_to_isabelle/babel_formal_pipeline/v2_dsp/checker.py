@@ -18,7 +18,7 @@ from .runtime import DspConfig
 
 ProofFailure = NativeFailure  # Preserve the old exception import for callers.
 
-CHECKER_VERSION = "dsp_isabelle2026_native_p8"
+CHECKER_VERSION = "dsp_isabelle2026_native_p9"
 HEURISTICS = (
     "by auto", "by simp", "by blast", "by fastforce", "by force", "by eval",
     "by presburger", "by sos", "by arith", "by linarith", "by (auto simp: field_simps)",
@@ -31,7 +31,7 @@ def verification_input(record: dict, mode: str) -> dict:
     for name in (
         "native_search", "native_replay", "native_result", "native_context", "prover_settings", "workdir",
         "search_directory", "build_directory", "build_session", "build_log_path",
-        "build_log_excerpt", "build_returncode", "replay_theory_path", "replay_log_path",
+        "build_log_excerpt", "build_returncode", "build_metrics", "termination_hint", "parent_session", "replay_theory_path", "replay_log_path",
         "replay_verified", "verification_method", "pisa_result", "dsp_result", "import_resolution", "verify_fingerprint", "verify_duration_seconds", "backend_metadata", "isabelle_proof",
     ):
         result.pop(name, None)

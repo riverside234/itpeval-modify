@@ -39,6 +39,8 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
     parser.add_argument("--skip-sketch", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     add_parallel_arguments(parser)
+    if expected_source == "hol-most-match":
+        parser.set_defaults(memory_per_worker_gb=12.0)
     args = parser.parse_args()
     validate_layout(args.expected_root)
     mode = args.sketch_source

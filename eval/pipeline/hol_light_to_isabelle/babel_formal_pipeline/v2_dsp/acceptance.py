@@ -11,7 +11,7 @@ from ..common import fingerprint
 from ..sanitize_isabelle import sanitize_target
 from .checker import Checker
 from .export_dsp import export_record
-from .native_search import NativeSearch, build_diagnostics, build_error
+from .native_search import NativeFailure, NativeSearch, build_diagnostics, build_error
 from .preflight import control_record
 from .runtime import DspConfig, NATIVE_DIR
 
@@ -121,13 +121,23 @@ def dataset_cases(records: list[dict]) -> list[ProofCase]:
 
 class PreparedNative(NativeSearch):
     """Reuse this invocation's checked parent; each job still runs isabelle build."""
-    def __init__(self, config, parent, *, candidate=None):
+    def __init__(self, config, parent, *, candidate=None, import_parents=None):
         super().__init__(config)
         self.parent = parent
         self.candidate = candidate
+        self.import_parents = import_parents
 
     def infrastructure(self, *, deadline):
         return self.parent
+
+    def job_parent(self, resolution, *, deadline):
+        if self.import_parents is None:
+            return self.parent
+        from .import_cache import import_key
+        cached = self.import_parents.get(import_key(resolution))
+        if cached is None:
+            raise NativeFailure("import_build_error", "No prepared heap for this exact original import set")
+        return cached.job_parent()
 
     def request(self, record, sketch, **options):
         if self.candidate is not None and options["action"] == "search":
@@ -177,7 +187,7 @@ def case_problems(case: ProofCase, result: dict) -> list[str]:
     return errors
 
 
-def run_proof_case(case: ProofCase, *, config: DspConfig, backend: dict, parent, directory: Path) -> dict:
+def run_proof_case(case: ProofCase, *, config: DspConfig, backend: dict, parent, directory: Path, import_parents=None) -> dict:
     actual = replace(config, provers=case.provers) if case.provers is not None else config
     # The same installed distribution/heap was checked once. Only the prover
     # selection changes; reflect it in metadata rather than hashing the install again.
@@ -185,7 +195,7 @@ def run_proof_case(case: ProofCase, *, config: DspConfig, backend: dict, parent,
     identity["config"] = asdict(actual)
     identity["backend_fingerprint"] = fingerprint(identity)
     checker = Checker(actual, results_dir=str(directory), native_factory=lambda cfg:
-        PreparedNative(cfg, parent, candidate=case.candidate))
+        PreparedNative(cfg, parent, candidate=case.candidate, import_parents=import_parents))
     result = checker.check(case.record, force_hammer=case.force_hammer,
                            backend_metadata=identity)
     problems = case_problems(case, result)

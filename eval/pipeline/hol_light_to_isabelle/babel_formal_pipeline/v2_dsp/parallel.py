@@ -196,7 +196,11 @@ def prepare_batch(config, records, plan):
     backend = config.metadata()  # Validate release/settings before any build.
     prepare_dependencies(config, records, plan)
     parent = NativeSearch(config).infrastructure(deadline=time.monotonic() + config.target_timeout_s)
-    return config, backend, lambda cfg: PreparedNative(cfg, parent)
+    imports = None
+    if any(row.get("source") == "hol-most-match" for row in records):
+        from .import_cache import prepare_import_parents
+        imports, _ = prepare_import_parents(config, records, plan, parent)
+    return config, backend, lambda cfg: PreparedNative(cfg, parent, import_parents=imports)
 
 
 def gate_records(records, *, config, plan, results_dir, sketch_source, fail_fast=False):
@@ -205,8 +209,9 @@ def gate_records(records, *, config, plan, results_dir, sketch_source, fail_fast
     valid = [row for row in records if not row.get("input_error")]
     if not valid:
         return {}
-    config, backend, factory = prepare_batch(config, valid, plan)
-    control = preflight(control_record("by simp", source=valid[0]["source"], sketch_source=sketch_source),
+    control_row = control_record("by simp", source=valid[0]["source"], sketch_source=sketch_source)
+    config, backend, factory = prepare_batch(config, [*valid, control_row], plan)
+    control = preflight(control_row,
         config=config, backend_metadata=backend, results_dir=results_dir, sketch_source=sketch_source,
         native_factory=factory)
     if not control["ok"]:

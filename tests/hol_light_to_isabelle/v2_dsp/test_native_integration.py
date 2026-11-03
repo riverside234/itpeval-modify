@@ -23,6 +23,31 @@ class NativeIntegrationTests(unittest.TestCase):
         cls.config = DspConfig.load(os.environ["ITPEVAL_NATIVE_ISABELLE2026_CONFIG"])
         cls.backend = cls.config.metadata()
 
+    def test_cached_import_parent_keeps_context_and_ancestor_guard(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.import_cache import prepare_import_parents
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.parallel import plan_parallel
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import PreparedNative
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
+        row = control_record("by simp")
+        template = row["isabelle_theory_template"].replace("imports Main", 'imports "HOL-Library.Finite_Map"')
+        target = sanitize_target(template, row["isabelle_target_name"])
+        row.update(isabelle_theory_template=template, isabelle_statement=target.statement,
+                   isabelle_context_before_target=target.context_before_target,
+                   isabelle_target_proof_span=list(target.proof_span), isabelle_proof_prefix=target.proof_prefix)
+        inherited = next(c.record for c in proof_cases() if c.name == "inherited_theory_search")
+        config = replace(self.config, threads=1)
+        native = NativeSearch(config)
+        parent = native.infrastructure(deadline=time.monotonic()+config.target_timeout_s)
+        parents, _ = prepare_import_parents(config, [row, inherited], plan_parallel(config), parent)
+        checker = Checker(config, native_factory=lambda cfg: PreparedNative(cfg, parent, import_parents=parents))
+        result = checker.check(row, backend_metadata=self.backend)
+        self.assertTrue(result["verified"], result.get("verify_error"))
+        self.assertTrue(result["native_search"]["parent_session"].startswith("DSP_Imports_"))
+        rejected = checker.check(inherited, backend_metadata=self.backend)
+        self.assertFalse(rejected["verified"])
+        self.assertEqual("context_error", rejected["failure_category"])
+        self.assertIn("already inherited", rejected["verify_error"])
+
     def test_controls_in_both_input_modes(self):
         for mode in ("draft", "hol-light-proof"):
             with self.subTest(mode=mode):
