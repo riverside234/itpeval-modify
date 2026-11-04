@@ -1,12 +1,16 @@
 # Isabelle2026 native DSP backend (default)
 
-`v2_dsp/` is the default for both Babel Formal and Hundred Theorems. The original
+`v2_dsp/` is the default for Babel Formal, Hundred Theorems and most-match. The original
 DSP/PISA/Isabelle2021 implementation is preserved separately in
 [`v2_dsp_pisa/`](../v2_dsp_pisa/README.md), including its copied upstream checker
 and recent runtime fixes. `v2_itpeval/` still uses Isabelle2024.
 
-Both native input modes remain available: saved mathematical Draft to Sketch,
-and HOL Light proof directly to Sketch. API and Qwen/vLLM inference are unchanged.
+The native command-line tools default to HOL Light proof directly to Sketch.
+Use `--records` with the runner. Saved mathematical Draft to Sketch remains
+available with `--drafts` (which selects Draft mode) or `--sketch-source draft`.
+API and Qwen/vLLM inference are unchanged. Generic `--input` paths default to
+direct; old saved Draft artifacts need the explicit Draft mode. Low-level Python
+API defaults remain compatible with existing callers.
 
 ## Verification
 
@@ -16,6 +20,15 @@ then calls Sledgehammer and executes its reconstructed commands. Success require
 complete target closure, an admissible completed proof, the matching request
 identity, and a successful native process exit. Sledgehammer's internal preplay
 is still part of proof search; it is not a second whole-proof verification stage.
+
+Checker p13 also tries bounded local search when a terminal `by` command fails
+with an ordinary method-application or incomplete-proof error. It starts from
+the unchanged saved state and must close that local obligation before continuing.
+Syntax/type/name errors, structural failures, rejected methods, timeouts and
+interrupts are not repaired. Original commands and checked replacements remain
+traceable; `terminal_repair_attempts` / `terminal_repair_successes` distinguish
+this path from explicit `sledgehammer` gaps. The completed proof contains only
+the successful replacement. See the [most-match failure review and focused retry](../../most_match_pipeline/README.md#review-of-commit-852f31b-finite_subset_instance).
 
 `verified` and `prove_success` describe this one native job;
 `verification_method` is `isabelle2026_native_completion`. There are no new
@@ -175,7 +188,8 @@ can retain their saved artifacts. No old preflight outcome has been relabeled.
 
 Use each dataset's `v2_dsp.run` / `run_babel` / `run_hundred` entry point and the
 2026 config. `--sketch-source draft --drafts <drafts.jsonl>` consumes saved Drafts;
-`--sketch-source hol-light-proof --records <records.jsonl>` uses the direct mode.
+`--records <records.jsonl>` uses the default direct mode. The explicit
+`--sketch-source hol-light-proof` flag is optional.
 Normal runs check native capabilities and each context before making model calls.
 `--dry-run` previews the chosen prompt without inference or native execution.
 

@@ -127,46 +127,118 @@ Start this retry with eight theorem workers and two import-build jobs of eight t
 
 The relevant distinction between session imports and parent heaps follows the [official session dependency implementation](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Build/sessions.scala).
 
-### Draft, Sketch and Prove
+### Direct to Sketch and Prove (default)
 
-Generate Drafts (append `--limit 1` for a smoke test, or `--dry-run` to inspect the first prompt):
-
-```bash
-python -m "$PIPE.generate_draft" --expected-root "$PWD" \
-  --input "$DATA/records.jsonl" --output "$DATA/drafts.jsonl"
-```
-
-Generate Sketches from those Drafts, then compile independent samples concurrently:
+Native `run`, `export_dsp`, `generate_sketch`, `prove` and the single-record
+`preflight` commands now default to **HOL Light proof → Isabelle Sketch**.
+Supply `--records` to the runner; it does not generate or consume a Draft.
+`--sketch-source hol-light-proof` remains an accepted explicit spelling. The
+same default applies to the Babel and Hundred native command-line adapters.
+Saved artifact mode tags and existing Python API defaults remain unchanged.
 
 ```bash
 python -m "$PIPE.v2_dsp.run" --expected-root "$PWD" \
-  --config "$CFG" --drafts "$DATA/drafts.jsonl" --samples 1 \
-  --workers 8 --threads-per-worker 1 \
-  --dsp-output "$DATA/draft/inputs.jsonl" \
-  --sketch-output "$DATA/draft/sketches.jsonl" \
-  --prove-output "$DATA/draft/prove.jsonl" --output "$DATA/draft/verified.jsonl"
-```
-
-Direct source proof to Sketch, using separate outputs:
-
-```bash
-python -m "$PIPE.v2_dsp.run" --expected-root "$PWD" \
-  --config "$CFG" --sketch-source hol-light-proof --records "$DATA/records.jsonl" \
+  --config "$CFG" --records "$DATA/records.jsonl" \
   --workers 8 --samples 1 \
   --dsp-output "$DATA/direct/inputs.jsonl" \
   --sketch-output "$DATA/direct/sketches.jsonl" \
   --prove-output "$DATA/direct/prove.jsonl" --output "$DATA/direct/verified.jsonl"
 ```
 
-To compile existing Sketches without generating new ones:
+To check existing direct Sketches without model calls:
 
 ```bash
 python -m "$PIPE.v2_dsp.prove" --expected-root "$PWD" --config "$CFG" \
-  --input "$DATA/draft/sketches.jsonl" --workers 8 \
+  --input "$DATA/direct/sketches.jsonl" --workers 8 \
+  --prove-output "$DATA/direct/prove.jsonl" --output "$DATA/direct/verified.jsonl"
+```
+
+Saved-Draft mode remains available. `--drafts` selects it automatically when
+`--sketch-source` is omitted. For generic `--input` paths, select
+`--sketch-source draft` explicitly; an input/mode mismatch is an error.
+
+```bash
+python -m "$PIPE.generate_draft" --expected-root "$PWD" \
+  --input "$DATA/records.jsonl" --output "$DATA/drafts.jsonl"
+
+python -m "$PIPE.v2_dsp.run" --expected-root "$PWD" \
+  --config "$CFG" --sketch-source draft --drafts "$DATA/drafts.jsonl" \
+  --samples 1 --workers 8 \
+  --dsp-output "$DATA/draft/inputs.jsonl" \
+  --sketch-output "$DATA/draft/sketches.jsonl" \
   --prove-output "$DATA/draft/prove.jsonl" --output "$DATA/draft/verified.jsonl"
 ```
 
-Both modes also support `--topic Cross3 --target-key cross_refl`, `--limit`, `--samples`, and `--no-resume`. Use `--llm-config` for Draft and `--sketch-llm-config` for the runner to select an existing API or vLLM profile. `--workers` controls native builds, not LLM request concurrency. The runner validates contexts before inference; context failures are recorded and do not spend model calls.
+Both modes support `--topic`, `--target-key`, `--limit`, `--samples`, and
+`--no-resume`. `--dry-run` previews the prompt without Isabelle or model calls.
+Use `--llm-config` for standalone generation and `--sketch-llm-config` for the
+runner to choose an API/vLLM profile. `--workers` controls native builds, not
+LLM request concurrency. Context failures are recorded before inference.
+
+### Review of commit 852f31b: finite_subset_instance
+
+The committed direct result for `Canonical_Models/finite_subset_instance`
+failed at sketch line 12:
+
+```isabelle
+by (intro impI, rule exI[where x="{}"], simp)
+```
+
+The logged goal was already existential. `intro impI` requires an applicable
+object implication and failed before the witness method. The import/context
+setup succeeded; **zero heuristics and zero Sledgehammer calls** ran. This is
+an explicit-method failure, not evidence of an ATP timeout or missing AFP.
+The later insertion case also uses a bare `proof` followed by a repeated premise
+introduction; its case structure needs revision rather than just removing impI.
+
+Checker **p13** can recover ordinary failed terminal `by` methods from the
+unchanged saved state using the existing bounded heuristic/Hammer search.
+Failed partial progress is discarded. The replacement must close the same
+local obligation before the next source command, and only the executed
+replacement enters `isabelle_proof`. Original sketches remain in
+`isabelle_sketch`, with the failed command and recovery recorded in the trace.
+`search_summary` and final summaries expose `terminal_repair_attempts` and
+`terminal_repair_successes`. A repair failure retains the underlying search
+error plus `repair_of_command` / `repair_of_line`.
+
+Only Isabelle's ordinary method-application/completion errors are eligible.
+Unknown facts/methods, syntax/type errors, invalid proof structure, forbidden
+commands, source-command timeouts, and interrupts still fail. Target closure
+and all existing context/admission guards still apply. This is a general shared
+native-backend change, not a target-name special case. There is no separate replay.
+
+The direct prompt advances to `most_match_direct_sketch_v4`. It distinguishes
+meta/object implication, explains induction case premises and hypotheses,
+requires explicit existential witnesses, and distinguishes `proof -` from a
+bare `proof`. Uncertain method chains should become well-scoped search gaps
+with their supporting facts. The Draft and Draft-to-Sketch prompts are unchanged.
+Prompt/checker fingerprints invalidate old cached generation/verification.
+
+After syncing, regenerate and check **only this failed theorem**:
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+PIPE=eval.pipeline.hol_light_to_isabelle.most_match_pipeline
+CFG=eval/configs/hol_light_to_isabelle/v2_dsp_most_match_2026.example.json
+RUN=eval/results/hol_light_to_isabelle_v2/most-match/v2-dsp-isabelle2026/canonical-models-finite-subset-instance/direct-p13
+
+python -m "$PIPE.extract_hol_light" --expected-root "$PWD" \
+  --topic Canonical_Models --target-key finite_subset_instance \
+  --output "$RUN/records.jsonl"
+
+python -m "$PIPE.v2_dsp.run" --expected-root "$PWD" \
+  --config "$CFG" --records "$RUN/records.jsonl" --samples 1 --workers 1 \
+  --dsp-output "$RUN/inputs.jsonl" --sketch-output "$RUN/sketches.jsonl" \
+  --prove-output "$RUN/prove.jsonl" --output "$RUN/verified.jsonl"
+```
+
+Set `CFG` to your existing most-match `.local.json` if its installation paths
+or settings differ. This makes one new Sketch call plus the required context
+and proof checks. It does not rerun the broad preflight cohort. The changed
+native adapter requires its cached infrastructure/import heaps to be rebuilt
+once. Add `--dry-run` to the second command to preview the new direct prompt.
+Native proof success must be established on the lab; offline tests cannot prove
+that the new model sample, or the old structurally flawed sample, will close.
 
 ## Parallel execution
 

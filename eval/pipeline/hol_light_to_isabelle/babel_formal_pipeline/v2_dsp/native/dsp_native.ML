@@ -77,6 +77,12 @@ fun check_reconstruction_transition tr =
 fun elem name attrs body = XML.Elem ((name, attrs), body);
 fun clean value = XML.content_of (YXML.parse_body value);
 fun text name value = elem name [] [XML.Text (clean value)];
+(* Retry only ordinary terminal-method failure. Parse/name/type errors, rejected
+   commands, timeouts, interrupts and Isar structural errors remain fatal. *)
+fun recoverable_terminal_error message =
+  exists (fn prefix => String.isPrefix prefix (clean message))
+    ["Failed to apply initial proof method", "Failed to apply terminal proof method",
+     "Failed to finish proof"];
 fun attr attrs name =
   (case AList.lookup (op =) attrs name of SOME s => s | NONE => fail "protocol_error" ("missing " ^ name));
 fun child nodes name =
@@ -152,11 +158,20 @@ fun run driver_theory request_file result_file =
     fun transition state span =
       let val thy = if Toplevel.is_toplevel state then driver_theory else Toplevel.theory_of state
       in Outer_Syntax.parse_span thy init span end;
+    fun record_attempt mode command line source_state started success error_message extra_attrs =
+      let
+        val _ = serial := !serial + 1;
+        val row = elem "attempt"
+          ([("mode", mode), ("success", Bool.toString success), ("index", string_of_int (!serial)),
+            ("line", string_of_int line), ("source_state", string_of_int source_state),
+            ("duration_seconds", Time.toString (Timer.checkRealTimer started))] @ extra_attrs)
+          [text "command" command, text "error" error_message];
+      in attempts := row :: !attempts end;
     fun attempt mode command line execute =
       let
         val started = Timer.startRealTimer ();
+        val source_state = !state_serial;
         val result = Exn.capture execute ();
-        val _ = serial := !serial + 1;
         val success = (case result of Exn.Res _ => true | _ => false);
         val error_message = (case result of
             Exn.Exn (Candidate_Timeout elapsed) => Timeout.message elapsed
@@ -165,12 +180,7 @@ fun run driver_theory request_file result_file =
             Exn.Exn (Candidate_Timeout _) => [("timeout_scope", "candidate")]
           | _ => []);
         val _ = last_error := error_message;
-        val row = elem "attempt"
-          ([("mode", mode), ("success", Bool.toString success), ("index", string_of_int (!serial)),
-            ("line", string_of_int line), ("source_state", string_of_int (!state_serial)),
-            ("duration_seconds", Time.toString (Timer.checkRealTimer started))] @ timeout_attrs)
-          [text "command" command, text "error" error_message];
-        val _ = attempts := row :: !attempts;
+        val _ = record_attempt mode command line source_state started success error_message timeout_attrs;
       in
         (case result of
           Exn.Res state => SOME state
@@ -299,7 +309,33 @@ fun run driver_theory request_file result_file =
         let val (proof, next) = gap state
         in (ensure_real next, chunks @ [proof ^ "\n"]) end
       else
-        (ensure_real (execute "search" state span), chunks @ [source_text span]);
+        let
+          val tr = transition state span;
+          val command = source_text span;
+          val attempted = Exn.capture (fn () => ensure_real (execute "search" state span)) ();
+          fun repair () =
+            let
+              val started = Timer.startRealTimer ();
+              val source_state = !state_serial;
+              (* Immutable saved state: discard all progress from the failed by.
+                 gap must close this exact obligation before the next source span. *)
+              val outcome = Exn.capture gap state;
+              val success = (case outcome of Exn.Res _ => true | _ => false);
+              val message = (case outcome of Exn.Exn exn => Runtime.exn_message exn | _ => "");
+              val _ = record_attempt "terminal_repair" command
+                (the_default 1 (Position.line_of (Toplevel.pos_of tr)))
+                source_state started success message [];
+              val (proof, next) = Exn.release outcome;
+            in (ensure_real next, chunks @ [proof ^ "\n"]) end;
+        in
+          (case attempted of
+            Exn.Res next => (next, chunks @ [command])
+          | Exn.Exn (exn as Failure ("sketch_step_failure", _)) =>
+              if Toplevel.name_of tr = "by" andalso Toplevel.is_proof state andalso
+                 recoverable_terminal_error (!last_error)
+              then repair () else Exn.reraise exn
+          | Exn.Exn exn => Exn.reraise exn)
+        end;
     fun work () =
       let
         val prefix = value nodes "prefix";

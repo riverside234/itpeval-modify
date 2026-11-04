@@ -1,3 +1,49 @@
+# Review of commit 852f31b: most-match induction method failure
+
+The saved `Canonical_Models/finite_subset_instance` direct sample reached its
+Isar induction base case and failed at `by (intro impI, rule exI[where x="{}"], simp)`.
+Its reported goal was existential; no heuristic or Sledgehammer attempt ran.
+The setup and imports had succeeded. The later insertion block also appears to
+reintroduce a case premise after a default `proof` rule, so a new generated
+Sketch is needed to test the prompt improvement.
+
+Checker **p13** adds narrowly classified terminal-method recovery. It discards
+failed `by` progress, runs bounded search from the saved state, and requires
+local closure before continuing. The original command, inner search result and
+repair outcome are recorded separately. Missing names, parser/type failures,
+invalid structure, source timeouts, interrupts and forbidden commands are not
+eligible. It does not rewrite declarations or insert premises. No replay is added.
+
+The classification follows Isabelle2026
+[`Proof_Display.method_error`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Isar/proof_display.ML)
+and [`Proof.finished_goal` / terminal proof execution](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Isar/proof.ML).
+The failing `intro` requires changed proof state, as defined in
+[`method.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Isar/method.ML).
+
+Direct prompts now cover meta/object implication, induction premises, explicit
+witnesses, and deliberate proof-block opening. Only direct prompt versions
+advance (Babel/Hundred p7; most-match v4). Draft prompts remain unchanged.
+Native CLI commands default to direct mode, with `--drafts` retaining the saved
+Draft path. Artifact tags and legacy Python API defaults are preserved.
+
+Regression coverage includes the committed failure, all three dataset CLI
+adapters, retained Draft commands, mode conflicts, and repair diagnostics.
+Native lab tests additionally check existential recovery, rollback before forced
+Sledgehammer, preserved local facts/following commands, false/missing-fact
+rejection, and an independent finite-set induction example. Local tests cannot
+establish native compilation or complete theorem success.
+
+Validation: **189 offline tests passed; 29 native tests skipped pending the lab**.
+The shared native suite, most-match extraction/parallel/cache tests, CLI adapters
+and Hundred fake-transport check passed. Python 3.10 syntax and patch checks
+passed. No model calls or native Isabelle builds were run locally.
+
+Use the [one-theorem retry](../../most_match_pipeline/README.md#review-of-commit-852f31b-finite_subset_instance)
+to regenerate this sample; broad previously passed contexts are not requested.
+Historical logs and generated sketches have not been edited.
+
+---
+
 # Review of run 20261104T002751Z-cfc4b7f0: test syntax and sum search
 
 Reviewed 2026-11-03 (America/Chicago). Source commit `7e7203655662a45e4d5d31d0951e7508f02c34e1`.

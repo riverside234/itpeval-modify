@@ -14,6 +14,7 @@ from ..isabelle_syntax import tokens
 SCHEMA_VERSION = "hol_light_to_isabelle_dsp_v2"
 ISABELLE_VERSION = "Isabelle2026"
 MODES = ("draft", "hol-light-proof")
+DEFAULT_SKETCH_SOURCE = "hol-light-proof"
 SKETCH_VALIDATOR_VERSION = "isabelle_sketch_structure_v2"
 CONTEXT_FIELDS = ("isabelle_statement", "isabelle_theory_template",
                   "isabelle_context_before_target", "isabelle_proof_prefix",
@@ -41,6 +42,14 @@ def validate_mode(mode: str) -> str:
     if mode not in MODES:
         raise ValueError("sketch_source must be draft or hol-light-proof")
     return mode
+
+
+def cli_mode(explicit: str | None, *, drafts: str | None = None) -> str:
+    """New CLI runs default to direct; an explicit --drafts keeps old commands valid.
+
+    Do not change legacy Python API defaults or reinterpret saved artifact modes.
+    """
+    return validate_mode(explicit or ("draft" if drafts else DEFAULT_SKETCH_SOURCE))
 
 
 def clean_record(record: dict, mode: str) -> dict:
@@ -232,7 +241,7 @@ def summarize_results(records: list[dict], *, mode: str, expected=None, expected
     # Only count the current check's steps. Replay-only rows may also carry
     # historical native_search metadata from an earlier verification.
     steps = [row.get("step_results") or [] for row in records]
-    gap_modes = {"heuristic", "hammer", "reconstruction"}
+    gap_modes = {"heuristic", "normalization", "hammer", "reconstruction", "terminal_repair"}
     summary["search_activity"] = {
         "samples_with_native_search": sum(any(s.get("mode") in gap_modes | {"search"}
                                               for s in sample) for sample in steps),
@@ -241,6 +250,9 @@ def summarize_results(records: list[dict], *, mode: str, expected=None, expected
         "heuristic_attempts": sum(s.get("mode") == "heuristic" for sample in steps for s in sample),
         "sledgehammer_calls": sum(s.get("mode") == "hammer" for sample in steps for s in sample),
         "reconstruction_attempts": sum(s.get("mode") == "reconstruction" for sample in steps for s in sample),
+        "terminal_repair_attempts": sum(s.get("mode") == "terminal_repair" for sample in steps for s in sample),
+        "terminal_repair_successes": sum(s.get("mode") == "terminal_repair" and bool(s.get("success"))
+                                         for sample in steps for s in sample),
     }
     return summary
 

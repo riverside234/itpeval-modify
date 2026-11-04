@@ -10,7 +10,7 @@ from ..sanitize_isabelle import sanitize_target
 from .checker import Checker
 from .native_search import NativeFailure
 from .export_dsp import export_record
-from .input_contract import MODES
+from .input_contract import MODES, DEFAULT_SKETCH_SOURCE
 from .runtime import DspConfig
 
 
@@ -92,7 +92,7 @@ def main(*, default_input: str = DEFAULT_INPUT, results_dir: str = RESULTS_DIR,
     parser.add_argument("--expected-root", help=f"Lab repo: {LAB_REPO_ROOT}")
     parser.add_argument("--config", required=True)
     parser.add_argument("--input", default=default_input)
-    parser.add_argument("--sketch-source", choices=MODES, default="draft")
+    parser.add_argument("--sketch-source", choices=MODES, default=DEFAULT_SKETCH_SOURCE)
     parser.add_argument("--topic")
     parser.add_argument("--target-key")
     parser.add_argument("--limit", type=int)

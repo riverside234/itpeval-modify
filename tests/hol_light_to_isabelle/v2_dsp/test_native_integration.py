@@ -23,6 +23,74 @@ class NativeIntegrationTests(unittest.TestCase):
         cls.config = DspConfig.load(os.environ["ITPEVAL_NATIVE_ISABELLE2026_CONFIG"])
         cls.backend = cls.config.metadata()
 
+    def test_failed_terminal_method_recovers_existential_from_saved_state(self):
+        row = control_record('by (intro impI, rule exI[where x="0"], simp)',
+                             conclusion=r'\<exists>n::nat. n = 0')
+        result = Checker(self.config).check(row, backend_metadata=self.backend)
+        self.assertTrue(result['verified'], result['verify_error'])
+        self.assertEqual(1, result['search_summary']['terminal_repair_successes'])
+        self.assertNotIn('impI', result['isabelle_proof'])
+
+    def test_failed_terminal_method_rolls_back_partial_progress_before_hammer(self):
+        config = replace(self.config, provers=('simp',))
+        row = control_record('by (rule conjI)', conclusion=r'True \<and> True')
+        result = Checker(config).check(row, force_hammer=True, backend_metadata=self.backend)
+        self.assertTrue(result['verified'], result['verify_error'])
+        self.assertEqual(1, result['search_summary']['terminal_repair_successes'])
+        self.assertGreater(result['search_summary']['hammer_successes'], 0)
+        failed = next(s for s in result['step_results'] if s['mode']=='search' and not s['success'])
+        hammer = next(s for s in result['step_results'] if s['mode']=='hammer')
+        self.assertEqual(failed['source_state'], hammer['source_state'])
+        self.assertNotIn('rule conjI', result['isabelle_proof'])
+        self.assertTrue(result['native_search']['target_closed'])
+
+    def test_terminal_repair_preserves_local_assumptions_and_following_commands(self):
+        sketch = ('proof -\n assume h: P\n have q: P using h by (rule FalseE)\n'
+                  ' show P using q by assumption\nqed')
+        result = Checker(self.config).check(control_record(sketch, conclusion=r'P \<Longrightarrow> P'),
+                                           backend_metadata=self.backend)
+        self.assertTrue(result['verified'], result['verify_error'])
+        self.assertIn('show P using q', result['isabelle_proof'])
+        self.assertNotIn('FalseE', result['isabelle_proof'])
+        self.assertEqual(1, result['search_summary']['terminal_repair_successes'])
+
+    def test_terminal_repair_cannot_close_false_or_ignore_missing_facts(self):
+        config = replace(self.config, provers=('simp',))
+        false = Checker(config).check(control_record('by simp', conclusion='False'),
+                                       force_hammer=True, backend_metadata=self.backend)
+        self.assertFalse(false['verified'])
+        self.assertEqual(1, false['search_summary']['terminal_repair_attempts'])
+        self.assertEqual(0, false['search_summary']['terminal_repair_successes'])
+        for proof in ('by (rule v2_control)', 'by (rule nonexistent_fact)', 'by nonexistent_method'):
+            with self.subTest(proof=proof):
+                row = Checker(config).check(control_record(proof), backend_metadata=self.backend)
+                self.assertFalse(row['verified'])
+                self.assertEqual('sketch_step_failure', row['failure_category'])
+                self.assertEqual(0, row['search_summary']['terminal_repair_attempts'])
+
+    def test_finite_induction_uses_case_premises_and_explicit_witnesses(self):
+        # A generic set theorem, independent of the dataset's substitution operators.
+        goal = r"finite (A::nat set) \<Longrightarrow> A \<subseteq> S \<Longrightarrow> " \
+               r"\<exists>B. finite B \<and> A \<subseteq> B \<and> B \<subseteq> S"
+        sketch = r'''proof -
+  assume fin: "finite A" and sub: "A \<subseteq> S"
+  from fin show ?thesis using sub
+  proof (induction A rule: finite_induct)
+    case empty
+    show ?case by (rule exI[where x="{}"], simp)
+  next
+    case (insert x F)
+    have fsub: "F \<subseteq> S" using insert.prems by blast
+    obtain B where b: "finite B" "F \<subseteq> B" "B \<subseteq> S"
+      using insert.IH[OF fsub] by blast
+    have xs: "x \<in> S" using insert.prems by blast
+    show ?case using b xs by (rule exI[where x="insert x B"], auto)
+  qed
+qed'''
+        result = Checker(self.config).check(control_record(sketch, conclusion=goal), backend_metadata=self.backend)
+        self.assertTrue(result['verified'], result['verify_error'])
+        self.assertEqual(0, result['search_summary']['terminal_repair_attempts'])
+
     def test_generic_candidate_timeout_falls_through_to_sledgehammer(self):
         from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import (
             timeout_hammer_case, run_proof_case)

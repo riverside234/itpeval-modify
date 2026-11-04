@@ -55,6 +55,16 @@ local
         (fn () => {skip_theory = false, theory = \<^theory>}) Position.start source;
       fun open_test_goal source = fold Toplevel.command_exception (transitions source)
         (Toplevel.make_state (SOME (Context.Theory \<^theory>)));
+      val _ = List.app (fn message => expect "ordinary method failure is recoverable" true
+        (DSP_Native.recoverable_terminal_error message))
+        ["Failed to apply initial proof method (line 12): goal (1 subgoal)",
+         "Failed to apply terminal proof method (line 12): goal (1 subgoal)",
+         "Failed to finish proof: goal (1 subgoal)"];
+      val _ = List.app (fn message => expect "syntax/name/structure errors are not repaired" false
+        (DSP_Native.recoverable_terminal_error message))
+        ["Undefined fact: target", "Undefined method: unknown", "Outer syntax error",
+         "Failed to refine any pending goal", "Timeout after 10.0s",
+         "Undefined fact: Failed to finish proof"];
       val plain_goal = open_test_goal "lemma dsp_plain_goal: True";
       val _ = expect "unrelated goals get no sum/norm hints" []
         (DSP_Sledgehammer.fact_hints (Toplevel.proof_of plain_goal));

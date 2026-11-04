@@ -185,7 +185,7 @@ python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.p
   --topic 030_the_ballot_problem --target-key all_countings
 ~~~
 
-Direct-mode smoke run:
+Direct-mode smoke run (the native CLI default; `--sketch-source hol-light-proof` is optional):
 
 ~~~bash
 python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.run_hundred \

@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from ..common import LAB_REPO_ROOT, RESULTS_DIR, key, repo_path, require_source, validate_layout, write_jsonl, read_jsonl
 from ..generate_draft import DEFAULT_OUTPUT as DEFAULT_INPUT
-from .input_contract import (SCHEMA_VERSION, MODES, clean_record, envelope, input_metadata,
+from .input_contract import (cli_mode, SCHEMA_VERSION, MODES, clean_record, envelope, input_metadata,
                              load_inputs, output_path as native_output_path, validate_artifacts)
 
 DEFAULT_OUTPUT = native_output_path(None, results_dir=RESULTS_DIR, filename="inputs.jsonl", mode="draft")
@@ -63,7 +63,8 @@ def main(*, default_input=DEFAULT_INPUT, default_output=DEFAULT_OUTPUT,
          expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--expected-root", help=f"Lab repo: {LAB_REPO_ROOT}")
-    parser.add_argument("--sketch-source", choices=MODES, default="draft")
+    parser.add_argument("--sketch-source", choices=MODES,
+                        help="Default: hol-light-proof; --drafts selects draft unless overridden")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--drafts")
     group.add_argument("--records")
@@ -73,6 +74,7 @@ def main(*, default_input=DEFAULT_INPUT, default_output=DEFAULT_OUTPUT,
     parser.add_argument("--target-key")
     parser.add_argument("--limit", type=int)
     args = parser.parse_args()
+    args.sketch_source = cli_mode(args.sketch_source, drafts=getattr(args, "drafts", None))
     validate_layout(args.expected_root)
     if args.records and args.sketch_source != "hol-light-proof" or args.drafts and args.sketch_source != "draft":
         parser.error("--records requires hol-light-proof; --drafts requires draft")

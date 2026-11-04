@@ -10,7 +10,7 @@ from dataclasses import replace
 from ..common import LAB_REPO_ROOT, RESULTS_DIR, key, repo_path, require_source, validate_layout, read_jsonl
 from .export_dsp import export_inputs, export_record
 from .generate_sketch import generate_sketches
-from .input_contract import MODES, envelope, load_inputs, output_path, validate_artifacts
+from .input_contract import MODES, cli_mode, envelope, load_inputs, output_path, validate_artifacts
 from .preflight import preflight
 from .prove import prove_sketches
 from .runtime import DspConfig
@@ -22,7 +22,8 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--expected-root", help=f"Lab repo: {LAB_REPO_ROOT}")
     parser.add_argument("--config", required=True)
-    parser.add_argument("--sketch-source", choices=MODES, default="draft")
+    parser.add_argument("--sketch-source", choices=MODES,
+                        help="Default: hol-light-proof; --drafts selects draft unless overridden")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--drafts")
     group.add_argument("--records")
@@ -42,6 +43,7 @@ def main(*, expected_source="babel-formal", results_dir=RESULTS_DIR) -> None:
     if expected_source in {"hol-most-match", "hundred-theorems"}:
         parser.set_defaults(memory_per_worker_gb=12.0)
     args = parser.parse_args()
+    args.sketch_source = cli_mode(args.sketch_source, drafts=getattr(args, "drafts", None))
     validate_layout(args.expected_root)
     mode = args.sketch_source
     if mode == "draft" and not args.drafts or mode == "hol-light-proof" and not args.records:

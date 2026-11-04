@@ -14,7 +14,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.checker im
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.generate_sketch import DEFAULT_OUTPUT as DEFAULT_INPUT
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig
 from .parallel import add_parallel_arguments, parallel_options, plan_parallel, prepare_batch, completed_jobs
-from .input_contract import (MODES, align_samples, envelope, load_inputs, output_path as native_output_path,
+from .input_contract import (cli_mode, MODES, align_samples, envelope, load_inputs, output_path as native_output_path,
                              validate_artifacts, save_results)
 
 
@@ -117,8 +117,9 @@ def main(*, default_input: str = DEFAULT_INPUT, default_output: str = DEFAULT_OU
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--expected-root", help=f"Lab repo: {LAB_REPO_ROOT}")
     parser.add_argument("--config", required=True)
-    parser.add_argument("--sketch-source", choices=MODES, default="draft")
-    parser.add_argument("--input", default=default_input)
+    parser.add_argument("--sketch-source", choices=MODES,
+                        help="Default: hol-light-proof; use draft for saved Draft-to-Sketch artifacts")
+    parser.add_argument("--input")
     parser.add_argument("--output")
     parser.add_argument("--prove-output", default=_DEFAULT_PROVE)
     parser.add_argument("--topic")
@@ -129,7 +130,12 @@ def main(*, default_input: str = DEFAULT_INPUT, default_output: str = DEFAULT_OU
     if expected_source in {"hol-most-match", "hundred-theorems"}:
         parser.set_defaults(memory_per_worker_gb=12.0)
     args = parser.parse_args()
+    args.sketch_source = cli_mode(args.sketch_source, drafts=getattr(args, "drafts", None))
     validate_layout(args.expected_root)
+    if not args.input:
+        if args.sketch_source == "hol-light-proof":
+            parser.error("direct mode requires --input with saved direct sketches")
+        args.input = default_input
     records = prove_sketches(
         config=DspConfig.load(args.config), input_path=args.input, output_path=args.output,
         prove_output=args.prove_output, topic=args.topic, target_key=args.target_key,

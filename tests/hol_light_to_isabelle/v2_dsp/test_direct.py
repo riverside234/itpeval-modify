@@ -112,7 +112,7 @@ class DirectTests(unittest.TestCase):
             write_jsonl(source, [record])
             for module, extra in (("run", ["--config", "not-installed.local.json"]), ("generate_sketch", [])):
                 command = [sys.executable, "-B", "-m", "eval.pipeline.hol_light_to_isabelle." + dataset + ".v2_dsp." + module,
-                           "--sketch-source", MODE, "--records", str(source), "--dry-run", *extra]
+                           "--records", str(source), "--dry-run", *extra]
                 run = subprocess.run(command, text=True, capture_output=True, check=True, timeout=30)
                 preview = json.loads(run.stdout)
                 self.assertEqual(MODE, preview["sketch_source"])

@@ -12,7 +12,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import (
     prompt_hash, public_record, read_jsonl, repo_path, require_source, validate_layout,
 )
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import normalize_visible_content
-from .input_contract import (MODES, envelope, clean_record, input_metadata, load_inputs,
+from .input_contract import (cli_mode, MODES, envelope, clean_record, input_metadata, load_inputs,
                              validate_artifacts, normalize_sketch, SKETCH_VALIDATOR_VERSION, draft_provenance,
                              output_path as native_output_path)
 from .direct_sketch_prompt import build_direct_sketch_prompt, DIRECT_PROMPT_VERSION
@@ -162,7 +162,8 @@ def main(*, legacy: bool = False, default_input: str = DEFAULT_INPUT,
          prompt_version: str | None = None, expected_source: str = "babel-formal") -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--expected-root", help=f"Lab repo: {LAB_REPO_ROOT}")
-    parser.add_argument("--sketch-source", choices=MODES, default="draft")
+    parser.add_argument("--sketch-source", choices=MODES,
+                        help="Default: hol-light-proof; --drafts selects draft unless overridden")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--input")
     group.add_argument("--drafts")
@@ -180,12 +181,13 @@ def main(*, legacy: bool = False, default_input: str = DEFAULT_INPUT,
     parser.add_argument("--fail-fast", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
+    args.sketch_source = cli_mode(args.sketch_source, drafts=getattr(args, "drafts", None))
     validate_layout(args.expected_root)
     if args.records and args.sketch_source != "hol-light-proof" or args.drafts and args.sketch_source != "draft":
         parser.error("--records requires hol-light-proof; --drafts requires draft")
-    args.input = args.input or args.records or args.drafts or default_input
-    if args.sketch_source == "hol-light-proof" and not (args.records or args.input != default_input):
+    if args.sketch_source == "hol-light-proof" and not (args.records or args.input):
         parser.error("direct mode requires --records or --input")
+    args.input = args.input or args.records or args.drafts or default_input
     chosen_config = resolve_model_config(
         args.llm_config, model=args.model, reasoning_effort=args.reasoning_effort,
         max_output_tokens=args.max_output_tokens, default_effort="high", dry_run=args.dry_run)
