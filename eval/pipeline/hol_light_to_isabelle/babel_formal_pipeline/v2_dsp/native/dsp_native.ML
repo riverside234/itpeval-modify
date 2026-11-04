@@ -163,6 +163,8 @@ fun run driver_theory request_file result_file =
     val hammer_reserve = number nodes "hammer_timeout_s" +
       number nodes "preplay_timeout_s" + 2.0 * step_budget;
     val last_error = Unsynchronized.ref "";
+    val heuristic_spent = Unsynchronized.ref 0.0;
+    fun heuristic_remaining () = Real.max (0.0, 2.0 * step_budget - !heuristic_spent);
     fun remaining () = whole_budget - Time.toReal (Timer.checkRealTimer timer);
     fun bounded seconds f arg =
       let val budget = Real.min (seconds, remaining ())
@@ -247,7 +249,8 @@ fun run driver_theory request_file result_file =
                 val tr = transition st span;
                 val _ = check_reconstruction_transition tr;
               in ensure_real (Toplevel.command_exception tr st) end;
-            val next = candidate_timeout remaining step_budget
+            val budget = if mode = "heuristic" then Real.min (step_budget, heuristic_remaining ()) else step_budget;
+            val next = candidate_timeout remaining budget
               (fn () => fold step (spans saved proof) saved) ();
             (* Only the fixed normalization below may retain a changed goal with
                the same subgoal count. Heuristics must still close it; ordinary
@@ -264,12 +267,20 @@ fun run driver_theory request_file result_file =
       in attempt mode proof 0 apply_candidate end;
     fun choose _ _ _ [] = NONE
       | choose mode allow_partial state (proof :: rest) =
-          if mode = "heuristic" andalso remaining () <= hammer_reserve + step_budget
+          if mode = "heuristic" andalso
+             (remaining () <= hammer_reserve + step_budget orelse heuristic_remaining () < 0.001)
           then NONE
           else if mode = "heuristic" andalso not (heuristic_available state proof)
           then choose mode allow_partial state rest
-          else (case candidate mode allow_partial state proof of SOME next => SOME (proof, next)
-            | NONE => choose mode allow_partial state rest);
+          else
+            let
+              val started = Timer.startRealTimer ();
+              val selected = candidate mode allow_partial state proof;
+              val _ = if mode = "heuristic" then
+                heuristic_spent := !heuristic_spent + Time.toReal (Timer.checkRealTimer started)
+                else ();
+            in case selected of SOME next => SOME (proof, next)
+             | NONE => choose mode allow_partial state rest end;
     fun normalize_for_hammer state =
       if has_pair_binder state then
         (* Use the kernel-checked apply command, and retain it in the final proof.
@@ -280,6 +291,9 @@ fun run driver_theory request_file result_file =
     fun gap try_heuristics initial =
       let
         val _ = Proof.assert_backward (Toplevel.proof_of initial);
+        (* One allowance for the whole gap, including normalization/reconstruction
+           rounds. Optional methods must not repeatedly postpone native Hammer. *)
+        val _ = heuristic_spent := 0.0;
         fun solve state chunks =
           if closes_obligation initial state then (cat_lines (rev chunks), state)
           else

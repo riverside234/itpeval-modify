@@ -154,7 +154,7 @@ class CompactCanonRegressionTests(unittest.TestCase):
         raw = extract_records(topic='Canonical_Models', target_key='compact_canon_qfree')[0]
         record = export_dsp.export_record(raw, sketch_source=MODE)
         prompt = build_direct_sketch_prompt(record)
-        self.assertEqual('most_match_direct_sketch_v5', prompt.version)
+        self.assertEqual('most_match_direct_sketch_v6', prompt.version)
         self.assertIn(raw['hol_light_proof'], prompt.user_prompt)
         self.assertIn(raw['isabelle_prompt_context'], prompt.user_prompt)
         self.assertNotIn(raw['isabelle_theory_template'], prompt.user_prompt)
@@ -191,3 +191,32 @@ class CompactCanonRegressionTests(unittest.TestCase):
         self.assertEqual(1, summary['search_activity']['terminal_method_timeouts'])
         self.assertEqual(1, summary['search_activity']['sledgehammer_calls'])
         self.assertEqual(0, search_summary(self.row['step_results'])['terminal_method_timeouts'])
+
+
+class CompactPremiseRegressionTests(unittest.TestCase):
+    def test_p14_reaches_compactness_and_new_references_expose_required_premise(self):
+        row=read_jsonl(repo_path('eval/results/hol_light_to_isabelle_v2/most-match/v2-dsp-isabelle2026/'
+            'canonical-models-compact-canon-qfree/direct-p14/verified.jsonl'))[0]
+        self.assertEqual('hammer',row['failed_obligation']['mode'])
+        self.assertEqual('78',row['failed_obligation']['preceding_line'])
+        self.assertEqual(3,row['search_summary']['candidate_timeouts'])
+        self.assertEqual(0,row['search_summary']['terminal_method_timeouts'])
+        self.assertIn('by (rule ps_mono[OF ps_inst ut])',row['isabelle_sketch'])
+        raw=extract_records(topic='Canonical_Models',target_key='compact_canon_qfree')[0]
+        ref=raw['isabelle_prompt_context']
+        self.assertIn('lemma compact_prop:',ref)
+        self.assertIn(r'\<phi> \<in> A \<longrightarrow> qfree \<phi>',ref)
+        self.assertIn('qfree_formsubst',ref)
+        self.assertIn('canonical_canon_of_prop',ref)
+        self.assertLessEqual(len(ref),8000)
+        self.assertEqual(row['isabelle_theory_template'],raw['isabelle_theory_template'])
+        self.assertNotIn('lemma compact_canon_qfree:',ref)
+        origins=[s['origin'] for s in raw['metadata']['prompt_context']['isabelle']['selected_snippets'] if s['origin']]
+        self.assertTrue(all('/stmts/isabelle/' in s for s in origins))
+        self.assertFalse(any('Canonical_Models.thy' in s for s in origins))
+        direct=build_direct_sketch_prompt(export_dsp.export_record(raw,sketch_source=MODE))
+        self.assertIn('enumerate every premise',direct.user_prompt)
+        self.assertIn('quantifier-free condition implicit',direct.user_prompt)
+        # Old saved records remain usable for backend-only retries.
+        from eval.pipeline.hol_light_to_isabelle.most_match_pipeline.context import validate_prompt_context
+        validate_prompt_context(row)

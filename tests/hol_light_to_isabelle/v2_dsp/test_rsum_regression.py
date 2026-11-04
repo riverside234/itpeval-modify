@@ -120,12 +120,15 @@ class RsumRegressionTests(unittest.TestCase):
     def test_forced_hammer_failure_keeps_the_actual_goal_without_heuristic_errors(self):
         result = {'success':False, 'target_closed':False, 'failure_category':'timeout',
                   'error':'native Sledgehammer timed out', 'step_results':[
+                      {'mode':'heuristic','success':False,'source_state':'7','error':'goal (1 subgoal): discarded simp state'},
                       {'mode':'hammer','success':False,'source_state':'7','error':'timeout'}],
                   'prover_settings':{'goal_before_search':'actual normalized pair-sum goal'}}
         with patch.object(PreparedNative, 'request', return_value=result):
             checked = run_proof_case(self.cases[-1], config=self.config, backend={},
                 parent=(self.path,'test'), directory=self.path/'goal-report')['result']
         self.assertEqual('actual normalized pair-sum goal', checked['failed_obligation']['goal_diagnostic'])
+        self.assertIn('discarded simp state',checked['failed_obligation']['heuristic_goal_diagnostic'])
+        self.assertEqual('native_sledgehammer_subgoal',checked['failed_obligation']['goal_diagnostic_source'])
         self.assertIn('actual normalized pair-sum goal', checked['verify_error'])
         self.assertFalse(checked['verified'])
 

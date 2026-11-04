@@ -19,7 +19,8 @@ def build_record(group, pair, *, source_chars=SOURCE_CONTEXT_CHARS, isabelle_cha
     target = next(d for d in source.proofs if d.name == pair["hol_light_name"])
     isa = sanitize_target(group["template"], pair["isabelle_name"], topic=group["topic"])
     hol_reference, isa_reference, retrieval = build_contexts(source, target, isa,
-        source_chars=source_chars, isabelle_chars=isabelle_chars)
+        source_chars=source_chars, isabelle_chars=isabelle_chars,
+        import_root=Path(group["target_path"]).parents[3] / "afp" / "stmts" / "isabelle")
     record = {
         "experiment_version": "v2", "experiment_setting": "oracle_isabelle_statement",
         "source": SOURCE, "theorem_id": group["theorem_id"], "topic": group["topic"], "tier": "most-match",

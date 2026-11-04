@@ -1,5 +1,10 @@
 # Isabelle2026 native DSP backend (default)
 
+Checker p15 caps optional heuristics at twice the step timeout per gap, reserving
+the remaining search for native Sledgehammer. Reports distinguish its actual
+first subgoal from discarded heuristic states. Most-match now retrieves bounded
+masked imported signatures; see its [focused compactness retry](../../most_match_pipeline/README.md#review-of-commit-4d53634-compactness-premise-and-imported-references).
+
 Native checker p14 extends terminal-method recovery to local `by` timeouts.
 It discards the timed-out attempt, skips optional heuristics for that repair,
 and runs bounded Sledgehammer from the original proof state. Structural-command

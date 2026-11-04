@@ -3,7 +3,7 @@ from ..prompt import Prompt
 from .input_contract import input_metadata, require_text
 from .sketch_prompt import ISABELLE_OUTPUT_RULES, ISABELLE_PROOF_REQUIREMENTS
 
-DIRECT_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_direct_p8"
+DIRECT_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_direct_p9"
 SYSTEM_PROMPT = (
     "You are a proof engineer fluent in HOL Light and Isabelle/HOL. Translate the "
     "selected completed HOL Light proof directly into an Isabelle proof, preserving "
@@ -71,6 +71,20 @@ DIRECT_HELPER_RULES = (
     "opaque predicates by extensional equality of their set arguments. "
     "Avoid unfolding a substantial semantic predicate just to change its set "
     "argument; first normalize or rewrite that argument.\n"
+    "- Before invoking a substantial library theorem, enumerate every premise "
+    "in its supplied target signature. Source and target versions can have "
+    "different side conditions. Establish them for the exact transformed object "
+    "at the scope where the theorem is applied. For example, a property known "
+    "for each finite subset is not automatically an available fact about the "
+    "whole set; prove any required closure under substitutions, images or "
+    "transformations separately. Do not leave a required well-formedness or "
+    "quantifier-free condition implicit.\n"
+    "- Use the imported helper's displayed signature to prove the concrete "
+    "next goal, supplying established premises explicitly. Avoid manufacturing "
+    "a more general implication and asking search to rediscover a substantial "
+    "compactness, completeness, induction or existence theorem. If an "
+    "imported helper needs additional premises, prove them before invoking it; "
+    "an opaque search gap is not a replacement for that dependency.\n"
     "- Treat a source helper as a dependency, not a tactic to copy. Establish "
     "only the needed mathematical instance if no supplied Isabelle helper "
     "matches it. Keep this local claim narrowly scoped and supply its relevant "

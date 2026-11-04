@@ -195,6 +195,21 @@ qed'''
         self.assertEqual(0, result['search_summary']['candidate_timeouts'])
         self.assertEqual(0, result['search_summary']['hammer_attempts'])
 
+    def test_total_heuristic_budget_leaves_hammer_an_opportunity(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import timeout_hammer_case
+        config=replace(self.config,step_timeout_s=0.1,provers=('simp',))
+        case=timeout_hammer_case(config)
+        class SlowNative(NativeSearch):
+            def request(self,record,sketch,**options):
+                options['heuristics']=(case.candidate,)*8
+                return super().request(record,sketch,**options)
+        row=Checker(config,native_factory=SlowNative).check(case.record,backend_metadata=self.backend)
+        self.assertTrue(row['verified'],row['verify_error'])
+        self.assertGreaterEqual(row['search_summary']['candidate_timeouts'],1)
+        self.assertLessEqual(row['search_summary']['heuristic_attempts'],2)
+        self.assertEqual(1,row['search_summary']['hammer_successes'])
+        self.assertNotIn('dsp_regression_delay',row['isabelle_proof'])
+
     def test_sledgehammer_reserve_skips_heuristics_when_budget_is_short(self):
         config = replace(self.config, target_timeout_s=90, hammer_timeout_s=90,
                          step_timeout_s=1, provers=('simp',))

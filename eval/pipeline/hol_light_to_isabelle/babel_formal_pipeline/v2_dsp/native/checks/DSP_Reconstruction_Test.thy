@@ -68,6 +68,9 @@ local
       val plain_goal = open_test_goal "lemma dsp_plain_goal: True";
       val _ = expect "unrelated goals get no sum/norm hints" []
         (DSP_Sledgehammer.fact_hints (Toplevel.proof_of plain_goal));
+      val _ = expect "diagnostic is the pending subgoal, not the whole goal theorem" true
+        (Term.aconv_untyped (DSP_Sledgehammer.search_goal (Toplevel.proof_of plain_goal),
+          \<^prop>\<open>True\<close>));
       val pair_goal = open_test_goal
         "lemma dsp_pair_goal: \"(\\<Sum>(x,y)\\<in>A. (x::nat) + y) = (\\<Sum>z\\<in>A. fst z + snd z)\"";
       val _ = expect "pair binder is detected in the typed goal" true

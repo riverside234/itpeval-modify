@@ -42,6 +42,39 @@ class RetrievalTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 context.retrieve([], query='', budget=cap)
 
+    def test_import_retrieval_follows_only_masked_ancestors_and_retains_provenance(self):
+        import tempfile
+        from unittest.mock import patch
+        base = repo_path('eval/results/hol_light_to_isabelle_v2')
+        base.mkdir(parents=True,exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=base) as folder:
+            root = Path(folder)
+            (root/'Parent.thy').write_text('theory Parent imports Grand Main begin\n'
+                'lemma helper: "True" by simp\nlemma \\<open>True\\<close> sorry\ncontext fixes x :: nat begin\n'
+                'lemma hidden: "x=x" sorry\nend\nend',encoding='utf-8')
+            (root/'Grand.thy').write_text('theory Grand imports Target begin\n'
+                'lemma ancestor: "True" sorry\nend',encoding='utf-8')
+            (root/'Target.thy').write_text('DO NOT READ TARGET',encoding='utf-8')
+            (root/'Sibling.thy').write_text('DO NOT READ SIBLING',encoding='utf-8')
+            opened=[]
+            original=Path.read_text
+            def read(path,*args,**kwargs):
+                opened.append(path.name)
+                return original(path,*args,**kwargs)
+            with patch.object(Path,'read_text',read):
+                parts,meta=context.imported_references('section \\<open>Introduction\\<close>\ntheory Target imports Parent Other.Parent begin',root)
+            self.assertEqual(['Parent.thy','Grand.thy'],opened)
+            self.assertEqual(['helper','ancestor'],[s.name for s in parts])
+            self.assertNotIn('by simp',' '.join(s.text for s in parts))
+            self.assertTrue(all(s.origin for s in parts))
+            self.assertEqual(['Main','Other.Parent'],meta['unresolved_imports'])
+            self.assertTrue(all(s['masked_sha256'] for s in meta['sources']))
+            # Identical spans in different files must not collide.
+            copies=[context.Snippet('helper','lemma',0,20,'lemma helper: True sorry',origin=n)
+                    for n in ('A.thy','B.thy')]
+            _,metadata=context.retrieve(copies,query='helper',budget=500)
+            self.assertEqual(2,len(metadata['selected_snippets']))
+
     def test_active_scopes_and_annotated_definitions(self):
         prefix = ('theory T imports Main begin\ncontext fixes x :: nat assumes h: "x > 0" begin\n'
                   'definition\\<^marker>\\<open>tag important\\<close> op where "op = x"\n'
@@ -84,7 +117,7 @@ class DatasetTests(unittest.TestCase):
                 meta = row['metadata']['prompt_context']
                 target = next(s for s in meta['hol_light']['selected_snippets'] if s['name'] == row['hol_light_target_name'])
                 self.assertTrue(all(s['span'][0] <= target['span'][0] for s in meta['hol_light']['selected_snippets']))
-                self.assertTrue(all(s['span'][1] <= len(checked.prefix) for s in meta['isabelle']['selected_snippets']))
+                self.assertTrue(all(s['span'][1] <= len(checked.prefix) for s in meta['isabelle']['selected_snippets'] if not s.get('origin')))
                 self.assertNotIn(row['isabelle_target_name'], [s['name'] for s in meta['isabelle']['selected_snippets']
                     if s['kind'] in {'lemma', 'theorem', 'corollary', 'proposition'}])
 

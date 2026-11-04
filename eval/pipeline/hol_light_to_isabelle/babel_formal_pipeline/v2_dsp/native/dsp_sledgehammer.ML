@@ -35,10 +35,12 @@ fun reconstructions count (Sledgehammer.SH_Some (result, preplayed)) =
 (* Small, goal-driven hints from already available library facts. Keep normal
    fact selection (only=false); do not import theories or manufacture premises.
    Missing names are omitted, and no dataset/target names occur in this policy. *)
+fun search_goal proof = Logic.get_goal (Thm.prop_of (#goal (Proof.goal proof))) 1;
+
 fun fact_hints proof =
   let
     val ctxt = Proof.context_of proof;
-    val names = Term.add_const_names (Thm.prop_of (#goal (Proof.goal proof))) []
+    val names = Term.add_const_names (search_goal proof) []
       |> map Long_Name.base_name;
     fun has name = member (op =) names name;
     val wanted =
@@ -62,7 +64,7 @@ fun search report {provers, hammer_timeout, preplay_timeout} state =
                ("isar_proofs", "false"), ("max_proofs", "4")]
       @ (if null provers then [] else [("provers", space_implode " " provers)]);
     val params = Sledgehammer_Commands.default_params (Proof.theory_of proof) raw;
-    val goal_text = Syntax.string_of_term (Proof.context_of proof) (Thm.prop_of (#goal (Proof.goal proof)))
+    val goal_text = Syntax.string_of_term (Proof.context_of proof) (search_goal proof)
       |> YXML.parse_body |> XML.content_of;
     val initial =
       [("resolved_provers", space_implode " " (#provers params)),

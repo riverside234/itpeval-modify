@@ -1,3 +1,56 @@
+# Review of commit 4d53634: compactness search and bounded references
+
+The `compact_canon_qfree` p14 result advanced past the two previously failing set
+steps. It stopped at `compact_prop_instance` (sketch line 78), with three optional
+candidate timeouts and a real Sledgehammer timeout (42.431 seconds). The result
+contains one successful earlier Hammer reconstruction and one successful terminal
+repair; no terminal timeouts. There is no evidence here of a broken ATP install.
+
+The masked imported signature in
+`hol_dataset/aligned-isabelle-hl-main/afp/stmts/isabelle/Ground_FOL_Compactness.thy`
+shows that `compact_prop` requires a whole-set quantifier-free premise as well
+as finite-subset satisfiability. This signature and `qfree_formsubst` were absent
+from the old prompt. The sketch's local `qf_inst` is inside the finite-subset
+proof and is insufficient as a scoped whole-set fact at the later application.
+The oracle supports proving that condition; this is not a claim that the sketch's
+mathematical implication is false. The target's completed Isabelle proof was not
+read or added to the prompt.
+
+Implemented fixes:
+
+- Most-match retrieval v2 walks only explicit transitive imports with matching
+  headers in the masked AFP statement snapshot. It excludes the target theory,
+  unrelated files, scoped and unnamed helper declarations, and records origins,
+  hashes and unresolved imports. Named source dependencies are prioritized.
+  The total Isabelle reference cap stays at 8,000 characters; checker input and
+  imports are unchanged. Older v1 artifacts remain usable for saved-sketch tests.
+- Direct prompts advance to most-match v6 and Babel/Hundred p9. They require
+  all target-helper premises and concrete applications at the correct scope.
+  Draft instructions are unchanged; fresh records gain the improved reference.
+- Native p15 limits the optional heuristic portfolio to two step budgets per
+  gap, including its subsequent normalization/reconstruction rounds. It then
+  yields to bounded Hammer. Existing per-candidate and whole-target deadlines,
+  rollback, admission checks and target closure remain mandatory.
+- Goal diagnostics and goal-based hints use the pending first subgoal, following
+  Isabelle's [`Logic.get_goal` use in Sledgehammer](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/Tools/Sledgehammer/sledgehammer.ML).
+  Failure reports prefer that actual search state over a failed heuristic's
+  discarded simplified goal, while retaining the latter separately.
+
+Regression coverage includes transitive-only masked import retrieval, target and
+sibling exclusion, locale/unnamed theorem exclusion, provenance for overlapping
+spans, leading document headings, all-dataset context caps, the committed p14
+failure, and exact search-state diagnostics. Native controls additionally cover
+portfolio timeouts followed by real Hammer and the first-subgoal diagnostic.
+
+Validation: **194 offline tests passed; 33 native tests skipped pending the lab**.
+All 353 most-match candidates extract successfully within the context caps.
+Python 3.10 syntax and patch whitespace checks passed. Native Isabelle2026 is
+not installed on this workstation. No API calls or lab proof runs were made.
+Use the [focused retry](../../most_match_pipeline/README.md#review-of-commit-4d53634-compactness-premise-and-imported-references)
+with re-extraction; old records do not gain new imported signatures automatically.
+
+---
+
 # Review of commit ea7bb55: COMPACT_CANON_QFREE
 
 The committed most-match `Canonical_Models/compact_canon_qfree` direct sample

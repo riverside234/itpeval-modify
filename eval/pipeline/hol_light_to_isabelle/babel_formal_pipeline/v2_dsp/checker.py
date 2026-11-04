@@ -18,7 +18,7 @@ from .runtime import DspConfig
 
 ProofFailure = NativeFailure  # Preserve the old exception import for callers.
 
-CHECKER_VERSION = "dsp_isabelle2026_native_p14"
+CHECKER_VERSION = "dsp_isabelle2026_native_p15"
 HEURISTICS = (
     "by auto", "by simp", "by blast", "by fastforce", "by force", "by eval",
     "by presburger", "by sos", "by arith", "by linarith", "by (auto simp: field_simps)",
@@ -175,9 +175,11 @@ class Checker:
                 result["failed_obligation"] = failure_obligation(search["step_results"])
                 obligation = result["failed_obligation"]
                 if (obligation.get("mode") in {"hammer", "reconstruction"}
-                        and not obligation.get("goal_diagnostic")
                         and search.get("prover_settings", {}).get("goal_before_search")):
+                    if obligation.get("goal_diagnostic"):
+                        obligation["heuristic_goal_diagnostic"] = obligation["goal_diagnostic"]
                     obligation["goal_diagnostic"] = search["prover_settings"]["goal_before_search"][-4000:]
+                    obligation["goal_diagnostic_source"] = "native_sledgehammer_subgoal"
                 if obligation.get("preceding_command"):
                     message += (f"; after sketch line {obligation.get('preceding_line', '?')}: "
                                 + obligation["preceding_command"][:400])

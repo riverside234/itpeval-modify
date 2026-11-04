@@ -15,7 +15,7 @@ Completed Isabelle proof files are never read by extraction or prompt constructi
 The model receives the complete selected HOL statement/proof, the exact Isabelle oracle, and selected references:
 
 - HOL Light reference: **16,000 characters** by default. Select earlier helper statements and definitions, ranked by names used in the proof, identifier overlap and one dependency expansion. Keep the masked target statement for input validation; it is explicitly not a premise. Omit tactic programs and later source facts.
-- Isabelle reference: **8,000 characters** by default. Select relevant earlier declarations and preserve active theory/locale/context headers, parameters and assumptions. Never include target or later proof declarations.
+- Isabelle reference: **8,000 characters** by default. Select relevant earlier declarations and preserve active theory/locale/context headers, parameters and assumptions. Retrieval v2 also follows transitive imports available in the dataset's `afp/stmts/isabelle` snapshot and ranks their masked top-level declarations within the same cap. It never reads the selected target theory from that snapshot or searches unrelated sibling theories. Qualified or unavailable imports are recorded as unresolved, without guessing their basenames. No new verifier imports are added.
 - Select whole snippets. If required scope/target material exceeds the budget, extraction reports an error instead of truncating it. Optional oversized snippets are omitted.
 
 The caps include reference labels/separators. They are character counts, not estimated token counts, and exclude the selected proof, oracle, instructions and generated Draft. The largest selected source proof in this snapshot is about 30,000 characters. `isabelle_prompt_context` is the bounded model view; `isabelle_context_before_target` and `isabelle_theory_template` retain the full masked verifier context. Earlier masked helpers remain admitted background facts, consistent with the existing experiment.
@@ -174,6 +174,72 @@ Both modes support `--topic`, `--target-key`, `--limit`, `--samples`, and
 Use `--llm-config` for standalone generation and `--sketch-llm-config` for the
 runner to choose an API/vLLM profile. `--workers` controls native builds, not
 LLM request concurrency. Context failures are recorded before inference.
+
+### Review of commit 4d53634: compactness premise and imported references
+
+The p14 run passed the earlier set-representation and monotonicity steps. It
+failed at sketch line 78, `compact_prop_instance`: three optional candidates
+timed out, then Sledgehammer searched for 42.431 seconds and returned no proof.
+There were no terminal-method timeouts. One earlier search/reconstruction and
+one terminal-method repair succeeded. This is progress beyond the p13 failure,
+but the theorem still did not close.
+
+The available imported `Ground_FOL_Compactness.compact_prop` requires both
+finite-subset satisfiability and quantifier-freeness for the whole set. The model
+was not shown this signature. It proved quantifier-freeness only for a local
+finite-subset instance, then left the whole-set compactness application as an
+opaque search goal. The needed premise is derivable from the oracle and the
+substitution helper; it must be established in scope and supplied explicitly.
+The log does not establish that the old claim is false or that the ATP setup is
+broken.
+
+Changes:
+
+- Retrieval **v2** includes relevant masked statements from reachable imported
+  snapshot theories, with source paths/hashes and unresolved-import metadata.
+  Directly named helper statements get priority over incidental definitions.
+  Imported local-scope and unnamed theorems are excluded. The target, full
+  verifier template, and **8,000-character cap** remain unchanged. The selected
+  target proof is never read. Re-extract records to get these references; saved
+  v1 records remain valid for backend-only checks.
+- Direct prompt **v6** (shared Babel/Hundred p9) requires checking every target
+  helper premise, proving properties of transformed/whole sets at the point of
+  use, and applying the concrete imported result rather than asking search to
+  rediscover a substantial theorem. Draft prompt instructions are unchanged.
+- Checker **p15** gives optional heuristics a total allowance of twice
+  `step_timeout_s` per gap (20 seconds with this config), shared across that
+  gap's normalization/reconstruction rounds. Each candidate also retains its
+  individual limit. Timer/interruption overhead can exceed the nominal allowance.
+  Remaining whole-target time and the existing Hammer reserve still apply.
+- Failure reports prefer the actual first subgoal sent to Sledgehammer over a
+  discarded heuristic's transformed state. The old diagnostic is retained as
+  `heuristic_goal_diagnostic`. Native goal reporting no longer prints the whole
+  goal theorem, which can misleadingly look like `claim ==> claim`.
+
+Retry **only the failed theorem**, using a fresh record and output directory:
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+PIPE=eval.pipeline.hol_light_to_isabelle.most_match_pipeline
+CFG=eval/configs/hol_light_to_isabelle/v2_dsp_most_match_2026.example.json
+RUN=eval/results/hol_light_to_isabelle_v2/most-match/v2-dsp-isabelle2026/canonical-models-compact-canon-qfree/direct-p15
+
+python -m "$PIPE.extract_hol_light" --expected-root "$PWD" \
+  --topic Canonical_Models --target-key compact_canon_qfree \
+  --output "$RUN/records.jsonl"
+
+python -m "$PIPE.v2_dsp.run" --expected-root "$PWD" \
+  --config "$CFG" --records "$RUN/records.jsonl" --samples 1 --workers 1 \
+  --dsp-output "$RUN/inputs.jsonl" --sketch-output "$RUN/sketches.jsonl" \
+  --prove-output "$RUN/prove.jsonl" --output "$RUN/verified.jsonl"
+```
+
+Use your most-match `.local.json` for `CFG` if appropriate. This makes one new
+Sketch call and checks that theorem and its prerequisite context; it does not
+rerun the full preflight cohort. Add `--dry-run` to the second command to inspect
+the imported signatures and prompt before calling the model. The updated native
+adapter requires its cached infrastructure/import heaps to refresh once. Native
+compilation and theorem completion still require lab verification.
 
 ### Review of commit ea7bb55: compact_canon_qfree
 
