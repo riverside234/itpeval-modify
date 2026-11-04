@@ -18,7 +18,7 @@ from .runtime import DspConfig
 
 ProofFailure = NativeFailure  # Preserve the old exception import for callers.
 
-CHECKER_VERSION = "dsp_isabelle2026_native_p13"
+CHECKER_VERSION = "dsp_isabelle2026_native_p14"
 HEURISTICS = (
     "by auto", "by simp", "by blast", "by fastforce", "by force", "by eval",
     "by presburger", "by sos", "by arith", "by linarith", "by (auto simp: field_simps)",
@@ -65,6 +65,8 @@ def failure_obligation(steps: list[dict]) -> dict:
         if detail:
             detail["repair_of_command"] = last.get("command", "")[:2000]
             detail["repair_of_line"] = last.get("line")
+            if last.get("repair_reason"):
+                detail["repair_reason"] = last["repair_reason"]
             return detail
     result = {name: last[name] for name in ("mode", "line", "source_state", "command", "error", "timeout_scope") if name in last}
     for field, size in (("command", 2000), ("error", 4000)):
@@ -94,7 +96,10 @@ def failure_obligation(steps: list[dict]) -> dict:
 
 def search_summary(steps: list[dict]) -> dict:
     """Keep search coverage visible even when compact reports truncate attempts."""
-    result = {"candidate_timeouts": sum(s.get("timeout_scope") == "candidate" for s in steps)}
+    result = {
+        "candidate_timeouts": sum(s.get("timeout_scope") == "candidate" for s in steps),
+        "terminal_method_timeouts": sum(s.get("timeout_scope") == "terminal_method" for s in steps),
+    }
     for mode in ("heuristic", "normalization", "hammer", "reconstruction", "terminal_repair"):
         selected = [s for s in steps if s.get("mode") == mode]
         result[mode + "_attempts"] = len(selected)

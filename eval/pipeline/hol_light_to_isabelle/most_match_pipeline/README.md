@@ -175,6 +175,85 @@ Use `--llm-config` for standalone generation and `--sketch-llm-config` for the
 runner to choose an API/vLLM profile. `--workers` controls native builds, not
 LLM request concurrency. Context failures are recorded before inference.
 
+### Review of commit ea7bb55: compact_canon_qfree
+
+The `Canonical_Models/compact_canon_qfree` sample (HOL name `COMPACT_CANON_QFREE`)
+reached its proof and completed **two Sledgehammer searches/reconstructions**.
+Checker p13 also repaired one failed `by blast` at line 39. The final failure
+was another explicit `by blast`, at line 56, which hit the 10-second method
+budget after 10.464 seconds. This was a local method timeout; the logged whole
+verification took 89.053 seconds against a configured 1,800-second target budget.
+The result does not indicate a broken installation or unavailable ATPs.
+
+The sketch uses equivalent set comprehensions with different binder/conjunct
+orders. At line 39 it asks `blast` to transfer a semantic predicate between
+these representations; the trace shows it failing and native search recovering
+with `Collect_cong`. Later it gives `blast` a general monotonicity rule and large
+set expressions instead of first matching the representations and instantiating
+the rule. The later compactness step was never executed, so its success remains
+unknown.
+
+Checker **p14** handles a local timeout of a terminal `by` transactionally:
+restore the saved state, skip the heuristic portfolio, and run bounded native
+Sledgehammer/reconstruction. The replacement must close the original local
+obligation before execution continues. Partial effects on the proof state from
+the failed method are discarded; the original sketch remains in the result.
+Whole-target deadlines, external interrupts and timeouts in structural commands
+such as `apply` still abort. Missing source facts/methods and malformed Isar
+remain errors. There is no separate replay build.
+
+`search_summary` and batch `search_activity` now report
+`terminal_method_timeouts` separately from optional candidate timeouts.
+The original source attempt has `timeout_scope=terminal_method`; its repair has
+`repair_reason=method_timeout`. A failed repair reports the underlying search
+failure and original source line. Known optional heuristics that require absent
+`sos`, `norm_sum` or `norm_scaleR` support are skipped; source commands are never
+silently skipped.
+
+The direct prompt advances to `most_match_direct_sketch_v5` (shared Babel/Hundred
+p8). It calls for explicit helper instantiation, consistent local abbreviations,
+separate set equality/inclusion bridges, and correct `obtains` witness handling.
+The input context caps and oracle are unchanged. Draft prompts are unchanged.
+
+Regenerate and check **only this failed theorem** after syncing:
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+PIPE=eval.pipeline.hol_light_to_isabelle.most_match_pipeline
+CFG=eval/configs/hol_light_to_isabelle/v2_dsp_most_match_2026.example.json
+RUN=eval/results/hol_light_to_isabelle_v2/most-match/v2-dsp-isabelle2026/canonical-models-compact-canon-qfree/direct-p14
+
+python -m "$PIPE.extract_hol_light" --expected-root "$PWD" \
+  --topic Canonical_Models --target-key compact_canon_qfree \
+  --output "$RUN/records.jsonl"
+
+python -m "$PIPE.v2_dsp.run" --expected-root "$PWD" \
+  --config "$CFG" --records "$RUN/records.jsonl" --samples 1 --workers 1 \
+  --dsp-output "$RUN/inputs.jsonl" --sketch-output "$RUN/sketches.jsonl" \
+  --prove-output "$RUN/prove.jsonl" --output "$RUN/verified.jsonl"
+```
+
+Use your most-match `.local.json` for `CFG` if it contains different lab paths.
+Direct-to-Sketch remains the default. This makes one new Sketch call and checks
+only that theorem, including its prerequisite context/import setup. Old results
+are retained. Updated adapter hashes require the cached native/import heaps to
+be refreshed once. Add `--dry-run` to the runner to inspect its prompt first.
+
+To isolate the backend change without a model call, check the saved failing
+sketch with a separate output path:
+
+```bash
+OLD=eval/results/hol_light_to_isabelle_v2/most-match/v2-dsp-isabelle2026/canonical-models-compact-canon-qfree/direct/verified.jsonl
+python -m "$PIPE.v2_dsp.prove" --expected-root "$PWD" --config "$CFG" \
+  --input "$OLD" --workers 1 \
+  --prove-output "$RUN/saved-prove.jsonl" --output "$RUN/saved-verified.jsonl"
+```
+
+This is a normal Prove run on the saved sketch, not an additional verification
+stage. It tests recovery independently of the prompt change; it may still fail
+at a later obligation. Native compilation and theorem completion must be checked
+on the lab; offline tests do not establish them.
+
 ### Review of commit 852f31b: finite_subset_instance
 
 The committed direct result for `Canonical_Models/finite_subset_instance`

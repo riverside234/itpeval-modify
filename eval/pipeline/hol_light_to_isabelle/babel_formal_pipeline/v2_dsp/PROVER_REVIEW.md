@@ -1,3 +1,63 @@
+# Review of commit ea7bb55: COMPACT_CANON_QFREE
+
+The committed most-match `Canonical_Models/compact_canon_qfree` direct sample
+failed at sketch line 56, `using ps_mono cover psT by blast`, with a local
+10.464-second method timeout. Imports/context execution succeeded, two native
+Sledgehammer searches reconstructed proofs, and p13 repaired the earlier
+failed `by blast` at line 39. The target did not close. Its later compactness
+argument was not reached.
+
+The earlier failure compares two extensionally equal comprehensions under
+`satisfies`, with different guard orders. Its native reconstruction used
+`Collect_cong`. The later timeout combines a general monotonicity rule with
+large, differently written set arguments. Explicit instantiation and a separate
+set-representation bridge are preferable to unbounded logical search here.
+This diagnosis uses the saved source proof, oracle, masked reference, sketch
+and execution trace; no completed target Isabelle proof is supplied.
+
+Implemented in shared native checker **p14**:
+
+- A typed local terminal-method timeout restores the saved state and goes
+  directly to bounded native Hammer/reconstruction. It must close the same
+  obligation; no failed partial proof state or unproved fact is committed.
+- The timeout classification preserves the whole-target deadline and external
+  interrupts. Nonterminal source commands keep their fatal timeout policy.
+  Ordinary parse/name/type failures remain errors. Timeout text alone is never
+  used to authorize a repair.
+- Attempt records distinguish `timeout_scope=terminal_method` and repair
+  `repair_reason=method_timeout`; per-sample/batch summaries count terminal
+  method timeouts separately. Failed repair diagnostics retain the native
+  failure, source command and source line.
+- Optional `sos`/norm candidates are skipped if their required methods or facts
+  are absent from the current context. Source commands are not filtered.
+- Only direct prompts advance: shared Babel/Hundred p8 and most-match v5.
+  They require matching helper premises, consistent comprehensions, explicit
+  equality/inclusion bridges and witnesses for `obtains`. Draft prompts, model
+  settings, bounded context policy and default direct mode stay unchanged.
+
+The timeout path follows the pinned Isabelle2026
+[`Timeout.apply`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Concurrent/timeout.ML),
+which cancels its timer and distinguishes its own timeout from other interrupts.
+Optional method lookup uses the official
+[`Method.check_name`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Isar/method.ML).
+No new imports, target-specific facts, admissions or replay stage are added.
+
+Regression coverage includes the committed failure, current direct prompt with
+unchanged bounded input/oracle, and timeout/repair summary diagnostics. Opt-in
+native tests cover timeout after partial method progress, forced Hammer,
+following-command preservation, structural timeout rejection, set equality under
+an opaque predicate and explicit higher-order rule instantiation. ML fixtures
+also check whole-budget exhaustion and interrupt propagation.
+
+Validation: **192 offline tests passed; 32 native tests skipped pending the lab**.
+The shared native suite, most-match extraction/parallel/cache tests, CLI adapters
+and Hundred fake-transport check passed. Native Isabelle is not installed on
+this workstation; real proof success is pending lab verification. The [one-theorem retry](../../most_match_pipeline/README.md#review-of-commit-ea7bb55-compact_canon_qfree)
+regenerates just the failed target. A separate saved-sketch command can test the
+backend change without calling a model. Existing committed logs are unchanged.
+
+---
+
 # Review of commit 852f31b: most-match induction method failure
 
 The saved `Canonical_Models/finite_subset_instance` direct sample reached its

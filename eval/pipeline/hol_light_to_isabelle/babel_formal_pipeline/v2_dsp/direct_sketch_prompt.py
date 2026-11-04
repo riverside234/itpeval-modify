@@ -3,7 +3,7 @@ from ..prompt import Prompt
 from .input_contract import input_metadata, require_text
 from .sketch_prompt import ISABELLE_OUTPUT_RULES, ISABELLE_PROOF_REQUIREMENTS
 
-DIRECT_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_direct_p7"
+DIRECT_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_direct_p8"
 SYSTEM_PROMPT = (
     "You are a proof engineer fluent in HOL Light and Isabelle/HOL. Translate the "
     "selected completed HOL Light proof directly into an Isabelle proof, preserving "
@@ -48,6 +48,44 @@ DIRECT_PROOF_STATE_RULES = (
 )
 
 
+DIRECT_HELPER_RULES = (
+    "HELPER APPLICATIONS AND REPRESENTATION MATCHING\n"
+    "- Read each available helper's actual Isabelle statement before applying it. "
+    "Match its quantified variables, types, premises and conclusion to the "
+    "current step. Use a direct rule application with explicitly instantiated "
+    "premises when it already proves the claim; do not hand a general "
+    "higher-order rule and large set expressions to blast to discover the "
+    "instantiation. For a helper mono with premises U \\<subseteq> V and P V, "
+    "and matching facts sub and pV, the schematic pattern is "
+    "by (rule mono[OF sub pV]). Use actual available names and matching types.\n"
+    "- Reuse one local abbreviation for each set, function or interpretation. "
+    "Keep comprehension binder order and conjunct order consistent with the "
+    "helper being used. Equivalent expressions are not necessarily syntactically "
+    "identical: changing bound-variable order or swapping conjuncts inside a "
+    "set argument may block an otherwise direct rule application.\n"
+    "- If two set representations differ, prove their equality or the required "
+    "inclusion separately, then rewrite the argument of the surrounding "
+    "predicate with that fact. For instance, establish A = B before transferring "
+    "R A to R B. Use a small membership/extensionality argument or targeted "
+    "simplification for this bridge. blast alone does not rewrite arbitrary "
+    "opaque predicates by extensional equality of their set arguments. "
+    "Avoid unfolding a substantial semantic predicate just to change its set "
+    "argument; first normalize or rewrite that argument.\n"
+    "- Treat a source helper as a dependency, not a tactic to copy. Establish "
+    "only the needed mathematical instance if no supplied Isabelle helper "
+    "matches it. Keep this local claim narrowly scoped and supply its relevant "
+    "facts to a standalone sledgehammer gap. Do not guess imported theorem "
+    "names, and do not strengthen a local statement merely to imitate the "
+    "source helper's generality.\n"
+    "- For an obtains declaration, construct a witness and all required "
+    "properties, then discharge the resulting thesis with the provided "
+    "elimination premise (usually that). Choosing a member of a set needs "
+    "nonemptiness; handle an empty-set case when the available helper requires "
+    "a member. For subset or monotonicity steps, normalize both set arguments "
+    "before applying the helper, instead of repeatedly invoking broad automation."
+)
+
+
 def build_direct_sketch_prompt(record: dict, *, isabelle_context: str | None = None,
                                partial_context: bool = False) -> Prompt:
     input_metadata(record, "hol-light-proof")
@@ -84,5 +122,6 @@ def build_direct_sketch_prompt(record: dict, *, isabelle_context: str | None = N
         "the same name exists in Isabelle.",
         ISABELLE_PROOF_REQUIREMENTS,
         DIRECT_PROOF_STATE_RULES,
+        DIRECT_HELPER_RULES,
     ])
     return Prompt(SYSTEM_PROMPT, user, DIRECT_PROMPT_VERSION)

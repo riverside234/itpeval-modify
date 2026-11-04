@@ -113,6 +113,14 @@ local
         (fn () => Time.sleep (Time.fromSeconds 2)) ()) ();
       val _ = expect "optional method timeout is a candidate failure" true
         (case local_timeout of Exn.Exn (DSP_Native.Candidate_Timeout _) => true | _ => false);
+      val terminal_timeout = Exn.capture (fn () => DSP_Native.terminal_timeout (K 10.0) 0.01
+        (fn () => Time.sleep (Time.fromSeconds 2)) ()) ();
+      val _ = expect "terminal by timeout is separately classified" true
+        (case terminal_timeout of Exn.Exn (DSP_Native.Terminal_Timeout _) => true | _ => false);
+      val _ = expect "unavailable norm heuristic is skipped in HOL-only context" false
+        (DSP_Native.heuristic_available pair_goal "by (simp only: case_prod_beta' norm_sum)");
+      val _ = expect "ordinary heuristic remains available" true
+        (DSP_Native.heuristic_available pair_goal "by simp");
       val budget_left = Unsynchronized.ref 10.0;
       val exhausted = Exn.capture (fn () => DSP_Native.candidate_timeout (fn () => !budget_left) 0.1
         (fn () => (budget_left := 0.0; raise Timeout.TIMEOUT Time.zeroTime)) ()) ();
@@ -128,6 +136,15 @@ local
         (fn () => raise Exn.Interrupt_Break) ()) ();
       val _ = expect "external interrupt is never a retryable timeout" true
         (case interrupted of Exn.Exn exn => Exn.is_interrupt_proper exn | _ => false);
+      val _ = budget_left := 10.0;
+      val terminal_exhausted = Exn.capture (fn () => DSP_Native.terminal_timeout (fn () => !budget_left) 0.1
+        (fn () => (budget_left := 0.0; raise Timeout.TIMEOUT Time.zeroTime)) ()) ();
+      val _ = expect "whole-target timeout cannot become terminal repair" true
+        (case terminal_exhausted of Exn.Exn (DSP_Native.Failure ("timeout", _)) => true | _ => false);
+      val terminal_interrupted = Exn.capture (fn () => DSP_Native.terminal_timeout (K 10.0) 1.0
+        (fn () => raise Exn.Interrupt_Break) ()) ();
+      val _ = expect "terminal repair never catches external interrupts" true
+        (case terminal_interrupted of Exn.Exn exn => Exn.is_interrupt_proper exn | _ => false);
       fun rejected source =
         (case Exn.capture DSP_Native.check_proof_tokens
             (Token.explode keywords Position.start source) of

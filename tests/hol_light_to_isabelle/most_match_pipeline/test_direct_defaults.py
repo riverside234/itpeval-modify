@@ -123,3 +123,71 @@ class DirectDefaultTests(unittest.TestCase):
         self.assertEqual(1, summary['terminal_repair_successes'])
         self.assertEqual(1, summary['samples_with_gap_filling'])
         self.assertEqual(0, summary['sledgehammer_calls'])
+
+
+class CompactCanonRegressionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.row = read_jsonl(repo_path(
+            'eval/results/hol_light_to_isabelle_v2/most-match/v2-dsp-isabelle2026/'
+            'canonical-models-compact-canon-qfree/direct/verified.jsonl'))[0]
+
+    def test_committed_timeout_occurs_after_successful_hammer_and_repair(self):
+        row = self.row
+        self.assertEqual('compact_canon_qfree', row['target_key'])
+        self.assertEqual('timeout', row['failure_category'])
+        self.assertEqual('56', row['failed_obligation']['line'])
+        self.assertEqual('by blast', row['failed_obligation']['command'])
+        self.assertEqual(2, row['search_summary']['hammer_successes'])
+        self.assertEqual(2, row['search_summary']['reconstruction_successes'])
+        self.assertEqual(1, row['search_summary']['terminal_repair_successes'])
+        last = row['step_results'][-1]
+        self.assertEqual('search', last['mode'])
+        self.assertGreaterEqual(float(last['duration_seconds']), 10)
+        self.assertIn('Timeout after', last['error'])
+        earlier = next(s for s in row['step_results'] if s.get('line')=='39'
+                       and s['mode']=='search' and not s['success'])
+        self.assertIn('Failed to apply initial proof method', earlier['error'])
+        self.assertIn('satisfies M', earlier['error'])
+
+    def test_direct_prompt_preserves_bounded_inputs_and_adds_general_helper_guidance(self):
+        raw = extract_records(topic='Canonical_Models', target_key='compact_canon_qfree')[0]
+        record = export_dsp.export_record(raw, sketch_source=MODE)
+        prompt = build_direct_sketch_prompt(record)
+        self.assertEqual('most_match_direct_sketch_v5', prompt.version)
+        self.assertIn(raw['hol_light_proof'], prompt.user_prompt)
+        self.assertIn(raw['isabelle_prompt_context'], prompt.user_prompt)
+        self.assertNotIn(raw['isabelle_theory_template'], prompt.user_prompt)
+        self.assertLessEqual(len(raw['isabelle_prompt_context']), 8000)
+        for phrase in ('mono[OF sub pV]', 'comprehension binder order',
+                       'prove their equality', 'opaque predicates', 'obtains declaration'):
+            self.assertIn(phrase, prompt.user_prompt)
+        self.assertEqual(self.row['hol_light_proof'], raw['hol_light_proof'])
+        self.assertEqual(self.row['isabelle_statement'], raw['isabelle_statement'])
+        draft = build_sketch_prompt(export_dsp.export_record({**raw, 'draft':'Use finite satisfiability.'}))
+        self.assertNotIn('HELPER APPLICATIONS AND REPRESENTATION MATCHING', draft.user_prompt)
+        self.assertEqual('most_match_sketch_v3', draft.version)
+
+    def test_terminal_timeout_metrics_and_failed_repair_keep_actual_search_error(self):
+        original = dict(mode='search', success=False, source_state='9', line='56',
+                        command='by blast', error='Timeout after 10s', timeout_scope='terminal_method')
+        hammer = dict(mode='hammer', success=False, source_state='9', line='0',
+                      command='native Sledgehammer', error='no executable reconstruction')
+        repair = dict(mode='terminal_repair', success=False, source_state='9', line='56',
+                      command='by blast', error='no executable reconstruction', repair_reason='method_timeout')
+        steps = [original, hammer, repair]
+        stats = search_summary(steps)
+        self.assertEqual(1, stats['terminal_method_timeouts'])
+        self.assertEqual(0, stats['candidate_timeouts'])
+        self.assertEqual(0, stats['terminal_repair_successes'])
+        failure = failure_obligation(steps)
+        self.assertEqual('hammer', failure['mode'])
+        self.assertEqual('no executable reconstruction', failure['error'])
+        self.assertEqual('method_timeout', failure['repair_reason'])
+        self.assertEqual('56', failure['repair_of_line'])
+        row = {**self.row, 'step_results':steps}
+        summary = summarize_results([row], mode=MODE)
+        self.assertEqual(0, summary['verified_samples'])
+        self.assertEqual(1, summary['search_activity']['terminal_method_timeouts'])
+        self.assertEqual(1, summary['search_activity']['sledgehammer_calls'])
+        self.assertEqual(0, search_summary(self.row['step_results'])['terminal_method_timeouts'])

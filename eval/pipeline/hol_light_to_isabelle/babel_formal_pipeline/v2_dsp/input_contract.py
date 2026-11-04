@@ -250,6 +250,8 @@ def summarize_results(records: list[dict], *, mode: str, expected=None, expected
         "heuristic_attempts": sum(s.get("mode") == "heuristic" for sample in steps for s in sample),
         "sledgehammer_calls": sum(s.get("mode") == "hammer" for sample in steps for s in sample),
         "reconstruction_attempts": sum(s.get("mode") == "reconstruction" for sample in steps for s in sample),
+        "terminal_method_timeouts": sum(s.get("timeout_scope") == "terminal_method"
+                                       for sample in steps for s in sample),
         "terminal_repair_attempts": sum(s.get("mode") == "terminal_repair" for sample in steps for s in sample),
         "terminal_repair_successes": sum(s.get("mode") == "terminal_repair" and bool(s.get("success"))
                                          for sample in steps for s in sample),

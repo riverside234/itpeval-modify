@@ -6,6 +6,7 @@ struct
 
 exception Failure of string * string;
 exception Candidate_Timeout of Time.time;
+exception Terminal_Timeout of Time.time;
 val allowed = space_explode " "
   "proof qed by apply apply_end done prefer defer back supply using unfolding have show thus hence assume presume fix obtain guess let note from with then next case moreover ultimately also finally interpret include including write consider define subgoal { } . ..";
 
@@ -31,7 +32,7 @@ fun checked_timeout seconds f arg =
   end;
 
 (* Optional methods run transactionally from the saved proof state. A local
-   timeout rejects only that candidate; required source commands still use
+   timeout rejects only that candidate; structural source commands still use
    checked_timeout and abort. Only Timeout.TIMEOUT is converted: external
    interrupts and an exhausted whole-target budget must never become retries. *)
 fun candidate_timeout remaining seconds f arg =
@@ -41,6 +42,27 @@ fun candidate_timeout remaining seconds f arg =
       if remaining () < 0.001 then fail "timeout" "whole-target deadline exceeded"
       else raise Candidate_Timeout elapsed
   end;
+
+(* A terminal by method is also transactional. Keep its timeout distinct from
+   optional candidates and catch it only at the proof_step repair boundary. *)
+fun terminal_timeout remaining seconds f arg =
+  candidate_timeout remaining seconds f arg
+    handle Candidate_Timeout elapsed => raise Terminal_Timeout elapsed;
+
+(* Avoid known optional candidates whose methods/facts are absent from imports.
+   Source commands are never filtered; missing source names remain errors. *)
+fun heuristic_available state command =
+  let
+    val ctxt = Toplevel.context_of state;
+    val (methods, facts) =
+      (case command of
+        "by sos" => (["sos"], [])
+      | "by (simp only: case_prod_beta' norm_sum)" => ([], ["case_prod_beta'", "norm_sum"])
+      | "by (simp only: norm_scaleR; metis abs_of_nonneg mult_right_mono mult.commute)" =>
+          ([], ["norm_scaleR", "abs_of_nonneg", "mult_right_mono", "mult.commute"])
+      | _ => ([], []));
+  in forall (fn name => can (Method.check_name ctxt) (name, Position.none)) methods andalso
+     forall (can (Proof_Context.get_thms ctxt)) facts end;
 
 (* Inspect decoded Isabelle names, not their surface spelling. Quoting or
    qualifying a method must not bypass the no-ML/no-admission policy. *)
@@ -78,7 +100,8 @@ fun elem name attrs body = XML.Elem ((name, attrs), body);
 fun clean value = XML.content_of (YXML.parse_body value);
 fun text name value = elem name [] [XML.Text (clean value)];
 (* Retry only ordinary terminal-method failure. Parse/name/type errors, rejected
-   commands, timeouts, interrupts and Isar structural errors remain fatal. *)
+   commands, interrupts and Isar structural errors remain fatal. Local terminal
+   timeouts take the separate typed Terminal_Timeout path, never text matching. *)
 fun recoverable_terminal_error message =
   exists (fn prefix => String.isPrefix prefix (clean message))
     ["Failed to apply initial proof method", "Failed to apply terminal proof method",
@@ -175,9 +198,11 @@ fun run driver_theory request_file result_file =
         val success = (case result of Exn.Res _ => true | _ => false);
         val error_message = (case result of
             Exn.Exn (Candidate_Timeout elapsed) => Timeout.message elapsed
+          | Exn.Exn (Terminal_Timeout elapsed) => Timeout.message elapsed
           | Exn.Exn exn => Runtime.exn_message exn | _ => "");
         val timeout_attrs = (case result of
             Exn.Exn (Candidate_Timeout _) => [("timeout_scope", "candidate")]
+          | Exn.Exn (Terminal_Timeout _) => [("timeout_scope", "terminal_method")]
           | _ => []);
         val _ = last_error := error_message;
         val _ = record_attempt mode command line source_state started success error_message timeout_attrs;
@@ -185,6 +210,7 @@ fun run driver_theory request_file result_file =
         (case result of
           Exn.Res state => SOME state
         | Exn.Exn (Candidate_Timeout _) => NONE
+        | Exn.Exn (exn as Terminal_Timeout _) => Exn.reraise exn
         | Exn.Exn (Failure ("timeout", message)) => fail "timeout" message
         | Exn.Exn (Timeout.TIMEOUT _) => fail "timeout" "native operation timed out; isolated job aborted"
         | Exn.Exn DSP_Sledgehammer.Hammer_Timeout => fail "timeout" "native Sledgehammer timed out"
@@ -196,10 +222,13 @@ fun run driver_theory request_file result_file =
         val tr = transition state span;
         val command = source_text span;
         val line = the_default 1 (Position.line_of (Toplevel.pos_of tr));
+        val run_command =
+          if mode = "search" andalso Toplevel.name_of tr = "by" andalso Toplevel.is_proof state
+          then terminal_timeout remaining step_budget
+          else bounded (if mode = "context" then context_budget else step_budget);
       in
         (case attempt mode command line
-          (fn () => bounded (if mode = "context" then context_budget else step_budget)
-            (Toplevel.command_exception tr) state) of
+          (fn () => run_command (Toplevel.command_exception tr) state) of
           SOME next => (state_serial := !state_serial + 1; next)
         | NONE => fail (!stage) ("failed command: " ^ command ^ "\n" ^ !last_error))
       end;
@@ -237,6 +266,8 @@ fun run driver_theory request_file result_file =
       | choose mode allow_partial state (proof :: rest) =
           if mode = "heuristic" andalso remaining () <= hammer_reserve + step_budget
           then NONE
+          else if mode = "heuristic" andalso not (heuristic_available state proof)
+          then choose mode allow_partial state rest
           else (case candidate mode allow_partial state proof of SOME next => SOME (proof, next)
             | NONE => choose mode allow_partial state rest);
     fun normalize_for_hammer state =
@@ -246,7 +277,7 @@ fun run driver_theory request_file result_file =
            apply also consumes chained facts normally, without losing their premises. *)
         choose "normalization" false state ["apply (simp only: case_prod_beta')"]
       else NONE;
-    fun gap initial =
+    fun gap try_heuristics initial =
       let
         val _ = Proof.assert_backward (Toplevel.proof_of initial);
         fun solve state chunks =
@@ -264,7 +295,7 @@ fun run driver_theory request_file result_file =
                   SOME selected => continue selected
                 | NONE => fail "incomplete_obligation" "could not finish the solved obligation")
               else
-                (case choose "heuristic" false state (values nodes "heuristics") of
+                (case choose "heuristic" false state (if try_heuristics then values nodes "heuristics" else []) of
                   SOME selected => continue selected
                 | NONE =>
                   (case normalize_for_hammer state of
@@ -306,25 +337,25 @@ fun run driver_theory request_file result_file =
       end;
     fun proof_step span (state, chunks) =
       if check_proof_span span then
-        let val (proof, next) = gap state
+        let val (proof, next) = gap true state
         in (ensure_real next, chunks @ [proof ^ "\n"]) end
       else
         let
           val tr = transition state span;
           val command = source_text span;
           val attempted = Exn.capture (fn () => ensure_real (execute "search" state span)) ();
-          fun repair () =
+          fun repair reason try_heuristics =
             let
               val started = Timer.startRealTimer ();
               val source_state = !state_serial;
               (* Immutable saved state: discard all progress from the failed by.
                  gap must close this exact obligation before the next source span. *)
-              val outcome = Exn.capture gap state;
+              val outcome = Exn.capture (gap try_heuristics) state;
               val success = (case outcome of Exn.Res _ => true | _ => false);
               val message = (case outcome of Exn.Exn exn => Runtime.exn_message exn | _ => "");
               val _ = record_attempt "terminal_repair" command
                 (the_default 1 (Position.line_of (Toplevel.pos_of tr)))
-                source_state started success message [];
+                source_state started success message [("repair_reason", reason)];
               val (proof, next) = Exn.release outcome;
             in (ensure_real next, chunks @ [proof ^ "\n"]) end;
         in
@@ -333,7 +364,11 @@ fun run driver_theory request_file result_file =
           | Exn.Exn (exn as Failure ("sketch_step_failure", _)) =>
               if Toplevel.name_of tr = "by" andalso Toplevel.is_proof state andalso
                  recoverable_terminal_error (!last_error)
-              then repair () else Exn.reraise exn
+              then repair "method_failure" true else Exn.reraise exn
+          | Exn.Exn (Terminal_Timeout _) =>
+              (* Do not retry the expensive source method or another heuristic
+                 portfolio: give native Hammer the remaining bounded opportunity. *)
+              repair "method_timeout" false
           | Exn.Exn exn => Exn.reraise exn)
         end;
     fun work () =

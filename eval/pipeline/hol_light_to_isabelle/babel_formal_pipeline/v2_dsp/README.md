@@ -1,5 +1,14 @@
 # Isabelle2026 native DSP backend (default)
 
+Native checker p14 extends terminal-method recovery to local `by` timeouts.
+It discards the timed-out attempt, skips optional heuristics for that repair,
+and runs bounded Sledgehammer from the original proof state. Structural-command
+and whole-target timeouts still fail, and external interrupts propagate.
+The original sketch is retained; only successfully executed replacements enter
+the completed proof. `terminal_method_timeouts` and `repair_reason` distinguish
+these events from candidate timeouts and ordinary method failures.
+See the [focused compact_canon_qfree retry](../../most_match_pipeline/README.md#review-of-commit-ea7bb55-compact_canon_qfree).
+
 `v2_dsp/` is the default for Babel Formal, Hundred Theorems and most-match. The original
 DSP/PISA/Isabelle2021 implementation is preserved separately in
 [`v2_dsp_pisa/`](../v2_dsp_pisa/README.md), including its copied upstream checker
@@ -21,11 +30,12 @@ complete target closure, an admissible completed proof, the matching request
 identity, and a successful native process exit. Sledgehammer's internal preplay
 is still part of proof search; it is not a second whole-proof verification stage.
 
-Checker p13 also tries bounded local search when a terminal `by` command fails
+Since p13, the checker also tries bounded local search when a terminal `by` command fails
 with an ordinary method-application or incomplete-proof error. It starts from
 the unchanged saved state and must close that local obligation before continuing.
-Syntax/type/name errors, structural failures, rejected methods, timeouts and
-interrupts are not repaired. Original commands and checked replacements remain
+Syntax/type/name errors, structural failures, rejected methods, nonterminal
+source-command timeouts, whole-target deadlines and interrupts are not repaired.
+Local terminal-method timeouts use the p14 recovery policy above. Original commands and checked replacements remain
 traceable; `terminal_repair_attempts` / `terminal_repair_successes` distinguish
 this path from explicit `sledgehammer` gaps. The completed proof contains only
 the successful replacement. See the [most-match failure review and focused retry](../../most_match_pipeline/README.md#review-of-commit-852f31b-finite_subset_instance).

@@ -125,10 +125,69 @@ qed'''
         self.assertNotIn('dsp_regression_delay', result['isabelle_proof'])
         self.assertNotIn('apply (rule conjI)', result['isabelle_proof'])
 
+    def test_terminal_timeout_rolls_back_partial_progress_and_reaches_hammer(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import timeout_hammer_case
+        config = replace(self.config, step_timeout_s=0.1, provers=('simp',))
+        row = {**timeout_hammer_case(config).record,
+               'isabelle_sketch':'by (rule conjI, dsp_regression_delay)'}
+        result = Checker(config).check(row, backend_metadata=self.backend)
+        self.assertTrue(result['verified'], result['verify_error'])
+        stats = result['search_summary']
+        self.assertEqual(1, stats['terminal_method_timeouts'])
+        self.assertEqual(0, stats['candidate_timeouts'])
+        self.assertEqual(0, stats['heuristic_attempts'])
+        self.assertEqual(1, stats['terminal_repair_successes'])
+        self.assertEqual(1, stats['hammer_successes'])
+        source = next(s for s in result['step_results'] if s.get('timeout_scope')=='terminal_method')
+        hammer = next(s for s in result['step_results'] if s['mode']=='hammer')
+        repair = next(s for s in result['step_results'] if s['mode']=='terminal_repair')
+        self.assertEqual(source['source_state'], hammer['source_state'])
+        self.assertEqual('method_timeout', repair['repair_reason'])
+        self.assertNotIn('dsp_regression_delay', result['isabelle_proof'])
+        self.assertNotIn('rule conjI', result['isabelle_proof'])
+        self.assertEqual(row['isabelle_sketch'], result['isabelle_sketch'])
+
+    def test_terminal_timeout_repair_preserves_following_source_commands(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import timeout_hammer_case
+        config = replace(self.config, step_timeout_s=0.1, provers=('simp',))
+        row = {**timeout_hammer_case(config).record, 'isabelle_sketch':
+               'proof -\n have h: True by dsp_regression_delay\n show ?thesis using h by simp\nqed'}
+        result = Checker(config).check(row, backend_metadata=self.backend)
+        self.assertTrue(result['verified'], result['verify_error'])
+        self.assertEqual(1, result['search_summary']['terminal_repair_successes'])
+        self.assertIn('show ?thesis using h by simp', result['isabelle_proof'])
+        self.assertNotIn('dsp_regression_delay', result['isabelle_proof'])
+
+    def test_set_argument_bridge_and_instantiated_helper_use_no_search(self):
+        goal = (r"\<And>F::nat set \<Rightarrow> bool. \<And>A P Q. "
+                r"F {x\<in>A. P x \<and> Q x} \<Longrightarrow> F {x\<in>A. Q x \<and> P x}")
+        proof = r'''proof -
+  fix F :: "nat set \<Rightarrow> bool" and A :: "nat set" and P Q :: "nat \<Rightarrow> bool"
+  assume h: "F {x\<in>A. P x \<and> Q x}"
+  have eq: "{x\<in>A. P x \<and> Q x} = {x\<in>A. Q x \<and> P x}" by auto
+  show "F {x\<in>A. Q x \<and> P x}" using h by (simp only: eq)
+qed'''
+        goal2 = (r"\<And>F::nat set \<Rightarrow> bool. \<And>A B. "
+                 r"(\<And>X Y. X \<subseteq> Y \<Longrightarrow> F Y \<Longrightarrow> F X) \<Longrightarrow> "
+                 r"A \<subseteq> B \<Longrightarrow> F B \<Longrightarrow> F A")
+        proof2 = r'''proof -
+  fix F :: "nat set \<Rightarrow> bool" and A B :: "nat set"
+  assume mono: "\<And>X Y. X \<subseteq> Y \<Longrightarrow> F Y \<Longrightarrow> F X"
+    and sub: "A \<subseteq> B" and fb: "F B"
+  show "F A" by (rule mono[OF sub fb])
+qed'''
+        for conclusion, body in ((goal,proof),(goal2,proof2)):
+            with self.subTest(conclusion=conclusion):
+                result = Checker(self.config).check(control_record(body, conclusion=conclusion),
+                                                    backend_metadata=self.backend)
+                self.assertTrue(result['verified'], result['verify_error'])
+                self.assertEqual(0, result['search_summary']['terminal_repair_attempts'])
+                self.assertEqual(0, result['search_summary']['hammer_attempts'])
+
     def test_required_source_command_timeout_still_aborts(self):
         from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import timeout_hammer_case
         config = replace(self.config, step_timeout_s=0.1)
-        row = {**timeout_hammer_case(config).record, 'isabelle_sketch':'by dsp_regression_delay'}
+        row = {**timeout_hammer_case(config).record, 'isabelle_sketch':'proof -\n show ?thesis\n apply dsp_regression_delay\n done\nqed'}
         result = Checker(config).check(row, backend_metadata=self.backend)
         self.assertFalse(result['verified'])
         self.assertEqual('timeout', result['failure_category'])
