@@ -240,6 +240,8 @@ class Report:
             row["performance"] = metrics
         if result.get("failed_obligation"):
             row["failed_obligation"] = result["failed_obligation"]
+        if result.get("search_summary"):
+            row["search_summary"] = result["search_summary"]
         if payload.get("target") is not None:
             row["target"] = list(payload["target"])
         if row["status"] == "unavailable_context":

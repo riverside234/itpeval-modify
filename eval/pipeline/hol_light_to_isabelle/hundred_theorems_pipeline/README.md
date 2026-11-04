@@ -205,17 +205,16 @@ and inference profile. Export/Sketch/prove/final flags match Babel's runner.
 `--skip-sketch` runs the native prover on saved Sketches. `--skip-prove` was removed.
 `verified` reports native checked target completion; there is no second proof verification step.
 
-## rsum_bound failure-only retry (commit 6300569)
+## rsum_bound retry and general timeout/Sledgehammer regressions
 
-Both committed `rsum_bound` sketches loaded their original masked context and
-then timed out at the nonnegative scaling bound. The native prover now adds
-bounded norm/order/nonlinear arithmetic candidates, and both sketch prompts ask
-for explicit normalization and sign conditions. Hundred Theorems batch jobs also
-reuse heaps containing exactly their original imports; the first build prepares
-the heap, and later jobs reuse it. This includes single-worker runs. Batch CLI
-memory admission defaults to 12 GiB per worker (not an OS limit).
-
-Rerun only the two failed searches with their unchanged saved sketches:
+The latest retry (`20261103T232010Z-e2f73e8b`) passed the scaling step but stopped
+at the finite-sum triangle inequality: an optional `metis` timeout incorrectly
+aborted the job before Sledgehammer. The shared native runner now retries from
+the saved state after a candidate timeout and reserves time for Sledgehammer.
+This applies to all proof gaps in all three native dataset pipelines. Required
+source commands, interrupts, target deadlines and proof-closure checks stay strict.
+General sum rules now precede expensive search, and stale Hammer settings from
+previous gaps are cleared. No target-specific completed proof is supplied.
 
 ```bash
 cd /data/not_backed_up/yxu209/itpeval-modify
@@ -224,17 +223,32 @@ python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.r
   --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
 ```
 
-`--plan-only` previews the two tests. This command makes no LLM calls and skips
-previously successful standalone context and backend-control tests. It performs
-required setup, then executes each failed proof in its original masked context.
-Proof failures still require successful native target closure to turn into passes.
-The command exits nonzero if either search fails.
+`--plan-only` previews four focused proof checks:
+
+- A general candidate-timeout-to-Sledgehammer regression on a conjunction goal,
+  requiring discarded partial progress, real Hammer reconstruction and closure.
+- Both previously failed, unchanged saved `rsum_bound` sketches.
+- The failed triangle obligation isolated in the original masked context,
+  with heuristics disabled so Sledgehammer must actually be exercised.
+
+No LLM calls, standalone context tests, broad previously passed capability tests,
+full native fixture or separate replay. Required setup and import heaps still
+run. Overall OK requires all four checks; a standalone probe cannot make a failed
+full sketch pass. The command exits nonzero if any check fails.
 
 The six compact report files are pushable under
 `eval/preflight_results/isabelle2026-rsum-bound/<timestamp>/`; full work files
-remain ignored. `failed_obligation` and timing/RSS metrics are retained in the
-compact report. See [diagnosis and limitations](../babel_formal_pipeline/v2_dsp/PROVER_REVIEW.md).
-Native success and the cache speedup must be measured on the lab installation.
+remain ignored. `search_summary` records Hammer attempts/successes and candidate
+timeouts even when detailed traces are shortened. `failed_obligation` retains
+the current source line and goal. See the
+[diagnosis and limitations](../babel_formal_pipeline/v2_dsp/PROVER_REVIEW.md).
+
+Hundred Theorems jobs reuse heaps containing exactly their original imports,
+including single-worker runs. The latest report measured worker startup at
+16-18 seconds versus 273-306 seconds before caching; the one-time import heap
+build took 194 seconds. A changed native adapter triggers a fresh heap build.
+Batch admission defaults to 12 GiB per worker (not an OS limit). Native success
+for this fix still needs the lab run.
 
 ## Batch runs and interpretation
 

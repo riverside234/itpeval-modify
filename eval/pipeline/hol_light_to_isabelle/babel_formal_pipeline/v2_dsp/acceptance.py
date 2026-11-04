@@ -29,6 +29,27 @@ class ProofCase:
     min_reconstructions: int = 0
     require_apply: bool = False
     candidate: str | None = None
+    require_candidate_timeout: bool = False
+
+
+def timeout_hammer_case(config: DspConfig) -> ProofCase:
+    """General regression: discard partial candidate progress and then run Hammer.
+
+    This method is defined only in the trusted test prefix, never in an LLM
+    proof. Its finite sleep exceeds the candidate limit; the worker must record
+    that timeout and prove the original conjunction through native Sledgehammer.
+    """
+    delay = config.step_timeout_s + 2
+    context = (
+        r"method_setup dsp_regression_delay = \<open>" + "\n"
+        "  Scan.succeed (fn _ => SIMPLE_METHOD (fn st =>\n"
+        f"    (Time.sleep (Time.fromReal {delay:.6f}); all_tac st)))\n"
+        + r"\<close>" + "\n"
+    )
+    row = control_record("sledgehammer", conclusion=r"True \<and> True", extra_context=context)
+    return ProofCase("candidate_timeout_then_hammer", row, provers=("simp",),
+        hammer_kind="native_tactic", min_reconstructions=1,
+        candidate="apply (rule conjI)\n by dsp_regression_delay", require_candidate_timeout=True)
 
 
 def proof_cases() -> list[ProofCase]:
@@ -164,7 +185,15 @@ def case_problems(case: ProofCase, result: dict) -> list[str]:
         errors.append("missing successful partial/complete reconstructions")
     if case.require_apply and not any(s.get("command", "").lstrip().startswith("apply") for s in recon):
         errors.append("multi-subgoal reconstruction did not execute apply")
-    if case.candidate and not any(s.get("success") and s.get("command") == case.candidate for s in steps):
+    if case.require_candidate_timeout:
+        timed = [s for s in steps if s.get("command") == case.candidate
+                 and not s.get("success") and s.get("timeout_scope") == "candidate"]
+        if not timed:
+            errors.append("injected candidate did not hit its local timeout")
+        elif not any(s.get("mode") == "hammer" and s.get("success")
+                     and s.get("source_state") == timed[-1].get("source_state") for s in steps):
+            errors.append("Sledgehammer did not run from the timed-out candidate's saved state")
+    elif case.candidate and not any(s.get("success") and s.get("command") == case.candidate for s in steps):
         errors.append("injected reconstruction was not executed")
     settings = result.get("prover_settings", {})
     if case.hammer_kind:

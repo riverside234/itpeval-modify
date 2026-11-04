@@ -18,16 +18,21 @@ from .runtime import DspConfig
 
 ProofFailure = NativeFailure  # Preserve the old exception import for callers.
 
-CHECKER_VERSION = "dsp_isabelle2026_native_p10"
+CHECKER_VERSION = "dsp_isabelle2026_native_p11"
 HEURISTICS = (
     "by auto", "by simp", "by blast", "by fastforce", "by force", "by eval",
     "by presburger", "by sos", "by arith", "by linarith", "by (auto simp: field_simps)",
-    # Products of two variable terms are nonlinear. Normalize scalar norms while
-    # retaining the chained sign/bound facts for the monotonicity reconstruction.
-    # These are general library rules, not facts from the selected target theory.
-    "by (simp only: norm_scaleR; metis abs_of_nonneg mult_right_mono mult.commute)",
+    # Direct library rules precede expensive general search. Expand pair binders
+    # without simplifying norm(scaleR ...) before matching the triangle rule.
+    "by (simp only: case_prod_beta'; rule norm_sum)",
+    "by (simp only: case_prod_beta'; intro sum_mono; force)",
+    "by (simp add: case_prod_beta' sum_distrib_left[symmetric] sum_distrib_right[symmetric])",
+    # Products of variable terms need order rules or nonlinear arithmetic. Keep
+    # the more expensive metis fallback last; a candidate timeout is recoverable.
+    # No selected-target fact or completed Isabelle proof is supplied here.
     "by (auto simp: mult.commute intro: mult_left_mono mult_right_mono)",
     "by nlinarith", "by (auto; nlinarith)",
+    "by (simp only: norm_scaleR; metis abs_of_nonneg mult_right_mono mult.commute)",
 )
 
 
@@ -35,7 +40,7 @@ def verification_input(record: dict, mode: str) -> dict:
     """A new check cannot inherit diagnostics or success artifacts from an old job."""
     result = clean_record(record, mode)
     for name in (
-        "failed_obligation", "native_search", "native_replay", "native_result", "native_context", "prover_settings", "workdir",
+        "failed_obligation", "search_summary", "native_search", "native_replay", "native_result", "native_context", "prover_settings", "workdir",
         "search_directory", "build_directory", "build_session", "build_log_path",
         "build_log_excerpt", "build_returncode", "build_metrics", "termination_hint", "parent_session", "replay_theory_path", "replay_log_path",
         "replay_verified", "verification_method", "pisa_result", "dsp_result", "import_resolution", "verify_fingerprint", "verify_duration_seconds", "backend_metadata", "isabelle_proof",
@@ -54,7 +59,7 @@ def failure_obligation(steps: list[dict]) -> dict:
     if not steps or steps[-1].get("success"):
         return {}
     last = steps[-1]
-    result = {name: last[name] for name in ("mode", "line", "source_state", "command", "error") if name in last}
+    result = {name: last[name] for name in ("mode", "line", "source_state", "command", "error", "timeout_scope") if name in last}
     for field, size in (("command", 2000), ("error", 4000)):
         if field in result:
             result[field] = result[field][:size]
@@ -63,6 +68,9 @@ def failure_obligation(steps: list[dict]) -> dict:
     state = last.get("source_state")
     if state is None:
         return result
+    current = [step for step in steps if step.get("source_state") == state]
+    result["hammer_attempted"] = any(step.get("mode") == "hammer" for step in current)
+    result["candidate_timeout_count"] = sum(step.get("timeout_scope") == "candidate" for step in current)
     for step in reversed(steps[:-1]):
         if (step.get("mode") in {"search", "target"} and step.get("success")
                 and step.get("command", "").strip()):
@@ -74,6 +82,16 @@ def failure_obligation(steps: list[dict]) -> dict:
                 and not step.get("success") and "goal (" in step.get("error", "")):
             result["goal_diagnostic"] = step["error"][-4000:]
             break
+    return result
+
+
+def search_summary(steps: list[dict]) -> dict:
+    """Keep search coverage visible even when compact reports truncate attempts."""
+    result = {"candidate_timeouts": sum(s.get("timeout_scope") == "candidate" for s in steps)}
+    for mode in ("heuristic", "hammer", "reconstruction"):
+        selected = [s for s in steps if s.get("mode") == mode]
+        result[mode + "_attempts"] = len(selected)
+        result[mode + "_successes"] = sum(bool(s.get("success")) for s in selected)
     return result
 
 
@@ -138,6 +156,7 @@ class Checker:
                                     heuristics=() if force_hammer else HEURISTICS, deadline=deadline)
             result["native_search"] = search
             result["step_results"] = search["step_results"]
+            result["search_summary"] = search_summary(search["step_results"])
             result["prover_settings"] = search.get("prover_settings", {})
             if not search["success"] or not search.get("target_closed"):
                 message = search.get("error") or "target is open"

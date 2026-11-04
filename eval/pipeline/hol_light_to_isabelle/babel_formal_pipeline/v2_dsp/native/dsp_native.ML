@@ -5,6 +5,7 @@ structure DSP_Native =
 struct
 
 exception Failure of string * string;
+exception Candidate_Timeout of Time.time;
 val allowed = space_explode " "
   "proof qed by apply apply_end done prefer defer back supply using unfolding have show thus hence assume presume fix obtain guess let note from with then next case moreover ultimately also finally interpret include including write consider define subgoal { } . ..";
 
@@ -23,6 +24,18 @@ fun checked_timeout seconds f arg =
   in if seconds <= 0.0 orelse Timeout.ignored timeout then
        fail "timeout" "native budget below Isabelle's one-millisecond timeout resolution"
      else Timeout.apply timeout f arg
+  end;
+
+(* Optional methods run transactionally from the saved proof state. A local
+   timeout rejects only that candidate; required source commands still use
+   checked_timeout and abort. Only Timeout.TIMEOUT is converted: external
+   interrupts and an exhausted whole-target budget must never become retries. *)
+fun candidate_timeout remaining seconds f arg =
+  let val budget = Real.min (seconds, remaining ())
+  in checked_timeout budget f arg
+    handle Timeout.TIMEOUT elapsed =>
+      if remaining () < 0.001 then fail "timeout" "whole-target deadline exceeded"
+      else raise Candidate_Timeout elapsed
   end;
 
 (* Inspect decoded Isabelle names, not their surface spelling. Quoting or
@@ -112,9 +125,14 @@ fun run driver_theory request_file result_file =
     val whole_budget = number nodes "remaining_s";
     val step_budget = number nodes "step_timeout_s";
     val context_budget = number nodes "context_step_timeout_s";
+    (* Leave room for search, preplay and at least one reconstruction instead of
+       spending the remaining target budget on optional heuristic candidates. *)
+    val hammer_reserve = number nodes "hammer_timeout_s" +
+      number nodes "preplay_timeout_s" + step_budget;
     val last_error = Unsynchronized.ref "";
+    fun remaining () = whole_budget - Time.toReal (Timer.checkRealTimer timer);
     fun bounded seconds f arg =
-      let val budget = Real.min (seconds, whole_budget - Time.toReal (Timer.checkRealTimer timer))
+      let val budget = Real.min (seconds, remaining ())
       in if budget <= 0.0 then fail "timeout" "whole-target deadline exceeded"
          else checked_timeout budget f arg end;
     fun init () =
@@ -136,17 +154,23 @@ fun run driver_theory request_file result_file =
         val result = Exn.capture execute ();
         val _ = serial := !serial + 1;
         val success = (case result of Exn.Res _ => true | _ => false);
-        val error_message = (case result of Exn.Exn exn => Runtime.exn_message exn | _ => "");
+        val error_message = (case result of
+            Exn.Exn (Candidate_Timeout elapsed) => Timeout.message elapsed
+          | Exn.Exn exn => Runtime.exn_message exn | _ => "");
+        val timeout_attrs = (case result of
+            Exn.Exn (Candidate_Timeout _) => [("timeout_scope", "candidate")]
+          | _ => []);
         val _ = last_error := error_message;
         val row = elem "attempt"
-          [("mode", mode), ("success", Bool.toString success), ("index", string_of_int (!serial)),
-           ("line", string_of_int line), ("source_state", string_of_int (!state_serial)),
-           ("duration_seconds", Time.toString (Timer.checkRealTimer started))]
+          ([("mode", mode), ("success", Bool.toString success), ("index", string_of_int (!serial)),
+            ("line", string_of_int line), ("source_state", string_of_int (!state_serial)),
+            ("duration_seconds", Time.toString (Timer.checkRealTimer started))] @ timeout_attrs)
           [text "command" command, text "error" error_message];
         val _ = attempts := row :: !attempts;
       in
         (case result of
           Exn.Res state => SOME state
+        | Exn.Exn (Candidate_Timeout _) => NONE
         | Exn.Exn (Failure ("timeout", message)) => fail "timeout" message
         | Exn.Exn (Timeout.TIMEOUT _) => fail "timeout" "native operation timed out; isolated job aborted"
         | Exn.Exn DSP_Sledgehammer.Hammer_Timeout => fail "timeout" "native Sledgehammer timed out"
@@ -180,7 +204,7 @@ fun run driver_theory request_file result_file =
                 val tr = transition st span;
                 val _ = check_reconstruction_transition tr;
               in ensure_real (Toplevel.command_exception tr st) end;
-            val next = bounded step_budget
+            val next = candidate_timeout remaining step_budget
               (fn () => fold step (spans saved proof) saved) ();
             val progress = closes_obligation saved next orelse
               (allow_partial andalso Toplevel.is_proof next andalso
@@ -191,8 +215,10 @@ fun run driver_theory request_file result_file =
       in attempt mode proof 0 apply_candidate end;
     fun choose _ _ _ [] = NONE
       | choose mode allow_partial state (proof :: rest) =
-          (case candidate mode allow_partial state proof of SOME next => SOME (proof, next)
-          | NONE => choose mode allow_partial state rest);
+          if mode = "heuristic" andalso remaining () <= hammer_reserve + step_budget
+          then NONE
+          else (case candidate mode allow_partial state proof of SOME next => SOME (proof, next)
+            | NONE => choose mode allow_partial state rest);
     fun gap initial =
       let
         val _ = Proof.assert_backward (Toplevel.proof_of initial);
@@ -200,6 +226,8 @@ fun run driver_theory request_file result_file =
           if closes_obligation initial state then (cat_lines (rev chunks), state)
           else
             let
+              (* Do not report a previous gap's hammer success for this state. *)
+              val _ = settings := [];
               fun continue (proof, next) =
                 (state_serial := !state_serial + 1; solve next (proof :: chunks));
             in

@@ -1,3 +1,103 @@
+# Review of run 20261103T232010Z-e2f73e8b: optional method timeout
+
+Date: 2026-11-03. Report:
+`eval/preflight_results/isabelle2026-rsum-bound/20261103T232010Z-e2f73e8b/`.
+Historical reports and both saved sketches remain unchanged.
+
+Both searches passed the former scaled-norm bound and reached the next gap,
+`triangle` (`using fin`, saved-sketch line 30 / direct-sketch line 26). The
+optional scalar-norm `metis` candidate then timed out after **11.855 s / 10.711 s**.
+The ML runner treated this candidate timeout as fatal and aborted before the
+remaining candidates or Sledgehammer could run on that gap. This is a runner
+bug; the report does not demonstrate a Sledgehammer failure on the triangle
+inequality. The saved run's `native_outcome=some` described an earlier gap.
+
+The original-import heap succeeded. Startup was **17.925 s / 15.938 s**, compared
+with **272.823 s / 306.492 s** in the earlier two jobs. The new heap's one-time
+build took 194.037 s. These measurements support reusing the cache, but do not
+constitute a general end-to-end speedup benchmark.
+
+Changes in checker **p11**, shared by Babel Formal, Hundred Theorems and most-match:
+
+- Every optional heuristic or reconstruction candidate runs from a saved state.
+  A local `Timeout.TIMEOUT` rejects that candidate and tries the next one from
+  the same state; partial progress and its proof text are discarded. Exhausted
+  target budgets, required context/sketch command timeouts, and external
+  interrupts still abort. The timeout policy has no target-name, topic, or
+  mathematical-goal special case.
+- Optional heuristics stop when the remaining target budget needs to be reserved
+  for Sledgehammer search, preplay and one reconstruction. If heuristics do not
+  close a gap, Sledgehammer gets that remaining opportunity. Successful easy
+  proofs do not need an additional search. Existing budgets are not increased.
+- General pair-indexed sum rules handle norm bounds, sum monotonicity and constant
+  factoring before expensive search; the scalar-norm `metis` fallback moves last.
+  These use standard library facts, with no completed target proof or
+  `rsum_bound`-specific fact in the shared prover.
+- Hammer settings reset at each pending state, so a previous gap's success is not
+  shown as the current failure's result. Compact reports retain `search_summary`
+  (heuristic/hammer/reconstruction attempts and successes, candidate timeouts)
+  and final-state diagnostics before truncating long traces.
+- The existing prompts already request explicit sum/sign reasoning and are
+  unchanged in this fix. Stored-sketch retries do not invoke the model.
+
+The timeout/transaction behavior and library facts were checked against the
+pinned official Isabelle2026 sources:
+[`timeout.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Concurrent/timeout.ML),
+[`toplevel.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Isar/toplevel.ML),
+[`Real_Vector_Spaces.thy`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/Real_Vector_Spaces.thy),
+[`Product_Type.thy`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/Product_Type.thy), and
+[`Groups_Big.thy`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/Groups_Big.thy).
+
+## Focused lab retry, including general Sledgehammer coverage
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.retry_rsum_bound \
+  --expected-root "$PWD" \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
+```
+
+Append `--plan-only` to preview. Four proof checks are selected:
+
+1. `candidate_timeout_then_hammer`: a general conjunction goal, unrelated to
+   norms or integrals. A trusted test method deliberately delays after a partial
+   `apply` step. Acceptance requires a recorded candidate timeout, native
+   Sledgehammer on the original saved state, executable reconstruction and
+   target closure. It selects Sledgehammer's native `simp` prover for a
+   deterministic fallback check; this is not a direct `by simp` shortcut.
+2. `rsum_bound_saved_search`: the first unchanged recorded sketch.
+3. `rsum_bound_direct_search`: the second unchanged recorded sketch.
+4. `rsum_bound_triangle_forced_hammer`: the failed triangle obligation isolated
+   in the same earlier masked context, using configured provers and **no
+   heuristic candidates**. Acceptance requires actual successful Hammer and
+   reconstruction attempts. This is an explicitly labelled regression probe,
+   not an additional dataset theorem or a proof of `rsum_bound`.
+
+The command runs required setup but skips previously passed standalone contexts,
+previous broad capability controls and the full native fixture. No LLM calls or
+separate replay builds are made. The new adapter invalidates old heaps, so one
+initial rebuild is expected. All four proof checks must pass for overall OK;
+the command exits nonzero on failure. Successful isolated probes never replace
+an unsuccessful complete sketch.
+
+At most six compact files remain pushable under
+`eval/preflight_results/isabelle2026-rsum-bound/<timestamp>/`. Full artifacts
+stay ignored under `itpeval/.runs/`. Check `search_summary.hammer_attempts`,
+`hammer_successes` and `candidate_timeouts` on each report row to inspect coverage.
+
+Validation: **110 offline tests passed; 23 native tests were skipped** because
+Isabelle is installed on the lab computer. The checks cover all three adapters,
+saved-input preservation, forced-Hammer acceptance, timeout diagnostics and
+compact report accounting. The plan-only command selects exactly four checks;
+Python 3.10 syntax and patch whitespace checks pass.
+Native regression tests additionally cover retrying a later heuristic, discarded
+partial progress, required-command failure, whole-target limits, interrupts,
+Sledgehammer reservation, and generic sum rules with a negative case. Native
+compilation and complete theorem success still require the lab installation;
+local mocked tests do not establish either.
+
+---
+
 # Review of commit 6300569: rsum_bound proof search
 
 Date: 2026-11-03. Source commit `6300569dde128f9e9ec54e7af1c4e12a66c4efc5`.

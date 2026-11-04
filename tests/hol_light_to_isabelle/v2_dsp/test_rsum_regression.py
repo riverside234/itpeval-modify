@@ -10,6 +10,9 @@ from unittest.mock import Mock, patch
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.common import repo_path, fingerprint
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp import checker, lab_preflight as lab, parallel
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp import import_cache
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import (
+    case_problems, timeout_hammer_case, run_proof_case, PreparedNative)
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.theory_context import validate_context
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.native_search import read_result
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig
 from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp import retry_rsum_bound as retry
@@ -31,7 +34,7 @@ class RsumRegressionTests(unittest.TestCase):
         self.path = Path(temp.name)
 
     def test_both_recorded_failures_keep_the_original_sketch_and_oracle(self):
-        self.assertEqual(2, len(self.cases))
+        self.assertEqual(3, len(self.cases))
         for case, (_, source) in zip(self.cases, retry.LOGS):
             path = repo_path(source)
             request = json.loads((path/'input.json').read_text(encoding='utf-8'))
@@ -46,6 +49,73 @@ class RsumRegressionTests(unittest.TestCase):
             self.assertIn('content_pos_le', diagnostic['preceding_command'])
             self.assertEqual('hammer', diagnostic['mode'])
             self.assertTrue(all(s['success'] for s in old['step_results'] if s['mode']=='context'))
+
+    def test_latest_failures_are_candidate_timeouts_at_the_next_gap(self):
+        report = json.loads((repo_path(retry.FAILED_RUN)/'report.json').read_text(encoding='utf-8'))
+        failed = [c for c in report['checks'] if c['status']=='fail']
+        self.assertEqual([name for name, _ in retry.LOGS], [c['name'] for c in failed])
+        for row in failed:
+            detail = row['failed_obligation']
+            self.assertEqual('heuristic', detail['mode'])
+            self.assertIn('metis', detail['command'])
+            self.assertEqual('using fin', detail['preceding_command'])
+            self.assertIn('norm (', detail['goal_diagnostic'])
+            self.assertIn('Timeout after', detail['error'])
+
+    def test_forced_hammer_probe_uses_the_same_prefix_and_cannot_pass_on_heuristics(self):
+        probe = self.cases[-1]
+        self.assertEqual(retry.TRIANGLE_PROBE, probe.name)
+        self.assertTrue(probe.force_hammer)
+        self.assertEqual('any', probe.hammer_kind)
+        context = validate_context(probe.record)
+        self.assertEqual(validate_context(self.records[0]).prefix.rstrip(), context.prefix.rstrip())
+        self.assertNotIn('lemma rsum_bound:', context.prefix)
+        self.assertNotEqual(self.records[0]['isabelle_statement'], context.statement)
+        for exercised in (False, True):
+            steps = ([{'mode':'hammer','success':True}, {'mode':'reconstruction','success':True}]
+                     if exercised else [{'mode':'heuristic','success':True}])
+            native = {'success':True,'target_closed':True,'isabelle_proof':'by simp',
+                      'step_results':steps,'prover_settings':{}}
+            with patch.object(PreparedNative, 'request', return_value=native) as request:
+                result = run_proof_case(probe, config=self.config, backend={}, parent=(self.path,'test'),
+                                        directory=self.path/str(exercised))
+            self.assertEqual((), request.call_args.kwargs['heuristics'])
+            self.assertEqual(exercised, result['ok'])
+            self.assertEqual(int(exercised), result['result']['search_summary']['hammer_attempts'])
+
+    def test_general_timeout_probe_requires_hammer_from_the_original_state(self):
+        case = timeout_hammer_case(self.config)
+        self.assertNotIn('content', case.record['formal_statement'])
+        self.assertNotIn('norm', case.record['formal_statement'])
+        self.assertTrue(case.require_candidate_timeout)
+        self.assertFalse(case.force_hammer)
+        steps = [dict(mode='heuristic', success=False, command=case.candidate,
+                      source_state='5', timeout_scope='candidate'),
+                 dict(mode='hammer', success=True, source_state='5'),
+                 dict(mode='reconstruction', success=True, source_state='5')]
+        result = dict(verified=True, prove_success=True, native_search={'target_closed':True},
+                      step_results=steps, prover_settings={'reconstruction_source':'native_tactic'})
+        self.assertEqual([], case_problems(case, result))
+        for broken in ({**steps[0], 'timeout_scope':''}, {**steps[0], 'success':True}):
+            self.assertTrue(case_problems(case, {**result, 'step_results':[broken]+steps[1:]}))
+        self.assertTrue(case_problems(case, {**result, 'step_results':[
+            steps[0], {**steps[1], 'source_state':'6'}, steps[2]]}))
+
+    def test_search_summary_preserves_hammer_coverage_and_candidate_timeouts(self):
+        steps = [dict(mode='heuristic', success=False, source_state='1', timeout_scope='candidate'),
+                 dict(mode='hammer', success=True, source_state='1'),
+                 dict(mode='reconstruction', success=True, source_state='1'),
+                 dict(mode='heuristic', success=False, source_state='2', timeout_scope='candidate'),
+                 dict(mode='hammer', success=False, source_state='2')]
+        summary = checker.search_summary(steps)
+        self.assertEqual(2, summary['candidate_timeouts'])
+        self.assertEqual(2, summary['hammer_attempts'])
+        self.assertEqual(1, summary['hammer_successes'])
+        detail = checker.failure_obligation(steps)
+        self.assertTrue(detail['hammer_attempted'])
+        self.assertEqual(1, detail['candidate_timeout_count'])
+        self.assertNotIn('search_summary', checker.verification_input(
+            {**self.cases[0].record, 'search_summary':summary}, 'hol-light-proof'))
 
     def test_recorded_request_rejects_tampering_or_different_current_context(self):
         source = repo_path(retry.LOGS[0][1])
@@ -108,7 +178,7 @@ class RsumRegressionTests(unittest.TestCase):
         self.assertEqual(0, exited.exception.code)
         options = run.call_args.kwargs
         self.assertEqual(self.cases, options['extra_proof_cases'])
-        self.assertEqual([], options['controls_override'])
+        self.assertEqual(['candidate_timeout_then_hammer'], [c.name for c in options['controls_override']])
         self.assertFalse(options['include_contexts'])
         self.assertFalse(options['include_fixture'])
         self.assertFalse(options['include_dataset_cases'])
@@ -124,21 +194,23 @@ class RsumRegressionTests(unittest.TestCase):
                 lab,'run_fixture') as fixture, patch.object(lab.Checker,'check_context') as context, patch.object(
                 lab,'run_proof_case',return_value={'ok':not failed,'result':{'verified':not failed,
                     'verify_error':'failed product bound' if failed else '',
-                    'failed_obligation':{'goal_diagnostic':'norm (f x) <= e'} if failed else {}}}) as prove, contextlib.redirect_stdout(io.StringIO()):
+                    'failed_obligation':{'goal_diagnostic':'norm (f x) <= e'} if failed else {},
+                    'search_summary':{'hammer_attempts':1, 'hammer_successes':int(not failed)}}}) as prove, contextlib.redirect_stdout(io.StringIO()):
                 result = lab.run_lab_preflight(config_path='unused', records=self.records, scope=self.scope,
-                    output_root=self.path/str(failed), controls_override=[], extra_proof_cases=self.cases,
+                    output_root=self.path/str(failed), controls_override=[timeout_hammer_case(self.config)], extra_proof_cases=self.cases,
                     include_contexts=False, include_fixture=False, include_dataset_cases=False, warm_dependencies=True)
             self.assertEqual(not failed, result['ok'])
             self.assertEqual(not failed, result['dataset_checks_ok'])
             self.assertFalse(result['contexts_ok'])
             self.assertFalse(result['full_context_coverage'])
             self.assertEqual(0, result['context_counts']['reported'])
-            self.assertEqual(0, result['backend_controls_executed'])
-            self.assertEqual(2, prove.call_count)
+            self.assertEqual(1, result['backend_controls_executed'])
+            self.assertEqual(4, prove.call_count)
             fixture.assert_not_called()
             context.assert_not_called()
             proofs = [c for c in result['checks'] if c['domain']=='dataset_proof']
-            self.assertEqual(2, len(proofs))
+            self.assertEqual(3, len(proofs))
+            self.assertTrue(all(c['search_summary']['hammer_attempts']==1 for c in proofs))
             if failed:
                 self.assertTrue(all('failed_obligation' in c for c in proofs))
             self.assertLessEqual(len(list(Path(result['report_directory']).iterdir())), 6)

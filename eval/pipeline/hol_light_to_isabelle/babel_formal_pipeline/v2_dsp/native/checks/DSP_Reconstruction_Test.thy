@@ -86,6 +86,25 @@ local
         (fn () => Time.sleep (Time.fromSeconds 2)) ()) ();
       val _ = expect "ordinary ML timeout is enforced" true
         (case slow of Exn.Exn (Timeout.TIMEOUT _) => true | _ => false);
+      val local_timeout = Exn.capture (fn () => DSP_Native.candidate_timeout (K 10.0) 0.01
+        (fn () => Time.sleep (Time.fromSeconds 2)) ()) ();
+      val _ = expect "optional method timeout is a candidate failure" true
+        (case local_timeout of Exn.Exn (DSP_Native.Candidate_Timeout _) => true | _ => false);
+      val budget_left = Unsynchronized.ref 10.0;
+      val exhausted = Exn.capture (fn () => DSP_Native.candidate_timeout (fn () => !budget_left) 0.1
+        (fn () => (budget_left := 0.0; raise Timeout.TIMEOUT Time.zeroTime)) ()) ();
+      val _ = expect "target deadline cannot become a candidate retry" true
+        (case exhausted of Exn.Exn (DSP_Native.Failure ("timeout", _)) => true | _ => false);
+      val _ = entered := false;
+      val tiny_candidate = Exn.capture (fn () => DSP_Native.candidate_timeout (K 0.000001) 1.0
+        (fn () => entered := true) ()) ();
+      val _ = expect "candidate respects submillisecond whole budget" true
+        (case tiny_candidate of Exn.Exn (DSP_Native.Failure ("timeout", _)) => true | _ => false);
+      val _ = expect "exhausted candidate body was not entered" false (!entered);
+      val interrupted = Exn.capture (fn () => DSP_Native.candidate_timeout (K 10.0) 1.0
+        (fn () => raise Exn.Interrupt_Break) ()) ();
+      val _ = expect "external interrupt is never a retryable timeout" true
+        (case interrupted of Exn.Exn exn => Exn.is_interrupt_proper exn | _ => false);
       fun rejected source =
         (case Exn.capture DSP_Native.check_proof_tokens
             (Token.explode keywords Position.start source) of

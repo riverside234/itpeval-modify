@@ -23,6 +23,98 @@ class NativeIntegrationTests(unittest.TestCase):
         cls.config = DspConfig.load(os.environ["ITPEVAL_NATIVE_ISABELLE2026_CONFIG"])
         cls.backend = cls.config.metadata()
 
+    def test_generic_candidate_timeout_falls_through_to_sledgehammer(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import (
+            timeout_hammer_case, run_proof_case)
+        config = replace(self.config, step_timeout_s=0.1)
+        native = NativeSearch(config)
+        parent = native.infrastructure(deadline=time.monotonic()+config.target_timeout_s)
+        case = timeout_hammer_case(config)
+        result = run_proof_case(case, config=config, backend=self.backend, parent=parent,
+                                directory=Checker(config).directory("timeout-hammer-"))
+        self.assertTrue(result['ok'], result)
+        row = result['result']
+        self.assertEqual(1, row['search_summary']['candidate_timeouts'])
+        self.assertEqual(1, row['search_summary']['hammer_successes'])
+        self.assertNotIn('dsp_regression_delay', row['isabelle_proof'])
+        self.assertNotIn('apply (rule conjI)', row['isabelle_proof'])
+
+    def test_partial_candidate_timeout_retries_heuristic_from_saved_state(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import timeout_hammer_case
+        config = replace(self.config, step_timeout_s=0.1)
+        case = timeout_hammer_case(config)
+        class RetryNative(NativeSearch):
+            def request(self, record, sketch, **options):
+                options['heuristics'] = (case.candidate, 'by simp')
+                return super().request(record, sketch, **options)
+        result = Checker(config, native_factory=RetryNative).check(case.record, backend_metadata=self.backend)
+        self.assertTrue(result['verified'], result['verify_error'])
+        attempts = [s for s in result['step_results'] if s['mode']=='heuristic']
+        self.assertEqual([False, True], [s['success'] for s in attempts])
+        self.assertEqual('candidate', attempts[0]['timeout_scope'])
+        self.assertEqual(attempts[0]['source_state'], attempts[1]['source_state'])
+        self.assertEqual(0, result['search_summary']['hammer_attempts'])
+        self.assertNotIn('dsp_regression_delay', result['isabelle_proof'])
+        self.assertNotIn('apply (rule conjI)', result['isabelle_proof'])
+
+    def test_required_source_command_timeout_still_aborts(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import timeout_hammer_case
+        config = replace(self.config, step_timeout_s=0.1)
+        row = {**timeout_hammer_case(config).record, 'isabelle_sketch':'by dsp_regression_delay'}
+        result = Checker(config).check(row, backend_metadata=self.backend)
+        self.assertFalse(result['verified'])
+        self.assertEqual('timeout', result['failure_category'])
+        self.assertEqual('search', result['step_results'][-1]['mode'])
+        self.assertEqual(0, result['search_summary']['candidate_timeouts'])
+        self.assertEqual(0, result['search_summary']['hammer_attempts'])
+
+    def test_sledgehammer_reserve_skips_heuristics_when_budget_is_short(self):
+        config = replace(self.config, target_timeout_s=90, hammer_timeout_s=90,
+                         step_timeout_s=1, provers=('simp',))
+        result = Checker(config).check(control_record('sledgehammer'), backend_metadata=self.backend)
+        self.assertTrue(result['verified'], result['verify_error'])
+        self.assertEqual(0, result['search_summary']['heuristic_attempts'])
+        self.assertEqual(1, result['search_summary']['hammer_successes'])
+        self.assertEqual(1, result['search_summary']['reconstruction_successes'])
+
+    def test_pair_sum_rules_are_generic_and_preserve_pointwise_assumptions(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.checker import HEURISTICS
+        config = replace(self.config, provers=('dsp_nonexistent_prover',))
+        cases = [
+            (True, r"\<And>p::('a*'b)set. \<And>f::'a \<Rightarrow> 'b \<Rightarrow> 'c::real_normed_vector. "
+                r"finite p \<Longrightarrow> norm (\<Sum>(x,k)\<in>p. f x k) \<le> (\<Sum>(x,k)\<in>p. norm (f x k))",
+                "by (simp only: case_prod_beta'; rule norm_sum)"),
+            (True, r"\<And>p::('a*'b)set. \<And>f g::'a \<Rightarrow> 'b \<Rightarrow> real. "
+                r"(\<And>x k. (x,k)\<in>p \<Longrightarrow> f x k \<le> g x k) \<Longrightarrow> "
+                r"(\<Sum>(x,k)\<in>p. f x k) \<le> (\<Sum>(x,k)\<in>p. g x k)",
+                "by (simp only: case_prod_beta'; intro sum_mono; force)"),
+            (True, r"\<And>p::('a*'b)set. \<And>f::'a \<Rightarrow> 'b \<Rightarrow> real. \<And>c t::real. "
+                r"(\<Sum>(x,k)\<in>p. f x k) = t \<Longrightarrow> (\<Sum>(x,k)\<in>p. c * f x k) = c*t",
+                "by (simp add: case_prod_beta' sum_distrib_left[symmetric] sum_distrib_right[symmetric])"),
+            (False, r"\<And>p::('a*'b)set. \<And>f g::'a \<Rightarrow> 'b \<Rightarrow> real. "
+                r"(\<Sum>(x,k)\<in>p. f x k) \<le> (\<Sum>(x,k)\<in>p. g x k)",
+                "by (simp only: case_prod_beta'; intro sum_mono; force)"),
+        ]
+        for valid, goal, candidate in cases:
+            with self.subTest(valid=valid, candidate=candidate):
+                self.assertIn(candidate, HEURISTICS)
+                row = control_record('sledgehammer', conclusion=goal)
+                template = row['isabelle_theory_template'].replace('imports Main', 'imports Complex_Main')
+                target = sanitize_target(template, row['isabelle_target_name'])
+                row.update(isabelle_theory_template=template, isabelle_statement=target.statement,
+                    formal_statement=target.statement, isabelle_context_before_target=target.context_before_target,
+                    isabelle_target_proof_span=list(target.proof_span), isabelle_proof_prefix=target.proof_prefix)
+                class RuleNative(NativeSearch):
+                    def request(self, record, sketch, **options):
+                        options['heuristics'] = (candidate,)
+                        return super().request(record, sketch, **options)
+                result = Checker(config, native_factory=RuleNative).check(row, backend_metadata=self.backend)
+                self.assertEqual(valid, result['verified'], result['verify_error'])
+                if valid:
+                    self.assertEqual(1, result['search_summary']['heuristic_successes'])
+                    self.assertEqual(0, result['search_summary']['hammer_attempts'])
+
     def test_scaled_norm_heuristics_preserve_required_sign_conditions(self):
         from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
         # Disable ATP fallback: the valid obligation must be closed by the native
