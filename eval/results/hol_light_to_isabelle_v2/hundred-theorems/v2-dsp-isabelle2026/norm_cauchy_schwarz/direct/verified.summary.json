@@ -1,0 +1,54 @@
+{
+  "targets": 1,
+  "samples": 1,
+  "verified_samples": 0,
+  "pass_at_1_count": 0,
+  "pass_at_1": 0.0,
+  "pass_at_k_count": 0,
+  "pass_at_k": 0.0,
+  "metric": "empirical first-sample success and success among generated K samples",
+  "failure_counts": {
+    "timeout": 1
+  },
+  "summary_scope": "current_selection",
+  "schema_version": "hol_light_to_isabelle_dsp_v2",
+  "pipeline": "v2-dsp",
+  "sketch_source": "hol-light-proof",
+  "draft_used": false,
+  "expected_isabelle_version": "Isabelle2026",
+  "missing_samples": 0,
+  "llm_usage": {
+    "draft": {},
+    "sketch": {
+      "input_tokens": 60461,
+      "output_tokens": 1245,
+      "total_tokens": 61706,
+      "reasoning_tokens": 820,
+      "cached_tokens": 0
+    }
+  },
+  "llm_profiles": {
+    "draft": [],
+    "sketch": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-terra",
+        "reasoning_effort": "medium",
+        "max_output_tokens": 16000,
+        "stored_output": "content_only"
+      }
+    ]
+  },
+  "search_activity": {
+    "samples_with_native_search": 1,
+    "samples_with_gap_filling": 1,
+    "samples_with_sledgehammer": 1,
+    "heuristic_attempts": 45,
+    "sledgehammer_calls": 3,
+    "reconstruction_attempts": 2,
+    "terminal_method_timeouts": 0,
+    "terminal_repair_attempts": 3,
+    "terminal_repair_successes": 2
+  },
+  "stored_samples": 1
+}
