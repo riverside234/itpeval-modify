@@ -66,9 +66,9 @@ class DspConfig:
     startup_timeout_s: float = 600
     dependency_timeout_s: float = 3600
     context_step_timeout_s: float = 120
-    step_timeout_s: float = 10
-    hammer_timeout_s: float = 40
-    preplay_timeout_s: float = 10
+    step_timeout_s: float = 20
+    hammer_timeout_s: float = 60
+    preplay_timeout_s: float = 20
     target_timeout_s: float = 1200
 
     def __post_init__(self):

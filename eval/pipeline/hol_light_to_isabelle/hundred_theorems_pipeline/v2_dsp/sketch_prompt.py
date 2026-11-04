@@ -4,7 +4,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import Pro
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.sketch_prompt import SYSTEM_PROMPT, build_sketch_prompt as _build
 from ..common import SOURCE, require_source
 
-SKETCH_PROMPT_VERSION = "hundred_theorems_dsp_isabelle2026_draft_p7"
+SKETCH_PROMPT_VERSION = "hundred_theorems_dsp_isabelle2026_draft_p8"
 
 
 def build_sketch_prompt(record: dict) -> Prompt:

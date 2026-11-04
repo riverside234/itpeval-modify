@@ -100,7 +100,7 @@ class DirectDefaultTests(unittest.TestCase):
                        'standalone sledgehammer gap'):
             self.assertIn(phrase, direct.user_prompt)
         self.assertNotIn('TARGET PROOF STATE AND INDUCTION', draft.user_prompt)
-        self.assertEqual('most_match_sketch_v3', draft.version)
+        self.assertEqual('most_match_sketch_v4', draft.version)
         self.assertNotIn('draft', direct.system_prompt.lower().replace('informal draft', ''))
 
     def test_repair_diagnostics_retain_inner_failure_and_report_success_separately(self):
@@ -154,7 +154,7 @@ class CompactCanonRegressionTests(unittest.TestCase):
         raw = extract_records(topic='Canonical_Models', target_key='compact_canon_qfree')[0]
         record = export_dsp.export_record(raw, sketch_source=MODE)
         prompt = build_direct_sketch_prompt(record)
-        self.assertEqual('most_match_direct_sketch_v6', prompt.version)
+        self.assertEqual('most_match_direct_sketch_v7', prompt.version)
         self.assertIn(raw['hol_light_proof'], prompt.user_prompt)
         self.assertIn(raw['isabelle_prompt_context'], prompt.user_prompt)
         self.assertNotIn(raw['isabelle_theory_template'], prompt.user_prompt)
@@ -166,7 +166,7 @@ class CompactCanonRegressionTests(unittest.TestCase):
         self.assertEqual(self.row['isabelle_statement'], raw['isabelle_statement'])
         draft = build_sketch_prompt(export_dsp.export_record({**raw, 'draft':'Use finite satisfiability.'}))
         self.assertNotIn('HELPER APPLICATIONS AND REPRESENTATION MATCHING', draft.user_prompt)
-        self.assertEqual('most_match_sketch_v3', draft.version)
+        self.assertEqual('most_match_sketch_v4', draft.version)
 
     def test_terminal_timeout_metrics_and_failed_repair_keep_actual_search_error(self):
         original = dict(mode='search', success=False, source_state='9', line='56',

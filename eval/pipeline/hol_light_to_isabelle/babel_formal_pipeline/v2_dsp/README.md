@@ -1,5 +1,11 @@
 # Isabelle2026 native DSP backend (default)
 
+Sketch prompts explicitly prohibit `nlinarith` in both direct and saved-Draft modes.
+Native defaults and supplied configs use `hammer_timeout_s=60`,
+`preplay_timeout_s=20`, and `step_timeout_s=20`. The optional heuristic allowance
+is therefore 40 seconds per gap. Explicit settings in a lab `.local.json` take
+precedence over runtime defaults.
+
 Checker p15 caps optional heuristics at twice the step timeout per gap, reserving
 the remaining search for native Sledgehammer. Reports distinguish its actual
 first subgoal from discarded heuristic states. Most-match now retrieves bounded

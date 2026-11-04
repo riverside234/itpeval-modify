@@ -207,7 +207,7 @@ class RsumRegressionTests(unittest.TestCase):
             self.assertIn('product of two variable quantities is nonlinear', prompt.user_prompt)
             self.assertIn('sum monotonicity', prompt.user_prompt)
             self.assertIn("scalar's sign", prompt.user_prompt)
-            self.assertNotIn('nlinarith', prompt.user_prompt)
+            self.assertIn('Never use nlinarith', prompt.system_prompt)
             self.assertIn("rule method resolves", prompt.user_prompt)
             self.assertIn("before expanding scalar norms", prompt.user_prompt)
             self.assertIn("bare sledgehammer is not a complete proof body", prompt.user_prompt)

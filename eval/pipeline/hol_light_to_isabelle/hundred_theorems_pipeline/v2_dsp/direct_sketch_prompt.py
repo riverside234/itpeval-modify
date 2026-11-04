@@ -3,7 +3,7 @@ from ...babel_formal_pipeline.prompt import Prompt
 from ...babel_formal_pipeline.v2_dsp.direct_sketch_prompt import build_direct_sketch_prompt as _build
 from ..common import SOURCE, require_source
 
-DIRECT_PROMPT_VERSION = "hundred_theorems_dsp_isabelle2026_direct_p9"
+DIRECT_PROMPT_VERSION = "hundred_theorems_dsp_isabelle2026_direct_p10"
 
 
 def build_direct_sketch_prompt(record: dict) -> Prompt:

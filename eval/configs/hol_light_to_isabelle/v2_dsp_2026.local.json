@@ -11,9 +11,9 @@
   "provers": null,
   "startup_timeout_s": 600,
   "context_step_timeout_s": 120,
-  "step_timeout_s": 10,
-  "hammer_timeout_s": 40,
-  "preplay_timeout_s": 10,
+  "step_timeout_s": 20,
+  "hammer_timeout_s": 60,
+  "preplay_timeout_s": 20,
   "target_timeout_s": 1200,
   "theory_imports": {
     "Lebesgue_Measure": "HOL-Analysis.Lebesgue_Measure",

@@ -207,7 +207,7 @@ Changes:
   use, and applying the concrete imported result rather than asking search to
   rediscover a substantial theorem. Draft prompt instructions are unchanged.
 - Checker **p15** gives optional heuristics a total allowance of twice
-  `step_timeout_s` per gap (20 seconds with this config), shared across that
+  `step_timeout_s` per gap (20 seconds in the reviewed run; 40 seconds with current defaults), shared across that
   gap's normalization/reconstruction rounds. Each candidate also retains its
   individual limit. Timer/interruption overhead can exceed the nominal allowance.
   Remaining whole-target time and the existing Hammer reserve still apply.

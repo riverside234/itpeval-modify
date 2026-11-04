@@ -3,7 +3,7 @@ from __future__ import annotations
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import Prompt, _required
 
 
-SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p7"
+SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p8"
 
 # Both input modes use the same target, background, and gap contract.
 ISABELLE_OUTPUT_RULES = (
@@ -12,6 +12,9 @@ ISABELLE_OUTPUT_RULES = (
     "for unresolved proof obligations; a later prover will replace each with a "
     "checked proof that closes that obligation. A complete proof with no "
     "sledgehammer placeholders is valid; do not introduce gaps into known proofs. "
+    "Never use nlinarith, including inside compound method expressions. "
+    "Use available Isabelle rules and explicit side conditions for nonlinear "
+    "arithmetic, or leave a standalone sledgehammer gap for the remaining claim. "
     "Return only Isabelle/Isar syntax. "
     "For multiple claims use proof - ... qed. For a terminal proof use by followed "
     "by a complete method expression, such as by (simp add: available_facts). "
