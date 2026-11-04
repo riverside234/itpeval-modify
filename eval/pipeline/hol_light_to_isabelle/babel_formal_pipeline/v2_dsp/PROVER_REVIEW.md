@@ -1,3 +1,95 @@
+# Review of run 20261104T002751Z-cfc4b7f0: test syntax and sum search
+
+Reviewed 2026-11-03 (America/Chicago). Source commit `7e7203655662a45e4d5d31d0951e7508f02c34e1`.
+The committed compact report is under
+`eval/preflight_results/isabelle2026-rsum-bound/20261104T002751Z-cfc4b7f0/`.
+The lab-only directory under `itpeval/.runs/preflight/` holds its full artifacts.
+
+All five setup checks passed. Four proof checks failed:
+
+| Check | Evidence and diagnosis |
+| --- | --- |
+| `candidate_timeout_then_hammer` | Rejected before native execution: its test sketch was a bare `sledgehammer`, while the public input contract requires a complete `by` or `proof ... qed` body. This was a regression-fixture bug, not a prover timeout. |
+| Both stored `rsum_bound` sketches | The scaling step passed. At the triangle step the new candidate timeout was recovered and Sledgehammer actually ran. The norm-sum heuristic failed because `rule norm_sum` tried to resolve the chained `finite p` fact into a rule with no premises. The log also reported the unsupported `nlinarith` method. |
+| `rsum_bound_triangle_forced_hammer` | One actual Hammer attempt, zero heuristics, `native_outcome=timeout`, no proof/preplay candidate. This demonstrates a search failure on the raw pair-indexed goal, not another early-abort bug. |
+
+The saved and direct searches reached Hammer after their timed-out `metis`
+candidate (12.409 s / 11.115 s); their final Hammer calls took 45.012 s / 47.021 s.
+The isolated Hammer call took 44.044 s. Timeouts remain failures.
+
+Checker **p12** changes the shared native pipeline for every dataset:
+
+- The general timeout fixture now supplies a complete Isar proof body. Offline
+  tests validate positive retry inputs and require this fixture to reach the
+  native transport, catching the earlier mock-test blind spot. The real lab
+  check still requires a local candidate timeout, rollback, actual Hammer,
+  reconstruction and target closure.
+- The norm-sum heuristic uses `simp only: case_prod_beta' norm_sum`, preserving
+  scalar norms while matching the structural bound and avoiding `rule`'s
+  resolution of irrelevant chained facts. Unsupported nonlinear tactic names
+  are removed; existing Isabelle order-rule and `metis` candidates remain.
+- Before Hammer, pair binders can be normalized by the bounded, kernel-checked
+  command `apply (simp only: case_prod_beta')`. A changed goal is retained only
+  at the same proof level with no additional subgoals. The executed command is
+  included in the resulting proof. Ordinary heuristic/reconstruction closure
+  rules remain strict, and target completion is still required.
+- Hammer receives at most seven relevant, already available library hints for
+  sums, norms, scalar norms and pair binders. Selection inspects goal constants,
+  not theorem/topic names; absent facts are omitted. Native fact selection stays
+  enabled (`only=false`). No target proof, new import or mathematical assumption
+  is supplied. The chosen hints are recorded in `prover_settings.added_fact_hints`.
+- `search_summary` includes normalization attempts/successes. Hammer records the
+  actual `goal_before_search`, with Isabelle markup removed. Failed Hammer or
+  reconstruction reports retain this goal even when no heuristic produced an
+  error message; later unrelated source-command failures cannot inherit it.
+- Both Draft-to-Sketch and direct Sketch prompts now require available Isabelle
+  methods, explicit pair/summand matching, the norm-of-sum bound before scalar
+  expansion, relevant `using` facts, and a complete one-gap Isar body. Versions
+  advance for Babel, Hundred Theorems and most-match. The informal Draft prompt
+  and the two saved regression sketches remain unchanged.
+
+The rule/chained-fact behavior was checked in official
+[`method.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Isar/method.ML).
+Normalization uses the documented proof-state transition in
+[`proof.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/Pure/Isar/proof.ML).
+The fact override uses
+[`sledgehammer_fact.ML`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/Tools/Sledgehammer/sledgehammer_fact.ML)
+and existing facts from
+[`Real_Vector_Spaces.thy`](https://github.com/isabelle-prover/mirror-isabelle/blob/bc2b0ebd7ff3e6779a3fc9c0d88b90333ed83370/src/HOL/Real_Vector_Spaces.thy).
+
+Validation: **118 offline tests passed; 24 native tests require the lab**.
+These include all three dataset adapters, prompt contracts, historical-failure
+checks, positive test-body validation, transport reachability and goal diagnostics.
+Native tests now include irrelevant chained facts for the sum rule and a forced
+Hammer test for general pair-indexed sums. Python 3.10 syntax, plan-only selection
+and patch checks pass. Native compilation and complete theorem success are not
+established by offline tests.
+
+## Retry only these four failed checks
+
+After syncing the changes to the lab:
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+python -m eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.retry_rsum_bound \
+  --expected-root "$PWD" \
+  --config eval/configs/hol_light_to_isabelle/v2_dsp_2026.local.json
+```
+
+The selection remains: general timeout-to-Hammer regression, both unchanged saved
+sketches, and the isolated triangle obligation with heuristics disabled. Required
+setup still runs; previously passed broad controls/standalone contexts do not.
+No model calls or separate replay. The new native adapter requires an initial
+heap rebuild. Push the same six compact report files under
+`eval/preflight_results/isabelle2026-rsum-bound/<timestamp>/`.
+
+`--plan-only` previews the selection. This retry tests the prover on saved input;
+prompt changes affect newly generated sketches and do not rewrite those inputs.
+All four proof checks must pass; a successful isolated probe cannot substitute
+for a failed full sketch.
+
+---
+
 # Review of run 20261103T232010Z-e2f73e8b: optional method timeout
 
 Date: 2026-11-03. Report:

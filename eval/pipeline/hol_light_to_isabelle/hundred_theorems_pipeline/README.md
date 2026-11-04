@@ -207,14 +207,19 @@ and inference profile. Export/Sketch/prove/final flags match Babel's runner.
 
 ## rsum_bound retry and general timeout/Sledgehammer regressions
 
-The latest retry (`20261103T232010Z-e2f73e8b`) passed the scaling step but stopped
-at the finite-sum triangle inequality: an optional `metis` timeout incorrectly
-aborted the job before Sledgehammer. The shared native runner now retries from
-the saved state after a candidate timeout and reserves time for Sledgehammer.
-This applies to all proof gaps in all three native dataset pipelines. Required
-source commands, interrupts, target deadlines and proof-closure checks stay strict.
-General sum rules now precede expensive search, and stale Hammer settings from
-previous gaps are cleared. No target-specific completed proof is supplied.
+The latest retry (`20261104T002751Z-cfc4b7f0`) confirmed that candidate timeout
+recovery reaches Sledgehammer. It also exposed an invalid bare-search test body,
+a chained-fact mismatch in the norm-sum heuristic, unsupported arithmetic methods,
+and search timeouts on the pair-indexed sum goal.
+
+Checker p12 fixes the test body and heuristic, removes unsupported methods,
+and prepares pair-indexed goals for Hammer with a checked normalization step and
+bounded hints drawn from available library facts. These changes apply to all
+three native dataset pipelines. Both sketch prompt modes now ask for explicit
+summand matching, relevant chained facts, supported methods, and complete Isar
+bodies. The original saved sketches are preserved for regression testing.
+
+After syncing the changes, rerun the same four failed checks:
 
 ```bash
 cd /data/not_backed_up/yxu209/itpeval-modify
@@ -239,8 +244,9 @@ full sketch pass. The command exits nonzero if any check fails.
 The six compact report files are pushable under
 `eval/preflight_results/isabelle2026-rsum-bound/<timestamp>/`; full work files
 remain ignored. `search_summary` records Hammer attempts/successes and candidate
-timeouts even when detailed traces are shortened. `failed_obligation` retains
-the current source line and goal. See the
+timeouts and normalization steps even when detailed traces are shortened.
+`prover_settings.added_fact_hints` and `goal_before_search` expose what Hammer
+received; `failed_obligation` retains the current source line and goal. See the
 [diagnosis and limitations](../babel_formal_pipeline/v2_dsp/PROVER_REVIEW.md).
 
 Hundred Theorems jobs reuse heaps containing exactly their original imports,

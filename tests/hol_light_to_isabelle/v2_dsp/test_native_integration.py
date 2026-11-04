@@ -71,7 +71,7 @@ class NativeIntegrationTests(unittest.TestCase):
     def test_sledgehammer_reserve_skips_heuristics_when_budget_is_short(self):
         config = replace(self.config, target_timeout_s=90, hammer_timeout_s=90,
                          step_timeout_s=1, provers=('simp',))
-        result = Checker(config).check(control_record('sledgehammer'), backend_metadata=self.backend)
+        result = Checker(config).check(control_record('proof -\n show ?thesis\n sledgehammer\nqed'), backend_metadata=self.backend)
         self.assertTrue(result['verified'], result['verify_error'])
         self.assertEqual(0, result['search_summary']['heuristic_attempts'])
         self.assertEqual(1, result['search_summary']['hammer_successes'])
@@ -84,7 +84,7 @@ class NativeIntegrationTests(unittest.TestCase):
         cases = [
             (True, r"\<And>p::('a*'b)set. \<And>f::'a \<Rightarrow> 'b \<Rightarrow> 'c::real_normed_vector. "
                 r"finite p \<Longrightarrow> norm (\<Sum>(x,k)\<in>p. f x k) \<le> (\<Sum>(x,k)\<in>p. norm (f x k))",
-                "by (simp only: case_prod_beta'; rule norm_sum)"),
+                "by (simp only: case_prod_beta' norm_sum)"),
             (True, r"\<And>p::('a*'b)set. \<And>f g::'a \<Rightarrow> 'b \<Rightarrow> real. "
                 r"(\<And>x k. (x,k)\<in>p \<Longrightarrow> f x k \<le> g x k) \<Longrightarrow> "
                 r"(\<Sum>(x,k)\<in>p. f x k) \<le> (\<Sum>(x,k)\<in>p. g x k)",
@@ -99,7 +99,7 @@ class NativeIntegrationTests(unittest.TestCase):
         for valid, goal, candidate in cases:
             with self.subTest(valid=valid, candidate=candidate):
                 self.assertIn(candidate, HEURISTICS)
-                row = control_record('sledgehammer', conclusion=goal)
+                row = control_record('proof -\n have irrelevant: True by simp\n show ?thesis using irrelevant\n sledgehammer\nqed', conclusion=goal)
                 template = row['isabelle_theory_template'].replace('imports Main', 'imports Complex_Main')
                 target = sanitize_target(template, row['isabelle_target_name'])
                 row.update(isabelle_theory_template=template, isabelle_statement=target.statement,
@@ -115,6 +115,26 @@ class NativeIntegrationTests(unittest.TestCase):
                     self.assertEqual(1, result['search_summary']['heuristic_successes'])
                     self.assertEqual(0, result['search_summary']['hammer_attempts'])
 
+    def test_forced_hammer_uses_normalized_pair_goal_and_available_library_hints(self):
+        from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
+        goal = (r"\<And>p::('a*'b)set. \<And>f::'a \<Rightarrow> 'b \<Rightarrow> 'c::real_normed_vector. "
+                r"norm (\<Sum>(x,k)\<in>p. f x k) \<le> (\<Sum>(x,k)\<in>p. norm (f x k))")
+        row = control_record('proof -\n show ?thesis\n sledgehammer\nqed', conclusion=goal)
+        template = row['isabelle_theory_template'].replace('imports Main', 'imports Complex_Main')
+        target = sanitize_target(template, row['isabelle_target_name'])
+        row.update(isabelle_theory_template=template, isabelle_statement=target.statement,
+            formal_statement=target.statement, isabelle_context_before_target=target.context_before_target,
+            isabelle_target_proof_span=list(target.proof_span), isabelle_proof_prefix=target.proof_prefix)
+        config = replace(self.config, provers=('metis',))
+        result = Checker(config).check(row, force_hammer=True, backend_metadata=self.backend)
+        self.assertTrue(result['verified'], result['verify_error'])
+        self.assertEqual(0, result['search_summary']['heuristic_attempts'])
+        self.assertGreater(result['search_summary']['normalization_successes'], 0)
+        self.assertGreater(result['search_summary']['hammer_successes'], 0)
+        self.assertIn("apply (simp only: case_prod_beta')", result['isabelle_proof'])
+        self.assertIn('norm_sum', result['prover_settings']['added_fact_hints'].split())
+        self.assertTrue(result['prover_settings']['goal_before_search'])
+
     def test_scaled_norm_heuristics_preserve_required_sign_conditions(self):
         from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
         # Disable ATP fallback: the valid obligation must be closed by the native
@@ -125,7 +145,7 @@ class NativeIntegrationTests(unittest.TestCase):
                 r"norm (c *\<^sub>R u) \<le> b*c")
         for valid in (True, False):
             conclusion = goal if valid else goal.replace(r"0 \<le> c \<Longrightarrow> ", "")
-            row = control_record("sledgehammer", conclusion=conclusion)
+            row = control_record("proof -\n show ?thesis\n sledgehammer\nqed", conclusion=conclusion)
             template = row["isabelle_theory_template"].replace("imports Main", "imports Complex_Main")
             target = sanitize_target(template, row["isabelle_target_name"])
             row.update(isabelle_theory_template=template, isabelle_statement=target.statement,

@@ -46,7 +46,8 @@ def timeout_hammer_case(config: DspConfig) -> ProofCase:
         f"    (Time.sleep (Time.fromReal {delay:.6f}); all_tac st)))\n"
         + r"\<close>" + "\n"
     )
-    row = control_record("sledgehammer", conclusion=r"True \<and> True", extra_context=context)
+    row = control_record("proof -\n  show ?thesis\n    sledgehammer\nqed",
+                         conclusion=r"True \<and> True", extra_context=context)
     return ProofCase("candidate_timeout_then_hammer", row, provers=("simp",),
         hammer_kind="native_tactic", min_reconstructions=1,
         candidate="apply (rule conjI)\n by dsp_regression_delay", require_candidate_timeout=True)

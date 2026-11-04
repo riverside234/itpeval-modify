@@ -53,6 +53,19 @@ local
       val keywords = Thy_Header.get_keywords \<^theory>;
       fun transitions source = Outer_Syntax.parse_text \<^theory>
         (fn () => {skip_theory = false, theory = \<^theory>}) Position.start source;
+      fun open_test_goal source = fold Toplevel.command_exception (transitions source)
+        (Toplevel.make_state (SOME (Context.Theory \<^theory>)));
+      val plain_goal = open_test_goal "lemma dsp_plain_goal: True";
+      val _ = expect "unrelated goals get no sum/norm hints" []
+        (DSP_Sledgehammer.fact_hints (Toplevel.proof_of plain_goal));
+      val pair_goal = open_test_goal
+        "lemma dsp_pair_goal: \"(\\<Sum>(x,y)\\<in>A. (x::nat) + y) = (\\<Sum>z\\<in>A. fst z + snd z)\"";
+      val _ = expect "pair binder is detected in the typed goal" true
+        (DSP_Native.has_pair_binder pair_goal);
+      val hints = DSP_Sledgehammer.fact_hints (Toplevel.proof_of pair_goal);
+      val _ = expect "pair rewrite is an available hint" true (member (op =) hints "case_prod_beta'");
+      val _ = expect "sum monotonicity is an available hint" true (member (op =) hints "sum_mono");
+      val _ = expect "hints stay bounded" true (length hints <= 7);
       val using_steps = transitions "using local_fact (* comment *)\n by metis\n";
       val _ = expect "using/by has an ignored separator" true
         (exists Toplevel.is_ignored using_steps);

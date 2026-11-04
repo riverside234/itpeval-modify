@@ -13,7 +13,9 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp import imp
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.acceptance import (
     case_problems, timeout_hammer_case, run_proof_case, PreparedNative)
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.theory_context import validate_context
-from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.native_search import read_result
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.input_contract import normalize_sketch
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.preflight import control_record
+from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.native_search import read_result, NativeSearch
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.runtime import DspConfig
 from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp import retry_rsum_bound as retry
 from eval.pipeline.hol_light_to_isabelle.hundred_theorems_pipeline.v2_dsp.direct_sketch_prompt import build_direct_sketch_prompt
@@ -50,8 +52,8 @@ class RsumRegressionTests(unittest.TestCase):
             self.assertEqual('hammer', diagnostic['mode'])
             self.assertTrue(all(s['success'] for s in old['step_results'] if s['mode']=='context'))
 
-    def test_latest_failures_are_candidate_timeouts_at_the_next_gap(self):
-        report = json.loads((repo_path(retry.FAILED_RUN)/'report.json').read_text(encoding='utf-8'))
+    def test_previous_run_records_the_original_candidate_timeout_bug(self):
+        report = json.loads((repo_path(retry.REPORT_ROOT+'/20261103T232010Z-e2f73e8b')/'report.json').read_text(encoding='utf-8'))
         failed = [c for c in report['checks'] if c['status']=='fail']
         self.assertEqual([name for name, _ in retry.LOGS], [c['name'] for c in failed])
         for row in failed:
@@ -61,6 +63,38 @@ class RsumRegressionTests(unittest.TestCase):
             self.assertEqual('using fin', detail['preceding_command'])
             self.assertIn('norm (', detail['goal_diagnostic'])
             self.assertIn('Timeout after', detail['error'])
+
+    def test_latest_run_reached_hammer_and_reported_the_invalid_control(self):
+        directory = repo_path(retry.FAILED_RUN)
+        checks = [json.loads(line) for line in (directory/'checks.jsonl').read_text(encoding='utf-8').splitlines()]
+        bad_control = next(c for c in checks if c['name']=='candidate_timeout_then_hammer')
+        self.assertIn('proof body must start', bad_control['error'])
+        proofs = [c for c in checks if c['domain']=='dataset_proof']
+        self.assertEqual(3, len(proofs))
+        for row in proofs:
+            self.assertTrue(row['failed_obligation']['hammer_attempted'])
+            self.assertGreater(row['search_summary']['hammer_attempts'], 0)
+            settings = row['payload']['result']['prover_settings']
+            self.assertEqual('timeout', settings['native_outcome'])
+            self.assertEqual('0', settings['candidate_count'])
+        attempts = proofs[0]['payload']['result']['step_results']
+        self.assertTrue(any('Undefined method: "nlinarith"' in s.get('error','') for s in attempts))
+        self.assertFalse(any('nlinarith' in candidate for candidate in checker.HEURISTICS))
+
+    def test_positive_retry_bodies_validate_before_native_execution(self):
+        for case in [*self.cases, timeout_hammer_case(self.config)]:
+            with self.subTest(case=case.name):
+                self.assertEqual(case.record['isabelle_sketch'], normalize_sketch(case.record['isabelle_sketch']))
+        case = timeout_hammer_case(self.config)
+        fake_result = dict(success=False, target_closed=False, step_results=[],
+                           failure_category='test_transport', error='reached native transport')
+        with patch.object(NativeSearch, 'request', return_value=fake_result) as request:
+            result = run_proof_case(case, config=self.config, backend={}, parent=(self.path,'test'),
+                                    directory=self.path/'transport')
+        request.assert_called_once()
+        self.assertEqual((case.candidate,), request.call_args.kwargs['heuristics'])
+        self.assertEqual('test_transport', result['result']['failure_category'])
+        self.assertNotIn('proof body must start', result['result']['verify_error'])
 
     def test_forced_hammer_probe_uses_the_same_prefix_and_cannot_pass_on_heuristics(self):
         probe = self.cases[-1]
@@ -82,6 +116,18 @@ class RsumRegressionTests(unittest.TestCase):
             self.assertEqual((), request.call_args.kwargs['heuristics'])
             self.assertEqual(exercised, result['ok'])
             self.assertEqual(int(exercised), result['result']['search_summary']['hammer_attempts'])
+
+    def test_forced_hammer_failure_keeps_the_actual_goal_without_heuristic_errors(self):
+        result = {'success':False, 'target_closed':False, 'failure_category':'timeout',
+                  'error':'native Sledgehammer timed out', 'step_results':[
+                      {'mode':'hammer','success':False,'source_state':'7','error':'timeout'}],
+                  'prover_settings':{'goal_before_search':'actual normalized pair-sum goal'}}
+        with patch.object(PreparedNative, 'request', return_value=result):
+            checked = run_proof_case(self.cases[-1], config=self.config, backend={},
+                parent=(self.path,'test'), directory=self.path/'goal-report')['result']
+        self.assertEqual('actual normalized pair-sum goal', checked['failed_obligation']['goal_diagnostic'])
+        self.assertIn('actual normalized pair-sum goal', checked['verify_error'])
+        self.assertFalse(checked['verified'])
 
     def test_general_timeout_probe_requires_hammer_from_the_original_state(self):
         case = timeout_hammer_case(self.config)
@@ -158,6 +204,10 @@ class RsumRegressionTests(unittest.TestCase):
             self.assertIn('product of two variable quantities is nonlinear', prompt.user_prompt)
             self.assertIn('sum monotonicity', prompt.user_prompt)
             self.assertIn("scalar's sign", prompt.user_prompt)
+            self.assertNotIn('nlinarith', prompt.user_prompt)
+            self.assertIn("rule method resolves", prompt.user_prompt)
+            self.assertIn("before expanding scalar norms", prompt.user_prompt)
+            self.assertIn("bare sledgehammer is not a complete proof body", prompt.user_prompt)
 
     def test_hundred_single_worker_batch_prepares_exact_import_heaps(self):
         plan = parallel.ParallelPlan(1,1,1,8,12,64,1,8)

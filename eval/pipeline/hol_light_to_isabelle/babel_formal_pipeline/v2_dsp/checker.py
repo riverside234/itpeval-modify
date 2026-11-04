@@ -18,20 +18,21 @@ from .runtime import DspConfig
 
 ProofFailure = NativeFailure  # Preserve the old exception import for callers.
 
-CHECKER_VERSION = "dsp_isabelle2026_native_p11"
+CHECKER_VERSION = "dsp_isabelle2026_native_p12"
 HEURISTICS = (
     "by auto", "by simp", "by blast", "by fastforce", "by force", "by eval",
     "by presburger", "by sos", "by arith", "by linarith", "by (auto simp: field_simps)",
     # Direct library rules precede expensive general search. Expand pair binders
     # without simplifying norm(scaleR ...) before matching the triangle rule.
-    "by (simp only: case_prod_beta'; rule norm_sum)",
+    # simp treats norm_sum as a proposition; it does not resolve unrelated
+    # chained facts (e.g. finite p) into the premise-free norm_sum rule.
+    "by (simp only: case_prod_beta' norm_sum)",
     "by (simp only: case_prod_beta'; intro sum_mono; force)",
     "by (simp add: case_prod_beta' sum_distrib_left[symmetric] sum_distrib_right[symmetric])",
     # Products of variable terms need order rules or nonlinear arithmetic. Keep
     # the more expensive metis fallback last; a candidate timeout is recoverable.
     # No selected-target fact or completed Isabelle proof is supplied here.
     "by (auto simp: mult.commute intro: mult_left_mono mult_right_mono)",
-    "by nlinarith", "by (auto; nlinarith)",
     "by (simp only: norm_scaleR; metis abs_of_nonneg mult_right_mono mult.commute)",
 )
 
@@ -63,7 +64,7 @@ def failure_obligation(steps: list[dict]) -> dict:
     for field, size in (("command", 2000), ("error", 4000)):
         if field in result:
             result[field] = result[field][:size]
-    if last.get("mode") not in {"heuristic", "hammer", "reconstruction"}:
+    if last.get("mode") not in {"heuristic", "normalization", "hammer", "reconstruction"}:
         return result
     state = last.get("source_state")
     if state is None:
@@ -88,7 +89,7 @@ def failure_obligation(steps: list[dict]) -> dict:
 def search_summary(steps: list[dict]) -> dict:
     """Keep search coverage visible even when compact reports truncate attempts."""
     result = {"candidate_timeouts": sum(s.get("timeout_scope") == "candidate" for s in steps)}
-    for mode in ("heuristic", "hammer", "reconstruction"):
+    for mode in ("heuristic", "normalization", "hammer", "reconstruction"):
         selected = [s for s in steps if s.get("mode") == mode]
         result[mode + "_attempts"] = len(selected)
         result[mode + "_successes"] = sum(bool(s.get("success")) for s in selected)
@@ -162,6 +163,10 @@ class Checker:
                 message = search.get("error") or "target is open"
                 result["failed_obligation"] = failure_obligation(search["step_results"])
                 obligation = result["failed_obligation"]
+                if (obligation.get("mode") in {"hammer", "reconstruction"}
+                        and not obligation.get("goal_diagnostic")
+                        and search.get("prover_settings", {}).get("goal_before_search")):
+                    obligation["goal_diagnostic"] = search["prover_settings"]["goal_before_search"][-4000:]
                 if obligation.get("preceding_command"):
                     message += (f"; after sketch line {obligation.get('preceding_line', '?')}: "
                                 + obligation["preceding_command"][:400])

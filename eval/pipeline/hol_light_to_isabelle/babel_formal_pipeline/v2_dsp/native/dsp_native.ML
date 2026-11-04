@@ -12,7 +12,11 @@ val allowed = space_explode " "
 (* Token.source_of is compact internal text with DEL padding for removed
    delimiters. Token.unparse restores executable strings/cartouches and comments. *)
 fun source_text span = implode (map Token.unparse span);
-fun subgoal_count state = Thm.nprems_of (#goal (Proof.goal (Toplevel.proof_of state)));
+fun goal_of state = #goal (Proof.goal (Toplevel.proof_of state));
+fun subgoal_count state = Thm.nprems_of (goal_of state);
+fun has_pair_binder state =
+  member (op =) (Term.add_const_names (Thm.prop_of (goal_of state)) [])
+    \<^const_name>\<open>case_prod\<close>;
 fun closes_obligation saved next =
   not (Toplevel.is_proof next) orelse Toplevel.proof_level next < Toplevel.proof_level saved;
 
@@ -125,10 +129,10 @@ fun run driver_theory request_file result_file =
     val whole_budget = number nodes "remaining_s";
     val step_budget = number nodes "step_timeout_s";
     val context_budget = number nodes "context_step_timeout_s";
-    (* Leave room for search, preplay and at least one reconstruction instead of
-       spending the remaining target budget on optional heuristic candidates. *)
+    (* Leave room for bounded normalization, search, preplay and reconstruction
+       instead of spending the remaining target budget on optional heuristics. *)
     val hammer_reserve = number nodes "hammer_timeout_s" +
-      number nodes "preplay_timeout_s" + step_budget;
+      number nodes "preplay_timeout_s" + 2.0 * step_budget;
     val last_error = Unsynchronized.ref "";
     fun remaining () = whole_budget - Time.toReal (Timer.checkRealTimer timer);
     fun bounded seconds f arg =
@@ -206,11 +210,17 @@ fun run driver_theory request_file result_file =
               in ensure_real (Toplevel.command_exception tr st) end;
             val next = candidate_timeout remaining step_budget
               (fn () => fold step (spans saved proof) saved) ();
-            val progress = closes_obligation saved next orelse
+            (* Only the fixed normalization below may retain a changed goal with
+               the same subgoal count. Heuristics must still close it; ordinary
+               reconstructions must still strictly reduce the pending obligations. *)
+            val normalized = mode = "normalization" andalso Toplevel.is_proof next andalso
+              Toplevel.proof_level next = level andalso subgoal_count next <= subgoal_count saved andalso
+              not (Thm.eq_thm_prop (goal_of saved, goal_of next));
+            val progress = closes_obligation saved next orelse normalized orelse
               (allow_partial andalso Toplevel.is_proof next andalso
                Toplevel.proof_level next = level andalso subgoal_count next < subgoal_count saved);
             val _ = if progress then ()
-                    else fail "incomplete_obligation" "candidate neither closed nor reduced the pending obligation";
+                    else fail "incomplete_obligation" "candidate made no permitted progress on the pending obligation";
           in next end;
       in attempt mode proof 0 apply_candidate end;
     fun choose _ _ _ [] = NONE
@@ -219,6 +229,13 @@ fun run driver_theory request_file result_file =
           then NONE
           else (case candidate mode allow_partial state proof of SOME next => SOME (proof, next)
             | NONE => choose mode allow_partial state rest);
+    fun normalize_for_hammer state =
+      if has_pair_binder state then
+        (* Use the kernel-checked apply command, and retain it in the final proof.
+           This changes only pair syntax; scalar norms are intentionally untouched.
+           apply also consumes chained facts normally, without losing their premises. *)
+        choose "normalization" false state ["apply (simp only: case_prod_beta')"]
+      else NONE;
     fun gap initial =
       let
         val _ = Proof.assert_backward (Toplevel.proof_of initial);
@@ -240,6 +257,9 @@ fun run driver_theory request_file result_file =
                 (case choose "heuristic" false state (values nodes "heuristics") of
                   SOME selected => continue selected
                 | NONE =>
+                  (case normalize_for_hammer state of
+                    SOME normalized => continue normalized
+                  | NONE =>
                     let
                       val budget = number nodes "hammer_timeout_s";
                       val config = {provers = values nodes "provers", hammer_timeout = budget,
@@ -260,7 +280,7 @@ fun run driver_theory request_file result_file =
                       (case choose "reconstruction" true state candidates of
                         SOME selected => continue selected
                       | NONE => fail "missing_reconstruction" "all native reconstructions failed to make progress")
-                    end)
+                    end))
             end;
       in solve initial [] end;
     fun check_proof_span span =

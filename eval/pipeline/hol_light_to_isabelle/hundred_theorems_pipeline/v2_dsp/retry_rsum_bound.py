@@ -29,7 +29,7 @@ LOGS = (
     ("rsum_bound_direct_search", BASE + "v2-dsp-isabelle2026/rsum-bound/direct/work/target-3zezl1b1/search"),
 )
 REPORT_ROOT = "eval/preflight_results/isabelle2026-rsum-bound"
-FAILED_RUN = REPORT_ROOT + "/20261103T232010Z-e2f73e8b"
+FAILED_RUN = REPORT_ROOT + "/20261104T002751Z-cfc4b7f0"
 TRIANGLE_PROBE = "rsum_bound_triangle_forced_hammer"
 
 

@@ -32,9 +32,28 @@ fun reconstructions count (Sledgehammer.SH_Some (result, preplayed)) =
       else (maps (preplayed_commands count) preplayed, "preplayed")
   | reconstructions _ _ = ([], "none");
 
+(* Small, goal-driven hints from already available library facts. Keep normal
+   fact selection (only=false); do not import theories or manufacture premises.
+   Missing names are omitted, and no dataset/target names occur in this policy. *)
+fun fact_hints proof =
+  let
+    val ctxt = Proof.context_of proof;
+    val names = Term.add_const_names (Thm.prop_of (#goal (Proof.goal proof))) []
+      |> map Long_Name.base_name;
+    fun has name = member (op =) names name;
+    val wanted =
+      (if has "sum" then ["sum_mono", "sum_distrib_left", "sum_distrib_right"] else []) @
+      (if has "sum" andalso has "norm" then ["norm_sum", "sum_norm_le"] else []) @
+      (if has "case_prod" then ["case_prod_beta'"] else []) @
+      (if has "scaleR" andalso has "norm" then ["norm_scaleR"] else []);
+  in filter (can (Proof_Context.get_thms ctxt)) wanted end;
+
 fun search report {provers, hammer_timeout, preplay_timeout} state =
   let
     val proof = Toplevel.proof_of state;
+    val hints = fact_hints proof;
+    val fact_override: Sledgehammer_Fact.fact_override =
+      {add = map (fn name => (Facts.named name, [])) hints, del = [], only = false};
     val raw = [("timeout", Real.toString hammer_timeout),
                ("preplay_timeout", Real.toString preplay_timeout),
                (* Imported theory defaults must not switch a proof gap to falsification/abduction. *)
@@ -43,8 +62,13 @@ fun search report {provers, hammer_timeout, preplay_timeout} state =
                ("isar_proofs", "false"), ("max_proofs", "4")]
       @ (if null provers then [] else [("provers", space_implode " " provers)]);
     val params = Sledgehammer_Commands.default_params (Proof.theory_of proof) raw;
+    val goal_text = Syntax.string_of_term (Proof.context_of proof) (Thm.prop_of (#goal (Proof.goal proof)))
+      |> YXML.parse_body |> XML.content_of;
     val initial =
       [("resolved_provers", space_implode " " (#provers params)),
+       ("added_fact_hints", space_implode " " hints),
+       ("fact_hint_policy", "available_sum_norm_facts_v1"),
+       ("goal_before_search", goal_text),
        ("native_parameters", Sledgehammer_Prover.string_of_params params),
        ("caller_pide_enabled", Bool.toString (Print_Mode.PIDE_enabled ()))];
     val _ = report initial;
@@ -53,7 +77,7 @@ fun search report {provers, hammer_timeout, preplay_timeout} state =
     fun capture message = Synchronized.change messages (fn previous =>
       if length previous < 32 then clean message :: previous else previous);
     val returned = Exn.capture (fn () => Sledgehammer.run_sledgehammer params
-      Sledgehammer_Prover.Normal (SOME capture) 1 Sledgehammer_Fact.no_fact_override proof) ();
+      Sledgehammer_Prover.Normal (SOME capture) 1 fact_override proof) ();
     val captured = [("native_messages", cat_lines (rev (Synchronized.value messages)))];
     val _ = report (initial @ captured);
     val (_, (outcome, message)) = Exn.release returned;
