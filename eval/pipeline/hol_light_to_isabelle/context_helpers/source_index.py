@@ -87,28 +87,6 @@ class SourceIndex:
         at = bisect_left(starts, before)
         return self.bindings[name][at - 1] if at else None
 
-    def resolve(self, name, *, before, root):
-        aliases = []
-        seen = set()
-        for _ in range(9):  # At most eight alias hops, regardless of traversal depth.
-            if name == root.name:
-                return None, "excluded_target", aliases
-            binding = self.preceding(name, before)
-            if binding is None:
-                if name in seen:
-                    return None, "cycle_or_forward_alias", aliases
-                return None, "not_yet_bound" if name in self.bindings else "unresolved_reference", aliases
-            if binding.kind != "alias":
-                status = {"theorem": "resolved_alias" if aliases else "explicit_reference",
-                          "definition": "definition_reference", "opaque": "unsupported_binding"}[binding.kind]
-                return binding, status, aliases
-            if len(aliases) == 8:
-                break
-            aliases.append(binding.name)
-            seen.add(name)
-            name, before = binding.alias, binding.start
-        return None, "alias_limit", aliases
-
     def describe(self, binding):
         return {"name": binding.name, "span": [binding.start, binding.end], "kind": binding.kind,
                 "declaration_sha256": sha256(self.text[binding.start:binding.end]),
@@ -119,7 +97,7 @@ class SourceIndex:
 @dataclass(frozen=True)
 class SourceView:
     index: SourceIndex
-    root: Binding
+    root: Binding | None
     proof_path: str
     statement_path: str
     proof_sha256: str
@@ -130,7 +108,7 @@ class SourceView:
         return fingerprint([self.proof_path, self.proof_sha256, binding.start, binding.end])
 
 
-def _read_source(path: Path, max_chars: int, digest: str):
+def read_pinned_source(path: Path, max_chars: int, digest: str):
     if path.stat().st_size > max_chars * 4:
         raise SelectionFailure("source_scan_limit", f"source file exceeds the scan budget: {path.name}")
     text = path.read_text(encoding="utf-8")
@@ -157,8 +135,8 @@ def load_source(record, config, *, dataset_root=DATASET_ROOT):
         raise SelectionFailure("source_snapshot_mismatch", "record does not identify an allowed most-match file pair")
     proof_sha = metadata["hol_light_proof_sha256"]
     statement_sha = metadata["raw_hol_light_stmt_sha256"]
-    proof_text = _read_source(proof_path, config.max_source_chars, proof_sha)
-    masked_text = _read_source(statement_path, config.max_source_chars, statement_sha)
+    proof_text = read_pinned_source(proof_path, config.max_source_chars, proof_sha)
+    masked_text = read_pinned_source(statement_path, config.max_source_chars, statement_sha)
     index, snippets = _index_files(proof_text, masked_text, config)
     name = record["hol_light_target_name"]
     start, end = metadata["hol_light_declaration_span"]

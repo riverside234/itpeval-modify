@@ -7,5 +7,10 @@
   "max_import_files": 16,
   "max_import_chars": 256000,
   "max_fact_candidates": 24,
-  "max_prompt_chars": 100000
+  "max_prompt_chars": 100000,
+  "cross_file": false,
+  "source_load_manifest": "eval/configs/hol_light_to_isabelle/context_hol_light_loads.json",
+  "max_load_depth": 8,
+  "max_load_files": 16,
+  "max_load_directives": 128
 }

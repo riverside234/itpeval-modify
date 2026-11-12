@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "root": "hol_dataset/aligned-isabelle-hl-main",
+  "files": {
+    "Library/binomial.ml": {
+      "proof": "less-match/proofs/hol-light/binomial.ml",
+      "proof_sha256": "1e1ed89a8b2fe689105f3ff49866588b85a32568b35ad6be2d4ee211796d2ecb",
+      "statement": "less-match/stmts/hol-light/binomial.ml",
+      "statement_sha256": "90e68a438724ecff1ac36bfb1d8e601e4cbd6eb8c27e354170cd019326b7d82b"
+    },
+    "Library/grouptheory.ml": {
+      "proof": "hol/proofs/hol-light/grouptheory.ml",
+      "proof_sha256": "12461784a975326bbb430ad3fb5d82c757a15dea2cb0d000e62222668213ce55",
+      "statement": "hol/stmts/hol-light/grouptheory.ml",
+      "statement_sha256": "b97aecd3f731470c6ef81abed002f5c8018d89d89bb9dc20e31e6d581d531122"
+    },
+    "Logic/canon.ml": {
+      "proof": "afp/proofs/hol-light/canon.ml",
+      "proof_sha256": "129c3a195ce86003f187329bbb042492fd12429f3df6c45b6b5a0c4a9980b819",
+      "statement": "afp/stmts/hol-light/canon.ml",
+      "statement_sha256": "2dd4af36cd4697f81a65e51f12f5d1402bdf32108071fc50da9479d79d86e10d"
+    },
+    "Logic/fol.ml": {
+      "proof": "afp/proofs/hol-light/fol.ml",
+      "proof_sha256": "e00178e2f5b4b3090f648499e098a2ee3503ee9b57075d1b950772ec21dc01c5",
+      "statement": "afp/stmts/hol-light/fol.ml",
+      "statement_sha256": "deddc867900ddc7ac423c18dd4b3177fcc8f75592cbc263918551fd9e75fb00a"
+    },
+    "Logic/fol_prop.ml": {
+      "proof": "afp/proofs/hol-light/fol_prop.ml",
+      "proof_sha256": "5aae672bf0a88c299b9bb9becf8fc33493c7e5a64f3a52353d6c09648752858c",
+      "statement": "afp/stmts/hol-light/fol_prop.ml",
+      "statement_sha256": "efe8cafbd424815bda51f1873a95146e78b05bf2e1b2c0412c7db1c16906002c"
+    },
+    "Logic/prenex.ml": {
+      "proof": "afp/proofs/hol-light/prenex.ml",
+      "proof_sha256": "ab9f18b2629e86441744c84f0e74964045c84cbbc516cc8fc14c34ba6dbdd497",
+      "statement": "afp/stmts/hol-light/prenex.ml",
+      "statement_sha256": "e7a088ae4f02afd2d1a1c6d6fbac8eeae3129eb0a9eef03fef5a72eb79db9f60"
+    },
+    "Logic/skolem.ml": {
+      "proof": "afp/proofs/hol-light/skolem.ml",
+      "proof_sha256": "a2c3f1c83e10d741f19b64286a7ae2512568df531d1da0f801f668eabbbd6065",
+      "statement": "afp/stmts/hol-light/skolem.ml",
+      "statement_sha256": "b4ccf60de5fcb759d9191eaf728da63c91f42d5d38c6195c262d7670fcf45f16"
+    },
+    "Multivariate/canal.ml": {
+      "proof": "hol/proofs/hol-light/canal.ml",
+      "proof_sha256": "2db326dbb1819e2a059369a53771d0832eaa666d5d4f03f274d5b54de551e932",
+      "statement": "hol/stmts/hol-light/canal.ml",
+      "statement_sha256": "34e5c0ced9c21e8c67a0b654f59f30f3f17c30f50b69eafd61c2cc1ebeab2357"
+    },
+    "Multivariate/cauchy.ml": {
+      "proof": "hol/proofs/hol-light/cauchy.ml",
+      "proof_sha256": "d8da9b573df3a24423f36855aa8aeb851610b93e36031881d376396a8c60e7bb",
+      "statement": "hol/stmts/hol-light/cauchy.ml",
+      "statement_sha256": "81891b247aa3a078e1ccb6713c88b1e8429e7244a30b2caa5e6a8c6db89ed5b5"
+    },
+    "Multivariate/complexes.ml": {
+      "proof": "hol/proofs/hol-light/complexes.ml",
+      "proof_sha256": "c5ac5f6880bfccd640eca5b7714b3481e7b25b6af69ff51681f667e1636c9a2a",
+      "statement": "hol/stmts/hol-light/complexes.ml",
+      "statement_sha256": "d4375618f7309d28fc1dcd031ce511fa3ecedc3a85602113d56cc6be735a673a"
+    },
+    "Multivariate/convex.ml": {
+      "proof": "hol/proofs/hol-light/convex.ml",
+      "proof_sha256": "7b0c9481a8273787dc7cb9910074c11bd228d8025697b96d797f53eb066c5f6e",
+      "statement": "hol/stmts/hol-light/convex.ml",
+      "statement_sha256": "170354c7266b45de17c822bd11d97984bf65fea381009a5d1e66c8a1f3caa6d3"
+    },
+    "Multivariate/cross.ml": {
+      "proof": "hol/proofs/hol-light/cross.ml",
+      "proof_sha256": "e5851f22f3d76aff5491dd22cd6057cdbe43ec62ab24cd0b0a9a39b18e4b13f6",
+      "statement": "hol/stmts/hol-light/cross.ml",
+      "statement_sha256": "942139754bccc71f8e8a44cd01b1ed65567cf3daeca2b9237081d323419433ea"
+    },
+    "Multivariate/degree.ml": {
+      "proof": "hol/proofs/hol-light/degree.ml",
+      "proof_sha256": "7371f3c29843e32c8c54e29440ff1706d6bd3d51ceeba217b73a6dccd1fa577e",
+      "statement": "hol/stmts/hol-light/degree.ml",
+      "statement_sha256": "d2c1a9a230863aa6e71ad963286a2a28ebf4ad910b344f5f91b064938b04cef2"
+    },
+    "Multivariate/derivatives.ml": {
+      "proof": "hol/proofs/hol-light/derivatives.ml",
+      "proof_sha256": "ee9f95869a220644d46a2fd934fbca8406cf364036a9975f8062fcda4ba58742",
+      "statement": "hol/stmts/hol-light/derivatives.ml",
+      "statement_sha256": "a212b5ebd371220822db569042583bdfa289989ee6582555a5a1ee781e1e1f05"
+    },
+    "Multivariate/integration.ml": {
+      "proof": "hol/proofs/hol-light/integration.ml",
+      "proof_sha256": "03528229d7172f50edaf61bdaec89e51ea372f8c0368b02364473bb93504bf76",
+      "statement": "hol/stmts/hol-light/integration.ml",
+      "statement_sha256": "7ba873fb362c8b2ae237460bcadcb90af851258ee3e485ef0c51c9c8fe0b8016"
+    },
+    "Multivariate/measure.ml": {
+      "proof": "hol/proofs/hol-light/measure.ml",
+      "proof_sha256": "e65274cbbcb21ee112e1eef0233ac7a3c256239871be7e5b2759abd9eeac6383",
+      "statement": "hol/stmts/hol-light/measure.ml",
+      "statement_sha256": "268ce620fd2de48d5627921e1cc5e1ada513cd8a4df4feacca68fb8a06c2ecd5"
+    },
+    "Multivariate/metric.ml": {
+      "proof": "hol/proofs/hol-light/metric.ml",
+      "proof_sha256": "92fb06b8dc981481ea9ccc49bb756a8b9d74fd0f7c7ce143dcf58da4f1a89669",
+      "statement": "hol/stmts/hol-light/metric.ml",
+      "statement_sha256": "35d7ae3e0a3604ffbf7ae0d185173e2f6e24fb706a173acfee0ade75a36f92f6"
+    },
+    "Multivariate/moretop.ml": {
+      "proof": "hol/proofs/hol-light/moretop.ml",
+      "proof_sha256": "a531feef83a1166211ea46842f6f9296351b174ba9d828602a0685fa24e2c023",
+      "statement": "hol/stmts/hol-light/moretop.ml",
+      "statement_sha256": "135bd747c2cf5e9db18c5a853aade7f3075c718b72028710b2572add2d02e8a2"
+    },
+    "Multivariate/paths.ml": {
+      "proof": "hol/proofs/hol-light/paths.ml",
+      "proof_sha256": "5cb131e630d60b7f0436395d26a3c7c4e2b0fe27f813b3a1f569c654091e8076",
+      "statement": "hol/stmts/hol-light/paths.ml",
+      "statement_sha256": "e1126f586fe9a41bbc891f995cb50a26f34ff3199395f9ff50b348eba801d61f"
+    },
+    "Multivariate/polytope.ml": {
+      "proof": "hol/proofs/hol-light/polytope.ml",
+      "proof_sha256": "d5a677be35ff4bf2aee8321fe4e64a32f0116982f48ba5767cc24cfaee11332e",
+      "statement": "hol/stmts/hol-light/polytope.ml",
+      "statement_sha256": "1d4db504d66651a5b51f3fbd3e96bf9466b11cf1f0a4c5959e0776783128b230"
+    },
+    "Multivariate/topology.ml": {
+      "proof": "hol/proofs/hol-light/topology.ml",
+      "proof_sha256": "f27aa7b6330983867b6d4e2f5d3c505a1e67fb49b70a5bde8d526dd57c734204",
+      "statement": "hol/stmts/hol-light/topology.ml",
+      "statement_sha256": "627457348c27410d5823fd0006057d101de42663b11488efdda53639316c1724"
+    },
+    "Multivariate/transcendentals.ml": {
+      "proof": "hol/proofs/hol-light/transcendentals.ml",
+      "proof_sha256": "ef255eb24d0cede2db8f0a05554c2374860f23b78e841f4ddf9eb80ac5c24b86",
+      "statement": "hol/stmts/hol-light/transcendentals.ml",
+      "statement_sha256": "825623d2b845fd6c86f58b845ae529c2f8088a406baabd445a3a99a9be8c9600"
+    },
+    "sets.ml": {
+      "proof": "hol/proofs/hol-light/sets.ml",
+      "proof_sha256": "1e1ed89a8b2fe689105f3ff49866588b85a32568b35ad6be2d4ee211796d2ecb",
+      "statement": "hol/stmts/hol-light/sets.ml",
+      "statement_sha256": "90e68a438724ecff1ac36bfb1d8e601e4cbd6eb8c27e354170cd019326b7d82b"
+    }
+  }
+}

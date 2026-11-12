@@ -50,8 +50,8 @@ let LATER_FACT = prove (|T|, A_TAC);;
         index = SourceIndex(text, config)
         root = index.bindings["ROOT_FACT"][0]
         view = SourceView(index, root, "proof.ml", "stmt.ml", sha256(text), "", ())
-        helpers, _, report = walk(view, config)
-        self.assertEqual([item.name for item in helpers], ["FIRST_FACT", "OTHER_FACT", "BASE_FACT"])
+        helpers, _, report, _ = walk(view, config)
+        self.assertEqual([item.binding.name for item in helpers], ["FIRST_FACT", "OTHER_FACT", "BASE_FACT"])
         self.assertEqual([item["depth"] for item in report["nodes"]], [0, 1, 1, 2])
         self.assertEqual(report["loads"][0]["status"], "unresolved_load")
         edges = report["edges"]
@@ -64,9 +64,9 @@ let LATER_FACT = prove (|T|, A_TAC);;
         self.assertEqual(statuses["CYCLE_B"], "cycle_or_forward_alias")
         self.assertTrue(any(e.get("shared_child") and e["name"] == "BASE_FACT" for e in edges))
         self.assertFalse({"COMMENT_FACT", "STRING_FACT", "QUOTED_FACT"} & statuses.keys())
-        _, _, bounded = walk(view, replace(config, dependency_depth=1))
+        _, _, bounded, _ = walk(view, replace(config, dependency_depth=1))
         self.assertTrue(any(e["name"] == "BASE_FACT" and e["status"] == "depth_limit" for e in bounded["edges"]))
-        _, _, bounded = walk(view, replace(config, max_helpers=1))
+        _, _, bounded, _ = walk(view, replace(config, max_helpers=1))
         self.assertTrue(any(e["status"] == "node_limit" for e in bounded["edges"]))
 
     def test_oversized_package_keeps_pinned_scope_and_allows_other_branch(self):
@@ -147,13 +147,16 @@ class ContextExperimentTests(unittest.TestCase):
                 module + ".babel_formal_pipeline.v2_dsp.generate_sketch.call_draft_model",
                 return_value="by simp") as model:
             root = Path(tmp)
-            common = dict(helper_config=ContextConfig(), dataset_root=DATASET_ROOT, inspect_only=False,
+            common = dict(dataset_root=DATASET_ROOT, inspect_only=False,
                           native_config=DspConfig(), llm=InferenceConfig(), parallel=parallel)
-            for arm in ("baseline", "context-native", "context-native"):
-                result = run_experiment([self.raw], output=root / arm, arm=arm, **common)
+            for arm in ("baseline", "context-native", "context-native",
+                        "context-cross-file", "context-native-cross-file"):
+                helper_config = ContextConfig(cross_file=arm.endswith("-cross-file"))
+                result = run_experiment([self.raw], output=root / arm, arm=arm,
+                                        helper_config=helper_config, **common)
                 self.assertEqual(result["verified"], 1)
-            self.assertEqual(model.call_count, 2)
-            self.assertEqual(calls, {"context": 1, "inspect_facts": 2, "search": 2})
+            self.assertEqual(model.call_count, 4)
+            self.assertEqual(calls, {"context": 2, "inspect_facts": 3, "search": 4})
             baseline, context = [read_jsonl(root / arm / "inputs.jsonl")[0] for arm in ("baseline", "context-native")]
             self.assertEqual(baseline["isabelle_statement"], context["isabelle_statement"])
             self.assertNotEqual(baseline["input_fingerprint"], context["input_fingerprint"])

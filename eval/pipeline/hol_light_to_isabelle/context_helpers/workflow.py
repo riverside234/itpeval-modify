@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+from dataclasses import replace
 import json
 from pathlib import Path
 import time
@@ -30,13 +31,15 @@ from ..most_match_pipeline.v2_dsp.direct_sketch_prompt import DIRECT_PROMPT_VERS
 from eval.pipeline.proof_transfer.llm import resolve_model_config
 
 from .context import arm_record, baseline_view, prepare_selection, selection_change
-from .contracts import ContextConfig, MODE, SelectionFailure, VERSION
+from .contracts import ContextConfig, MODE, NATIVE_ARMS, SelectionFailure, VERSION, context_arm
+from .source_loads import LoadCatalog
 
 DEFAULT_OUTPUT = RESULTS_DIR + "/context_helpers"
-ARMS = ("baseline", "context", "context-native")
+ARMS = ("baseline", "context", "context-native", "context-cross-file", "context-native-cross-file")
 
 
 def prepare_records(records, config, *, arm, dataset_root):
+    catalog = LoadCatalog(config) if config.cross_file and arm != "baseline" else None
     prepared = []
     for original in records:
         row = arm_record(original, arm)
@@ -48,9 +51,9 @@ def prepare_records(records, config, *, arm, dataset_root):
             if arm == "baseline":
                 validate_context(original)
             else:
-                selection = prepare_selection(original, config, dataset_root=dataset_root)
+                selection = prepare_selection(original, config, dataset_root=dataset_root, catalog=catalog)
                 snapshot, report = selection.render()
-                row = snapshot if arm == "context" else row
+                row = row if arm in NATIVE_ARMS else snapshot
         except (KeyError, OSError, ValueError) as exc:
             mark_failure(report, getattr(exc, "category", "context_selection_error"), exc)
         report["arm"] = arm
@@ -81,7 +84,7 @@ def check_native(prepared, *, arm, config, plan, output):
     def check(i):
         row, report, selection = prepared[i]
         began = time.monotonic()
-        action = "inspect_facts" if arm == "context-native" else "context"
+        action = "inspect_facts" if arm in NATIVE_ARMS else "context"
         options = {"fact_names": tuple(selection.shortlist)} if action == "inspect_facts" else {}
         try:
             native = factory(runtime).request(
@@ -197,6 +200,10 @@ def compare_arms(root):
 
 def run_experiment(records, *, output, arm, helper_config, dataset_root, inspect_only,
                    native_config=None, llm=None, parallel=None, resume=True):
+    if arm != "baseline" and arm != context_arm(native=arm in NATIVE_ARMS, cross_file=helper_config.cross_file):
+        raise ValueError("context arm must match its cross-file and native fact settings")
+    if arm in NATIVE_ARMS and native_config is None:
+        raise ValueError("native fact inspection requires a native configuration")
     if not inspect_only:
         check_outputs(output, arm)
     prepared = prepare_records(records, helper_config, arm=arm, dataset_root=dataset_root)
@@ -247,6 +254,8 @@ def main():
     parser.add_argument("--limit", type=int)
     parser.add_argument("--helper-mode", choices=["baseline", "context"], default="context")
     parser.add_argument("--helper-config", help="Optional context experiment settings JSON")
+    parser.add_argument("--cross-file", action=argparse.BooleanOptionalAction,
+                        help="Follow pinned HOL Light load directives. Overrides cross_file in --helper-config.")
     parser.add_argument("--config", help="Native Isabelle2026 configuration for lab runs")
     parser.add_argument("--llm-config", help="API or vLLM profile for the existing direct sketch")
     parser.add_argument("--inspect-only", action="store_true", help="Write a selection comparison without inference")
@@ -262,9 +271,13 @@ def main():
     use_native = not args.inspect_only or args.native_facts
     if use_native and not args.config:
         parser.error("--config is required for a lab run or --native-facts")
-    arm = "context-native" if args.native_facts else args.helper_mode
     try:
         validate_layout(args.expected_root)
+        helper_config = ContextConfig.load(args.helper_config)
+        if args.cross_file is not None:
+            helper_config = replace(helper_config, cross_file=args.cross_file)
+        arm = (context_arm(native=args.native_facts, cross_file=helper_config.cross_file)
+               if args.helper_mode == "context" else "baseline")
         output = repo_path(Path(args.output_dir) / arm)
         input_paths = [args.records, args.config, args.llm_config, args.helper_config]
         if any(repo_path(path).is_relative_to(output) for path in input_paths if path):
@@ -274,7 +287,7 @@ def main():
         if not records or any(row.get("pipeline") or row.get("metadata", {}).get("context_experiment")
                               or baseline_view(row)["version"] == DEPENDENCY_CONTEXT_VERSION for row in records):
             raise ValueError("provide matching original most-match extraction records")
-        summary = run_experiment(records, output=output, arm=arm, helper_config=ContextConfig.load(args.helper_config),
+        summary = run_experiment(records, output=output, arm=arm, helper_config=helper_config,
             dataset_root=args.dataset_root, inspect_only=args.inspect_only,
             native_config=DspConfig.load(args.config) if use_native else None,
             llm=None if args.inspect_only else resolve_model_config(args.llm_config, default_effort="high"),

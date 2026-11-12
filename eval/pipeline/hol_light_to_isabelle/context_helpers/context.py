@@ -5,8 +5,8 @@ from dataclasses import asdict, dataclass
 from ..most_match_pipeline.common import DATASET_ROOT, fingerprint, key, sha256
 from ..most_match_pipeline.context import (DEPENDENCY_CONTEXT_VERSION, identifiers,
                                           validate_prompt_context)
-from .contracts import ContextConfig, VERSION
-from .dependencies import source_packages, walk
+from .contracts import ContextConfig, LOAD_SETTINGS, VERSION, context_arm
+from .dependencies import imported_definitions, source_packages, walk
 from .selection import Selection
 from .source_index import load_source
 from . import target_facts
@@ -62,13 +62,16 @@ class ContextSelection:
                   "hol_light": self.hol_info, "isabelle": target_info,
                   "policy": "bounded_dependency_references",
                   "verification_context": "full_original_masked_prefix"}
-        arm = "context-native" if inspection is not None else "context"
+        arm = context_arm(native=inspection is not None, cross_file=self.config.cross_file)
+        settings = asdict(self.config)
+        if not self.config.cross_file:
+            settings = {name: value for name, value in settings.items() if name not in LOAD_SETTINGS}
         report = {"target": list(key(self.record)), "arm": arm, "status": "selected",
                   "baseline": baseline, "selection": policy,
                   "changes": {name: selection_change(baseline[name], policy[name])
                               for name in ("hol_light", "isabelle")},
                   "dependency_graph": self.graph, "target_candidates": evidence,
-                  "settings": asdict(self.config), "backend_sha256": backend_sha256}
+                  "settings": settings, "backend_sha256": backend_sha256}
         if inspection is not None:
             report["fact_inspection_version"] = inspection["version"]
         row = arm_record(self.record, arm, support_sha256=fingerprint(report), prompt_context=policy)
@@ -79,10 +82,10 @@ class ContextSelection:
         return row, report
 
 
-def prepare_selection(record, config, *, dataset_root=DATASET_ROOT):
+def prepare_selection(record, config, *, dataset_root=DATASET_ROOT, catalog=None):
     validate_prompt_context(record)
     source = load_source(record, config, dataset_root=dataset_root)
-    helpers, hints, graph = walk(source, config)
+    helpers, hints, graph, definitions = walk(source, config, catalog=catalog)
     pinned, eligible, packages = source_packages(source, helpers, graph)
     baseline = baseline_view(record)
     selection = Selection(baseline["hol_light"]["budget_chars"], pinned)
@@ -91,13 +94,26 @@ def prepare_selection(record, config, *, dataset_root=DATASET_ROOT):
         node["reference_span"] = [snippet.start, snippet.end]
         node["reference_chars"] = len(snippet.text)
         node["vocabulary"] = [entry.name for entry in required]
+    imported = []
+    for snippet, edge in imported_definitions(definitions):
+        edge["reference_selection"] = "selected" if selection.add_optional(snippet) else "over_budget"
+        edge["reference_path"] = snippet.origin
+        edge["reference_span"] = [snippet.start, snippet.end]
+        imported.append(snippet)
     query = identifiers(source.root.statement + "\n" + source.root.proof)
-    helper_symbols = frozenset().union(*(identifiers(helper.statement) for helper in helpers))
+    helper_symbols = frozenset().union(*(identifiers(helper.binding.statement) for helper in helpers))
     query |= helper_symbols
     ranked = sorted(eligible, key=lambda item: (-len(identifiers(item.text) & query), -item.start, item.name))
     for item in ranked:
         if identifiers(item.text) & query:
             selection.add_optional(item)
-    hol_reference, hol_info = selection.finish([*pinned, *eligible])
+    candidates = [*pinned, *eligible, *imported]
+    if config.cross_file:
+        for node, snippet, required in packages:
+            if snippet.origin:
+                node["reference_path"] = snippet.origin
+                candidates.extend([snippet, *required])
+        candidates = list(dict.fromkeys(candidates))
+    hol_reference, hol_info = selection.finish(candidates)
     target = target_facts.candidates(record, hints, helper_symbols, config, dataset_root=dataset_root)
     return ContextSelection(record, config, graph, hol_reference, hol_info, *target)

@@ -8,7 +8,7 @@ The checker runs its usual native Prove stage.
 | Arm | Prompt reference selection |
 |---|---|
 | baseline | The references in the original extracted record. |
-| context | Follow explicit references and simple aliases to earlier theorems in the same HOL Light file. Select masked statements, definitions and candidate Isabelle signatures from masked snapshots. |
+| context | Follow explicit references and simple aliases to earlier theorems. Select masked statements, definitions and candidate Isabelle signatures. Cross-file loads are optional. |
 | context-native | Use the same candidate ranking. Resolve the Isabelle shortlist in the verifier's actual context before the oracle, and use the resolved names and typed propositions. |
 
 The defaults follow two theorem edges and five unique helpers per target.
@@ -22,9 +22,9 @@ are excluded. The native lookup returns signatures only, including all
 propositions of a fact bundle when it fits the lookup limit.
 
 The source index supports literal top-level prove declarations and simple
-aliases. Literal loads, opaque bindings and possible local shadowing are
-reported. The pilot does not resolve cross-file HOL Light loads or recover
-implicit theorem uses inside tactics. Isabelle snapshot traversal is limited to
+aliases. Reports record opaque bindings, possible local shadowing and unresolved
+loads. Dependencies used implicitly inside tactics are outside the static scan.
+Isabelle snapshot traversal is limited to
 explicit imports found under the dataset's masked AFP and HOL snapshots.
 Native availability is scoped to the pre-oracle context. A resolved signature
 can still require a bridge, an instantiation or additional premises. A name
@@ -59,6 +59,47 @@ Read the dependency graph, candidate statuses and old/new reference selections
 in the run's context/inspection.jsonl. For a second-hop example, set the topic to
 Conformal_Mappings and the target to Bloch before extracting. The report also
 records unresolved identifiers, which can be tactics or theorem names.
+
+## Optional cross-file retrieval
+
+Set `"cross_file": true` in the helper config, or add `--cross-file` to a
+context command. It defaults to false. `--no-cross-file` overrides a true
+config value. The enabled runs use the `context-cross-file` and
+`context-native-cross-file` arm directories, so both settings can use the same
+run directory. Run both context settings with identical limits to compare their
+selections. The baseline arm continues to use the saved references.
+
+~~~bash
+python -m "$PIPE.context_helpers.workflow" \
+  --expected-root "$PWD" --records "$RUN/records.jsonl" \
+  --helper-config "$HELPER" --output-dir "$RUN" --cross-file --inspect-only
+~~~
+
+The resolver follows top-level literal `needs`, `loadt`, and `loads` in order.
+It visits nested loads and resolves each proof's names at the point where that
+proof was declared. Duplicate `needs` uses the load basename and file identity.
+`loadt` and `loads` may rebind names. The report records the load chain, origin,
+cycles, missing entries, hash mismatches, and budget limits. The manifest
+supplies the local resolution for each literal path. The scan does not run
+OCaml or search its runtime load path. See the
+[HOL Light loader](https://github.com/jrh13/hol-light/blob/master/hol_loader.ml).
+
+The [default manifest](../../../configs/hol_light_to_isabelle/context_hol_light_loads.json)
+pins 23 files available in the dataset. An unmapped literal is reported even
+when a different file has the same basename. To add sources, copy the manifest
+and set `source_load_manifest` to your copy. It has `version: 1`, a
+repository-local `root`, and `files` keyed by exact load paths. Each entry
+gives a `proof` path under that root and a `proof_sha256`. Optional
+`statement` and `statement_sha256` fields give a paired masked snapshot.
+Hashes use UTF-8 text with normalized line endings. For a proof-only entry,
+the model receives only the proposition extracted from a supported literal
+`prove` declaration. Definition excerpts require a matching masked snapshot.
+
+The load walk is bounded by `max_load_depth`, `max_load_files`, and
+`max_load_directives`. The theorem walk and prompt keep their existing helper
+and character limits. Try `Polytope/Krein_Milman` to see the resolver follow
+`Multivariate/paths.ml` into `Multivariate/convex.ml` and select
+`CONVEX_HULL_EMPTY`.
 
 ## Lab inspection and paired runs
 
