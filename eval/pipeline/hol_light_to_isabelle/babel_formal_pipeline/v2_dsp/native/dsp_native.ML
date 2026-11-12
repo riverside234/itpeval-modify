@@ -135,6 +135,44 @@ fun begin_context_theory driver_theory prefix =
        condition_bad = (false, ""), errors = [], initiators = []};
   in Resources.begin_theory source (Theory.parents_of driver_theory) end;
 
+(* Resolve named static facts at the target boundary. Fact names are data and
+   never become Isar commands, attributes, literal propositions, or ML code. *)
+fun inspect_fact ctxt forbidden requested =
+  let
+    val generic = Context.Proof ctxt;
+    val print_ctxt = ctxt |> Config.put Printer.show_types true |> Config.put Printer.show_sorts true;
+    fun excluded name = member (op =) forbidden (Long_Name.base_name name);
+    fun row status name scope propositions =
+      elem "fact" [("requested", requested), ("status", status), ("name", name), ("scope", scope)]
+        (map (text "proposition") propositions);
+    fun skipped status = row status "" "" [];
+    fun resolve (scope, table) =
+      Option.map (fn name => (scope, table, name))
+        (try (Facts.check generic table) (requested, Position.none));
+  in
+    if excluded requested then skipped "excluded"
+    else
+      (case get_first resolve
+          [("local", Proof_Context.facts_of ctxt),
+           ("global", Global_Theory.facts_of (Proof_Context.theory_of ctxt))] of
+        NONE => skipped "not_resolved"
+      | SOME (scope, table, name) =>
+          if excluded name then skipped "excluded"
+          else if Facts.is_dynamic table name then skipped "dynamic"
+          else
+            (case Facts.lookup generic table name of
+              NONE => skipped "not_resolved"
+            | SOME {thms, ...} =>
+                if null thms then skipped "not_resolved"
+                else if exists (excluded o #1 o Thm.get_name_hint) thms then skipped "excluded"
+                else if length thms > 32 then skipped "signature_too_large"
+                else
+                  let val propositions = map (clean o Thm.string_of_thm print_ctxt) thms
+                  in if fold (fn prop => fn n => n + size prop) propositions 0 > 6000
+                     then skipped "signature_too_large"
+                     else row "resolved" name scope propositions end))
+  end;
+
 fun run driver_theory request_file result_file =
   let
     val (attrs, nodes) =
@@ -146,8 +184,9 @@ fun run driver_theory request_file result_file =
     val id = attr attrs "request_id";
     val digest = attr attrs "input_sha256";
     val action = attr attrs "action";
-    val _ = if member (op =) ["context", "search"] action then () else fail "protocol_error" "bad action";
+    val _ = if member (op =) ["context", "search", "inspect_facts"] action then () else fail "protocol_error" "bad action";
     val attempts = Unsynchronized.ref ([]: XML.tree list);
+    val inspected = Unsynchronized.ref ([]: XML.tree list);
     val settings = Unsynchronized.ref ([]: (string * string) list);
     val serial = Unsynchronized.ref 0;
     val state_serial = Unsynchronized.ref 0;
@@ -404,18 +443,26 @@ fun run driver_theory request_file result_file =
            The request excludes later basenames also used by earlier scoped helpers;
            no later source is executed, and the ancestor guard above still applies. *)
         val ctxt = Toplevel.context_of context;
+        val forbidden = values nodes "forbidden_names";
         val _ = List.app (fn name =>
           let val qualified = distinct (op =) [original_name ^ "." ^ name,
                                               Proof_Context.full_name ctxt (Binding.name name)]
           in if exists (can (Proof_Context.get_thms ctxt)) qualified then
                fail "context_error" ("target or later fact leaked into the input context: " ^ name)
-             else () end) (values nodes "forbidden_names");
+             else () end) forbidden;
         val clean = execute_text "context" context "declare [[quick_and_dirty = false, smt_oracle = false]]";
         val opened = execute_text "target" clean (value nodes "statement" ^ "\n" ^ value nodes "proof_prefix");
         val _ = if Toplevel.is_proof opened andalso not (Toplevel.is_skipped opened) then ()
                 else fail "context_error" "oracle did not open a real target proof";
       in
         if action = "context" then ()
+        else if action = "inspect_facts" then
+          let
+            val names = values nodes "fact_names";
+            val _ = if length names <= 32 andalso distinct (op =) names = names then ()
+                    else fail "protocol_error" "invalid fact inspection shortlist";
+            val inspect = inspect_fact (Toplevel.context_of clean) forbidden;
+          in inspected := bounded context_budget (map inspect) names end
         else
           let
             val _ = stage := "sketch_step_failure";
@@ -442,9 +489,11 @@ fun run driver_theory request_file result_file =
       [("schema", "dsp_native_result_v1"), ("request_id", id), ("input_sha256", digest),
        ("action", action), ("success", Bool.toString success),
        ("target_closed", Bool.toString (!target_closed))]
-      [text "proof" (!reconstructed), text "category" category, text "error" message,
+      ([text "proof" (!reconstructed), text "category" category, text "error" message,
        elem "attempts" [] (rev (!attempts)),
-       elem "settings" [] (map (fn (name, value) => elem "param" [("name", name)] [XML.Text value]) (!settings))];
+       elem "settings" [] (map (fn (name, value) => elem "param" [("name", name)] [XML.Text value]) (!settings))] @ (if action = "inspect_facts" then
+        [elem "facts" [("schema", "dsp_native_fact_inspection_v1"), ("boundary", "before_oracle")] (!inspected)]
+        else []));
     val _ = File.write (Path.explode result_file) (XML.string_of result);
   in () end;
 

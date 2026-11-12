@@ -105,14 +105,14 @@ class ContextRegressions(unittest.TestCase):
             engine.request(row, '', directory=self.job, action='context', heuristics=(), deadline=time.monotonic()+120)
         data = json.loads((self.job / 'input.json').read_text())
         self.assertEqual('90', data['context_step_timeout_s'])
-        self.assertEqual('10', data['step_timeout_s'])
+        self.assertEqual('20', data['step_timeout_s'])
         self.assertEqual(['bertrand.ML:' + hashlib.sha256(content).hexdigest()], data['auxiliary_sources'])
         self.assertNotIn('Bertrand', (self.job / 'DSP_Driver.thy').read_text())
         self.assertIn('Pratt_Certificate', (self.job / 'ROOT').read_text())
 
     def test_context_timeout_remains_positive_bounded_and_separate_from_proof_steps(self):
         self.assertEqual(120, DspConfig().context_step_timeout_s)
-        self.assertEqual(10, DspConfig().step_timeout_s)
+        self.assertEqual(20, DspConfig().step_timeout_s)
         for value in (0, -1, 0.0001, True, float('inf')):
             with self.assertRaises(ValueError):
                 DspConfig(context_step_timeout_s=value)

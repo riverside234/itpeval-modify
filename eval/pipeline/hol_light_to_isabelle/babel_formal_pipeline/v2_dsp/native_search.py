@@ -18,6 +18,10 @@ from .runtime import DspConfig, NATIVE_DIR, RUNTIME_DIR, OwnedProcess, adapter_h
 
 PROTOCOL_VERSION = "dsp_native_request_v1"
 RESULT_VERSION = "dsp_native_result_v1"
+FACTS_VERSION = "dsp_native_fact_inspection_v1"
+MAX_INSPECT_FACTS = 32
+MAX_SIGNATURE_BYTES = 6000
+FACT_NAME = re.compile(r"[A-Za-z_][A-Za-z_0-9'-]*(?:\.[A-Za-z_][A-Za-z_0-9'-]*)*")
 
 
 class NativeFailure(RuntimeError):
@@ -178,6 +182,30 @@ def quote(value: str) -> str:
     return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
+def read_inspected_facts(node: ET.Element, names: list[str], *, success: bool) -> list[dict]:
+    if node.get("schema") != FACTS_VERSION or node.get("boundary") != "before_oracle":
+        raise NativeFailure("protocol_error", "invalid fact inspection version or context boundary")
+    facts = []
+    for item in node:
+        requested, status = item.get("requested"), item.get("status")
+        name, scope = item.get("name", ""), item.get("scope", "")
+        props = [prop.text or "" for prop in item]
+        resolved = status == "resolved"
+        if (item.tag != "fact" or any(p.tag != "proposition" or len(p) for p in item)
+                or status not in {"resolved", "not_resolved", "excluded", "dynamic", "signature_too_large"}
+                or resolved != bool(props)
+                or (resolved and (not FACT_NAME.fullmatch(name) or scope not in {"local", "global"}))
+                or (not resolved and (name or scope))
+                or any(not prop.strip() for prop in props)
+                or sum(len(prop.encode("utf-8")) for prop in props) > MAX_SIGNATURE_BYTES):
+            raise NativeFailure("protocol_error", "invalid inspected fact entry")
+        facts.append({"requested": requested, "status": status, "name": name,
+                      "scope": scope, "propositions": props})
+    if [fact["requested"] for fact in facts] != (names if success else []):
+        raise NativeFailure("protocol_error", "fact inspection entries do not match this request")
+    return facts
+
+
 def read_result(path: Path, request: dict, *, returncode: int) -> dict:
     if not path.is_file():
         details = build_diagnostics(path.parent, returncode)
@@ -205,6 +233,8 @@ def read_result(path: Path, request: dict, *, returncode: int) -> dict:
     if root.get("target_closed") not in {"true", "false"}:
         raise NativeFailure("protocol_error", "invalid target completion flag")
     required = {"proof", "error", "category", "attempts", "settings"}
+    if request["action"] == "inspect_facts":
+        required.add("facts")
     if set(child.tag for child in root) != required or any(len(root.findall(name)) != 1 for name in required):
         raise NativeFailure("protocol_error", "missing, repeated or unknown result fields")
     rows = []
@@ -221,6 +251,11 @@ def read_result(path: Path, request: dict, *, returncode: int) -> dict:
               "step_results": rows,
               "prover_settings": {item.get("name"): item.text or "" for item in root.findall("settings/param")},
               "result_path": str(path), "request_id": request["request_id"]}
+    if request["action"] == "inspect_facts":
+        if result["target_closed"] or result["isabelle_proof"]:
+            raise NativeFailure("protocol_error", "fact inspection must leave the target open")
+        result["fact_inspection"] = {"version": FACTS_VERSION, "boundary": "before_oracle",
+            "facts": read_inspected_facts(root.find("facts"), request["fact_names"], success=result["success"])}
     if returncode != 0:
         details = build_diagnostics(path.parent, returncode)
         result.update(details, success=False, failure_category="worker_failure",
@@ -308,10 +343,17 @@ class NativeSearch:
         return "".join(mapping.get(char, char) for char in text)
 
     def request(self, record: dict, sketch: str, *, directory: Path, action: str,
-                heuristics: tuple[str, ...], deadline: float) -> dict:
+                heuristics: tuple[str, ...], deadline: float, fact_names: tuple[str, ...] = ()) -> dict:
         context = validate_context(record)
-        if action not in {"context", "search"}:
+        if action not in {"context", "search", "inspect_facts"}:
             raise ValueError("unsupported native action")
+        if action == "inspect_facts":
+            if (sketch or heuristics or len(fact_names) > MAX_INSPECT_FACTS
+                    or any(not isinstance(name, str) or len(name) > 240 or not FACT_NAME.fullmatch(name)
+                           for name in fact_names) or len(set(fact_names)) != len(fact_names)):
+                raise ValueError("fact inspection accepts only a bounded list of unique literal fact names")
+        elif fact_names:
+            raise ValueError("fact_names requires the inspect_facts action")
         if action == "search":
             sketch = normalize_sketch(sketch)
         prefix, resolution = resolve_imports(context.prefix, self.config, theory_name=context.theory_name)
@@ -342,6 +384,8 @@ class NativeSearch:
                    "hammer_timeout_s": str(self.config.hammer_timeout_s),
                    "preplay_timeout_s": str(self.config.preplay_timeout_s),
                    "remaining_s": str(max(0.001, deadline - time.monotonic()))}
+        if action == "inspect_facts":
+            request["fact_names"] = list(fact_names)
         request["input_sha256"] = fingerprint(request)
         root = ET.Element("dsp_request", schema=PROTOCOL_VERSION, **{
             k: request[k] for k in ("request_id", "input_sha256", "action")})

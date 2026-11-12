@@ -14,6 +14,7 @@ from ..hundred_theorems_pipeline.hol_syntax import tokens as hol_tokens, phrases
 from ..babel_formal_pipeline.isabelle_syntax import tokens as isa_tokens, OUTER_COMMANDS
 
 CONTEXT_VERSION = "most_match_retrieval_v2"
+DEPENDENCY_CONTEXT_VERSION = "most_match_dependency_context_v1"
 LEGACY_CONTEXT_VERSION = "most_match_retrieval_v1"
 SOURCE_CONTEXT_CHARS = 16000
 ISABELLE_CONTEXT_CHARS = 8000
@@ -57,10 +58,10 @@ def source_snippets(text):
 
 
 @lru_cache(maxsize=32)
-def isabelle_snippets(prefix, *, top_level_only=False):
+def isabelle_snippets(prefix, *, top_level_only=False, active_only=False):
     items = isa_tokens(prefix)
     starts = [t for t in items if t.kind == "word" and t.text in OUTER_COMMANDS | {"open_bundle"}]
-    chunks = []
+    chunks, explicit_in = [], set()
     for index, token in enumerate(starts):
         end = starts[index + 1].start if index + 1 < len(starts) else len(prefix)
         text = prefix[token.start:end].strip()
@@ -70,6 +71,8 @@ def isabelle_snippets(prefix, *, top_level_only=False):
                 len(words) < 2 or words[1].kind != "word" or
                 words[1].text in {"assumes", "fixes", "shows", "obtains", "includes"}):
             continue  # An unnamed proposition is not a reusable fact named "open".
+        if active_only and len(words) > 1 and words[1].text == "(":
+            explicit_in.add(token.start)
         name_token = words[1].text if len(words) > 1 else token.text
         name_match = IDENTIFIER.search(name_token)
         name = name_match[0] if name_match else token.text
@@ -77,7 +80,10 @@ def isabelle_snippets(prefix, *, top_level_only=False):
     # Preserve the actual active scope headers, including fixed locale parameters
     # and assumptions. Closed scopes are not active assumptions for this target.
     stack, pending, top_level = [], None, []
+    scoped = []
     for chunk in chunks:
+        if active_only:
+            scoped.append((chunk, tuple(stack)))
         if len(stack) == 1 and chunk.kind not in {"locale", "class"}:
             # Declarations explicitly inside a locale need its exported signature.
             words = isa_tokens(chunk.text)
@@ -96,7 +102,13 @@ def isabelle_snippets(prefix, *, top_level_only=False):
     allowed = {"lemma", "theorem", "corollary", "proposition", "definition", "abbreviation",
                "fun", "primrec", "datatype", "type_synonym", "notation", "lemmas", "unbundle",
                "include", "includes", "named_theorems", "locale", "class"}
-    return [chunk for chunk in (top_level if top_level_only else chunks) if chunk.kind in allowed], mandatory
+    if top_level_only:
+        chunks = top_level
+    elif active_only:
+        chunks = [chunk for chunk, scope in scoped
+                  if tuple(stack[:len(scope)]) == scope and chunk.start not in explicit_in]
+        allowed |= {"inductive", "inductive_set", "function", "record"}
+    return [chunk for chunk in chunks if chunk.kind in allowed], mandatory
 
 
 def theory_header(text):
@@ -112,16 +124,17 @@ def theory_header(text):
     return name, [t.text.strip('"') for t in items[start:end]]
 
 
-def imported_references(prefix, root):
-    """Only transitive imports present in the supplied masked AFP snapshot.
+def imported_references(prefix, root, *, extra_roots=(), max_files=None, max_chars=None):
+    """Follow explicit imports available in the supplied masked snapshots.
 
     No target theory, sibling search, external installation or proof file is read.
-    Unavailable imports stay unavailable to retrieval; verifier imports are unchanged.
+    Additional snapshot roots and scan limits are for the context experiment.
     """
     from ..hundred_theorems_pipeline.masking import mask_isabelle_reference
     target, imports = theory_header(prefix)
-    root = repo_path(root)
+    roots = tuple(dict.fromkeys(repo_path(path) for path in (root, *extra_roots)))
     seen, parts, sources, missing = {target}, [], [], []
+    skipped = {}
     pending = list(imports)
     while pending:
         name = pending.pop(0)
@@ -133,11 +146,24 @@ def imported_references(prefix, root):
         if name in seen:
             continue
         seen.add(name)
-        path = root / (name + '.thy')
-        if not path.is_file():
+        paths = [path for folder in roots if (path := folder / (name + ".thy")).is_file()]
+        if not paths:
             missing.append(name)
             continue
-        raw = path.read_text(encoding='utf-8')
+        if len(paths) > 1:
+            skipped[name] = "ambiguous_snapshot"
+            continue
+        if max_files is not None and len(sources) >= max_files:
+            skipped[name] = "import_file_limit"
+            continue
+        path = repo_path(paths[0])
+        if max_chars is not None and path.stat().st_size > max_chars * 4:
+            skipped[name] = "import_size_limit"
+            continue
+        raw = path.read_text(encoding="utf-8")
+        if max_chars is not None and len(raw) > max_chars:
+            skipped[name] = "import_size_limit"
+            continue
         declared, parents = theory_header(raw)
         if declared != name:
             raise ValueError("import snapshot/header mismatch: " + str(path))
@@ -148,7 +174,15 @@ def imported_references(prefix, root):
         sources.append({'theory':name,'path':origin,'raw_sha256':sha256(raw),
                         'masked_sha256':sha256(masked),'imports':parents})
         pending.extend(parents)
-    return parts, {'sources':sources,'unresolved_imports':sorted(set(missing))}
+    metadata = {"sources": sources, "unresolved_imports": sorted(set(missing))}
+    if skipped:
+        metadata["skipped_imports"] = skipped
+    return parts, metadata
+
+
+def render_snippet(snippet):
+    origin = f"; imported from {snippet.origin}" if snippet.origin else ""
+    return f"(* {snippet.kind} {snippet.name}; source chars {snippet.start}:{snippet.end}{origin} *)\n{snippet.text}"
 
 
 def retrieve(snippets, *, query, budget, mandatory=()):
@@ -166,15 +200,12 @@ def retrieve(snippets, *, query, budget, mandatory=()):
         named = snippet.name.casefold() in query_ids
         priority = 200 if named and snippet.kind in {"lemma", "theorem", "corollary", "proposition"} else 100 if named else 0
         return priority + overlap + (2 if snippet.kind == "definition" and overlap else 0)
-    def rendered(snippet):
-        origin = f"; imported from {snippet.origin}" if snippet.origin else ""
-        return f"(* {snippet.kind} {snippet.name}; source chars {snippet.start}:{snippet.end}{origin} *)\n{snippet.text}"
     chosen, used = {}, 0
     def add(snippet, required=False):
         nonlocal used
         if (snippet.origin, snippet.start, snippet.end) in chosen:
             return True
-        size = len(rendered(snippet)) + (2 if chosen else 0)
+        size = len(render_snippet(snippet)) + (2 if chosen else 0)
         if used + size > budget:
             if required:
                 raise ValueError("mandatory target statement/active scope exceeds context budget; increase the cap")
@@ -189,7 +220,7 @@ def retrieve(snippets, *, query, budget, mandatory=()):
         if score(snippet) > 0:
             add(snippet)
     ordered = sorted(chosen.values(), key=lambda s: (s.origin, s.start, s.end))
-    text = "\n\n".join(rendered(s) for s in ordered)
+    text = "\n\n".join(render_snippet(s) for s in ordered)
     if not text:
         text = "(* No relevant reference declarations fit the context selection. *)"
     if len(text) > budget:
@@ -223,7 +254,7 @@ def build_contexts(source, target, isa, *, import_root=None, source_chars=SOURCE
 
 def validate_prompt_context(record):
     metadata = record.get("metadata", {}).get("prompt_context", {})
-    if metadata.get("version") not in {CONTEXT_VERSION, LEGACY_CONTEXT_VERSION}:
+    if metadata.get("version") not in {CONTEXT_VERSION, LEGACY_CONTEXT_VERSION, DEPENDENCY_CONTEXT_VERSION}:
         raise ValueError("missing/current most-match retrieval metadata; re-extract records")
     for name, field in (("hol_light", "hol_light_reference_context"), ("isabelle", "isabelle_prompt_context")):
         text = record.get(field)

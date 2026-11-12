@@ -22,6 +22,9 @@ The caps include reference labels/separators. They are character counts, not est
 
 Each record saves selected spans, hashes, budgets, omitted counts and original file hashes in `metadata.prompt_context`. Retrieval is deterministic. Changing budgets/selections changes prompt/input fingerprints, so stale results are not reused.
 
+For the opt-in comparison with bounded recursive selection, see the
+[context experiment and lab commands](../context_helpers/README.md).
+
 ## Lab commands
 
 Run from the repository root with the Python 3.10 main environment active. Dataset files and Isabelle/AFP installations must be inside this checkout.

@@ -32,7 +32,9 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
                    expected_source: str = "babel-formal", sketch_source: str = "draft",
                    workers: int = 1, threads_per_worker: int | None = None,
                    memory_per_worker_gb: float = 4.0,
-                   dependency_jobs: int | None = None, dependency_threads: int | None = None) -> list[dict]:
+                   dependency_jobs: int | None = None, dependency_threads: int | None = None,
+                   prepared_native=None) -> list[dict]:
+    """Accept this run's prepared backend and worker factory after a context gate."""
     records = load_inputs(input_path, mode=sketch_source, artifacts=True, samples=True, topic=topic, target_key=target_key, limit=limit)
     records = align_samples(records, expected, expected_samples, mode=sketch_source)
     if not records:
@@ -62,7 +64,9 @@ def prove_sketches(*, config: DspConfig, input_path: str = DEFAULT_INPUT,
     native_factory = None
     try:
         valid = [r for r in records if not r.get("input_error") and not r.get("sketch_error")]
-        if valid and (plan.workers > 1 or expected_source in {"hol-most-match", "hundred-theorems"}):
+        if prepared_native is not None:
+            backend, native_factory = prepared_native
+        elif valid and (plan.workers > 1 or expected_source in {"hol-most-match", "hundred-theorems"}):
             config, backend, native_factory = prepare_batch(config, valid, plan)
         else:
             backend = config.metadata()
