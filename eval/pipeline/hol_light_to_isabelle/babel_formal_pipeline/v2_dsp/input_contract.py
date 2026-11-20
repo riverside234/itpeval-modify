@@ -10,6 +10,9 @@ from ..common import (fingerprint, key, public_record, read_jsonl, repo_path,
 from ..inventory import inventory_hol_declarations
 from ..theory_context import validate_context, normalize_body
 from ..isabelle_syntax import tokens
+from ...context_helpers.prompts import BUNDLE_DIGEST, BUNDLE_FIELD, validate_bundle
+from ...isabelle_references import proof_context, reference_default
+from ...most_match_pipeline.context import has_dependency_context, validate_prompt_context
 
 SCHEMA_VERSION = "hol_light_to_isabelle_dsp_v2"
 ISABELLE_VERSION = "Isabelle2026"
@@ -34,7 +37,7 @@ def sample_cohort(record: dict, mode: str) -> str:
     fields = CONTEXT_FIELDS + ("metadata", "input_fingerprint", "sketch_model",
         "sketch_prompt_version", "sketch_prompt_sha256", "sketch_validator_version")
     fields += (("draft", "draft_error") + DRAFT_PROVENANCE_FIELDS
-               if mode == "draft" else SOURCE_FIELDS)
+               if mode == "draft" else (*SOURCE_FIELDS, BUNDLE_FIELD))
     return fingerprint({name: record.get(name) for name in fields})
 
 
@@ -84,6 +87,11 @@ def input_metadata(record: dict, sketch_source: str = "draft") -> dict:
     if record.get("input_error"):
         raise ValueError(record["input_error"])
     context = validate_context(record)
+    bundle = validate_bundle(record)
+    if bundle is not None and (mode != "hol-light-proof" or not has_dependency_context(record)):
+        raise ValueError("source helper bundles require a dependency-aware direct Sketch input")
+    if has_dependency_context(record):
+        validate_prompt_context(record)
     metadata = {**context.metadata, **envelope(mode)}
     if "isabelle_prompt_context" in record:
         metadata["draft_context_policy"] = "bounded_retrieved_masked_context"
@@ -110,6 +118,13 @@ def input_metadata(record: dict, sketch_source: str = "draft") -> dict:
             raise ValueError("proof-masked HOL Light reference hash mismatch")
         metadata.update({name + "_sha256": sha256(value) for name, value in consumed.items()})
         metadata.pop("draft_context_policy", None)
+        if bundle is not None:
+            consumed[BUNDLE_DIGEST] = metadata[BUNDLE_DIGEST] = record["metadata"]["context_experiment"][BUNDLE_DIGEST]
+    reference = proof_context(record)
+    if reference is not None:
+        metadata["isabelle_prompt_context_sha256"] = sha256(reference)
+        if mode == "draft":
+            metadata["draft_context_policy"] = "isabelle_reference_proofs"
     metadata["input_fingerprint"] = fingerprint({
         **envelope(mode), "consumed": consumed,
         "target_context": {name: record.get(name, "") for name in CONTEXT_FIELDS},
@@ -181,7 +196,7 @@ def align_samples(records: list[dict], expected: list[dict] | None, samples: int
     latest = {(key(row), int(row["sample_idx"])): row for row in records}
     result = []
     fields = CONTEXT_FIELDS + ("metadata",) + (
-        ("draft", "draft_error") + DRAFT_PROVENANCE_FIELDS if mode == "draft" else SOURCE_FIELDS)
+        ("draft", "draft_error") + DRAFT_PROVENANCE_FIELDS if mode == "draft" else (*SOURCE_FIELDS, BUNDLE_FIELD))
     for target in expected:
         for index in range(samples):
             row = latest.get((key(target), index))
@@ -277,8 +292,9 @@ def output_path(path, *, results_dir: str, filename: str, mode: str, config=None
             providers = {(r.get("draft_model") or {}).get("provider", "openai") for r in records or []}
             if providers != {"openai"} and providers:
                 profile = ("qwen_draft_" if providers == {"vllm"} else "mixed_drafts_") + profile
-    return str(Path(results_dir) / "v2-dsp-isabelle2026" /
+    default = (Path(results_dir) / "v2-dsp-isabelle2026" /
                ("direct" if mode == "hol-light-proof" else "draft") / profile / filename)
+    return str(reference_default(default, records or ()))
 
 
 # Standard Isar outer commands cannot be methods inside a terminal `by`.

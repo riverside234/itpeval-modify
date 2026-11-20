@@ -1,5 +1,6 @@
 """Translate one completed HOL Light proof directly into an Isabelle2021 sketch."""
 from ..prompt import Prompt
+from ...isabelle_references import REFERENCE_NOTE, REFERENCE_TITLE, proof_context
 from .input_contract import input_metadata, require_text
 from .sketch_prompt import ISABELLE_OUTPUT_RULES, ISABELLE_PROOF_REQUIREMENTS
 
@@ -16,12 +17,14 @@ SYSTEM_PROMPT = (
 
 def build_direct_sketch_prompt(record: dict) -> Prompt:
     input_metadata(record, "hol-light-proof")
+    reference = proof_context(record)
 
     def section(title, field):
         return title + "\n~~~\n" + require_text(record, field) + "\n~~~"
 
     user = "\n\n".join([
         "TARGET: " + record["topic"] + "/" + record["isabelle_target_name"],
+        REFERENCE_TITLE + "\n~~~\n" + reference + "\n~~~" if reference is not None else
         section("AVAILABLE ISABELLE CONTEXT BEFORE TARGET", "isabelle_context_before_target"),
         section("EXACT ORACLE ISABELLE DECLARATION", "isabelle_statement"),
         "PROOF PREFIX ALREADY PRESENT (continue after it; do not repeat)\n~~~\n"
@@ -48,4 +51,6 @@ def build_direct_sketch_prompt(record: dict) -> Prompt:
         "the same name exists in Isabelle.",
         ISABELLE_PROOF_REQUIREMENTS,
     ])
+    if reference is not None:
+        user += "\n\n" + REFERENCE_NOTE
     return Prompt(SYSTEM_PROMPT, user, DIRECT_PROMPT_VERSION)

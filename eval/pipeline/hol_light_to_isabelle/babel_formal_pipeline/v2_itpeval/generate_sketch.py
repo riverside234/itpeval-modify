@@ -16,6 +16,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_itpeval.sketch
     SKETCH_PROMPT_VERSION, build_sketch_prompt,
 )
 from eval.pipeline.inference.config import output_path_for_profile
+from ...isabelle_references import reference_default
 from eval.pipeline.proof_transfer.llm import (
     DEFAULT_DRAFT_MODEL, DraftModelConfig, call_draft_model, resolve_model_config,
 )
@@ -51,7 +52,7 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
         llm_config, model=model, reasoning_effort=reasoning_effort,
         max_output_tokens=max_output_tokens, default_effort="high",
         dry_run=dry_run)
-    output_path = output_path_for_profile(output_path, default_output, config, draft_records=records)
+    output_path = output_path_for_profile(output_path, reference_default(default_output, records), config, draft_records=records)
     if dry_run:
         input_metadata(records[0])
         prompt = builder(records[0])

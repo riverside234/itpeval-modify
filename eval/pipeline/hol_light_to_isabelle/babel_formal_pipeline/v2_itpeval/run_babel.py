@@ -15,6 +15,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_itpeval.verify
     DEFAULT_OUTPUT, preflight, verify_sketches,
 )
 from eval.pipeline.inference.config import output_path_for_profile
+from ...isabelle_references import reference_default
 from eval.pipeline.proof_transfer.llm import DEFAULT_DRAFT_MODEL, resolve_model_config
 
 
@@ -48,8 +49,10 @@ def main() -> None:
     records = latest_records(args.drafts, **filters)
     if not records:
         parser.error("no matching saved Drafts")
-    args.sketch_output = output_path_for_profile(args.sketch_output, DEFAULT_SKETCHES, llm_config, draft_records=records)
-    args.output = output_path_for_profile(args.output, DEFAULT_OUTPUT, llm_config, draft_records=records)
+    args.sketch_output = output_path_for_profile(
+        args.sketch_output, reference_default(DEFAULT_SKETCHES, records), llm_config, draft_records=records)
+    args.output = output_path_for_profile(
+        args.output, reference_default(DEFAULT_OUTPUT, records), llm_config, draft_records=records)
     if args.samples < 1:
         parser.error("--samples must be positive")
     paths = [args.drafts, args.sketch_output, args.output]

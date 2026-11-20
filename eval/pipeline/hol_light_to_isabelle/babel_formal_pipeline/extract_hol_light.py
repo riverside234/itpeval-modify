@@ -11,6 +11,8 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.inventory import 
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.manifest import Target, targets_for_topic
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.sanitize_isabelle import sanitize_target
 
+from ..isabelle_references import add_argument, attach_aligned_context, reference_output
+
 
 DEFAULT_OUTPUT = RESULTS_DIR + "/babel_formal_v2_exact_name_records.jsonl"
 
@@ -22,7 +24,7 @@ def _unique_by_name(declarations, name: str, kind: str):
     return matches[0]
 
 
-def build_record(topic, target: Target, *, proofs=None, masked=None) -> dict:
+def build_record(topic, target: Target, *, proofs=None, masked=None, isabelle_reference_proofs=False) -> dict:
     if target.topic != topic.topic:
         raise ValueError("target/topic mismatch")
     proofs = proofs if proofs is not None else inventory_hol_declarations(
@@ -39,7 +41,7 @@ def build_record(topic, target: Target, *, proofs=None, masked=None) -> dict:
         raise ValueError(f"HOL statement mismatch for {source.name}")
     isa = sanitize_target(topic.isabelle_stmt_content, target.isabelle_target_name,
                           topic=topic.topic)
-    return {
+    record = {
         "experiment_version": "v2",
         "experiment_setting": "oracle_isabelle_statement",
         "source": topic.source, "theorem_id": topic.theorem_id,
@@ -70,10 +72,14 @@ def build_record(topic, target: Target, *, proofs=None, masked=None) -> dict:
             "isabelle_prior_theorem_count": isa.prior_theorem_count,
         },
     }
+    if isabelle_reference_proofs:
+        attach_aligned_context(record, topic)
+    return record
 
 
 def extract_records(*, topic: str | None = None, theorem_id: int | None = None,
-                    target_key: str | None = None, verified_only: bool = False) -> list[dict]:
+                    target_key: str | None = None, verified_only: bool = False,
+                    isabelle_reference_proofs: bool = False) -> list[dict]:
     records = []
     topics = list(iter_topics(topic=topic, theorem_id=theorem_id))
     if not topics:
@@ -85,7 +91,8 @@ def extract_records(*, topic: str | None = None, theorem_id: int | None = None,
         targets = targets_for_topic(aligned.topic, pairs, verified_only=verified_only)
         if target_key is not None:
             targets = [target for target in targets if target.target_key == target_key]
-        records.extend(build_record(aligned, target, proofs=proof, masked=masked)
+        records.extend(build_record(aligned, target, proofs=proof, masked=masked,
+                                    isabelle_reference_proofs=isabelle_reference_proofs)
                        for target in targets)
     if not records:
         raise ValueError("no matching Babel Formal theorem targets")
@@ -101,7 +108,8 @@ def main() -> None:
     parser.add_argument("--target-key")
     parser.add_argument("--all-targets", action="store_true")
     parser.add_argument("--verified-only", action="store_true")
-    parser.add_argument("--output", default=DEFAULT_OUTPUT)
+    add_argument(parser)
+    parser.add_argument("--output")
     args = parser.parse_args()
     validate_layout(args.expected_root)
     if args.all_topics == bool(args.topic or args.id is not None):
@@ -109,8 +117,10 @@ def main() -> None:
     if args.all_targets == bool(args.target_key):
         parser.error("choose --all-targets or --target-key")
     records = extract_records(topic=args.topic, theorem_id=args.id,
-                              target_key=args.target_key, verified_only=args.verified_only)
-    path = write_jsonl(args.output, records)
+                              target_key=args.target_key, verified_only=args.verified_only,
+                              isabelle_reference_proofs=args.isabelle_reference_proofs)
+    default = reference_output(DEFAULT_OUTPUT) if args.isabelle_reference_proofs else DEFAULT_OUTPUT
+    path = write_jsonl(args.output or default, records)
     print(f"Wrote {len(records)} V2 records to {path}")
 
 

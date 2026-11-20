@@ -6,20 +6,27 @@ import json
 from pathlib import Path
 from .aligned_data import load_topic, topics
 from .common import DATASET_ROOT, RESULTS_DIR, SOURCE, repo_path, sha256, validate_layout, write_jsonl
-from .context import build_contexts, SOURCE_CONTEXT_CHARS, ISABELLE_CONTEXT_CHARS
+from .context import build_contexts, selected_reference_proofs, SOURCE_CONTEXT_CHARS, ISABELLE_CONTEXT_CHARS
 from .inventory import inventory_topic
 from ..babel_formal_pipeline.sanitize_isabelle import sanitize_target
 from ..babel_formal_pipeline.theory_context import validate_context
+from ..isabelle_references import add_argument, reference_output, snapshot_references, store_context
 
 DEFAULT_OUTPUT = RESULTS_DIR + "/records.jsonl"
 
 
-def build_record(group, pair, *, source_chars=SOURCE_CONTEXT_CHARS, isabelle_chars=ISABELLE_CONTEXT_CHARS):
+def build_record(group, pair, *, source_chars=SOURCE_CONTEXT_CHARS, isabelle_chars=ISABELLE_CONTEXT_CHARS,
+                 isabelle_reference_proofs=False):
     source = next(s for s in group["sources"] if Path(s.path).name == pair["source_file"])
     target = next(d for d in source.proofs if d.name == pair["hol_light_name"])
     isa = sanitize_target(group["template"], pair["isabelle_name"], topic=group["topic"])
+    local_proofs = None
+    if isabelle_reference_proofs:
+        local_proofs = snapshot_references(group["target_path"], isa.context_before_target,
+                                           target_name=isa.name, target_statement=isa.statement)
     hol_reference, isa_reference, retrieval = build_contexts(source, target, isa,
         source_chars=source_chars, isabelle_chars=isabelle_chars,
+        proof_sources={"": local_proofs} if isabelle_reference_proofs else None,
         import_root=Path(group["target_path"]).parents[3] / "afp" / "stmts" / "isabelle")
     record = {
         "experiment_version": "v2", "experiment_setting": "oracle_isabelle_statement",
@@ -46,12 +53,16 @@ def build_record(group, pair, *, source_chars=SOURCE_CONTEXT_CHARS, isabelle_cha
             "isabelle_line_start": isa.line_start, "isabelle_prior_theorem_count": isa.prior_theorem_count,
             "prompt_context": retrieval},
     }
+    if isabelle_reference_proofs:
+        store_context(record, isa_reference, selected_reference_proofs(retrieval["isabelle"]),
+                      status=local_proofs.status if local_proofs is not None else "missing_proof_snapshot")
     validate_context(record)
     return record
 
 
 def extract_records(*, dataset_root=DATASET_ROOT, topic=None, target_key=None,
-                    source_chars=SOURCE_CONTEXT_CHARS, isabelle_chars=ISABELLE_CONTEXT_CHARS, report=None):
+                    source_chars=SOURCE_CONTEXT_CHARS, isabelle_chars=ISABELLE_CONTEXT_CHARS, report=None,
+                    isabelle_reference_proofs=False):
     records, rows = [], []
     for name in topics(topic):
         group = load_topic(name, dataset_root)
@@ -61,7 +72,8 @@ def extract_records(*, dataset_root=DATASET_ROOT, topic=None, target_key=None,
             if target_key is not None and pair["isabelle_name"] != target_key:
                 continue
             try:
-                records.append(build_record(group, pair, source_chars=source_chars, isabelle_chars=isabelle_chars))
+                records.append(build_record(group, pair, source_chars=source_chars, isabelle_chars=isabelle_chars,
+                                            isabelle_reference_proofs=isabelle_reference_proofs))
                 coverage["extracted_count"] += 1
             except (ValueError, KeyError) as exc:
                 coverage["issues"].append({"target_key": pair["isabelle_name"], "error": f"{type(exc).__name__}: {exc}"})
@@ -79,11 +91,13 @@ def add_extraction_arguments(parser):
     parser.add_argument("--target-key")
     parser.add_argument("--source-context-chars", type=int, default=SOURCE_CONTEXT_CHARS)
     parser.add_argument("--isabelle-context-chars", type=int, default=ISABELLE_CONTEXT_CHARS)
+    add_argument(parser)
 
 
 def extraction_options(args):
     return dict(dataset_root=args.dataset_root, topic=args.topic, target_key=args.target_key,
-                source_chars=args.source_context_chars, isabelle_chars=args.isabelle_context_chars)
+                source_chars=args.source_context_chars, isabelle_chars=args.isabelle_context_chars,
+                isabelle_reference_proofs=args.isabelle_reference_proofs)
 
 
 def main():
@@ -92,12 +106,14 @@ def main():
     add_extraction_arguments(parser)
     parser.add_argument("--all-topics", action="store_true")
     parser.add_argument("--all-targets", action="store_true")
-    parser.add_argument("--output", default=DEFAULT_OUTPUT)
+    parser.add_argument("--output")
     parser.add_argument("--report")
     args = parser.parse_args()
     validate_layout(args.expected_root)
     if args.all_topics and args.topic or args.all_targets and args.target_key:
         parser.error("all selectors cannot be combined with an individual selector")
+    default = reference_output(DEFAULT_OUTPUT) if args.isabelle_reference_proofs else DEFAULT_OUTPUT
+    args.output = args.output or default
     destination = repo_path(args.output)
     coverage_path = repo_path(args.report or (args.output + ".coverage.json"))
     if destination == coverage_path:

@@ -1,5 +1,8 @@
 """Translate one completed HOL Light proof directly into an Isabelle2026 sketch."""
 from ..prompt import Prompt
+from ...context_helpers.prompts import BUNDLE_FIELD, direct_prompt_version, render_support
+from ...isabelle_references import REFERENCE_NOTE, REFERENCE_TITLE, proof_context
+from ...most_match_pipeline.context import has_dependency_context
 from .input_contract import input_metadata, require_text
 from .sketch_prompt import ISABELLE_OUTPUT_RULES, ISABELLE_PROOF_REQUIREMENTS
 
@@ -103,13 +106,20 @@ DIRECT_HELPER_RULES = (
 def build_direct_sketch_prompt(record: dict, *, isabelle_context: str | None = None,
                                partial_context: bool = False) -> Prompt:
     input_metadata(record, "hol-light-proof")
+    if has_dependency_context(record):
+        isabelle_context = record["isabelle_prompt_context"]
+        partial_context = True
+    reference = proof_context(record)
+    if reference is not None:
+        isabelle_context = reference
+    title = REFERENCE_TITLE if reference is not None else "AVAILABLE ISABELLE CONTEXT BEFORE TARGET"
 
     def section(title, field):
         return title + "\n~~~\n" + require_text(record, field) + "\n~~~"
 
     user = "\n\n".join([
         "TARGET: " + record["topic"] + "/" + record["isabelle_target_name"],
-        "AVAILABLE ISABELLE CONTEXT BEFORE TARGET\n~~~\n"
+        title + "\n~~~\n"
         + (isabelle_context if isabelle_context is not None else require_text(record, "isabelle_context_before_target")) + "\n~~~",
         section("EXACT ORACLE ISABELLE DECLARATION", "isabelle_statement"),
         "PROOF PREFIX ALREADY PRESENT (continue after it; do not repeat)\n~~~\n"
@@ -138,4 +148,8 @@ def build_direct_sketch_prompt(record: dict, *, isabelle_context: str | None = N
         DIRECT_PROOF_STATE_RULES,
         DIRECT_HELPER_RULES,
     ])
-    return Prompt(SYSTEM_PROMPT, user, DIRECT_PROMPT_VERSION)
+    if reference is not None:
+        user += "\n\n" + REFERENCE_NOTE
+    if BUNDLE_FIELD in record:
+        user += render_support(record[BUNDLE_FIELD]["helpers"])
+    return Prompt(SYSTEM_PROMPT, user, direct_prompt_version(record, DIRECT_PROMPT_VERSION))

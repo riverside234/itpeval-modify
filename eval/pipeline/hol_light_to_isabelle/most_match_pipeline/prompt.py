@@ -1,6 +1,7 @@
 """Mathematical Draft using only the saved, bounded reference selections."""
 from ..babel_formal_pipeline.prompt import Prompt, build_draft_prompt as _build
 from .context import validate_prompt_context
+from ..isabelle_references import has_reference_proofs
 
 DRAFT_PROMPT_VERSION = "most_match_draft_v1"
 CONTEXT_NOTE = (
@@ -14,8 +15,15 @@ CONTEXT_NOTE = (
 )
 
 
+def context_note(record):
+    if has_reference_proofs(record):
+        return CONTEXT_NOTE.replace("They contain earlier helper statements and relevant definitions; proofs are masked.",
+                                    "They contain earlier helper statements, relevant definitions and Isabelle proof examples.")
+    return CONTEXT_NOTE
+
+
 def build_draft_prompt(record):
     validate_prompt_context(record)
     prompt = _build(record, dataset_label="HOL most-match", version=DRAFT_PROMPT_VERSION,
                     isabelle_context=record["isabelle_prompt_context"], partial_context=True)
-    return Prompt(prompt.system_prompt, prompt.user_prompt + "\n\n" + CONTEXT_NOTE, DRAFT_PROMPT_VERSION)
+    return Prompt(prompt.system_prompt, prompt.user_prompt + "\n\n" + context_note(record), DRAFT_PROMPT_VERSION)

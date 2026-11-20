@@ -8,7 +8,7 @@ The supplied snapshot has 16 Isabelle statement files and 31 HOL Light files in 
 
 There are **353 unique exact/case-insensitive name candidates across 15 topics**. A candidate requires a unique completed HOL `prove` declaration, an identical masked HOL statement, and a unique Isabelle name. Candidate matching does **not** establish semantic equivalence; records retain `semantic_alignment_verified=false`. Coverage reports list unmatched and ambiguous declarations. `Poly_Roots` has zero automatic matches: source names start with `COMPLEX_`, and some target results generalize complex numbers to type classes. These need reviewed mappings and are not silently treated as aligned. Unsupported source proof generators are not fabricated into proofs.
 
-Completed Isabelle proof files are never read by extraction or prompt construction. The oracle and verifier template come from `stmts/isabelle`, with residual proofs masked by the existing masker.
+The oracle and verifier template come from `stmts/isabelle`, with residual proofs masked by the existing masker. To provide matching earlier and imported proof bodies in the model context under the same character cap, use [`--isabelle-reference-proofs`](../README.md#include-isabelle-helper-proofs-in-the-model-context).
 
 ## Context policy
 

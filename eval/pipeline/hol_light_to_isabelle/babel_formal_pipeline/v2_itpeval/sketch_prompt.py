@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import Prompt, _required
+from ...isabelle_references import REFERENCE_NOTE, REFERENCE_TITLE, proof_context
 
 
 SKETCH_PROMPT_VERSION = "babel_formal_v2_itpeval_sketch_p2"
@@ -15,12 +16,14 @@ SYSTEM_PROMPT = (
 
 
 def build_sketch_prompt(record: dict) -> Prompt:
+    reference = proof_context(record)
     draft = _required(record, "draft")
     prefix = record.get("isabelle_proof_prefix") or ""
     user = "\n\n".join([
         f"TARGET: {record['topic']}/{record['isabelle_target_name']}",
-        "ISABELLE CONTEXT BEFORE TARGET\n~~~isabelle\n"
-        + _required(record, "isabelle_context_before_target") + "\n~~~",
+        (REFERENCE_TITLE if reference is not None else "ISABELLE CONTEXT BEFORE TARGET")
+        + "\n~~~isabelle\n"
+        + (reference if reference is not None else _required(record, "isabelle_context_before_target")) + "\n~~~",
         "ORACLE TARGET STATEMENT\n~~~isabelle\n"
         + _required(record, "isabelle_statement") + "\n~~~",
         "PROOF PREFIX ALREADY IN THEORY\n~~~isabelle\n"
@@ -33,4 +36,7 @@ def build_sketch_prompt(record: dict) -> Prompt:
         "without repeating it. End a structured proof with qed. Do not use "
         "sorry, oops, admit, ML, axiomatization, or new declarations.",
     ])
+    if reference is not None:
+        return Prompt(SYSTEM_PROMPT.replace("proof-masked ", "", 1), user + "\n\n" + REFERENCE_NOTE,
+                      SKETCH_PROMPT_VERSION)
     return Prompt(SYSTEM_PROMPT, user, SKETCH_PROMPT_VERSION)

@@ -10,6 +10,7 @@ from ..common import (fingerprint, key, public_record, read_jsonl, repo_path,
 from ..inventory import inventory_hol_declarations
 from ..theory_context import validate_context, normalize_body
 from ..isabelle_syntax import tokens
+from ...isabelle_references import proof_context, reference_default
 
 SCHEMA_VERSION = "hol_light_to_isabelle_dsp_pisa_v1"
 ISABELLE_VERSION = "Isabelle2021"
@@ -98,6 +99,11 @@ def input_metadata(record: dict, sketch_source: str = "draft") -> dict:
             raise ValueError("proof-masked HOL Light reference hash mismatch")
         metadata.update({name + "_sha256": sha256(value) for name, value in consumed.items()})
         metadata.pop("draft_context_policy", None)
+    reference = proof_context(record)
+    if reference is not None:
+        metadata["isabelle_prompt_context_sha256"] = sha256(reference)
+        if mode == "draft":
+            metadata["draft_context_policy"] = "isabelle_reference_proofs"
     metadata["input_fingerprint"] = fingerprint({
         **envelope(mode), "consumed": consumed,
         "target_context": {name: record.get(name, "") for name in CONTEXT_FIELDS},
@@ -259,8 +265,9 @@ def output_path(path, *, results_dir: str, filename: str, mode: str, config=None
             providers = {(r.get("draft_model") or {}).get("provider", "openai") for r in records or []}
             if providers != {"openai"} and providers:
                 profile = ("qwen_draft_" if providers == {"vllm"} else "mixed_drafts_") + profile
-    return str(Path(results_dir) / "v2-dsp-pisa-isabelle2021" /
+    default = (Path(results_dir) / "v2-dsp-pisa-isabelle2021" /
                ("direct" if mode == "hol-light-proof" else "draft") / profile / filename)
+    return str(reference_default(default, records or ()))
 
 
 # Standard Isar outer commands cannot be methods inside a terminal `by`.

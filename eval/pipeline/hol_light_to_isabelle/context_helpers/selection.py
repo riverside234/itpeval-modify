@@ -1,7 +1,7 @@
 """Fit whole reference packages without spending mandatory scope space."""
 
 from ..most_match_pipeline.common import sha256
-from ..most_match_pipeline.context import render_snippet
+from ..most_match_pipeline.context import render_snippet, snippet_proof_metadata
 from .contracts import SelectionFailure
 
 
@@ -48,7 +48,7 @@ class Selection:
                 "candidate_snippets": len(candidates),
                 "selected_snippets": [
                     {"name": item.name, "kind": item.kind, "span": [item.start, item.end],
-                     "origin": item.origin, "sha256": sha256(item.text)} for item in selected],
+                     "origin": item.origin, "sha256": sha256(item.text), **snippet_proof_metadata(item)} for item in selected],
                 "omitted_snippets": sum(self.span_key(item) not in self.items for item in candidates),
                 "over_budget_snippets": len(self.omitted)}
         return context, info

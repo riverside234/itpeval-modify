@@ -1,21 +1,33 @@
-"""Budgets and identities for the context-only experiment."""
+"""Budgets and identities for the context and source-proof experiments."""
 
 from dataclasses import dataclass
 import json
 
-from ..most_match_pipeline.common import repo_path
+from ..babel_formal_pipeline.common import repo_path
+from ..most_match_pipeline.context import ISABELLE_CONTEXT_CHARS, SOURCE_CONTEXT_CHARS
 from ..babel_formal_pipeline.v2_dsp.native_search import MAX_INSPECT_FACTS
 
 VERSION = "hol_light_to_isabelle_context_v1"
 MODE = "hol-light-proof"
 DEFAULT_LOAD_MANIFEST = "eval/configs/hol_light_to_isabelle/context_hol_light_loads.json"
 LOAD_SETTINGS = ("cross_file", "source_load_manifest", "max_load_depth", "max_load_files", "max_load_directives")
-NATIVE_ARMS = {"context-native", "context-native-cross-file"}
+ALIGNED_CAP_SETTINGS = ("source_context_chars", "isabelle_context_chars")
+EXPANSION_SETTINGS = ("max_helper_proof_chars", "max_total_helper_proof_chars", "max_helper_support_chars")
+HELPER_MODES = ("baseline", "context", "expand")
 
 
-def context_arm(*, native, cross_file):
-    arm = "context-native" if native else "context"
-    return arm + "-cross-file" if cross_file else arm
+def context_arm(*, native, cross_file, mode="context"):
+    if mode == "baseline":
+        return mode
+    arm = mode + ("-native" if native else "")
+    return arm + ("-cross-file" if cross_file else "")
+
+
+ARMS = ("baseline",) + tuple(
+    context_arm(native=native, cross_file=cross_file, mode=mode)
+    for mode in HELPER_MODES[1:] for cross_file in (False, True) for native in (False, True)
+)
+NATIVE_ARMS = {arm for arm in ARMS if "-native" in arm}
 
 
 @dataclass(frozen=True)
@@ -29,6 +41,11 @@ class ContextConfig:
     max_import_chars: int = 256_000
     max_fact_candidates: int = 24
     max_prompt_chars: int = 100_000
+    max_helper_proof_chars: int = 12_000
+    max_total_helper_proof_chars: int = 32_000
+    max_helper_support_chars: int = 40_000
+    source_context_chars: int = SOURCE_CONTEXT_CHARS
+    isabelle_context_chars: int = ISABELLE_CONTEXT_CHARS
     cross_file: bool = False
     source_load_manifest: str = DEFAULT_LOAD_MANIFEST
     max_load_depth: int = 8
@@ -50,6 +67,11 @@ class ContextConfig:
             "max_import_chars": (256, 1_000_000),
             "max_fact_candidates": (1, MAX_INSPECT_FACTS),
             "max_prompt_chars": (256, 1_000_000),
+            "max_helper_proof_chars": (0, 1_000_000),
+            "max_total_helper_proof_chars": (0, 1_000_000),
+            "max_helper_support_chars": (0, 1_000_000),
+            "source_context_chars": (256, 1_000_000),
+            "isabelle_context_chars": (256, 1_000_000),
             "max_load_depth": (1, 32),
             "max_load_files": (1, 64),
             "max_load_directives": (1, 512),

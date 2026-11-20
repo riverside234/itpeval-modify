@@ -38,6 +38,7 @@ hol_light_to_isabelle/
 - [Babel Formal instructions](babel_formal_pipeline/README.md)
 - [Hundred Theorems instructions](hundred_theorems_pipeline/README.md)
 - [Most-match instructions](most_match_pipeline/README.md) — 353 candidates, bounded model context, parallel native verification
+- [Context retrieval and source helper proof experiments for all three datasets](context_helpers/README.md)
 
 Babel and Hundred Theorems use the same oracle/context, model-content, sampling, resume,
 verification, and native/PISA completion contracts. Hundred Theorems frontends reuse the
@@ -103,3 +104,49 @@ selects 65 representative contexts. `--dataset both` retains the original
 Babel/Hundred cohort. Native DSP runners, Prove commands and lab preflights accept
 `--workers 1..60`, `--threads-per-worker` and `--memory-per-worker-gb`; see the
 [most-match parallel execution notes](most_match_pipeline/README.md#parallel-execution).
+
+## Include Isabelle helper proofs in the model context
+
+Pass `--isabelle-reference-proofs` to the dataset's extractor. It adds the
+complete proof bodies of matching earlier Isabelle lemmas to the reference
+context used by Draft and Sketch. Most-match also retrieves proofs from
+available imported snapshots within its `--isabelle-context-chars` cap.
+When a complete proof does not fit or its declaration cannot be matched,
+the extractor can keep the masked statement. The selected theorem and later
+proofs from its theory are excluded. HOL Light references, the Isabelle
+oracle, and the verifier template follow the original masked-context policy.
+
+Use any row from this table for a one-theorem test.
+
+| Dataset package | Topic | Target key |
+|---|---|---|
+| `babel_formal_pipeline` | `circle_average` | `circleAverage_center_independent` |
+| `hundred_theorems_pipeline` | `015_the_fundamental_theorem_of_integral_calculus` | `rsum_bound` |
+| `most_match_pipeline` | `Canonical_Models` | `compact_canon_qfree` |
+
+```bash
+cd /data/not_backed_up/yxu209/itpeval-modify
+DATASET=most_match_pipeline
+TOPIC=Canonical_Models
+TARGET=compact_canon_qfree
+PIPE="eval.pipeline.hol_light_to_isabelle.${DATASET}"
+CFG=eval/configs/hol_light_to_isabelle/v2_dsp_most_match_2026.example.json
+RUN="eval/results/hol_light_to_isabelle_v2/isabelle-reference-proofs/${DATASET}"
+
+python -m "$PIPE.extract_hol_light" --expected-root "$PWD" \
+  --topic "$TOPIC" --target-key "$TARGET" --isabelle-reference-proofs \
+  --output "$RUN/records.jsonl"
+
+python -m "$PIPE.v2_dsp.run" --expected-root "$PWD" --config "$CFG" \
+  --records "$RUN/records.jsonl" --samples 1 --dry-run
+```
+
+For Babel Formal or Hundred Theorems, use your usual Isabelle2026 config.
+Drop `--dry-run` on the lab to run Sketch and Prove. To use the Draft route,
+pass the same records to `generate_draft --input`, then use the generated Drafts
+as input to the saved-Draft runner. The most-match recursive context workflow
+also accepts these records. The mode is recorded in
+`metadata.isabelle_reference_proofs`, along with the count and provenance of
+the included proofs. Omitting the flag on extraction gives the masked default.
+Opt-in extraction, Draft, and native DSP use `isabelle-reference-proofs` in
+their default output paths.

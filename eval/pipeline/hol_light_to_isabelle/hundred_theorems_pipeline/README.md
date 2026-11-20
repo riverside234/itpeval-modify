@@ -14,7 +14,7 @@ then feed either the ITPEval baseline or the DSP baseline.
 
 Use the aligned `eval/data/proofs.json` and `eval/data/stmts.json` records
 whose source is `hundred-theorems`. Only HOL Light completed proofs are read.
-Completed Isabelle proofs are excluded from the loader.
+The [optional reference proof mode](../README.md#include-isabelle-helper-proofs-in-the-model-context) uses aligned earlier Isabelle proofs in model prompts. The default reference context is masked.
 
 The current aligned inputs contain **58 file groups**. The default inventory
 finds **99 unique case-insensitive name matches in 13 file groups**. These
@@ -295,3 +295,6 @@ The shared full preflight extracts fresh contexts when `--input` is omitted.
 Bertrand contexts require the pinned AFP companion `bertrand.ML`; the native loader
 stages it automatically from `session_roots` without importing the target theory.
 See the [native review](../babel_formal_pipeline/v2_dsp/PROVER_REVIEW.md).
+
+The [context workflow](../context_helpers/README.md) compares full references with
+bounded dependency retrieval and optional native Isabelle fact inspection.

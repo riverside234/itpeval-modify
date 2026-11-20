@@ -55,6 +55,9 @@ gpt-6.1-terra, and high reasoning effort. Draft generation retains medium
 reasoning effort. Only visible content is stored; final records omit prompt
 text and thinking. Prompt previews print prompts only in dry-run mode.
 
+On extraction, [`--isabelle-reference-proofs`](../README.md#include-isabelle-helper-proofs-in-the-model-context)
+includes matching earlier Isabelle proofs in the model context.
+
 ## v2-itpeval
 
 Use an installed Isabelle2024 under the normal ITPEval prefix. Set
@@ -123,3 +126,6 @@ be checked again. Preflight reports and logs are Git-trackable.
 Run offline regressions with `python -m unittest discover -s tests/hol_light_to_isabelle`.
 Transport tests use explicit fakes; actual ML/prover/dependency validation requires
 running the consolidated preflight on the Linux lab computer.
+
+The [context workflow](../context_helpers/README.md) compares full references with
+bounded dependency retrieval and optional native Isabelle fact inspection.

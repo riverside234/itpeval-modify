@@ -3,6 +3,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from ..isabelle_references import REFERENCE_NOTE, REFERENCE_TITLE, proof_context
+
 
 DRAFT_PROMPT_VERSION = "babel_formal_v2_hol_light_to_isabelle_p3"
 
@@ -40,12 +42,15 @@ def _section(title: str, content: str) -> str:
 def build_draft_prompt(record: dict, *, dataset_label: str = "Babel Formal",
                        version: str = DRAFT_PROMPT_VERSION, isabelle_context: str | None = None,
                        partial_context: bool = False) -> Prompt:
+    reference = proof_context(record)
+    if reference is not None:
+        isabelle_context = reference
     prefix = record.get("isabelle_proof_prefix") or ""
     user = "\n\n".join([
         f"TARGET: {dataset_label} topic {record['topic']}, theorem {record['target_key']}.",
         _section("EXACT ORACLE ISABELLE DECLARATION (goal and hypotheses)",
                  _required(record, "isabelle_statement")),
-        _section("PROOF-MASKED ISABELLE CONTEXT BEFORE TARGET",
+        _section(REFERENCE_TITLE if reference is not None else "PROOF-MASKED ISABELLE CONTEXT BEFORE TARGET",
                  isabelle_context if isabelle_context is not None else _required(record, "isabelle_context_before_target")),
         _section("ISABELLE PROOF PREFIX ALREADY PRESENT (if any)",
                  prefix if prefix else "(none)"),
@@ -119,6 +124,11 @@ def build_draft_prompt(record: dict, *, dataset_label: str = "Babel Formal",
     ])
     if partial_context:
         user = user.replace("Use the full proof-masked source file", "Use the retrieved proof-masked source excerpts")
+    if reference is not None:
+        user = user.replace(
+            "Earlier masked Isabelle helper statements are available background facts; their sorry placeholders provide no proof details.",
+            "Earlier named Isabelle facts provide background for the target.", 1)
+        user += "\n\n" + REFERENCE_NOTE
     return Prompt(SYSTEM_PROMPT, user, version)
 
 

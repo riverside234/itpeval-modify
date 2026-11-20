@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import Prompt, _required
+from ...isabelle_references import REFERENCE_NOTE, REFERENCE_TITLE, proof_context
 
 
 SKETCH_PROMPT_VERSION = "babel_formal_dsp_isabelle2026_draft_p8"
@@ -121,10 +122,14 @@ def build_sketch_prompt(record: dict, *, isabelle_context: str | None = None,
     statement = _required(record, "formal_statement")
     if statement != _required(record, "isabelle_statement"):
         raise ValueError("formal_statement must be the unchanged oracle")
+    reference = proof_context(record)
+    if reference is not None:
+        isabelle_context = reference
+    title = REFERENCE_TITLE if reference is not None else "AVAILABLE ISABELLE CONTEXT BEFORE TARGET"
     prefix = record.get("isabelle_proof_prefix") or "(none)"
     user = "\n\n".join([
         f"TARGET: {record['topic']}/{record['isabelle_target_name']}",
-        "AVAILABLE ISABELLE CONTEXT BEFORE TARGET\n~~~isabelle\n"
+        title + "\n~~~isabelle\n"
         + (isabelle_context if isabelle_context is not None else _required(record, "isabelle_context_before_target")) + "\n~~~",
         "EXACT ORACLE DECLARATION\n~~~isabelle\n" + statement + "\n~~~",
         "PROOF PREFIX ALREADY PRESENT (continue after it; do not repeat)\n~~~isabelle\n"
@@ -142,4 +147,6 @@ def build_sketch_prompt(record: dict, *, isabelle_context: str | None = None,
         "instead of copying the name into Isabelle.",
         ISABELLE_PROOF_REQUIREMENTS,
     ])
+    if reference is not None:
+        user += "\n\n" + REFERENCE_NOTE
     return Prompt(SYSTEM_PROMPT, user, SKETCH_PROMPT_VERSION)

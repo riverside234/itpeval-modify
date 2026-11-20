@@ -1,4 +1,4 @@
-"""Rank candidates from masked Isabelle snapshots and resolve a bounded shortlist."""
+"""Rank Isabelle reference candidates and resolve a bounded shortlist."""
 
 from dataclasses import replace
 from pathlib import Path
@@ -6,8 +6,13 @@ import re
 
 from ..babel_formal_pipeline.theory_context import validate_context
 from ..babel_formal_pipeline.v2_dsp.native_search import FACT_NAME, forbidden_fact_names
-from ..most_match_pipeline.common import repo_path, sha256
-from ..most_match_pipeline.context import IDENTIFIER, identifiers, imported_references, isabelle_snippets
+from ..babel_formal_pipeline.common import repo_path, sha256
+from ..most_match_pipeline.common import SOURCE as MOST_MATCH_SOURCE
+from ..isabelle_references import (ReferenceProofs, aligned_isabelle_proof, has_reference_proofs,
+                                   proof_context, snapshot_references)
+from .datasets import aligned_topic
+from ..most_match_pipeline.context import (IDENTIFIER, identifiers, imported_references, isabelle_snippets,
+                                          with_reference_proof)
 from .selection import Selection
 
 
@@ -19,11 +24,25 @@ VOCABULARY_KINDS = {"definition", "abbreviation", "fun", "primrec", "datatype", 
 def candidates(record, hints, helper_symbols, config, *, dataset_root):
     context = validate_context(record)
     local, scopes = isabelle_snippets(context.prefix, active_only=True)
-    snapshot = repo_path(dataset_root).parent
+    dataset = repo_path(dataset_root)
+    snapshot = dataset.parent
+    proof_sources = None
+    if has_reference_proofs(record):
+        proof_context(record)
+        if record["source"] == MOST_MATCH_SOURCE:
+            path = dataset / "stmts" / "isabelle" / (record["topic"] + ".thy")
+            references = snapshot_references(path, context.prefix, target_name=record["isabelle_target_name"],
+                                             target_statement=context.statement)
+        else:
+            full, origin = aligned_isabelle_proof(aligned_topic(record))
+            references = ReferenceProofs(full, origin, masked_theory=context.theory_name,
+                                         target_name=record["isabelle_target_name"], target_statement=context.statement)
+        proof_sources = {"": references}
     imported, import_info = imported_references(
         context.prefix, snapshot / "afp" / "stmts" / "isabelle",
         extra_roots=(snapshot / "hol" / "stmts" / "isabelle",),
-        max_files=config.max_import_files, max_chars=config.max_import_chars)
+        max_files=config.max_import_files, max_chars=config.max_import_chars,
+        proof_sources=proof_sources, target_name=record["isabelle_target_name"])
     blocked = set(forbidden_fact_names(context))
     direct = identifiers(record["hol_light_proof"])
     main = identifiers(context.statement + "\n" + record["hol_light_statement"])
@@ -60,10 +79,10 @@ def candidates(record, hints, helper_symbols, config, *, dataset_root):
             shortlist.setdefault(requested, (item, named, score))
             if len(shortlist) >= config.max_fact_candidates:
                 break
-    return ranked, scopes, shortlist, import_info
+    return ranked, scopes, shortlist, import_info, proof_sources
 
 
-def select_target(ranked, scopes, shortlist, imports, *, budget, inspection=None):
+def select_target(ranked, scopes, shortlist, imports, *, budget, inspection=None, proof_sources=None):
     selection = Selection(budget, scopes)
     inspected = {fact["requested"]: fact for fact in inspection["facts"]} if inspection is not None else {}
     vocabulary = [item for _, item, _, _ in ranked if item.kind in VOCABULARY_KINDS]
@@ -92,16 +111,27 @@ def select_target(ranked, scopes, shortlist, imports, *, budget, inspection=None
             candidate = replace(item, name=name, kind="signature", text=text)
         else:
             candidate = item
+        example = with_reference_proof(item, proof_sources)
+        if status == "resolved" and example.proof_example is not None:
+            example = replace(candidate, proof_example=example.proof_example,
+                              text=candidate.text + "\n(* Proof example from the Isabelle snapshot. *)\n"
+                              + example.proof_example.body)
         if source_name:
-            candidate = replace(candidate, text=f"(* Candidate name match to HOL Light {source_name}. *)\n"
-                                                 + candidate.text)
+            label = f"(* Candidate name match to HOL Light {source_name}. *)\n"
+            candidate = replace(candidate, text=label + candidate.text)
+            if example.proof_example is not None:
+                example = replace(example, text=label + example.text)
         # Isabelle symbol escapes (e.g. \<And>) are syntax, not references to
         # same-spelled constructors in a snapshot.
         needed = set(IDENTIFIER.findall(re.sub(r"\\<[^>]+>", " ", candidate.text)))
         required = [entry for entry in vocabulary if entry.name in needed
                     and (entry.origin or not item.origin and entry.start < item.start)]
         visible.append(candidate)
-        if selection.add([*required, candidate]) or selection.add_optional(candidate):
+        with_proof = example.proof_example is not None and (
+            selection.add([*required, example]) or selection.add([example]))
+        if with_proof or selection.add([*required, candidate]) or selection.add_optional(candidate):
+            if with_proof:
+                detail["reference_proof"] = example.proof_example.metadata
             requested_vocabulary[requested] = required
             added_names.add(name)
             detail["selection"] = "selected"

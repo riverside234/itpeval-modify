@@ -15,7 +15,7 @@ from ..preflight_storage import ReportStorage, excerpt, write_json, write_bytes
 from ..common import fingerprint, key, latest_records, repo_path, validate_layout
 from .acceptance import (FIXTURE, PreparedNative, dataset_cases, proof_cases, run_fixture, run_proof_case)
 from .checker import CHECKER_VERSION, Checker
-from .native_search import NativeFailure, NativeSearch, resolve_imports
+from .native_search import NativeFailure, NativeSearch, inherits_core_set, resolve_imports
 from .parallel import (add_parallel_arguments, parallel_options, plan_parallel, completed_jobs, prepare_dependencies)
 from ..theory_context import validate_context
 from .runtime import DspConfig, NATIVE_DIR, hash_file
@@ -120,7 +120,7 @@ def dependency_plan(records, config):
         topic["targets"].append(row["target_key"])
         # This is a known incompatibility, never an exclusion or a successful check.
         # The native ancestor check remains the authoritative gate for every target.
-        if config.base_session == "HOL" and context.theory_name == "Set":
+        if inherits_core_set(config, context.theory_name):
             inherited.append(key(row))
     return {"required_afp_sessions": sorted(required), "session_roots": list(config.session_roots),
             "known_inherited_targets": inherited, "topics": topics,

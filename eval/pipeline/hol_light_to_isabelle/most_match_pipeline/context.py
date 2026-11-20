@@ -1,4 +1,4 @@
-"""Deterministic, proof-masked retrieval with hard character budgets.
+"""Deterministic reference retrieval with hard character budgets.
 
 Selected declarations are whole snippets, never byte/character slices of commands.
 This is a prompt view, not the Isabelle theory used by the checker.
@@ -12,6 +12,7 @@ import re
 from .common import sha256, repo_path
 from ..hundred_theorems_pipeline.hol_syntax import tokens as hol_tokens, phrases
 from ..babel_formal_pipeline.isabelle_syntax import tokens as isa_tokens, OUTER_COMMANDS
+from ..isabelle_references import ProofExample, snapshot_references
 
 CONTEXT_VERSION = "most_match_retrieval_v2"
 DEPENDENCY_CONTEXT_VERSION = "most_match_dependency_context_v1"
@@ -30,6 +31,7 @@ class Snippet:
     end: int
     text: str
     origin: str = ""
+    proof_example: ProofExample | None = None
 
 
 @lru_cache(maxsize=32768)
@@ -124,11 +126,12 @@ def theory_header(text):
     return name, [t.text.strip('"') for t in items[start:end]]
 
 
-def imported_references(prefix, root, *, extra_roots=(), max_files=None, max_chars=None):
+def imported_references(prefix, root, *, extra_roots=(), max_files=None, max_chars=None,
+                        proof_sources=None, target_name=None):
     """Follow explicit imports available in the supplied masked snapshots.
 
-    No target theory, sibling search, external installation or proof file is read.
-    Additional snapshot roots and scan limits are for the context experiment.
+    Proof examples are optional and come from the exact paired snapshot of an
+    eligible theory. The selected theory and unrelated siblings stay excluded.
     """
     from ..hundred_theorems_pipeline.masking import mask_isabelle_reference
     target, imports = theory_header(prefix)
@@ -173,6 +176,11 @@ def imported_references(prefix, root, *, extra_roots=(), max_files=None, max_cha
         parts.extend(replace(part, origin=origin) for part in declarations)
         sources.append({'theory':name,'path':origin,'raw_sha256':sha256(raw),
                         'masked_sha256':sha256(masked),'imports':parents})
+        if proof_sources is not None:
+            refs = snapshot_references(path, masked, target_name=target_name)
+            if refs is not None:
+                proof_sources[origin] = refs
+            sources[-1]["reference_proofs_status"] = refs.status if refs is not None else "missing_proof_snapshot"
         pending.extend(parents)
     metadata = {"sources": sources, "unresolved_imports": sorted(set(missing))}
     if skipped:
@@ -185,7 +193,23 @@ def render_snippet(snippet):
     return f"(* {snippet.kind} {snippet.name}; source chars {snippet.start}:{snippet.end}{origin} *)\n{snippet.text}"
 
 
-def retrieve(snippets, *, query, budget, mandatory=()):
+def with_reference_proof(snippet, sources):
+    refs = sources.get(snippet.origin) if sources is not None else None
+    if refs is None or snippet.kind not in {"lemma", "theorem", "corollary", "proposition"}:
+        return snippet
+    text, examples = refs.restore(snippet.text)
+    return replace(snippet, text=text, proof_example=examples[0]) if len(examples) == 1 else snippet
+
+
+def snippet_proof_metadata(snippet):
+    return {"reference_proof": snippet.proof_example.metadata} if snippet.proof_example is not None else {}
+
+
+def selected_reference_proofs(info):
+    return [item["reference_proof"] for item in info["selected_snippets"] if "reference_proof" in item]
+
+
+def retrieve(snippets, *, query, budget, mandatory=(), proof_sources=None):
     if isinstance(budget, bool) or not isinstance(budget, int) or budget < 256:
         raise ValueError("context budgets must be integer character counts >= 256")
     query_ids = identifiers(query)
@@ -201,7 +225,7 @@ def retrieve(snippets, *, query, budget, mandatory=()):
         priority = 200 if named and snippet.kind in {"lemma", "theorem", "corollary", "proposition"} else 100 if named else 0
         return priority + overlap + (2 if snippet.kind == "definition" and overlap else 0)
     chosen, used = {}, 0
-    def add(snippet, required=False):
+    def add(snippet, required=False, proof_source=None):
         nonlocal used
         if (snippet.origin, snippet.start, snippet.end) in chosen:
             return True
@@ -210,17 +234,20 @@ def retrieve(snippets, *, query, budget, mandatory=()):
             if required:
                 raise ValueError("mandatory target statement/active scope exceeds context budget; increase the cap")
             return False
-        chosen[(snippet.origin, snippet.start, snippet.end)] = snippet
+        chosen[(snippet.origin, snippet.start, snippet.end)] = (snippet, score(proof_source or snippet))
         used += size
         return True
     for snippet in mandatory:
         add(snippet, True)
     ranked = sorted(snippets, key=lambda s: (-score(s), -s.start, s.name))
     for snippet in ranked:
-        if score(snippet) > 0:
+        if score(snippet) <= 0:
+            continue
+        example = with_reference_proof(snippet, proof_sources)
+        if not add(example, proof_source=snippet) and example is not snippet:
             add(snippet)
-    ordered = sorted(chosen.values(), key=lambda s: (s.origin, s.start, s.end))
-    text = "\n\n".join(render_snippet(s) for s in ordered)
+    ordered = [chosen[key] for key in sorted(chosen)]
+    text = "\n\n".join(render_snippet(s) for s, _ in ordered)
     if not text:
         text = "(* No relevant reference declarations fit the context selection. *)"
     if len(text) > budget:
@@ -228,11 +255,12 @@ def retrieve(snippets, *, query, budget, mandatory=()):
     return text, {"budget_chars": budget, "selected_chars": len(text), "sha256": sha256(text),
                   "candidate_snippets": len(snippets), "selected_snippets": [
                       {"name": s.name, "kind": s.kind, "span": [s.start, s.end], "origin": s.origin,
-                       "sha256": sha256(s.text), "score": score(s)} for s in ordered],
-                  "omitted_snippets": len(set(snippets) - set(ordered))}
+                       "sha256": sha256(s.text), "score": rank, **snippet_proof_metadata(s)} for s, rank in ordered],
+                  "omitted_snippets": sum((s.origin, s.start, s.end) not in chosen for s in set(snippets))}
 
 
-def build_contexts(source, target, isa, *, import_root=None, source_chars=SOURCE_CONTEXT_CHARS, isabelle_chars=ISABELLE_CONTEXT_CHARS):
+def build_contexts(source, target, isa, *, import_root=None, source_chars=SOURCE_CONTEXT_CHARS,
+                   isabelle_chars=ISABELLE_CONTEXT_CHARS, proof_sources=None):
     source_parts = source_snippets(source.statement_text)
     chosen = [part for part in source_parts if part.name == target.name]
     if len(chosen) != 1:
@@ -242,20 +270,26 @@ def build_contexts(source, target, isa, *, import_root=None, source_chars=SOURCE
     hol, hol_meta = retrieve(source_parts, query=target.statement + "\n" + target.proof,
                              budget=source_chars, mandatory=chosen)
     parts, scopes = isabelle_snippets(isa.context_before_target)
-    imported, import_meta = imported_references(isa.context_before_target, import_root) if import_root else ([], {})
+    imported, import_meta = imported_references(isa.context_before_target, import_root,
+        proof_sources=proof_sources, target_name=isa.name) if import_root else ([], {})
     reference, isa_meta = retrieve(parts + imported, query=isa.statement + "\n" + target.statement + "\n" + target.proof,
-                                   budget=isabelle_chars, mandatory=scopes)
+                                   budget=isabelle_chars, mandatory=scopes, proof_sources=proof_sources)
     isa_meta["imported_context"] = import_meta
     return hol, reference, {"version": CONTEXT_VERSION, "unit": "characters",
                             "hol_light": hol_meta, "isabelle": isa_meta,
-                            "policy": "earlier_and_imported_masked_statements; active_isabelle_scopes; complete_selected_proof",
+                            "policy": ("earlier_and_imported_reference_proofs" if proof_sources is not None else
+                                       "earlier_and_imported_masked_statements; active_isabelle_scopes; complete_selected_proof"),
                             "verification_context": "full_original_masked_prefix"}
+
+
+def has_dependency_context(record):
+    return record.get("metadata", {}).get("prompt_context", {}).get("version") == DEPENDENCY_CONTEXT_VERSION
 
 
 def validate_prompt_context(record):
     metadata = record.get("metadata", {}).get("prompt_context", {})
     if metadata.get("version") not in {CONTEXT_VERSION, LEGACY_CONTEXT_VERSION, DEPENDENCY_CONTEXT_VERSION}:
-        raise ValueError("missing/current most-match retrieval metadata; re-extract records")
+        raise ValueError("missing or unsupported retrieval metadata; re-extract records")
     for name, field in (("hol_light", "hol_light_reference_context"), ("isabelle", "isabelle_prompt_context")):
         text = record.get(field)
         info = metadata.get(name, {})

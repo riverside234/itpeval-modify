@@ -22,6 +22,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.v2_dsp.sketch_pro
 )
 from eval.pipeline.proof_transfer.llm import call_draft_model, resolve_model_config
 from eval.pipeline.inference.client import visible_text
+from ...context_helpers.prompts import direct_prompt_version
 
 
 DEFAULT_OUTPUT = native_output_path(None, results_dir=RESULTS_DIR, filename="sketches.jsonl", mode="draft")
@@ -78,12 +79,10 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text("", encoding="utf-8")
     previous = read_jsonl(output_path) if resume and output.is_file() else []
-    completed = {row.get("sketch_fingerprint"): row for row in previous
-                 if row.get("pipeline") == "v2-dsp" and row.get("isabelle_sketch")
-                 and not row.get("sketch_error") and row.get("sketch_prompt_version") == version
-                 and row.get("sketch_validator_version") == SKETCH_VALIDATOR_VERSION}
-    latest_sample = {(key(row), row["sample_idx"]): row.get("sketch_fingerprint")
-                     for row in previous}
+    completed = {(row.get("sketch_fingerprint"), row.get("sketch_prompt_version")): row
+                 for row in previous if row.get("pipeline") == "v2-dsp" and row.get("isabelle_sketch")
+                 and not row.get("sketch_error") and row.get("sketch_validator_version") == SKETCH_VALIDATOR_VERSION}
+    latest_sample = {(key(row), row["sample_idx"]): row for row in previous}
     written = 0
     for raw_record in records:
         from .export_dsp import export_record
@@ -107,6 +106,7 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
             if not continue_on_error:
                 raise
             metadata, prompt, digest, input_error = {}, None, "", str(exc)
+        sample_version = direct_prompt_version(record, version)
         for sample_idx in range(samples):
             identity = fingerprint({
                 **envelope(sketch_source), "target": key(record),
@@ -115,14 +115,16 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
                 "sketch_validator_version": SKETCH_VALIDATOR_VERSION,
                 "draft_provenance": draft_provenance(record) if sketch_source == "draft" else None,
             })
-            if not input_error and identity in completed:
-                if latest_sample.get((key(record), sample_idx)) != identity:
-                    append_jsonl(output_path, public_record(completed[identity]))
-                    latest_sample[(key(record), sample_idx)] = identity
+            generation = (identity, sample_version)
+            if not input_error and generation in completed:
+                saved = completed[generation]
+                if latest_sample.get((key(record), sample_idx)) is not saved:
+                    append_jsonl(output_path, public_record(saved))
+                    latest_sample[(key(record), sample_idx)] = saved
                 continue
             result = {**clean_record(record, sketch_source), **metadata, **envelope(sketch_source),
                       "sample_idx": sample_idx, "sketch_fingerprint": identity,
-                      "sketch_prompt_version": version,
+                      "sketch_prompt_version": sample_version,
                       "sketch_validator_version": SKETCH_VALIDATOR_VERSION,
                       "sketch_prompt_sha256": digest, "sketch_model": config.to_metadata(),
                       "sketch_generated_at": datetime.now(timezone.utc).isoformat()}
@@ -148,10 +150,11 @@ def generate_sketches(*, input_path: str = DEFAULT_INPUT, output_path: str | Non
                 # the completed API call's usage so failed samples remain counted.
                 result.setdefault("sketch_response", getattr(exc, "metadata", {}))
                 result["sketch_error"] = f"{type(exc).__name__}: {exc}"
-                result["failure_category"] = input_category if input_error else "sketch_error"
+                result["failure_category"] = (input_category if input_error else
+                                              getattr(exc, "metadata", {}).get("failure_category", "sketch_error"))
             result["sketch_duration_seconds"] = round(time.monotonic() - started, 3)
             append_jsonl(output_path, result)
-            latest_sample[(key(record), sample_idx)] = identity
+            latest_sample[(key(record), sample_idx)] = result
             written += 1
             print(f"DSP sketch {record['topic']}/{record['target_key']} sample={sample_idx}")
     return written

@@ -14,6 +14,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.prompt import (
     DRAFT_PROMPT_VERSION, build_draft_prompt, normalize_visible_content,
 )
 from eval.pipeline.inference.config import output_path_for_profile
+from ..isabelle_references import reference_default
 from eval.pipeline.proof_transfer.llm import (
     DEFAULT_DRAFT_MODEL, DEFAULT_REASONING_EFFORT, DraftModelConfig, call_draft_model, resolve_model_config,
 )
@@ -41,7 +42,7 @@ def generate_drafts(*, input_path: str = DEFAULT_INPUT, output_path: str | None 
         llm_config, model=model, reasoning_effort=reasoning_effort,
         max_output_tokens=max_output_tokens, default_effort="medium",
         dry_run=dry_run)
-    output_path = output_path_for_profile(output_path, default_output, config)
+    output_path = output_path_for_profile(output_path, reference_default(default_output, records), config)
     if dry_run:
         prompt = builder(records[0])
         print(json.dumps({
@@ -109,6 +110,7 @@ def generate_drafts(*, input_path: str = DEFAULT_INPUT, output_path: str | None 
             completed[completed_key] = result
         written += 1
         print(f"[{index}/{len(records)}] draft {record['topic']}/{record['target_key']}")
+    print(f"Wrote {written} new Draft records to {output}")
     return written
 
 
@@ -131,7 +133,7 @@ def main(*, legacy: bool = False, default_input: str = DEFAULT_INPUT,
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     validate_layout(args.expected_root)
-    written = generate_drafts(
+    generate_drafts(
         input_path=args.input, output_path=args.output, topic=args.topic,
         target_key=args.target_key, limit=args.limit, model=args.model,
         reasoning_effort=args.reasoning_effort, max_output_tokens=args.max_output_tokens,
@@ -139,8 +141,7 @@ def main(*, legacy: bool = False, default_input: str = DEFAULT_INPUT,
         dry_run=args.dry_run, prompt_builder=prompt_builder,
         prompt_version=prompt_version, expected_source=expected_source,
         llm_config=args.llm_config, default_output=default_output)
-    if not args.dry_run:
-        print(f"Wrote {written} new Draft records to {repo_path(output_path_for_profile(args.output, default_output, resolve_model_config(args.llm_config, dry_run=True)))}")
+
 
 
 if __name__ == "__main__":

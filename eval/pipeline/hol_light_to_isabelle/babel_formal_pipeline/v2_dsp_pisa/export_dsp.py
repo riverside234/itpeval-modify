@@ -31,7 +31,7 @@ def export_inputs(*, input_path: str, output_path: str | None = None, sketch_sou
     records = load_inputs(input_path, mode=sketch_source, topic=topic, target_key=target_key, limit=limit)
     require_source(records, expected_source)
     destination = pisa_output_path(output_path, results_dir=results_dir,
-                                           filename="inputs.jsonl", mode=sketch_source)
+                                           filename="inputs.jsonl", mode=sketch_source, records=records)
     if repo_path(input_path) == repo_path(destination):
         raise ValueError("source input and DSP export must be distinct")
     if not records:

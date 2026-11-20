@@ -12,6 +12,7 @@ from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.isabelle_syntax i
 
 
 from eval.pipeline.hol_light_to_isabelle.babel_formal_pipeline.isabelle_syntax import Token, tokens
+from ..isabelle_references import proof_context
 
 
 FORBIDDEN = {
@@ -126,6 +127,10 @@ def input_metadata(record: dict) -> dict:
         raise ValueError("a successful saved mathematical Draft is required")
     context = validate_context(record)
     result = {**context.metadata, "draft_sha256": sha256(draft)}
+    reference = proof_context(record)
+    if reference is not None:
+        result["draft_context_policy"] = "isabelle_reference_proofs"
+        result["isabelle_prompt_context_sha256"] = sha256(reference)
     for name in ("draft_sha256", "context_sha256", "statement_sha256", "template_sha256"):
         if record.get(name) and record[name] != result[name]:
             raise ValueError("stale saved input: " + name)

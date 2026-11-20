@@ -140,7 +140,7 @@ def token_budget(config: InferenceConfig, messages: list[dict]) -> dict:
     metadata = {"prompt_tokens":count,"max_output_tokens":config.max_output_tokens,"context_limit":limit}
     if count+config.max_output_tokens > limit:
         raise InferenceError("prompt plus output budget exceeds the configured context limit",
-                             metadata={"token_budget":metadata})
+                             metadata={"token_budget":metadata,"failure_category":"prompt_context_overflow"})
     return metadata
 
 
@@ -173,6 +173,9 @@ def generate_text(*, system_prompt: str, user_prompt: str, config: InferenceConf
             status_code = getattr(exc,"status_code",None)
             if isinstance(status_code,int):
                 metadata["status_code"] = status_code
+            if getattr(exc,"code",None) in ("context_length_exceeded","context_window_exceeded"):
+                metadata["failure_category"] = "prompt_context_overflow"
+                raise InferenceError("API prompt exceeds the configured context limit",metadata=metadata) from None
             raise InferenceError("API request failed: "+type(exc).__name__,metadata=metadata) from None
         status = _field(response,"status")
         metadata = {"backend":"api","response_id":_field(response,"id"),

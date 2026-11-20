@@ -61,6 +61,19 @@ class ClientTests(unittest.TestCase):
         self.assertNotIn("SECRET_KEY",str(failure.exception))
         self.assertEqual("RuntimeError",failure.exception.metadata["error_type"])
 
+    def test_api_context_limit_is_classified_without_echoing_provider_body(self):
+        client, factory = self.api(None)
+        error = RuntimeError("PROVIDER_BODY")
+        error.code = "context_length_exceeded"
+        error.status_code = 400
+        client.responses.create.side_effect = error
+        with patch.dict("sys.modules", {"openai": SimpleNamespace(OpenAI=factory)}), patch.dict(
+                os.environ, {"OPENAI_API_KEY": "test-key"}):
+            with self.assertRaisesRegex(InferenceError, "context limit") as failure:
+                generate_text(system_prompt="s", user_prompt="u", config=InferenceConfig())
+        self.assertEqual("prompt_context_overflow", failure.exception.metadata["failure_category"])
+        self.assertNotIn("PROVIDER_BODY", str(failure.exception))
+
     def test_api_incomplete_response_cannot_be_saved_as_success(self):
         response = {"status":"incomplete","output_text":"partial proof","usage":{"output_tokens":128}}
         client,factory = self.api(response)
@@ -114,6 +127,7 @@ class ClientTests(unittest.TestCase):
             with self.assertRaisesRegex(InferenceError,"exceeds") as failure:
                 generate_text(system_prompt="s",user_prompt="u",config=resolve_config(state["profile_path"]))
             self.assertEqual(65500,failure.exception.metadata["token_budget"]["prompt_tokens"])
+            self.assertEqual("prompt_context_overflow", failure.exception.metadata["failure_category"])
             self.assertFalse([url for url,_ in state["calls"] if url.endswith("/chat/completions")])
 
     def test_wrong_server_model_or_version_is_rejected(self):

@@ -15,13 +15,16 @@ from .inventory import inventory_topic
 from .manifest import MANIFEST, Target, targets_for_topic
 from .masking import MASKING_VERSION
 
+from ..isabelle_references import add_argument, reference_output
+
 DEFAULT_OUTPUT = RESULTS_DIR + "/hundred_theorems_v2_records.jsonl"
 
 
-def build_record(topic, target: Target, *, proofs=None, masked=None) -> dict:
+def build_record(topic, target: Target, *, proofs=None, masked=None, isabelle_reference_proofs=False) -> dict:
     proofs = proofs if proofs is not None else inventory_hol_declarations(topic.hol_light_proof_content,masked=False)
     masked = masked if masked is not None else inventory_hol_declarations(topic.hol_light_stmt_content,masked=True)
-    record = _build_record(topic,target,proofs=proofs,masked=masked)
+    record = _build_record(topic, target, proofs=proofs, masked=masked,
+                           isabelle_reference_proofs=isabelle_reference_proofs)
     _,source,target_input = raw_inputs(topic.theorem_id)
     record["metadata"].update({
         "raw_hol_light_stmt_sha256":sha256(source["content"]),
@@ -36,7 +39,7 @@ def build_record(topic, target: Target, *, proofs=None, masked=None) -> dict:
 def extract_records(*, topic: str | None = None, theorem_id: int | None = None,
                     target_key: str | None = None, verified_only: bool = False,
                     manifest_path: str | Path = MANIFEST, continue_on_error: bool = True,
-                    report: dict | None = None) -> list[dict]:
+                    report: dict | None = None, isabelle_reference_proofs: bool = False) -> list[dict]:
     topics = [(tid,title) for tid,title in list_topics()
               if (topic is None or title == topic) and (theorem_id is None or tid == theorem_id)]
     if not topics:
@@ -59,7 +62,8 @@ def extract_records(*, topic: str | None = None, theorem_id: int | None = None,
             masked = inventory_hol_declarations(aligned.hol_light_stmt_content,masked=True)
             for target in targets:
                 try:
-                    result.append(build_record(aligned,target,proofs=proofs,masked=masked))
+                    result.append(build_record(aligned, target, proofs=proofs, masked=masked,
+                                               isabelle_reference_proofs=isabelle_reference_proofs))
                     row["extracted_count"] += 1
                 except (ValueError,KeyError) as exc:
                     if not continue_on_error:
@@ -91,7 +95,8 @@ def main() -> None:
     parser.add_argument("--verified-only",action="store_true")
     parser.add_argument("--manifest",default=str(MANIFEST))
     parser.add_argument("--fail-fast",action="store_true")
-    parser.add_argument("--output",default=DEFAULT_OUTPUT)
+    add_argument(parser)
+    parser.add_argument("--output")
     parser.add_argument("--report",help="Defaults to <output>.coverage.json.")
     args = parser.parse_args()
     validate_layout(args.expected_root)
@@ -99,12 +104,15 @@ def main() -> None:
         parser.error("choose --all-topics or --topic/--id")
     if args.all_targets == bool(args.target_key):
         parser.error("choose --all-targets or --target-key")
+    default = reference_output(DEFAULT_OUTPUT) if args.isabelle_reference_proofs else DEFAULT_OUTPUT
+    args.output = args.output or default
     report = {}
     records = None
     try:
         records = extract_records(topic=args.topic,theorem_id=args.id,target_key=args.target_key,
                                   verified_only=args.verified_only,manifest_path=args.manifest,
-                                  continue_on_error=not args.fail_fast,report=report)
+                                  continue_on_error=not args.fail_fast, report=report,
+                                  isabelle_reference_proofs=args.isabelle_reference_proofs)
     finally:
         path = repo_path(args.report or (args.output+".coverage.json"))
         if path == repo_path(args.output):

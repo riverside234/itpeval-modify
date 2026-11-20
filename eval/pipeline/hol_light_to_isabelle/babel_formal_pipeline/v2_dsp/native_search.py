@@ -40,6 +40,10 @@ AUXILIARY_SOURCES = {
 }
 
 
+def inherits_core_set(config: DspConfig, theory_name: str) -> bool:
+    return config.base_session == "HOL" and theory_name == "Set"
+
+
 def forbidden_fact_names(context) -> list[str]:
     """Keep target checks strict; a later basename can name a valid earlier helper.
 

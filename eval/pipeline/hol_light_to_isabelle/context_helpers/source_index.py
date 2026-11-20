@@ -1,4 +1,4 @@
-"""Index explicit references in a pinned most-match HOL Light source file."""
+"""Index explicit HOL Light references from pinned dataset inputs."""
 
 from __future__ import annotations
 
@@ -10,9 +10,11 @@ from pathlib import Path, PurePosixPath
 
 from ..hundred_theorems_pipeline.hol_syntax import phrases, prove_call, tokens
 from ..most_match_pipeline.aligned_data import TOPICS
-from ..most_match_pipeline.common import DATASET_ROOT, fingerprint, repo_path, sha256
+from ..babel_formal_pipeline.common import fingerprint, repo_path, sha256
+from ..most_match_pipeline.common import DATASET_ROOT, SOURCE as MOST_MATCH_SOURCE
 from ..most_match_pipeline.context import source_snippets
 from .contracts import ContextConfig, SelectionFailure
+from .datasets import aligned_topic
 
 DEFINITION_CALLS = {"new_definition", "new_recursive_definition", "define"}
 LOAD_CALLS = {"needs", "loadt", "loads"}
@@ -124,7 +126,7 @@ def _index_files(proof_text, masked_text, config):
     return SourceIndex(proof_text, config), source_snippets(masked_text)
 
 
-def load_source(record, config, *, dataset_root=DATASET_ROOT):
+def _read_most_match(record, config, dataset_root):
     metadata = record["metadata"]
     root = repo_path(dataset_root)
     proof_path = repo_path(PurePosixPath(metadata["hol_light_proof_path"].replace("\\", "/")))
@@ -137,12 +139,39 @@ def load_source(record, config, *, dataset_root=DATASET_ROOT):
     statement_sha = metadata["raw_hol_light_stmt_sha256"]
     proof_text = read_pinned_source(proof_path, config.max_source_chars, proof_sha)
     masked_text = read_pinned_source(statement_path, config.max_source_chars, statement_sha)
+    repo = repo_path(".")
+    return (proof_text, masked_text, proof_path.relative_to(repo).as_posix(),
+            statement_path.relative_to(repo).as_posix(), proof_sha, statement_sha)
+
+
+def _read_aligned(record, config):
+    topic = aligned_topic(record)
+    metadata = record["metadata"]
+    hashes = {
+        "hol_light_proof_sha256": topic.hol_light_proof_sha256,
+        "hol_light_stmt_sha256": topic.hol_light_stmt_sha256,
+        "isabelle_stmt_sha256": topic.isabelle_stmt_sha256,
+    }
+    if (any(metadata.get(name) != value for name, value in hashes.items())
+            or record["hol_light_reference_context"] != topic.hol_light_stmt_content
+            or record["isabelle_theory_template"] != topic.isabelle_stmt_content):
+        raise SelectionFailure("source_snapshot_mismatch", "aligned input differs from dataset snapshot; re-extract records")
+    if len(topic.hol_light_stmt_content) > config.max_source_chars:
+        raise SelectionFailure("source_scan_limit", "masked HOL Light source exceeds max_source_chars")
+    identity = f"{topic.source}:{topic.theorem_id}:hol-light"
+    return (topic.hol_light_proof_content, topic.hol_light_stmt_content, f"eval/data/proofs.json:{identity}",
+            f"eval/data/stmts.json:{identity}", topic.hol_light_proof_sha256, topic.hol_light_stmt_sha256)
+
+
+def load_source(record, config, *, dataset_root=DATASET_ROOT):
+    source = (_read_most_match(record, config, dataset_root) if record["source"] == MOST_MATCH_SOURCE
+              else _read_aligned(record, config))
+    proof_text, masked_text, proof_path, statement_path, proof_sha, statement_sha = source
     index, snippets = _index_files(proof_text, masked_text, config)
     name = record["hol_light_target_name"]
-    start, end = metadata["hol_light_declaration_span"]
+    start, end = record["metadata"]["hol_light_declaration_span"]
     binding = index.preceding(name, start + 1)
     if (binding is None or binding.kind != "theorem" or (binding.start, binding.end) != (start, end)
             or binding.statement != record["hol_light_statement"] or binding.proof != record["hol_light_proof"]):
         raise SelectionFailure("source_snapshot_mismatch", "selected proof does not match its pinned declaration")
-    return SourceView(index, binding, proof_path.relative_to(repo_path(".")).as_posix(),
-                      statement_path.relative_to(repo_path(".")).as_posix(), proof_sha, statement_sha, snippets)
+    return SourceView(index, binding, proof_path, statement_path, proof_sha, statement_sha, snippets)
